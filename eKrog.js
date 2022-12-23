@@ -35,8 +35,10 @@ const cv_maxRadijLevel  = 15
 const cv_minRadijLevel  = -25
 
 var lo_xCircleCenter, lo_yCircleCenter = 100
+var xCircleCenterDefault, yCircleCenterDefault
+var circleCenterDefaultPositionDefined = ""
 var lo_dragEnotskiKrogActive  = ""
-var lo_dragEnotskiKrogAddX = 0, lo_dragEnotskiKrogAddY = 20
+var lo_dragEnotskiKrogAddX = 0, lo_dragEnotskiKrogAddY = 0
 var lo_mouseAboveEnotskiKrogCenter  = ""
 const cv_moveEnotskiKrogMarkerRadij  = 20
 
@@ -215,17 +217,76 @@ function checkGraphTanCot_click() {
     }
 }
 
+
 // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
 // Add the event listeners for mousedown, mousemove, and mouseup
 elMyCanvas.addEventListener('mousedown', (e) => {
     lo_mousedownX = e.offsetX;
     lo_mouseDownY = e.offsetY;
+    lo_mouseDown = true
+    //10.12.2022 v1.0.0.0 Ali hoèe vleèi celotno sliko enotskega kroga?
+    lo_dragEnotskiKrogActive = lo_mouseAboveEnotskiKrogCenter
+    console.log("dragEnotskiKrogActive: " + lo_dragEnotskiKrogActive)
+
+});
+elMyCanvas.addEventListener('mouseup', (e) => {
+    lo_mouseDown = ""
+    //10.12.2022 v1.0.0.0
+    lo_dragEnotskiKrogActive = ""
+    //console.log("dragEnotskiKrogActive: FALSE")
 });
 elMyCanvas.addEventListener('mousemove', (e) => {
-    lo_mouseMoveX = e.offsetX;
-    lo_mouseMoveY = e.offsetY;
+
+    //console.log("mouse_move() enter")
+
+    //Vleèenje okna / enotskega kroga
+    if (lo_mouseDown) {
+        switch (lo_dragEnotskiKrogActive) {
+            case true:
+                //let vl_yCircleCenter = yCircleCenterDefault //pb1.Height / 2
+                //let vl_xCircleCenter = xCircleCenterDefault //vl_yCircleCenter
+                let circleCenterPos = lf_setCircleCenterPos()
+                let vl_xCircleCenter = circleCenterPos[0]
+                let vl_yCircleCenter = circleCenterPos[1]
+                lo_dragEnotskiKrogAddX = e.offsetX - vl_xCircleCenter
+                lo_dragEnotskiKrogAddY = e.offsetY - vl_yCircleCenter
+                paint()
+                return
+            default:
+                //Me.Location = New Point((Me.Location.X - lo_lastMouseLocation.X) + e.X, (Me.Location.Y - lo_lastMouseLocation.Y) + e.Y)
+                //Me.Update()
+                //console.log("mouse_move-drag")
+                //return
+        }
+    }
+
+    //10.12.2022 v1.0.0.0 Je nad središèem enotskega kroga in bo možno vleèenje celotne slike enotskega kroga?
+    lo_mouseAboveEnotskiKrogCenter = ""
+    let diffX = e.offsetX - lo_xCircleCenter
+    let diffY = e.offsetY - lo_yCircleCenter
+    let dist = Math.sqrt(diffX * diffX + diffY * diffY)
+    //console.log("dist=" + dist)
+    //Je miška znotraj kroga doloèenega polmera okoli centra enotskega kroga?
+    if (dist < cv_moveEnotskiKrogMarkerRadij) {
+        //Miška je nekje nad centrom enostkega kroga ...
+        lo_mouseAboveEnotskiKrogCenter = true
+    }
+
+    //Èe se miška v resnici ni premaknila ne naredim niè (že samo prikaz ToolTip-a sprovocira novo generiranje dogodka MouseMove() !!)
+    if (e.offsetX == lo_mouseMoveX && e.offsetY == lo_mouseMoveY) {
+        //console.log("mouse_no_move")
+        return
+    }
+
+    //Miška se je zares premaknila
+    //console.log("mouse_move_beforeExecute")
+    lo_mouseMoveX = e.offsetX
+    lo_mouseMoveY = e.offsetY
+    //console.log(e.offsetX + "-" + e.offsetY)
     paint()
+    //console.log("mouse_move exit")
 });
+
 //window.addEventListener("wheel", event, (passive = true) => {
 window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
@@ -489,9 +550,13 @@ function paint() {
     lo_yCircleCenter = yCircleCenter
        
     paint_author();
+
     //tmpStr = "velikost enotskega kroga spremeniš z vrtenjem kolešèka miške"
     tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke nad krogom"
+    gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 22)
+    tmpStr = "enotski krog lahko pri sredi" + scSchLow + scTchLow  + "u prime" + scSchLow + " z mi" + scSchLow + "ko in ga premakne" + scSchLow 
     gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 8)
+
     paint_eKrog();
 
     if (lo_showTeorija) {
@@ -536,8 +601,14 @@ function paint_eKrog() {
     if (vl_outPart < 30) { vl_outPart = 30 }
     radij = ctxH / 2 - vl_outPart
     if (radij < 10) { radij = 10 }
-    xCircleCenter = 70 + radij
-    yCircleCenter = ctxH - 100 - radij
+    //xCircleCenter = 70 + radij
+    //yCircleCenter = ctxH - 100 - radij
+    let circleCenterPos = lf_setCircleCenterPos()
+    xCircleCenter = circleCenterPos[0]; yCircleCenter = circleCenterPos[1]
+    xCircleCenter += lo_dragEnotskiKrogAddX
+    yCircleCenter += lo_dragEnotskiKrogAddY
+    lo_xCircleCenter = xCircleCenter
+    lo_yCircleCenter = yCircleCenter
     let xCircleLeft = xCircleCenter - radij
     let xCircleRight = xCircleCenter + radij
     let yCircleTop = yCircleCenter - radij
@@ -555,6 +626,11 @@ function paint_eKrog() {
     // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/ellipse
     gEllipse(xCircleCenter, yCircleCenter, radij, radij, 0, "white", 1, "darkslateGray")
     //console.log("xCircleCenter=" + xCircleCenter + ", yCircleCenter=" + yCircleCenter + ", radij=" + radij )
+
+    ////==== MARKER V SREDIŠÈU KROŽNICE ZA PREMIKANJE ENOTSKEGA KROGA PO OKNU SEM IN TJA ...  10.12.2022 v1.0.0.0
+    if (lo_mouseAboveEnotskiKrogCenter || lo_dragEnotskiKrogActive) {
+        gEllipse(xCircleCenter, yCircleCenter, cv_moveEnotskiKrogMarkerRadij, cv_moveEnotskiKrogMarkerRadij, 0, "#64B89680", 2, "#64B896A0")
+    }
 
     //==== MARKERJI NA KROŽNICI ZA ZNAÈILNE KOTE
     checkBox = document.querySelector('#checkShowZnacilniKoti');
@@ -817,6 +893,12 @@ function paint_eKrog() {
             break
     }
 
+}
+
+function lf_setCircleCenterPos() {
+    let x = 70 + radij
+    let y = ctxH - 100 - radij
+    return [x, y]
 }
 
 function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_function, vp_alpha, vp_alphaDeg, vp_alphaStrRad, vp_showZnacilniKoti, vp_znacilenKot, vp_alpha2, vp_alpha2Deg, vp_alpha2StrRad) { 
