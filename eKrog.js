@@ -20,6 +20,7 @@ var lo_hasRepaintRequest  = ""
 
 var lo_showTanCot  = "1"
 var lo_showZnacilniKoti = "1"
+var lo_showTeorija = ""
 var lo_fullScreen = ""
 var lo_showRulesSupplement  = ""
 var lo_showRulesComplement  = ""
@@ -86,6 +87,9 @@ const scOmega = String.fromCharCode(937)
 const scKoren = String.fromCharCode(0x221A)
 const scStopinj = String.fromCharCode(0xB0)
 const scPI = String.fromCharCode(0xB6)
+const scPower2 = String.fromCharCode(0xB2)
+const scInfinity = String.fromCharCode(0x221E)
+//----
 const scTch = String.fromCharCode(0x10C)
 const scTchLow = String.fromCharCode(0x10D)
 const scSch = String.fromCharCode(0x160)
@@ -132,12 +136,12 @@ function checkFullScreen_click() {
     if (lo_fullScreen) { openFullscreen() } else { closeFullscreen() }
     paint()
 }
-//document.getElementById("checkShowTeorija").addEventListener("click", checkShowTeorija_click);
-//function checkShowTeorija_click() {
-//    if (document.getElementById("checkShowTeorija").checked) { lo_showTeorija = true } else { lo_showTeorija = "" }
-//    //console.log("showTeorija=" + lo_showTeorija)
-//    //paint()
-//}
+document.getElementById("checkShowTeorija").addEventListener("click", checkShowTeorija_click);
+function checkShowTeorija_click() {
+    if (document.getElementById("checkShowTeorija").checked) { lo_showTeorija = true } else { lo_showTeorija = "" }
+    //console.log("showTeorija=" + lo_showTeorija)
+    paint()
+}
 document.getElementById("checkRulesSupplement").addEventListener("click", checkRulesSupplement_click);
 function checkRulesSupplement_click() {
     if (document.getElementById("checkRulesSupplement").checked) { lo_showRulesSupplement = true } else { lo_showRulesSupplement = "" }
@@ -254,6 +258,154 @@ paint();
 // elMainDate.style.top = "1px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
 // elMainDate.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
 
+function lf_paint_pravila(ctx) {
+
+    lf_paint_pravila01(ctx)
+    lf_paint_pravila02(ctx)
+    lf_paint_tabelaKotnihFunkcij(ctx)
+
+}
+
+function lf_paint_pravila01(ctx) {
+
+    let x0, y0, x, y, w, h, d
+    let tmpStr
+
+    x0 = 6; y0 = 110; d=4
+    w = 208; h = 151
+
+    ctx.fillStyle = "#FFFFFFC0"//"#C0C0C020"
+    ctx.fillRect(x0 - d, y0 - d, w + 2 * d, h + 2 * d)
+    ctx.fillStyle = "#C0C0F018"
+    ctx.fillRect(x0, y0, w, h)
+
+    //==== PRAVILA
+    x = 10
+    let vStep = 24
+    y = y0 + 20
+    tmpStr = "180" + scStopinj + " = " + scPI + " rad" //"180° = ¶ rad"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep
+    tmpStr = "1 rad = 180" + scStopinj + "/" + scPI + " = 57,3" + scStopinj //"1 rad = 180°/¶ = 57,3°"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep
+    tmpStr = "sin" + scPower2 + scAlpha + " + cos" + scPower2 + scAlpha + " = 1" //"sin?? + cos?? = 1"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep
+    tmpStr = "tan(" + scAlpha + ") = sin(" + scAlpha + ") / cos(" + scAlpha + ")" //"tan(?) = sin(?) / cos(?)"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep
+    tmpStr = "cot(" + scAlpha + ") = cos(" + scAlpha + ") / sin(" + scAlpha + ")" //"cot(?) = cos(?) / sin(?)"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep
+    tmpStr = "cot(" + scAlpha + ") = 1 / tan(" + scAlpha + ")" //"cot(?) = 1 / tan(?)"
+    gText(tmpStr, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+
+}
+
+function lf_paint_pravila02(ctx) {
+
+    let x0, y0, x, y, w, h, d
+    let tmpStr
+
+    x0 = 6; y0 = 281; d = 4 // 281 = (110+151) + 20 ... prejšnji blok pravil + 20
+    w = 295; h = 440
+
+    ctx.fillStyle = "#FFFFFFC0"//"#C0C0C020"
+    ctx.fillRect(x0 - d, y0 - d, w + 2 * d, h + 2 * d)
+    ctx.fillStyle = "#C0C0F018"
+    ctx.fillRect(x0, y0, w, h)
+       
+    //==== PRAVILA
+    x = 10
+    let vStep = 24
+    y = y0 +20; gText("-------- komplementarni", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(90" + scStopinj + "-" + scAlpha + ") = cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(90" + scStopinj + "-" + scAlpha + ") = sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    //----
+    y += vStep; gText("-------- IV -> I", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(-" + scAlpha + ") = -sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(-" + scAlpha + ") = cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    //----
+    y += vStep; gText("-------- II -> I", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(90" + scStopinj + "+" + scAlpha + ") = sin(90" + scStopinj + "-" + scAlpha + ") = cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(90" + scStopinj + "+" + scAlpha + ") = -cos(90" + scStopinj + "-" + scAlpha + ") = -sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    //----
+    y += vStep; gText("-------- III -> I", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(180" + scStopinj + "+" + scAlpha + ") = -sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(180" + scStopinj + "+" + scAlpha + ") = -cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    //----
+    y += vStep; gText("-------- suplementarni", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(180" + scStopinj + "-" + scAlpha + ") = sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(180" + scStopinj + "-" + scAlpha + ") = -cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    //----
+    y += vStep; gText("-------- periodi" + scTchLow + "nost na 2" +scPI, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("sin(360" + scStopinj + "+" + scAlpha + ") = sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("cos(360" + scStopinj + "+" + scAlpha + ") = cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+}
+
+function lf_paint_tabelaKotnihFunkcij(ctx) {
+
+    let x0, y0, x, y, w, h, d
+    let tmpStr
+
+    x0 = 6; y0 = 731; d = 4 // 731 = (281+440) + 20 ... prejšnji blok pravil + 20
+    w = 343; h = 155
+
+    ctx.fillStyle = "#FFFFFFC0"//"#C0C0C020"
+    ctx.fillRect(x0 - d, y0 - d, w + 2 * d, h + 2 * d)
+    ctx.fillStyle = "#C0C0F018"
+    ctx.fillRect(x0, y0, w, h)
+
+    //==== PRAVILA
+    const vStepAdd = 6
+    const hStep = 70
+    let vStep = 24
+    x = 10
+    y = y0 + 20; gText(scAlpha, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += (vStep + vStepAdd); gText("0" + scStopinj, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("30" + scStopinj, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("45" + scStopinj, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("60" + scStopinj, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("90" + scStopinj, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+
+    gLine(x, y0 + 27, w - 10, y0 + 27, 1, "gray", [])
+    gLine(60, y0+3, 60, y0+h - 8, 1, "gray", [])
+
+    x += hStep
+    y = y0 + 20; gText("sin(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep + vStepAdd; gText("0", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("1/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "2/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("1", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+
+    x += hStep
+    y = y0 + 20; gText("cos(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep + vStepAdd; gText("1", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "2/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("1/2", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("0", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+
+    x += hStep
+    y = y0 + 20; gText("tan(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep + vStepAdd; gText("0", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3/3", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("1", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scInfinity, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+
+    x += hStep
+    y = y0 + 20; gText("cot(" + scAlpha + ")", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep + vStepAdd; gText(scInfinity, myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("1", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText(scKoren + "3/3", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+    y += vStep; gText("0", myFontMathLabelsLargeItalic, "darkSlateGray", x, y)
+}
+
+
 function lf_changeRadij(vp_change) {
 
     //console.log("radijLevel=" + lo_radijLevel)
@@ -338,9 +490,13 @@ function paint() {
        
     paint_author();
     //tmpStr = "velikost enotskega kroga spremeniš z vrtenjem kolešèka miške"
-    tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke"
+    tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke nad krogom"
     gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 8)
     paint_eKrog();
+
+    if (lo_showTeorija) {
+        lf_paint_pravila(ctx)
+    }
 }
 
 function paint_author() {
