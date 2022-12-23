@@ -19,6 +19,20 @@ label {
 .label01 { left: 30px; }
 .label02 { left: 150px; }
 .label03 { left: 280px; }
+/* Safari syntax */
+:-webkit-full-screen {
+  background-color: yellow;
+}
+
+/* IE11 */
+:-ms-fullscreen {
+  background-color: yellow;
+}
+
+/* Standard syntax */
+:fullscreen {
+  background-color: yellow;
+}
 </style>
 </head>
 <body>
@@ -32,6 +46,8 @@ label {
 <label for="checkShowTanCot" class="label01" style="top:17px;"> Prika&#382;i Tan/Cot </label>
 <input type="checkbox" class="check01" id="checkShowZnacilniKoti" name="checkShowZnacilniKoti" value="yes" style="top:35px;">  
 <label for="checkShowZnacilniKoti" class="label01" style="top:37px;"> Zna&#269;ilni koti </label>
+<input type="checkbox" class="check01" id="checkFullScreen" name="checkFullScreen" value="yes" style="top:55px;">  
+<label for="checkFullScreen" class="label01" style="top:57px;"> Celozaslonsko </label>
 <!-- <input type="checkbox" class="check01" id="checkShowTeorija" name="checkShowTeorija" value="yes" style="top:55px;">  -->
 <!-- <label for="checkShowTeorija" class="label01" style="top:57px;"> Teorija </label> -->
 

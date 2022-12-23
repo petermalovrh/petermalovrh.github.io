@@ -19,7 +19,8 @@ var lo_repaintTimerActive  = ""
 var lo_hasRepaintRequest  = ""
 
 var lo_showTanCot  = "1"
-var lo_showZnacilniKoti  = "1"
+var lo_showZnacilniKoti = "1"
+var lo_fullScreen = ""
 var lo_showRulesSupplement  = ""
 var lo_showRulesComplement  = ""
 var lo_showRules3to1  = ""
@@ -55,6 +56,8 @@ var ctxW = window.innerWidth - 18;
 var ctxH = window.innerHeight - 10;
 var ctx = elMyCanvas.getContext("2d");
 const bckgColor = "#F4F8F8";
+
+var elem = document.documentElement; //23.12.2022 https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_fullscreen2
 
 //https://www.w3schools.com/tags/canvas_font.asp
 const myFontMathLabels = "bold 11pt Cambria"
@@ -120,6 +123,13 @@ document.getElementById("checkShowZnacilniKoti").addEventListener("click", check
 function checkShowZnacilniKoti_click() {
     if (document.getElementById("checkShowZnacilniKoti").checked) { lo_showZnacilniKoti = true } else { lo_showZnacilniKoti = "" }
     //console.log("showZnacilniKoti=" + lo_showZnacilniKoti)
+    paint()
+}
+document.getElementById("checkFullScreen").addEventListener("click", checkFullScreen_click);
+function checkFullScreen_click() {
+    if (document.getElementById("checkFullScreen").checked) { lo_fullScreen = true } else { lo_fullScreen = "" }
+    //console.log("showZnacilniKoti=" + lo_showZnacilniKoti)
+    if (lo_fullScreen) { openFullscreen() } else { closeFullscreen() }
     paint()
 }
 //document.getElementById("checkShowTeorija").addEventListener("click", checkShowTeorija_click);
@@ -279,6 +289,20 @@ function resizeCanvas() {
     elMyCanvas.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     elMyCanvas.style.left = "2px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     elMyCanvas.style.top = "2px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+
+    //if (window.innerHeight == screen.height) {
+        // browser is fullscreen
+    //}
+    if ((screen.availHeight || screen.height - 30) <= window.innerHeight) {
+        // browser is almost certainly fullscreen
+    } else {
+        // browser almost certainly isn't in fullscreen
+        if (lo_fullScreen) {
+            lo_fullScreen = ""
+            checkFullScreen.checked = ""
+        }
+    }
+
 }
 
 function paint() {
@@ -1521,6 +1545,26 @@ window.onresize = function (event) {
     resizeCanvas();
     paint();
 };
+
+function openFullscreen() {
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+    }
+}
+
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+    }
+}
 
 function gEllipse(x, y, radiusX, radiusY, rotation, fillColor, strokeWidth, strokeColor) {
     ctx.beginPath();
