@@ -1,3 +1,9 @@
+//------------------------------------
+const gl_versionNr = "v1.8"
+const gl_versionDate = "23.12.2022"
+const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
+//------------------------------------
+
 //var cv_privateFormBorder  = 2
 var lo_backgroundColor = "whiteSmoke"
 //var lo_penFrg1 As Pen = New Pen(Color.DarkSlateGray, 1)
@@ -550,6 +556,7 @@ function paint() {
     lo_yCircleCenter = yCircleCenter
        
     paint_author();
+    paint_version();
 
     //tmpStr = "velikost enotskega kroga spremeniš z vrtenjem kolešèka miške"
     tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke nad krogom"
@@ -581,6 +588,40 @@ function paint_author() {
     let y1 = y0 + wh[1]
     //----
     gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
+}
+
+function paint_version() {
+
+    //======== VERZIJA APLIKACIJE
+    let tmpStr = gl_versionNr
+    let font = "italic bold 14px cambria"
+    let wh = gMeasureText(tmpStr, font);
+    //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
+    let topMargin = 33
+    let rightMargin = 78
+    //----
+    let dd = 5
+    let x1 = ctxW - rightMargin - dd
+    let x0 = x1 - wh[0]
+    let y0 = topMargin + dd
+    let y1 = y0 + wh[1]
+    //----
+    gBannerRectWithText(x0, y0, x1, y1, dd, "lightYellow", 1, "lightGray", font, "darkMagenta", tmpStr, "#D0D0D040", 3, 3)
+
+    //======== DATUM APLIKACIJE
+    tmpStr = gl_versionDate
+    font = "italic bold 12px cambria"
+    wh = gMeasureText(tmpStr, font);
+    //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
+    topMargin = 35
+    rightMargin = 6
+    //----
+    dd = 5
+    x1 = ctxW - rightMargin - dd
+    x0 = x1 - wh[0]
+    y0 = topMargin + dd
+    y1 = y0 + wh[1]
+    gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", "italic 12px cambria", "gray", tmpStr, "", 3, 3)
 }
 
 function paint_eKrog() {
