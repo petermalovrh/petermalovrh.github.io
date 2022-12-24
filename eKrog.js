@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.8"
-const gl_versionDate = "23.12.2022"
+const gl_versionNr = "v1.9"
+const gl_versionDate = "24.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -819,8 +819,6 @@ function paint_eKrog() {
     //var myRgbColor = vl_color.r
     //console.log(myRgbColor)
 
-
-
     //======== TRIKOTNIK SIN/COS/1 V ENOTSKEM KROGU
     lf_paint_eKrog_sinCos(ctx, true, xCircleCenter, yCircleCenter, radij, scAlpha, alpha, alphaDeg, alphaStrDeg, alphaStrRad3, vl_znacilenKot, kvadrant)
 
@@ -894,9 +892,7 @@ function paint_eKrog() {
     //---- TOP
     let vl_graphTop = 50
     //---- LEFT
-    let vl_graphLeft = xCircleRight + 100
-    if (vl_graphLeft < 2 * radij + 100) { vl_graphLeft = 2 * radij + 100 }
-    if (vl_graphLeft < 800) { vl_graphLeft = 800 }
+    let vl_graphLeft = lf_getGraphAreaLeft() //xCircleRight + 100
     //---- WIDTH
     const cv_marginRight = 20
     const cv_graphMidGapH = 60
@@ -936,6 +932,15 @@ function paint_eKrog() {
 
 }
 
+function lf_getGraphAreaLeft() { //xCircleRight + 100
+
+    let vl_graphLeft = lo_xCircleCenter + radij + 100
+    if (vl_graphLeft < 2 * radij + 100) { vl_graphLeft = 2 * radij + 100 }
+    if (vl_graphLeft < 800) { vl_graphLeft = 800 }
+    return vl_graphLeft
+
+}
+
 function lf_setCircleCenterPos() {
     let x = 70 + radij
     let y = ctxH - 100 - radij
@@ -945,6 +950,8 @@ function lf_setCircleCenterPos() {
 function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_function, vp_alpha, vp_alphaDeg, vp_alphaStrRad, vp_showZnacilniKoti, vp_znacilenKot, vp_alpha2, vp_alpha2Deg, vp_alpha2StrRad) { 
 
     //On Error GoTo labErr
+    ctx.fillStyle = "#F5F5F5D0"
+    ctx.fillRect(vp_left-25, vp_top, vp_width+60, vp_height)
 
     let vl_alpha0 = 0
     let vl_maxFunValue = 1
@@ -1745,9 +1752,20 @@ function lf_paint_eKrog_tanCot(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
             tmpWidth = wh[0]; tmpHeight = wh[1];
             hDiff = radij / Math.tan(alpha) / 2
             if (Math.abs(hDiff) > 0.9 * radij) { hDiff = 0.9 * radij * (Math.tan(alpha) / Math.abs(Math.tan(alpha))) }
+            //let graphAreaLeft = lf_getGraphAreaLeft()
+            //console.log("graphAreaLeft=" + graphAreaLeft)
+            //let kTmp
             if (kvadrant == 1 || kvadrant == 2) {
                 xPointCtg = xCircleCenter + radij / Math.tan(alpha)
                 yPointCtg = yCircleTop - 1
+                //if (xPointCtg > graphAreaLeft) {
+                    //kTmp = (graphAreaLeft - xCircleCenter) / (xPointCtg - xCircleCenter)
+                    //gLine(xCircleCenter, yCircleTop - 1, graphAreaLeft, yCircleTop - 1 , 5, "goldenrod", [])
+                    //gLine(graphAreaLeft, yCircleTop - 1, xPointCtg, yCircleTop - 1, 25, "#05F5F5C0", [])
+                    //gLine(graphAreaLeft, yCircleTop - 1, xPointCtg, yCircleTop - 1, 5, "goldenrod", [])
+                //} else {
+                    //gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, "goldenrod", [])
+                //}
                 gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, "goldenrod", [])
                 x = xCircleCenter + hDiff - tmpWidth / 2
                 y = yCircleTop - tmpHeight - 3
@@ -1763,8 +1781,6 @@ function lf_paint_eKrog_tanCot(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
             }
         }
     }
-
-
 
 }
 
