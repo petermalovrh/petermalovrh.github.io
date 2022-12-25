@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.9"
-const gl_versionDate = "24.12.2022"
+const gl_versionNr = "v1.10"
+const gl_versionDate = "25.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -104,6 +104,39 @@ const scSch = String.fromCharCode(0x160)
 const scSchLow = String.fromCharCode(0x161)
 const scZh = String.fromCharCode(0x17D)
 const scZLow = String.fromCharCode(0x17E)
+
+//---- 25.12.2022 na enem mestu zberem uporabljene fiziène barve
+const cv_color_blue = "#0000FF"
+const cv_color_dodgerBlue = "#1E90FF"
+const cv_color_green = "#008000"
+const cv_color_seaGreen = "#2E8B57"
+const cv_color_salmon = "#FA8072"
+const cv_color_darkKhaki = "#BDB76B"
+const cv_color_mediumAquamarine = "#66CDAA"
+const cv_color_mediumOrchid = "#BA55D3"
+const cv_color_plum = "#DDA0DD"
+const cv_color_goldenrod = "#DAA520"
+const cv_color_wheat = "#F5DEB3"
+//---- 25.12.2022 na enem mestu zbrane funkcionalne barve
+const myColorSin = cv_color_blue + "FF"
+const myColorSinLight = cv_color_dodgerBlue + "FF"
+const myColorCos = cv_color_green + "FF"
+const myColorCosLight = cv_color_seaGreen + "FF"
+const myColorTan = cv_color_mediumOrchid + "FF"
+const myColorTanLight = cv_color_plum + "FF"
+const myColorCot = cv_color_goldenrod + "FF"
+const myColorCotLight = cv_color_wheat + "FF"
+const myColorAlphaEKrog = cv_color_salmon + "40"
+const myColorAlphaGraph = cv_color_salmon + "60"
+const myColorAlpha2eKrog = cv_color_mediumAquamarine + "40" //cv_color_darkKhaki + "40"
+const myColorAlpha2graph = cv_color_mediumAquamarine + "60" //cv_color_darkKhaki + "60"
+
+//---- 25.12.2022 iz neta snel funkcije za ugotavljanje komponent barve iz imena barve (https://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes)
+var cvsConvertColors = document.createElement('canvas');
+cvsConvertColors.height = 1;
+cvsConvertColors.width = 1;
+var ctxConvertColors = cvsConvertColors.getContext('2d');
+ctxConvertColors.willReadFrequently = true
 
 //======== SET CHECKBOXES STATES
 var checkBox 
@@ -312,6 +345,14 @@ window.addEventListener("wheel", event => {
     //y = 0;
     //isDrawing = false;
 //});
+
+//let zzzg = colorToHexRGB("plum")
+//zzzg = colorToHexRGBA("plum")
+//console.log(colorToHexRGB("plum"))
+console.log("plum=" + colorToHexRGBA("plum") + " plum(hexG)=" + colorHexG("plum") + " plum(decG)=" + colorDecG("plum"))
+console.log("plum=" + colorToHexRGBA("plum") + " plum(hexA)=" + colorHexA("plum") + " plum(decA)=" + colorDecA("plum"))
+console.log("colorFromARGB(32, 128, 64, 255)=" + colorFromARGB(32, 128, 64, 255))
+console.log("gf_alphaColor(20, darkOrchid)=" + gf_alphaColor(20, "darkOrchid"))
 
 resizeCanvas();
 paint();
@@ -606,7 +647,7 @@ function paint_version() {
     let y0 = topMargin + dd
     let y1 = y0 + wh[1]
     //----
-    gBannerRectWithText(x0, y0, x1, y1, dd, "lightYellow", 1, "lightGray", font, "darkMagenta", tmpStr, "#D0D0D040", 3, 3)
+    gBannerRectWithText(x0, y0, x1, y1, dd, "#FFF800B0", 1, "lightGray", font, "blue", tmpStr, "#D0D0D040", 3, 3)
 
     //======== DATUM APLIKACIJE
     tmpStr = gl_versionDate
@@ -947,11 +988,18 @@ function lf_setCircleCenterPos() {
     return [x, y]
 }
 
-function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_function, vp_alpha, vp_alphaDeg, vp_alphaStrRad, vp_showZnacilniKoti, vp_znacilenKot, vp_alpha2, vp_alpha2Deg, vp_alpha2StrRad) { 
+function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_function, vp_alpha, vp_alphaDeg, vp_alphaStrRad, vp_showZnacilniKoti, vp_znacilenKot, vp_alpha2, vp_alpha2Deg, vp_alpha2StrRad) {
 
     //On Error GoTo labErr
-    ctx.fillStyle = "#F5F5F5D0"
-    ctx.fillRect(vp_left-25, vp_top, vp_width+60, vp_height)
+
+    // èe se je COT() od enotskega kroga narisal daleè na desno v podroèje teh krivulj, potem tisto, kar je pod krivuljami, posivim
+    if (vp_alpha <= Math.PI / 4 || vp_alpha > 7 * Math.PI / 4) {
+        ctx.fillStyle = "#F5F5F5D0"
+        ctx.fillRect(vp_left - 25, vp_top, vp_width + 60, vp_height)
+        //console.log("posivljeno")
+    } else {
+        //console.log("ni posivljeno")
+    }
 
     let vl_alpha0 = 0
     let vl_maxFunValue = 1
@@ -987,25 +1035,25 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
     //======== IZPIS FUNKCIJE
     switch (vp_function) {
         case cv_fun_sin: //SINUS
-            gText("SIN(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, "blue", vp_left - 25, vp_top - 27)
+            gText("SIN(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, myColorSin, vp_left - 25, vp_top - 27)
             break
         case cv_fun_cos: //COSINUS
-            gText("COS(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, "green", vp_left - 25, vp_top - 27)
+            gText("COS(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, myColorCos, vp_left - 25, vp_top - 27)
             break
         case cv_fun_tan: //TANGENS
-            gText("TAN(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, "mediumOrchid", vp_left - 25, vp_top - 27)
+            gText("TAN(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, myColorTan, vp_left - 25, vp_top - 27)
             break
         case cv_fun_cot: //KOTANGENS
-            gText("COT(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, "goldenrod", vp_left - 25, vp_top - 27)
+            gText("COT(" + scAlpha + ")", myFontMathLabelsLargeBoldItalic, myColorCot, vp_left - 25, vp_top - 27)
             break
     }
 
     //======== KOT ALFA NA X OSI
-    let vl_color = "#FA807260" //gf_alphaColor(96, Color.Salmon)
+    let vl_color = myColorAlphaGraph
     x = vl_xYos + vl_xDataRange * vp_alpha / 2 / Math.PI
     gLine(vl_xYos, vl_yXos, x, vl_yXos, 9, vl_color, [])
     if (vp_alpha2 != vp_alpha) {
-        vl_color = "#BD876860" //gf_alphaColor(96, Color.DarkKhaki)
+        vl_color = myColorAlpha2graph
         x = vl_xYos + vl_xDataRange * vp_alpha2 / 2 / Math.PI
         gLine(vl_xYos, vl_yXos + 3, x, vl_yXos + 3, 9, vl_color, [])
     }
@@ -1188,9 +1236,8 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
         if (yData >= 0) {
             gText(vp_alpha.toFixed(3), myFontMathValuesSmall, "darkSlateGray", x - 15, vl_yXos + 14)
         } else {
-            gText(vp_alpha.toFixed(3), myFontMathValuesSmall, "darkSlateGray", x - 15, vl_yXos - 3)
+            gText(vp_alpha.toFixed(3), myFontMathValuesSmall, "darkSlateGray", x - 15, vl_yXos - 6)
         }
-
     }
 
     //==== OZNAÈEN SINUS/COSINUS ZA PRIMER KAKŠNEGA DODATNO VKLOPLJENEGA PRIKAZA PRAVILA
@@ -1241,28 +1288,28 @@ function lf_paint_graph_single_markFunValue(ctx, vp_xDataRange, vp_xYos, vp_yXos
     let tmpColor = "darkSlateGray"
     switch (vp_function) {
         case cv_fun_sin: //SINUS
-            gLine(vp_xYos - 2, y, x + 2, y, 1, "dodgerBlue", [2, 5])
-            gLine(x, vp_yXos, x, y, 7, "blue", [])
-            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, "dodgerBlue", [])
-            tmpColor = "blue"
+            gLine(vp_xYos - 2, y, x + 2, y, 1, myColorSinLight, [2, 5])
+            gLine(x, vp_yXos, x, y, 7, myColorSin, [])
+            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, myColorSinLight, [])
+            tmpColor = myColorSin
             break
         case cv_fun_cos: //COSINUS
-            gLine(vp_xYos - 2, y, x + 2, y, 1, "seaGreen", [2, 5])
-            gLine(x, vp_yXos, x, y, 7, "green", [])
-            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, "seaGreen", [])
-            tmpColor = "green"
+            gLine(vp_xYos - 2, y, x + 2, y, 1, myColorCosLight, [2, 5])
+            gLine(x, vp_yXos, x, y, 7, myColorCos, [])
+            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, myColorCosLight, [])
+            tmpColor = myColorCos
             break
         case cv_fun_tan: //TANGENS
-            gLine(vp_xYos - 2, y, x + 2, y, 1, "plum", [2, 5])
-            gLine(x, vp_yXos, x, y, 7, "mediumOrchid", [])
-            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, "plum", [])
-            tmpColor = "mediumOrchid"
+            gLine(vp_xYos - 2, y, x + 2, y, 1, myColorTanLight, [2, 5])
+            gLine(x, vp_yXos, x, y, 7, myColorTan, [])
+            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, myColorTanLight, [])
+            tmpColor = myColorTan
             break
         case cv_fun_cot: //KOTANGENS
-            gLine(vp_xYos - 2, y, x + 2, y, 1, "wheat", [2, 5])
-            gLine(x, vp_yXos, x, y, 7, "goldenrod", [])
-            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, "wheat", [])
-            tmpColor = "goldenrod"
+            gLine(vp_xYos - 2, y, x + 2, y, 1, myColorCotLight, [2, 5])
+            gLine(x, vp_yXos, x, y, 7, myColorCot, [])
+            gLine(vp_xYos, vp_yXos, vp_xYos, y, 2, myColorCotLight, [])
+            tmpColor = myColorCot
             break
     }
     if (yData >= 0) {
@@ -1445,7 +1492,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     }
 
     //======== PIZZA SLICE ZA KOT
-    if (vp_basicChart) { vl_color = "#FA807240" } else { vl_color = "#BD876B40" }
+    if (vp_basicChart) { vl_color = myColorAlphaEKrog } else { vl_color = myColorAlpha2eKrog } //lightSalmon ali darkKhaki
     let radijKot = 0.45 * radij
     if (radijKot > 120) { radijKot = 120 }
     if ((radijKot > 40) && (!vp_basicChart)) { radijKot -= 30 }
@@ -1520,11 +1567,11 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     }
 
     //======== POUDARJENA SINUS IN COSINUS KRAKA TRIKOTNIKA
-    gLine(xCircleCenter, yCircleCenter, xPointOnCircle, yCircleCenter, 5, "green", [])
-    gLine(xCircleCenter, yPointOnCircle, xPointOnCircle, yPointOnCircle, 1, "lightGray", [])
+    gLine(xCircleCenter, yCircleCenter, xPointOnCircle, yCircleCenter, 5, myColorCos, [])
+    gLine(xCircleCenter, yPointOnCircle, xPointOnCircle, yPointOnCircle, 1, myColorCosLight, [3, 3])
     //----
-    gLine(xCircleCenter, yCircleCenter, xCircleCenter, yPointOnCircle, 2, "blue", [])
-    gLine(xPointOnCircle, yCircleCenter, xPointOnCircle, yPointOnCircle, 5, "blue", [])
+    gLine(xCircleCenter, yCircleCenter, xCircleCenter, yPointOnCircle, 2, myColorSin, [])
+    gLine(xPointOnCircle, yCircleCenter, xPointOnCircle, yPointOnCircle, 5, myColorSin, [])
 
     //======== Z DEBELO RDEÈO PIKO POUDAREK, DA SMO NA ZNAÈILNEM KOTU 0, 30, 45, 60 ali 90 STOPINJ, SICER NAVADEN SIV KROGEC
     if (vl_znacilenKot) {
@@ -1576,17 +1623,17 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     wh2 = gMeasureText(tmpValueStr, "normal 10pt cambria");
     tmpWidth2 = wh2[0]; tmpHeight2 = wh2[1]; 
     if (kvadrant == 1 || kvadrant == 4) {
-        gText(tmpStr, myFontMathLabels, "blue", x + 4, y - 6)
-        gText("= " + tmpValueStr, myFontMathValues, "blue", x + 4, y + 11)
+        gText(tmpStr, myFontMathLabels, myColorSin, x + 4, y - 6)
+        gText("= " + tmpValueStr, myFontMathValues, myColorSin, x + 4, y + 11)
         if (vp_basicChart) {
-            gText(tmpValueStr, myFontMathValuesSmall, "blue", xCircleCenter - tmpWidth2 - 3, yPointOnCircle - tmpHeight2 / 2)
+            gText(tmpValueStr, myFontMathValuesSmall, myColorSin, xCircleCenter - tmpWidth2 - 3, yPointOnCircle - tmpHeight2 / 2)
         }
     }
     else {
-        gText(tmpStr, myFontMathLabels, "blue", x - 3 - tmpWidth, y - 8)
-        gText("= " + tmpValueStr, myFontMathValues, "blue", x - 3 - tmpWidth - 6, y + 9)
+        gText(tmpStr, myFontMathLabels, myColorSin, x - 3 - tmpWidth, y - 8)
+        gText("= " + tmpValueStr, myFontMathValues, myColorSin, x - 3 - tmpWidth - 6, y + 9)
         if (vp_basicChart) {
-            gText(tmpValueStr, myFontMathValuesSmall, "blue", xCircleCenter + 3, yPointOnCircle - tmpHeight2 / 2)
+            gText(tmpValueStr, myFontMathValuesSmall, myColorSin, xCircleCenter + 3, yPointOnCircle - tmpHeight2 / 2)
         }
     }
     //----
@@ -1618,13 +1665,13 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     wh2 = gMeasureText(tmpValueStr, myFontMathValuesSmall);
     tmpWidth2 = wh2[0]; tmpHeight2 = wh2[1]; 
     if (kvadrant == 1 || kvadrant == 2) {
-        gText(tmpStr, myFontMathLabels, "green", x - tmpWidth / 2, y + 17)
-        gText("= " + tmpValueStr, myFontMathValues, "green", x - tmpWidth / 2, y + 34)
-        gText(tmpValueStr, myFontMathValuesSmall, "green", xPointOnCircle - tmpWidth2 / 2, yCircleCenter + 15)
+        gText(tmpStr, myFontMathLabels, myColorCos, x - tmpWidth / 2, y + 17)
+        gText("= " + tmpValueStr, myFontMathValues, myColorCos, x - tmpWidth / 2, y + 34)
+        gText(tmpValueStr, myFontMathValuesSmall, myColorCos, xPointOnCircle - tmpWidth2 / 2, yCircleCenter + 15)
     }
     else {
-        gText(tmpStr, myFontMathLabels, "green", x - tmpWidth / 2, y - 3 - tmpHeight)
-        gText(tmpValueStr, myFontMathValuesSmall, "green", xPointOnCircle - tmpWidth2 / 2, yCircleCenter - tmpHeight2 )
+        gText(tmpStr, myFontMathLabels, myColorCos, x - tmpWidth / 2, y - 3 - tmpHeight)
+        gText(tmpValueStr, myFontMathValuesSmall, myColorCos, xPointOnCircle - tmpWidth2 / 2, yCircleCenter - tmpHeight2 )
     }
 
 
@@ -1697,18 +1744,18 @@ function lf_paint_eKrog_tanCot(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
             if (kvadrant == 1 || kvadrant == 4) {
                 xPointTan = xCircleRight + 1
                 yPointTan = yCircleCenter - radij * Math.tan(alpha)
-                gLine(xCircleRight + 1, yCircleCenter, xPointTan, yPointTan, 5, "mediumOrchid", [])
+                gLine(xCircleRight + 1, yCircleCenter, xPointTan, yPointTan, 5, myColorTan, [])
                 y = yCircleCenter - vDiff
-                gText(tmpStr, myFontMathLabels, "mediumOrchid", xPointTan + 7, y - 7)
-                gText(tmpValueStr, myFontMathValues, "mediumOrchid", xPointTan + 7, y + 10)
+                gText(tmpStr, myFontMathLabels, myColorTan, xPointTan + 7, y - 7)
+                gText(tmpValueStr, myFontMathValues, myColorTan, xPointTan + 7, y + 10)
             }
             else {
                 xPointTan = xCircleLeft
                 yPointTan = yCircleCenter + radij * Math.tan(alpha)
-                gLine(xCircleLeft, yCircleCenter, xPointTan, yPointTan, 5, "mediumOrchid", [])
+                gLine(xCircleLeft, yCircleCenter, xPointTan, yPointTan, 5, myColorTan, [])
                 y = yCircleCenter + vDiff
-                gText(tmpStr, myFontMathLabels, "mediumOrchid", xPointTan - tmpWidth - 7, y - 7)
-                gText(tmpValueStr, myFontMathValues, "mediumOrchid", xPointTan - tmpWidth2 - 11, y + 10)
+                gText(tmpStr, myFontMathLabels, myColorTan, xPointTan - tmpWidth - 7, y - 7)
+                gText(tmpValueStr, myFontMathValues, myColorTan, xPointTan - tmpWidth2 - 11, y + 10)
             }
         }
     }
@@ -1760,24 +1807,24 @@ function lf_paint_eKrog_tanCot(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
                 yPointCtg = yCircleTop - 1
                 //if (xPointCtg > graphAreaLeft) {
                     //kTmp = (graphAreaLeft - xCircleCenter) / (xPointCtg - xCircleCenter)
-                    //gLine(xCircleCenter, yCircleTop - 1, graphAreaLeft, yCircleTop - 1 , 5, "goldenrod", [])
+                    //gLine(xCircleCenter, yCircleTop - 1, graphAreaLeft, yCircleTop - 1 , 5, myColorCot, [])
                     //gLine(graphAreaLeft, yCircleTop - 1, xPointCtg, yCircleTop - 1, 25, "#05F5F5C0", [])
-                    //gLine(graphAreaLeft, yCircleTop - 1, xPointCtg, yCircleTop - 1, 5, "goldenrod", [])
+                    //gLine(graphAreaLeft, yCircleTop - 1, xPointCtg, yCircleTop - 1, 5, myColorCot, [])
                 //} else {
-                    //gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, "goldenrod", [])
+                    //gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, myColorCot, [])
                 //}
-                gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, "goldenrod", [])
+                gLine(xCircleCenter, yCircleTop - 1, xPointCtg, yPointCtg, 5, myColorCot, [])
                 x = xCircleCenter + hDiff - tmpWidth / 2
                 y = yCircleTop - tmpHeight - 3
-                gText(tmpStr, myFontMathLabels, "goldenrod", x, y+2)
+                gText(tmpStr, myFontMathLabels, myColorCot, x, y+2)
             }
             else {
                 xPointCtg = xCircleCenter - radij / Math.tan(alpha)
                 yPointCtg = yCircleBottom + 1
-                gLine(xCircleCenter, yCircleBottom + 1, xPointCtg, yPointCtg, 5, "goldenrod", [])
+                gLine(xCircleCenter, yCircleBottom + 1, xPointCtg, yPointCtg, 5, myColorCot, [])
                 x = xCircleCenter - hDiff - tmpWidth / 2
                 y = yCircleBottom + 4
-                gText(tmpStr, myFontMathLabels, "goldenrod", x, y+15)
+                gText(tmpStr, myFontMathLabels, myColorCot, x, y+15)
             }
         }
     }
@@ -1785,13 +1832,7 @@ function lf_paint_eKrog_tanCot(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
 }
 
 function gf_alphaColor(vp_alpha, vp_color) {
-
-    //R: parseInt(this.substring(0, 2), 16),
-    //G : parseInt(this.substring(2, 4), 16),
-    //B : parseInt(this.substring(4, 6), 16),
-
-        //Return Color.FromArgb(vp_alpha, vp_color.R, vp_color.G, vp_color.B)
-
+    return colorToHexRGB(vp_color) + byteToHex(vp_alpha)
 }
 
 
@@ -1860,6 +1901,83 @@ function closeFullscreen() {
         document.msExitFullscreen();
     }
 }
+
+function colorToRGBA(color) {
+    //https://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
+    // Returns the color as an array of [r, g, b, a] -- all range from 0 - 255
+    // colorToRGBA('red')  -> [255, 0, 0, 255]
+    // colorToRGBA('#f00') -> [255, 0, 0, 255]
+    ctxConvertColors.fillStyle = color;
+    ctxConvertColors.fillRect(0, 0, 1, 1);
+    return ctxConvertColors.getImageData(0, 0, 1, 1).data;
+}
+
+function byteToHex(num) {
+    // Turns a number (0-255) into a 2-character hex number (00-FF)
+    return ('0' + num.toString(16)).slice(-2).toUpperCase();
+}
+
+function colorToHexRGB(color) {
+    //https://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
+    // Convert any CSS color to a hex representation
+    // colorToHexRGB('red')            # '#FF0000'
+    // colorToHexRGB('rgb(255, 0, 0)') # '#FF0000'
+    let rgba = colorToRGBA(color);
+    let hex = [0, 1, 2].map(function (idx) { return byteToHex(rgba[idx]); }).join('');
+    //console.log("color=" + color + " -> rgba=" + rgba + " -> " + ("#" + hex))
+    return "#" + hex;
+}
+
+function colorToHexRGBA(color) {
+    //https://stackoverflow.com/questions/1573053/javascript-function-to-convert-color-names-to-hex-codes
+    // Convert any CSS color to a hex representation
+    // colorToHexRGB('red')            # '#FF0000'
+    // colorToHexRGB('rgb(255, 0, 0)') # '#FF0000'
+    let rgba = colorToRGBA(color);
+    let hex = [0, 1, 2, 3].map( function (idx) { return byteToHex(rgba[idx]); }).join('');
+    //console.log("color=" + color + " -> rgba=" + rgba + " -> " + ("#" + hex))
+    return "#" + hex;
+}
+
+function colorDecR(color) {
+    let rgba = colorToRGBA(color);
+    return rgba[0]
+}
+function colorDecG(color) {
+    let rgba = colorToRGBA(color);
+    return rgba[1]
+}
+function colorDecB(color) {
+    let rgba = colorToRGBA(color);
+    return rgba[2]
+}
+function colorDecA(color) {
+    let rgba = colorToRGBA(color);
+    return rgba[3]
+}
+
+function colorHexR(color) {
+    let rgba = colorToRGBA(color);
+    return byteToHex(rgba[0])
+}
+function colorHexG(color) {
+    let rgba = colorToRGBA(color);
+    return byteToHex(rgba[1])
+}
+function colorHexB(color) {
+    let rgba = colorToRGBA(color);
+    return byteToHex(rgba[2])
+}
+function colorHexA(color) {
+    let rgba = colorToRGBA(color);
+    return byteToHex(rgba[3])
+}
+
+function colorFromARGB(A, R, G, B) {
+    return "#" + byteToHex(R) + byteToHex(G) + byteToHex(B) + byteToHex(A)
+}
+
+
 
 function gEllipse(x, y, radiusX, radiusY, rotation, fillColor, strokeWidth, strokeColor) {
     ctx.beginPath();
