@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.10"
-const gl_versionDate = "25.12.2022"
+const gl_versionNr = "v1.11"
+const gl_versionDate = "26.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -34,6 +34,7 @@ var lo_showRules3to1  = ""
 var lo_showRules4to1 = ""
 var lo_showGraphSinCos = true
 var lo_showGraphTanCot = true
+var lo_showCalculator = ""
 
 var lo_radijLevel  = -5 
 const cv_radijFactor  = 1.07
@@ -104,6 +105,10 @@ const scSch = String.fromCharCode(0x160)
 const scSchLow = String.fromCharCode(0x161)
 const scZh = String.fromCharCode(0x17D)
 const scZLow = String.fromCharCode(0x17E)
+//----
+const scCopyright = String.fromCharCode(0xA9)
+const scDoubleQuote = String.fromCharCode(0x22)
+const scSingleQuote = String.fromCharCode(0x27)
 
 //---- 25.12.2022 na enem mestu zberem uporabljene fiziène barve
 const cv_color_blue = "#0000FF"
@@ -138,7 +143,10 @@ cvsConvertColors.width = 1;
 var ctxConvertColors = cvsConvertColors.getContext('2d');
 ctxConvertColors.willReadFrequently = true
 
-//======== SET CHECKBOXES STATES
+//---- 26.12.2022
+var tmCalcId
+
+//======== SET CHECKBOXES 'ON' STATES
 var checkBox 
 checkBox = document.querySelector('#checkShowTanCot');
 checkBox.checked = true
@@ -246,6 +254,7 @@ function checkGraphSinCos_click() {
     if (lf_determineFunGroup()) {
         paint()
     }
+    //console.log("call calculation ...")
 }
 document.getElementById("checkGraphTanCot").addEventListener("click", checkGraphTanCot_click);
 function checkGraphTanCot_click() {
@@ -255,6 +264,170 @@ function checkGraphTanCot_click() {
         paint()
     }
 }
+document.getElementById("checkCalculator").addEventListener("click", checkCalculator_click);
+function checkCalculator_click() {
+    if (document.getElementById("checkCalculator").checked) { lo_showCalculator = true } else { lo_showCalculator = "" }
+    //console.log("showCalculator=" + lo_showCalculator)
+
+    switch (lo_showCalculator) {
+        case true:
+            tmCalcId = setInterval(tmCalc_tick, 200)
+            break
+        default:
+            clearInterval(tmCalcId)
+            break
+    }
+    lf_adjustControls()
+
+    //console.log("hide calculator!")
+    //.Visible=True ... "visible" or "block"
+    //.Visible=False .. "hidden" or "none"
+    //document.getElementById("checkCalculator").style.visibility = "hidden"; // or x.style.display = "none"; //https://social.msdn.microsoft.com/Forums/en-US/00faaaf0-0f96-4c33-a255-4c2ca2bdfb51/how-to-quothidequot-or-make-quotvisiblequot-in-javascript-when-i-quotcheck-or?forum=asphtmlcssjavascript
+    //document.getElementById("labelCalculator").style.visibility = "hidden"; // or x.style.display = "none"; //https://social.msdn.microsoft.com/Forums/en-US/00faaaf0-0f96-4c33-a255-4c2ca2bdfb51/how-to-quothidequot-or-make-quotvisiblequot-in-javascript-when-i-quotcheck-or?forum=asphtmlcssjavascript
+
+    //if (lf_determineFunGroup()) {
+    //    paint()
+    //}
+}
+
+function tmCalc_tick() {
+    lf_calculate()
+}
+var radioCalcDeg = document.createElement('input');
+radioCalcDeg.type = 'radio';
+radioCalcDeg.name = 'calcMode'; //https://www.javascripttutorial.net/javascript-dom/javascript-radio-button/
+radioCalcDeg.id = 'radioCalcDeg';
+radioCalcDeg.value = 'Deg';
+radioCalcDeg.style.left = "418px"
+radioCalcDeg.style.top = "45px"
+radioCalcDeg.style.visibility = "hidden"
+var labelCalcDeg = document.createElement('label')
+labelCalcDeg.htmlFor = 'radioCalcDeg';
+labelCalcDeg.style.left = "440px"
+labelCalcDeg.style.top = "47px"
+labelCalcDeg.style.visibility = "hidden"
+var descCalcDeg = document.createTextNode('Deg');
+labelCalcDeg.appendChild(descCalcDeg);
+document.body.appendChild(radioCalcDeg);
+document.body.appendChild(labelCalcDeg);
+
+var radioCalcSms = document.createElement('input');
+radioCalcSms.type = 'radio';
+radioCalcSms.name = 'calcMode';
+radioCalcSms.id = 'radioCalcSms';
+radioCalcSms.value = 'Sms';
+radioCalcSms.style.left = "468px"
+radioCalcSms.style.top = "45px"
+radioCalcSms.style.visibility = "hidden"
+var labelCalcSms = document.createElement('label')
+labelCalcSms.htmlFor = 'radioCalcSms';
+labelCalcSms.style.left = "490px"
+labelCalcSms.style.top = "47px"
+labelCalcSms.style.visibility = "hidden"
+var descCalcSms = document.createTextNode('S/M/S');
+labelCalcSms.appendChild(descCalcSms);
+document.body.appendChild(radioCalcSms);
+document.body.appendChild(labelCalcSms);
+
+var radioCalcRad = document.createElement('input');
+radioCalcRad.type = 'radio';
+radioCalcRad.name = 'calcMode';
+radioCalcRad.id = 'radioCalcRad';
+radioCalcRad.value = 'Rad';
+radioCalcRad.style.left = "533px"
+radioCalcRad.style.top = "45px"
+var labelCalcRad = document.createElement('label')
+labelCalcRad.htmlFor = 'radioCalcRad';
+labelCalcRad.style.left = "555px"
+labelCalcRad.style.top = "47px"
+labelCalcDeg.style.visibility = "hidden"
+var descCalcRad = document.createTextNode('Rad');
+labelCalcRad.appendChild(descCalcRad);
+document.body.appendChild(radioCalcRad);
+document.body.appendChild(labelCalcRad);
+
+var textCalcDeg = document.createElement('input');
+textCalcDeg.type = 'text';
+textCalcDeg.id = 'textCalcDeg';
+textCalcDeg.value = '';
+textCalcDeg.maxLength = 9
+textCalcDeg.style.left = "424px"
+textCalcDeg.style.top = "68px"
+textCalcDeg.style.width = "80px"
+textCalcDeg.style.visibility = "hidden"
+document.body.appendChild(textCalcDeg);
+
+var textCalcSmsDeg = document.createElement('input');
+textCalcSmsDeg.type = 'text';
+textCalcSmsDeg.id = 'textCalcSmsDeg';
+textCalcSmsDeg.value = '';
+textCalcSmsDeg.maxLength = 6
+textCalcSmsDeg.style.left = "424px"
+textCalcSmsDeg.style.top = "68px"
+textCalcSmsDeg.style.width = "40px"
+textCalcSmsDeg.style.visibility = "hidden"
+document.body.appendChild(textCalcSmsDeg);
+
+var textCalcSmsMin = document.createElement('input');
+textCalcSmsMin.type = 'text';
+textCalcSmsMin.id = 'textCalcSmsMin';
+textCalcSmsMin.value = '';
+textCalcSmsMin.maxLength = 6
+textCalcSmsMin.style.left = "476px"
+textCalcSmsMin.style.top = "68px"
+textCalcSmsMin.style.width = "40px"
+textCalcSmsMin.style.visibility = "hidden"
+document.body.appendChild(textCalcSmsMin);
+
+var textCalcSmsSec = document.createElement('input');
+textCalcSmsSec.type = 'text';
+textCalcSmsSec.id = 'textCalcSmsSec';
+textCalcSmsSec.value = '';
+textCalcSmsSec.maxLength = 6
+textCalcSmsSec.style.left = "528px"
+textCalcSmsSec.style.top = "68px"
+textCalcSmsSec.style.width = "55px"
+textCalcSmsSec.style.visibility = "hidden"
+document.body.appendChild(textCalcSmsSec);
+
+var textCalcRslt = document.createElement('input');
+textCalcRslt.type = 'text';
+textCalcRslt.id = 'textCalcRslt';
+textCalcRslt.value = '';
+textCalcRslt.maxLength = 1000
+textCalcRslt.style.left = "584px"
+textCalcRslt.style.top = "68px"
+textCalcRslt.style.width = "220px"
+textCalcRslt.style.background = "whiteSmoke"
+textCalcRslt.style.visibility = "hidden"
+textCalcRslt.readOnly = true
+document.body.appendChild(textCalcRslt);
+
+const cv_modeDeg = 1
+const cv_modeSms = 2
+const cv_modeRad = 3
+var lo_mode
+var lo_noChange = ""
+
+//======== SET RADIOBOXES CLICK EVENT LISTENERS
+document.getElementById("radioCalcDeg").addEventListener("click", radioCalcDeg_click);
+function radioCalcDeg_click() {
+    if (document.getElementById("radioCalcDeg").checked) { lf_changeMode(cv_modeDeg) }
+    //console.log("lo_showTanCot=" + lo_showTanCot)
+}
+document.getElementById("radioCalcSms").addEventListener("click", radioCalcSms_click);
+function radioCalcSms_click() {
+    if (document.getElementById("radioCalcSms").checked) { lf_changeMode(cv_modeSms) }
+    //console.log("lo_showTanCot=" + lo_showTanCot)
+}
+document.getElementById("radioCalcRad").addEventListener("click", radioCalcRad_click);
+function radioCalcRad_click() {
+    if (document.getElementById("radioCalcRad").checked) { lf_changeMode(cv_modeRad) }
+    //console.log("lo_showTanCot=" + lo_showTanCot)
+}
+
+lf_changeMode(cv_modeDeg)
+
 
 
 // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
@@ -265,7 +438,7 @@ elMyCanvas.addEventListener('mousedown', (e) => {
     lo_mouseDown = true
     //10.12.2022 v1.0.0.0 Ali hoèe vleèi celotno sliko enotskega kroga?
     lo_dragEnotskiKrogActive = lo_mouseAboveEnotskiKrogCenter
-    console.log("dragEnotskiKrogActive: " + lo_dragEnotskiKrogActive)
+    //console.log("dragEnotskiKrogActive: " + lo_dragEnotskiKrogActive)
 
 });
 elMyCanvas.addEventListener('mouseup', (e) => {
@@ -349,10 +522,10 @@ window.addEventListener("wheel", event => {
 //let zzzg = colorToHexRGB("plum")
 //zzzg = colorToHexRGBA("plum")
 //console.log(colorToHexRGB("plum"))
-console.log("plum=" + colorToHexRGBA("plum") + " plum(hexG)=" + colorHexG("plum") + " plum(decG)=" + colorDecG("plum"))
-console.log("plum=" + colorToHexRGBA("plum") + " plum(hexA)=" + colorHexA("plum") + " plum(decA)=" + colorDecA("plum"))
-console.log("colorFromARGB(32, 128, 64, 255)=" + colorFromARGB(32, 128, 64, 255))
-console.log("gf_alphaColor(20, darkOrchid)=" + gf_alphaColor(20, "darkOrchid"))
+//console.log("plum=" + colorToHexRGBA("plum") + " plum(hexG)=" + colorHexG("plum") + " plum(decG)=" + colorDecG("plum"))
+//console.log("plum=" + colorToHexRGBA("plum") + " plum(hexA)=" + colorHexA("plum") + " plum(decA)=" + colorDecA("plum"))
+//console.log("colorFromARGB(32, 128, 64, 255)=" + colorFromARGB(32, 128, 64, 255))
+//console.log("gf_alphaColor(20, darkOrchid)=" + gf_alphaColor(20, "darkOrchid"))
 
 resizeCanvas();
 paint();
@@ -596,8 +769,7 @@ function paint() {
     lo_xCircleCenter = xCircleCenter
     lo_yCircleCenter = yCircleCenter
        
-    paint_author();
-    paint_version();
+
 
     //tmpStr = "velikost enotskega kroga spremeniš z vrtenjem kolešèka miške"
     tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke nad krogom"
@@ -607,9 +779,10 @@ function paint() {
 
     paint_eKrog();
 
-    if (lo_showTeorija) {
-        lf_paint_pravila(ctx)
-    }
+    if (lo_showTeorija) { lf_paint_pravila(ctx) }
+
+    paint_author();
+    paint_version();
 }
 
 function paint_author() {
@@ -2086,3 +2259,518 @@ function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeC
         gText(tmpStr, font, fontColor, x0, y1)
     }
 }
+
+//===========================================================================================================
+
+function lf_changeMode(vp_mode) {
+
+    lo_mode = vp_mode
+    //console.log("newMode=" + lo_mode)
+
+    lo_noChange = true
+    switch (lo_mode) {
+        case cv_modeDeg:
+            radioCalcSms.checked = ""
+            radioCalcRad.checked = ""
+            radioCalcDeg.checked = true
+            //console.log("newMode=" + lo_mode)
+            break
+        case cv_modeSms:
+            radioCalcDeg.checked = ""
+            radioCalcRad.checked = ""
+            radioCalcSms.checked = true
+            break
+        case cv_modeRad:
+            radioCalcDeg.checked = ""
+            radioCalcSms.checked = ""
+            radioCalcRad.checked = true
+            break
+    }
+    lo_noChange = ""
+
+    lf_adjustControls()
+
+}
+
+function lf_adjustControls() {
+
+    let value
+    if (lo_showCalculator) { value = "visible" } else { value = "hidden" }
+    radioCalcDeg.style.visibility = value
+    labelCalcDeg.style.visibility = value
+    radioCalcSms.style.visibility = value
+    labelCalcSms.style.visibility = value
+    radioCalcRad.style.visibility = value
+    labelCalcRad.style.visibility = value
+
+    textCalcRslt.style.visibility = value
+    switch (lo_mode) {
+        case cv_modeDeg: case cv_modeRad:
+            textCalcDeg.style.visibility = value
+            textCalcSmsDeg.style.visibility = "hidden"
+            textCalcSmsMin.style.visibility = "hidden"
+            textCalcSmsSec.style.visibility = "hidden"
+            textCalcRslt.style.left = "520px" //textDeg.Left + textDeg.Width + 8
+            break
+        case cv_modeSms:
+            textCalcDeg.style.visibility = "hidden"
+            textCalcSmsDeg.style.visibility = value
+            textCalcSmsMin.style.visibility = value
+            textCalcSmsSec.style.visibility = value
+            textCalcRslt.style.left = "601px" //textSmsSec.Width + textSmsSec.Width + 8
+            break
+    }
+    //textCalcRslt.Width = Me.ClientSize.Width - textRslt.Left - 8
+
+}
+
+function lf_calculate() {
+
+    //console.log("lo_mode=" + lo_mode)
+    switch (lo_mode) {
+        case cv_modeDeg:
+            lf_calculate_deg()
+            break
+        case cv_modeSms:
+            lf_calculate_sms()
+            break
+        case cv_modeRad:
+            lf_calculate_rad()
+            break
+    }
+}
+
+function lf_calculate_deg() {
+    //------------------------------
+    //120  -> 120° 0// 0" = 2,094 rad = 2¶/3
+    //43.5 -> 43° 30// 0" = 0,7592 rad
+    // ¶ ? ° ?
+    //ASCII CODE PAGE: https://www.ascii-code.com/
+    //------------------------------
+        
+    let vl_oldRsltText = textCalcRslt.value
+    //console.log("vl_oldRsltText=" + vl_oldRsltText)
+
+    let alphaDegStr = textCalcDeg.value
+    //console.log("alphaDegStr=" + alphaDegStr)
+
+    let outStr = lf_calcultate_filterStrDigitMinusDotComma(alphaDegStr)
+    if (outStr != alphaDegStr) {
+        alphaDegStr = outStr
+        textCalcDeg.value = alphaDegStr
+    }
+     
+    // //zamenjam vejice v pike zaradi univerzalnosti raèunanja
+    // alphaDegStr = alphaDegStr.replace(/,/g, ".") // !TODO! replace() DONE kje.Replace(kaj,kam) --> kje.replace(rEx-kaj,kam) ... https://www.tutorialrepublic.com/faq/how-to-replace-character-inside-a-string-in-javascript.php
+    // console.log("alphaDegStr=" + alphaDegStr)
+    // //Èe ima vmes minus in ta minus ni na zaèetku, potem ta minus pobrišem
+    // let tmpPos = alphaDegStr.indexOf("-") // InStr(kje,kaj) --> kje.indexOf(kaj, start) !TODO! DONE
+    // if (tmpPos > 0) {
+    //     alphaDegStr = alphaDegStr.replace("-", "")
+    //     textCalcDeg.value = alphaDegStr
+    // }
+
+    //======== 1) KOT V STOPINJAH/MINUTAH/SEKUNDAH
+
+    let alphaDeg = Number(alphaDegStr) //Val(alphaDegStr) !TODO! DONE
+    let vl_negative = ""
+    if (alphaDeg < 0) {
+        alphaDeg = -alphaDeg
+        vl_negative = true
+    }
+    let kotSmsStr = lf_getKotSms(alphaDeg)
+    //console.log("kotSmsStr=" + kotSmsStr)
+    if (vl_negative) {
+        kotSmsStr = "-" + kotSmsStr
+    }
+
+    //======== 2) KOT V RADIANIH
+
+    let kotRad = alphaDeg * Math.PI / 180
+    let kotRadStr = kotRad.toFixed(4)
+    if (vl_negative) {
+        kotRadStr = "-" + kotRadStr
+    }
+
+    //======== 3) POSEBNI PRIMERI KOTA V RADIANIH
+
+    let kotRadSpecStr = lf_getKotRadSpec(alphaDeg)
+    if (vl_negative && kotRadSpecStr != "") {
+        kotRadSpecStr = "-" + kotRadSpecStr
+    }
+
+    //======== REZULTAT 
+
+    let rsltStr = kotSmsStr + " = " + kotRadStr + " rad"
+    if (kotRadSpecStr != "") {
+        rsltStr += "  =  " + kotRadSpecStr
+    }
+
+    if (rsltStr != vl_oldRsltText) {
+        textCalcRslt.value = rsltStr
+    }
+
+}
+
+function lf_calculate_sms() {
+    //------------------------------
+    //120  -> 120° 0// 0" = 2,094 rad = 2¶/3
+    //43.5 -> 43° 30// 0" = 0,7592 rad
+    // ¶ ? ° ?
+    //ASCII CODE PAGE: https://www.ascii-code.com/
+    //------------------------------
+
+    let vl_oldRsltText = textCalcRslt.value
+
+    let alphaSmsDegStr = textCalcSmsDeg.value
+    let outStr = lf_calcultate_filterStrDigitMinus(alphaSmsDegStr)
+    if (outStr != alphaSmsDegStr) {
+        alphaSmsDegStr = outStr
+        textCalcSmsDeg.value = alphaSmsDegStr
+    }
+
+    let alphaSmsMinStr = textCalcSmsMin.value
+    outStr = lf_calcultate_filterStrDigit(alphaSmsMinStr)
+    if (outStr != alphaSmsMinStr) {
+        alphaSmsMinStr = outStr
+        textCalcSmsMin.value = alphaSmsMinStr
+    }
+
+    let alphaSmsSecStr = textCalcSmsSec.value
+    outStr = lf_calcultate_filterStrDigitDotComma(alphaSmsSecStr)
+    if (outStr != alphaSmsSecStr) {
+        alphaSmsSecStr = outStr
+        textCalcSmsSec.value = alphaSmsSecStr
+    }
+
+    let alphaSmsDeg = Number(alphaSmsDegStr)
+    let vl_negative = ""
+    if (alphaSmsDeg < 0) {
+        alphaSmsDeg = -alphaSmsDeg
+        vl_negative = true
+    }
+    let alphaSmsMin = Number(alphaSmsMinStr)
+    let alphaSmsSec = Number(alphaSmsSecStr)
+
+    //======== 1) KOT V STOPINJAH DECIMALNO
+
+    let alphaDeg = alphaSmsDeg + alphaSmsMin / 60 + alphaSmsSec / 3600
+    let alphaDegStr = alphaDeg.toFixed(5) + scStopinj
+    if (vl_negative) {
+        alphaDegStr = "-" + alphaDegStr
+    }
+
+    //======== 2) KOT V RADIANIH
+
+    let kotRad = alphaDeg * Math.PI / 180
+    let kotRadStr = kotRad.toFixed(4)
+    if (vl_negative) {
+        kotRadStr = "-" + kotRadStr
+    }
+
+    //======== 3) POSEBNI PRIMERI KOTA V RADIANIH
+
+    let kotRadSpecStr = lf_getKotRadSpec(alphaDeg)
+    if (vl_negative && kotRadSpecStr != "") {
+        kotRadSpecStr = "-" + kotRadSpecStr
+    }
+
+    //======== REZULTAT 
+
+    let rsltStr = alphaDegStr + "  =  " + kotRadStr + " rad"
+    if (kotRadSpecStr != "") {
+        rsltStr += "  =  " + kotRadSpecStr
+    }
+
+    if (rsltStr != vl_oldRsltText) {
+        textCalcRslt.value = rsltStr
+    }
+
+}
+
+
+function lf_calculate_rad() {
+    //------------------------------
+    //2,094 -> 120° = 120° 0// 0" = 2¶/3 
+    //1.5 -> 85,94367°  =  85° 56// 37,22"
+    //3.1415926 -> 180,00000°  =  179° 59// 59,95"
+    // ¶ ? ° ?
+    //ASCII CODE PAGE: https://www.ascii-code.com/
+    //------------------------------
+
+    let vl_oldRsltText = textCalcRslt.value
+    //console.log("vl_oldRsltText=" + vl_oldRsltText)
+
+    let alphaRadStr = textCalcDeg.value
+    //console.log("alphaRadStr=" + alphaRadStr)
+    let outStr = lf_calcultate_filterStrDigitMinusDotComma(alphaRadStr)
+    if (outStr != alphaRadStr) {
+        alphaRadStr = outStr
+        textCalcDeg.value = alphaRadStr
+    }
+
+    //======== 1) KOT V RADIANIH
+
+    let alphaRad = Number(alphaRadStr)
+    let vl_negative = ""
+    if (alphaRad < 0) {
+        alphaRad = -alphaRad
+        vl_negative = true
+    }
+
+    //======== 2) KOT V STOPINJAH
+
+    let alphaDeg = alphaRad * 180 / Math.PI
+    let alphaDegStr = ""
+    if ((alphaDeg - Math.trunc(alphaDeg)) * 360000 < 1) {
+        alphaDegStr = Math.trunc(alphaDeg) + scStopinj
+    } else {
+        alphaDegStr = alphaDeg.toFixed(5) + scStopinj
+    }
+    if (vl_negative) {
+        alphaDegStr = "-" + alphaDegStr
+    }
+
+    //======== 3) KOT V STOPINJAH/MINUTAH/SEKUNDAH
+
+    let kotSmsStr = lf_getKotSms(alphaDeg)
+    if (vl_negative) {
+        kotSmsStr = "-" + kotSmsStr
+    }
+
+    //======== 4) POSEBNI PRIMERI KOTA V RADIANIH
+
+    let kotRadSpecStr = lf_getKotRadSpec(alphaDeg)
+    if (vl_negative && kotRadSpecStr != "") {
+        kotRadSpecStr = "-" + kotRadSpecStr
+    }
+
+    //======== REZULTAT 
+
+    let rsltStr = alphaDegStr + "  =  " + kotSmsStr
+    if (kotRadSpecStr != "") {
+        rsltStr += "  =  " + kotRadSpecStr
+    }
+
+    if (rsltStr != vl_oldRsltText) {
+        textCalcRslt.value = rsltStr
+    }
+
+}
+
+function lf_calcultate_filterStrDigitMinusDotComma(alphaStr) {
+
+    let vl_haveDot = ""
+    let vl_char = ""
+    let vl_code = 0
+    let vl_takeIt = ""
+    let outStr = ""
+    for (let index = 0; index <= (alphaStr.length - 1); index++) {
+        vl_char = alphaStr.substring(index, index + 1)
+        vl_code = vl_char.charCodeAt(0)
+        //console.log("char=" + vl_char + " code=" + vl_code)
+        vl_takeIt = ""
+        switch (vl_char) {
+            case "1": case "2": case "3": case "4": case "5": case "6": case "7": case "8": case "9": case "0":
+                vl_takeIt = true
+                //console.log("take digit")
+                break
+            case ".":
+                if (!vl_haveDot) {
+                    vl_takeIt = true
+                    //console.log("take dot")
+                    vl_haveDot = true
+                }
+                break
+            case ",":
+                if (!vl_haveDot) {
+                    vl_char = "."
+                    vl_takeIt = true
+                    //console.log("take comma as dot")
+                    vl_haveDot = true
+                }
+                break
+            case "-":
+                if (index == 0) {
+                    vl_takeIt = true
+                    //console.log("take minus")
+                }
+                break
+        }
+        if (vl_takeIt) {
+            outStr += vl_char
+            //console.log("outStr=" + outStr)
+        }
+    }
+    return outStr
+}
+
+function lf_calcultate_filterStrDigitDotComma(alphaStr) {
+
+    let vl_haveDot = ""
+    let vl_char = ""
+    let vl_code = 0
+    let vl_takeIt = ""
+    let outStr = ""
+    for (let index = 0; index <= (alphaStr.length - 1); index++) {
+        vl_char = alphaStr.substring(index, index + 1)
+        vl_code = vl_char.charCodeAt(0)
+        //console.log("char=" + vl_char + " code=" + vl_code)
+        vl_takeIt = ""
+        switch (vl_char) {
+            case "1": case "2": case "3": case "4": case "5": case "6": case "7": case "8": case "9": case "0":
+                vl_takeIt = true
+                //console.log("take digit")
+                break
+            case ".":
+                if (!vl_haveDot) {
+                    vl_takeIt = true
+                    //console.log("take dot")
+                    vl_haveDot = true
+                }
+                break
+            case ",":
+                if (!vl_haveDot) {
+                    vl_char = "."
+                    vl_takeIt = true
+                    //console.log("take comma as dot")
+                    vl_haveDot = true
+                }
+                break
+        }
+        if (vl_takeIt) {
+            outStr += vl_char
+            //console.log("outStr=" + outStr)
+        }
+    }
+    return outStr
+}
+
+function lf_calcultate_filterStrDigitMinus(alphaStr) {
+
+    let vl_char = ""
+    let vl_code = 0
+    let vl_takeIt = ""
+    let outStr = ""
+    for (let index = 0; index <= (alphaStr.length - 1); index++) {
+        vl_char = alphaStr.substring(index, index + 1)
+        vl_code = vl_char.charCodeAt(0)
+        //console.log("char=" + vl_char + " code=" + vl_code)
+        vl_takeIt = ""
+        switch (vl_char) {
+            case "1": case "2": case "3": case "4": case "5": case "6": case "7": case "8": case "9": case "0":
+                vl_takeIt = true
+                //console.log("take digit")
+                break
+            case "-":
+                if (index == 0) {
+                    vl_takeIt = true
+                    //console.log("take minus")
+                }
+                break
+        }
+        if (vl_takeIt) {
+            outStr += vl_char
+            //console.log("outStr=" + outStr)
+        }
+    }
+    return outStr
+}
+
+function lf_calcultate_filterStrDigit(alphaStr) {
+
+    let vl_char = ""
+    let vl_code = 0
+    let vl_takeIt = ""
+    let outStr = ""
+    for (let index = 0; index <= (alphaStr.length - 1); index++) {
+        vl_char = alphaStr.substring(index, index + 1)
+        vl_code = vl_char.charCodeAt(0)
+        //console.log("char=" + vl_char + " code=" + vl_code)
+        vl_takeIt = ""
+        switch (vl_char) {
+            case "1": case "2": case "3": case "4": case "5": case "6": case "7": case "8": case "9": case "0":
+                vl_takeIt = true
+                //console.log("take digit")
+                break
+        }
+        if (vl_takeIt) {
+            outStr += vl_char
+            //console.log("outStr=" + outStr)
+        }
+    }
+    return outStr
+}
+
+function lf_getKotSms(alphaDeg) {
+
+    let kotDeg, kotMin
+    let kotSec, kotRest
+    let kotDegStr, kotMinStr, kotSecStr, kotSmsStr
+
+    kotDeg = Math.trunc(alphaDeg)
+    //console.log("kotDeg=" + kotDeg)
+    kotRest = alphaDeg - kotDeg
+    kotMin = Math.trunc(kotRest * 60 + 0.0000001)
+    //console.log("kotMin=" + kotMin)
+    kotRest = alphaDeg - kotDeg - kotMin / 60
+    kotSec = kotRest * 3600
+    //console.log("kotSec=" + kotSec)
+
+    kotDegStr = kotDeg
+    kotMinStr = kotMin
+    if (((kotSec - Math.trunc(kotSec)) * 200) < 1) {
+        kotSecStr = Math.trunc(kotSec)
+    } else {
+        kotSecStr = kotSec.toFixed(2)
+    }
+
+    //----
+    kotSmsStr = kotDegStr + scStopinj + " " + kotMinStr + scSingleQuote + " " + kotSecStr + scDoubleQuote
+    return kotSmsStr
+}
+
+function lf_getKotRadSpec(alphaDeg) {
+
+    switch (alphaDeg) {
+        case 30:
+            return scPI + "/6"
+        case 45:
+            return scPI + "/4"
+        case 60:
+            return scPI + "/3"
+        case 90:
+            return scPI + "/2"
+        case 120:
+            return "2" + scPI  + "/3"
+        case 135:
+            return "3" + scPI + "/4"
+        case 150:
+            return "5" + scPI + "/6"
+        case 180:
+            return scPI 
+        case 210:
+            return "7" + scPI + "/6"
+        case 225:
+            return "5" + scPI + "/4"
+        case 240:
+            return "4" + scPI + "/3"
+        case 270:
+            return "3" + scPI + "/2"
+        case 300:
+            return "5" + scPI + "/3"
+        case 315:
+            return "7" + scPI + "/4"
+        case 330:
+            return "11" + scPI + "/6"
+        case 360:
+            return "2" + scPI + ""
+            break
+        default:
+            return ""
+    }
+
+}
+
+
+
