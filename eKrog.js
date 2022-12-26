@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.11"
+const gl_versionNr = "v1.12"
 const gl_versionDate = "26.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -88,6 +88,13 @@ const cv_descMode_tabelaKotnihFunkcij = 1
 const cv_descMode_pravila01 = 2
 const cv_descMode_pravila02 = 3
 const cv_descMode_max = 2
+
+//---- 26.12.2022 v1.12
+var lo_calcAlpha = 0
+var lo_calcAlphaDeg = 0
+var lo_calcAlphaDegPrev = 0
+var lo_calcKvadrant = 1
+var lo_calcZnacilenKot = true
 
 //https://stackoverflow.com/questions/13093126/insert-unicode-character-into-javascript
 // ° (U+00B0)   ¶ (U+00B6)    ? (U+03B1)   ? (U+221A)
@@ -403,30 +410,54 @@ textCalcRslt.style.visibility = "hidden"
 textCalcRslt.readOnly = true
 document.body.appendChild(textCalcRslt);
 
+var checkCalcAlphaLive = document.createElement('input');
+checkCalcAlphaLive.type = 'checkbox';
+checkCalcAlphaLive.name = 'calcAlphaLive';
+checkCalcAlphaLive.id = 'checkCalcAlphaLive';
+checkCalcAlphaLive.value = 'On';
+checkCalcAlphaLive.style.left = "620px"
+checkCalcAlphaLive.style.top = "45px"
+checkCalcAlphaLive.style.visibility = "hidden"
+var labelCalcAlphaLive = document.createElement('label')
+labelCalcAlphaLive.htmlFor = 'checkCalcAlphaLive';
+labelCalcAlphaLive.style.left = "640px"
+labelCalcAlphaLive.style.top = "47px"
+labelCalcDeg.style.visibility = "hidden"
+var descCalcAlphaLive = document.createTextNode('Prikaz v krogu');
+labelCalcAlphaLive.appendChild(descCalcAlphaLive);
+document.body.appendChild(checkCalcAlphaLive);
+document.body.appendChild(labelCalcAlphaLive);
+
 const cv_modeDeg = 1
 const cv_modeSms = 2
 const cv_modeRad = 3
 var lo_mode
 var lo_noChange = ""
+var lo_alphaLive = "" // 26.12.2022 v1.12
 
 //======== SET RADIOBOXES CLICK EVENT LISTENERS
 document.getElementById("radioCalcDeg").addEventListener("click", radioCalcDeg_click);
 function radioCalcDeg_click() {
-    if (document.getElementById("radioCalcDeg").checked) { lf_changeMode(cv_modeDeg) }
+    if (document.getElementById("radioCalcDeg").checked) { lf_calculator_changeMode(cv_modeDeg) }
     //console.log("lo_showTanCot=" + lo_showTanCot)
 }
 document.getElementById("radioCalcSms").addEventListener("click", radioCalcSms_click);
 function radioCalcSms_click() {
-    if (document.getElementById("radioCalcSms").checked) { lf_changeMode(cv_modeSms) }
+    if (document.getElementById("radioCalcSms").checked) { lf_calculator_changeMode(cv_modeSms) }
     //console.log("lo_showTanCot=" + lo_showTanCot)
 }
 document.getElementById("radioCalcRad").addEventListener("click", radioCalcRad_click);
 function radioCalcRad_click() {
-    if (document.getElementById("radioCalcRad").checked) { lf_changeMode(cv_modeRad) }
+    if (document.getElementById("radioCalcRad").checked) { lf_calculator_changeMode(cv_modeRad) }
+    //console.log("lo_showTanCot=" + lo_showTanCot)
+}
+document.getElementById("checkCalcAlphaLive").addEventListener("click", checkCalcAlphaLive_click);
+function checkCalcAlphaLive_click() {
+    if (document.getElementById("checkCalcAlphaLive").checked) { lf_calculator_changeAlphaLive(true) } else { lf_calculator_changeAlphaLive("") }
     //console.log("lo_showTanCot=" + lo_showTanCot)
 }
 
-lf_changeMode(cv_modeDeg)
+lf_calculator_changeMode(cv_modeDeg)
 
 
 
@@ -739,6 +770,8 @@ function resizeCanvas() {
 }
 
 function paint() {
+
+    //console.log("paint()")
     //elMyCanvas = document.getElementById("myCanvas");
     //ctx = elMyCanvas.getContext("2d");
     //ctx.fillStyle = "red";
@@ -924,99 +957,20 @@ function paint_eKrog() {
     gText(tmpStr, font, color, xCircleCenter + 2, yCircleBottom + wh[1] + 3)
 
     //======== ALFA
-    //---- najprej X in Y koordinati miške v okviru pictureBox-a
-    //let currentXpb = Cursor.Position.X - Me.Left - lo_frmBorderWidth - cv_privateFormBorder
-    //let currentYpb = Cursor.Position.Y - Me.Top - lo_frmTitleBarHeight - cv_privateFormBorder //- lo_frmBorderWidth ... zgornji border je že vsebovan v lo_frmTitleBarHeight
-    let currentXpb = lo_mouseMoveX
-    let currentYpb = lo_mouseMoveY
-    //---- razdalja miške od središèa enotskega kroga po X in po Y
-    let kvadrant
-    let dx, dy, alpha, alphaDeg
-    dx = (currentXpb - xCircleCenter)
-    dy = -(currentYpb - yCircleCenter)
-    //console.log("dx=" + dx + " dy=" + dy)
-    //if (dx > 0) {console.log("dx>0") }
-    //g.DrawString(dx.ToString & " " & dy.ToString, mdSignFont10, Brushes.Black, currentXpb + 5, currentYpb - 8)
-    //---- doloèanje kota alpha[rad] in kvadranta
-    if (dx == 0) { //---- NAVPIÈNO
-        if (dy >= 0) {
-            kvadrant = 1
-            alpha = Math.PI / 2
-            //console.log("alpha11=" + alpha + "rad")
-        }
-        else {
-            kvadrant = 3
-            alpha = 3 * Math.PI / 2
-            //console.log("alpha12=" + alpha + "rad")
-        }
+    //---- 26.12.2022 doloèanje kota in ostalih parametrov preseljeno v svojo funkcijo
+    let alpha, alphaDeg, kvadrant, vl_znacilenKot
+    if (lo_showCalculator && lo_alphaLive) {
+        //console.log("alpha goes live!")
+        alpha = lo_calcAlpha
+        alphaDeg = lo_calcAlphaDeg
+        kvadrant = lo_calcKvadrant
+        vl_znacilenKot = lo_calcZnacilenKot
+    } else {
+        //console.log("mouse alpha mode")
+        let aData = lf_getAlphaFromCurrentMousePosition()
+        alpha = aData[0]; alphaDeg = aData[1]; kvadrant = aData[2]; vl_znacilenKot = aData[3]; 
     }
-    else if (dx > 0) { //---- DESNO
-        if (dy >= 0) {
-            kvadrant = 1
-            alpha = Math.atan(dy / dx)
-            //console.log("alpha21=" + alpha + "rad")
-        }
-        else {
-            kvadrant = 4
-            alpha = 2 * Math.PI + Math.atan(dy / dx)
-            //console.log("alpha22=" + alpha + "rad")
-        }
-    }
-    else { //---- LEVO
-            if (dy >= 0) {
-                kvadrant = 2
-                alpha = Math.PI + Math.atan(dy / dx)
-                //console.log("alpha31=" + alpha + "rad")
-            }
-            else {
-                kvadrant = 3
-                alpha = Math.PI + Math.atan(dy / dx)
-                //console.log("alpha32=" + alpha + "rad")
-            }
-    }
-    alphaDeg = alpha * 180 / Math.PI
-    // ° ¶ ? ?
-    //console.log("alphaDeg=" + alphaDeg + "°")
-
-    //======== PREVERJANJE ZNAÈILNIH KOTOV 0,30,45,60,90
-    let vl_znacilenKot = ""
-    if (true) { //if (!window.event.ctrlKey) { ... test èe drži pritisnjeno tipko CTRL ... !TODO!
-        if (lo_showZnacilniKoti) {
-            vl_znacilenKot = true
-            //console.log("vl_znacilenKot=" + vl_znacilenKot)
-            let tmpAlphaDeg = 10 * Math.round((alphaDeg + 5) / 10) 
-            //console.log("tmpAlphaDeg=" + tmpAlphaDeg)
-            if (tmpAlphaDeg == 50) {
-                alphaDeg = tmpAlphaDeg - 5
-                //console.log("tmpAlphaDeg=" + tmpAlphaDeg + " alphaDeg=" + alphaDeg)
-            }
-            else {
-                tmpAlphaDeg = 10 * Math.round(alphaDeg / 10) 
-                switch (tmpAlphaDeg) {
-                    case 0:
-                        alphaDeg = tmpAlphaDeg
-                        break
-                    case 30:
-                        alphaDeg = tmpAlphaDeg
-                        break
-                    case 60:
-                        alphaDeg = tmpAlphaDeg
-                        break
-                    case 90:
-                        alphaDeg = tmpAlphaDeg
-                        break
-                    default:
-                        vl_znacilenKot = ""
-                        //console.log("-- vl_znacilenKot=" + vl_znacilenKot)
-                }
-                //console.log("alphaDeg=" + alphaDeg)
-            }
-            alpha = alphaDeg * Math.PI / 180
-            //console.log("alpha=" + alpha)
-            //console.log("----")
-        }
-    }
-
+    
     //alphaDeg = 90
     //alpha = Math.PI / 2
     //vl_znacilenKot = true
@@ -1144,6 +1098,104 @@ function paint_eKrog() {
             break
     }
 
+}
+
+function lf_getAlphaFromCurrentMousePosition() {
+
+    //======== ALFA
+    //---- najprej X in Y koordinati miške v okviru pictureBox-a
+    //let currentXpb = Cursor.Position.X - Me.Left - lo_frmBorderWidth - cv_privateFormBorder
+    //let currentYpb = Cursor.Position.Y - Me.Top - lo_frmTitleBarHeight - cv_privateFormBorder //- lo_frmBorderWidth ... zgornji border je že vsebovan v lo_frmTitleBarHeight
+    let currentXpb = lo_mouseMoveX
+    let currentYpb = lo_mouseMoveY
+    //---- razdalja miške od središèa enotskega kroga po X in po Y
+    let kvadrant
+    let dx, dy, alpha, alphaDeg
+    dx = (currentXpb - xCircleCenter)
+    dy = -(currentYpb - yCircleCenter)
+    //console.log("dx=" + dx + " dy=" + dy)
+    //if (dx > 0) {console.log("dx>0") }
+    //g.DrawString(dx.ToString & " " & dy.ToString, mdSignFont10, Brushes.Black, currentXpb + 5, currentYpb - 8)
+    //---- doloèanje kota alpha[rad] in kvadranta
+    if (dx == 0) { //---- NAVPIÈNO
+        if (dy >= 0) {
+            kvadrant = 1
+            alpha = Math.PI / 2
+            //console.log("alpha11=" + alpha + "rad")
+        }
+        else {
+            kvadrant = 3
+            alpha = 3 * Math.PI / 2
+            //console.log("alpha12=" + alpha + "rad")
+        }
+    }
+    else if (dx > 0) { //---- DESNO
+        if (dy >= 0) {
+            kvadrant = 1
+            alpha = Math.atan(dy / dx)
+            //console.log("alpha21=" + alpha + "rad")
+        }
+        else {
+            kvadrant = 4
+            alpha = 2 * Math.PI + Math.atan(dy / dx)
+            //console.log("alpha22=" + alpha + "rad")
+        }
+    }
+    else { //---- LEVO
+        if (dy >= 0) {
+            kvadrant = 2
+            alpha = Math.PI + Math.atan(dy / dx)
+            //console.log("alpha31=" + alpha + "rad")
+        }
+        else {
+            kvadrant = 3
+            alpha = Math.PI + Math.atan(dy / dx)
+            //console.log("alpha32=" + alpha + "rad")
+        }
+    }
+    alphaDeg = alpha * 180 / Math.PI
+    // ° ¶ ? ?
+    //console.log("alphaDeg=" + alphaDeg + "°")
+
+    //======== PREVERJANJE ZNAÈILNIH KOTOV 0,30,45,60,90
+    let vl_znacilenKot = ""
+    if (true) { //if (!window.event.ctrlKey) { ... test èe drži pritisnjeno tipko CTRL ... !TODO!
+        if (lo_showZnacilniKoti) {
+            vl_znacilenKot = true
+            //console.log("vl_znacilenKot=" + vl_znacilenKot)
+            let tmpAlphaDeg = 10 * Math.round((alphaDeg + 5) / 10)
+            //console.log("tmpAlphaDeg=" + tmpAlphaDeg)
+            if (tmpAlphaDeg == 50) {
+                alphaDeg = tmpAlphaDeg - 5
+                //console.log("tmpAlphaDeg=" + tmpAlphaDeg + " alphaDeg=" + alphaDeg)
+            }
+            else {
+                tmpAlphaDeg = 10 * Math.round(alphaDeg / 10)
+                switch (tmpAlphaDeg) {
+                    case 0:
+                        alphaDeg = tmpAlphaDeg
+                        break
+                    case 30:
+                        alphaDeg = tmpAlphaDeg
+                        break
+                    case 60:
+                        alphaDeg = tmpAlphaDeg
+                        break
+                    case 90:
+                        alphaDeg = tmpAlphaDeg
+                        break
+                    default:
+                        vl_znacilenKot = ""
+                    //console.log("-- vl_znacilenKot=" + vl_znacilenKot)
+                }
+                //console.log("alphaDeg=" + alphaDeg)
+            }
+            alpha = alphaDeg * Math.PI / 180
+            //console.log("alpha=" + alpha)
+            //console.log("----")
+        }
+    }
+    return [alpha, alphaDeg, kvadrant, vl_znacilenKot]
 }
 
 function lf_getGraphAreaLeft() { //xCircleRight + 100
@@ -2013,9 +2065,9 @@ function gf_alphaColor(vp_alpha, vp_color) {
 function lf_getAlphaStrings(alpha, alphaDeg, vp_znacilenKot) {
 
     //let alphaStrDeg = Format(alphaDeg, "###0.0") & "°"
-    let alphaStrDeg = alphaDeg.toFixed(1) + scStopinj //"°"
+    let alphaStrDeg = alphaDeg.toFixed(2) + scStopinj //"°"
     //let alphaStrRad = Format(alpha, "##0.00") & " rad"
-    let alphaStrRad = alpha.toFixed(2) + " rad"
+    let alphaStrRad = alpha.toFixed(3) + " rad"
     let alphaStrRad2 = alphaStrRad
     let alphaStrRad3 = alphaStrRad
     // ° ? ? 
@@ -2262,7 +2314,7 @@ function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeC
 
 //===========================================================================================================
 
-function lf_changeMode(vp_mode) {
+function lf_calculator_changeMode(vp_mode) {
 
     lo_mode = vp_mode
     //console.log("newMode=" + lo_mode)
@@ -2292,6 +2344,28 @@ function lf_changeMode(vp_mode) {
 
 }
 
+function lf_calculator_changeAlphaLive(vp_live) {
+
+    lo_alphaLive = vp_live
+    //console.log("newAlphaLive=" + lo_alphaLive)
+    paint()
+
+    //switch (lo_alphaLive) {
+    //    case true:
+    //        lo_alphaLive = ""
+    //        //console.log("newMode=" + lo_mode)
+    //        break
+    //    default:
+    //        lo_alphaLive = true
+    //        break
+    //}
+    //let value
+    //if (lo_showCalculator && lo_alphaLive) { value = "visible" } else { value = "hidden" }
+    //checkCalcAlphaLive.style.visibility = value
+    //labelCalcAlphaLive.style.visibility = value
+}
+
+
 function lf_adjustControls() {
 
     let value
@@ -2302,6 +2376,8 @@ function lf_adjustControls() {
     labelCalcSms.style.visibility = value
     radioCalcRad.style.visibility = value
     labelCalcRad.style.visibility = value
+    checkCalcAlphaLive.style.visibility = value
+    labelCalcAlphaLive.style.visibility = value
 
     textCalcRslt.style.visibility = value
     switch (lo_mode) {
@@ -2362,7 +2438,7 @@ function lf_calculate_deg() {
      
     // //zamenjam vejice v pike zaradi univerzalnosti raèunanja
     // alphaDegStr = alphaDegStr.replace(/,/g, ".") // !TODO! replace() DONE kje.Replace(kaj,kam) --> kje.replace(rEx-kaj,kam) ... https://www.tutorialrepublic.com/faq/how-to-replace-character-inside-a-string-in-javascript.php
-    // console.log("alphaDegStr=" + alphaDegStr)
+    //console.log("alphaDegStr=" + alphaDegStr)
     // //Èe ima vmes minus in ta minus ni na zaèetku, potem ta minus pobrišem
     // let tmpPos = alphaDegStr.indexOf("-") // InStr(kje,kaj) --> kje.indexOf(kaj, start) !TODO! DONE
     // if (tmpPos > 0) {
@@ -2409,7 +2485,8 @@ function lf_calculate_deg() {
     if (rsltStr != vl_oldRsltText) {
         textCalcRslt.value = rsltStr
     }
-
+    if (vl_negative) { alphaDeg = -alphaDeg }
+    lf_calculate_setAlphaData(alphaDeg, alphaDegStr) //26.12.2022 v1.12
 }
 
 function lf_calculate_sms() {
@@ -2485,7 +2562,8 @@ function lf_calculate_sms() {
     if (rsltStr != vl_oldRsltText) {
         textCalcRslt.value = rsltStr
     }
-
+    if (vl_negative) { alphaDeg = -alphaDeg }
+    lf_calculate_setAlphaData(alphaDeg, alphaDegStr) //26.12.2022 v1.12
 }
 
 
@@ -2523,7 +2601,7 @@ function lf_calculate_rad() {
     let alphaDeg = alphaRad * 180 / Math.PI
     let alphaDegStr = ""
     if ((alphaDeg - Math.trunc(alphaDeg)) * 360000 < 1) {
-        alphaDegStr = Math.trunc(alphaDeg) + scStopinj
+        alphaDegStr = (Math.trunc(alphaDeg)).toString() + scStopinj
     } else {
         alphaDegStr = alphaDeg.toFixed(5) + scStopinj
     }
@@ -2555,7 +2633,44 @@ function lf_calculate_rad() {
     if (rsltStr != vl_oldRsltText) {
         textCalcRslt.value = rsltStr
     }
+    if (vl_negative) { alphaDeg = -alphaDeg }
+    lf_calculate_setAlphaData(alphaDeg, alphaDegStr) //26.12.2022 v1.12
+}
 
+function lf_calculate_setAlphaData(vp_alphaDeg, vp_alphaDegStr) {
+    //26.12.2022 v1.12
+    //console.log("lf_calculate_setAlphaData()")
+    
+    let alphaDeg = vp_alphaDeg
+    //console.log("vp_alphaDeg=" + vp_alphaDeg + " alphaDeg=" + alphaDeg)
+    //Èe je kot negativen, ga najprej spravim v prvi kvadrant
+    if (alphaDeg < 0) {
+        //console.log("vp_alphaDeg=" + vp_alphaDeg + " alphaDeg=" + alphaDeg)
+        alphaDeg = alphaDeg + (1 + Math.trunc(-alphaDeg / 360)) * 360
+        //console.log("vp_alphaDeg=" + vp_alphaDeg + " -> alphaDeg=" + alphaDeg)
+    } else if (alphaDeg>=360) { 
+        alphaDeg = alphaDeg - (Math.trunc(alphaDeg / 360)) * 360
+        //console.log("vp_alphaDeg=" + vp_alphaDeg + " -> alphaDeg=" + alphaDeg)
+    }
+
+    //---- doloèanje kvadranta
+    let vl_kvadrant = Math.trunc(alphaDeg / 90) + 1
+    if (vl_kvadrant > 4) { vl_kvadrant = 4 }
+    //console.log("kvadrant==" + vl_kvadrant)
+
+    let vl_znacilenKot = ""
+    switch (alphaDeg) {
+        case 0: case 30: case 45: case 60: case 90:
+            vl_znacilenKot = true
+    }
+    lo_calcAlpha = alphaDeg * Math.PI / 180
+    lo_calcAlphaDeg = alphaDeg
+    lo_calcKvadrant = vl_kvadrant
+    lo_calcZnacilenKot = vl_znacilenKot
+    if (lo_calcAlphaDeg != lo_calcAlphaDegPrev) {
+        paint()
+    }
+    lo_calcAlphaDegPrev = lo_calcAlphaDeg
 }
 
 function lf_calcultate_filterStrDigitMinusDotComma(alphaStr) {
@@ -2720,7 +2835,7 @@ function lf_getKotSms(alphaDeg) {
     kotDegStr = kotDeg
     kotMinStr = kotMin
     if (((kotSec - Math.trunc(kotSec)) * 200) < 1) {
-        kotSecStr = Math.trunc(kotSec)
+        kotSecStr = (Math.trunc(kotSec)).toString()
     } else {
         kotSecStr = kotSec.toFixed(2)
     }
