@@ -570,8 +570,8 @@ elMyCanvas.addEventListener('touchmove', canvas_touchMove);
 function canvas_touchMove(e) {
     //e.preventDefault();
     lo_mouseMoveX = e.touches[0].clientX 
-    lo_mouseMoveX = -(e.touches[0].clientY)
-    console.log(lo_mouseMoveX, lo_mouseMoveX)
+    lo_mouseMoveY = -(e.touches[0].clientY)
+    //console.log(lo_mouseMoveX, lo_mouseMoveY)
     paint()
 }
 
@@ -996,6 +996,8 @@ function paint_eKrog() {
         //console.log("mouse alpha mode")
         let aData = lf_getAlphaFromCurrentMousePosition()
         alpha = aData[0]; alphaDeg = aData[1]; kvadrant = aData[2]; vl_znacilenKot = aData[3]; 
+        let tmpStr = "x=" + lo_mouseMoveX.toString() + "  y=" + lo_mouseMoveY.toString()
+        gText(tmpStr, "bold 18px cambria", "black", 20, 150)
     }
     
     //alphaDeg = 90
