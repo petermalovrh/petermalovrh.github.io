@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.12x3"
+const gl_versionNr = "v1.13"
 const gl_versionDate = "26.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -996,8 +996,8 @@ function paint_eKrog() {
         //console.log("mouse alpha mode")
         let aData = lf_getAlphaFromCurrentMousePosition()
         alpha = aData[0]; alphaDeg = aData[1]; kvadrant = aData[2]; vl_znacilenKot = aData[3]; 
-        let tmpStr = "x=" + lo_mouseMoveX.toFixed(0).toString() + "  y=" + lo_mouseMoveY.toFixed(0).toString()
-        gText(tmpStr, "bold 18px cambria", "black", 30, 150)
+        //let tmpStr = "x=" + lo_mouseMoveX.toFixed(0).toString() + "  y=" + lo_mouseMoveY.toFixed(0).toString()
+        //gText(tmpStr, "bold 18px cambria", "black", 30, 150)
     }
     
     //alphaDeg = 90
