@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.12"
+const gl_versionNr = "v1.12x"
 const gl_versionDate = "26.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -558,6 +558,24 @@ window.addEventListener("wheel", event => {
 //console.log("colorFromARGB(32, 128, 64, 255)=" + colorFromARGB(32, 128, 64, 255))
 //console.log("gf_alphaColor(20, darkOrchid)=" + gf_alphaColor(20, "darkOrchid"))
 
+//https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
+//const el = document.getElementById('canvas');
+//el.addEventListener('touchstart', handleStart);
+//el.addEventListener('touchend', handleEnd);
+//el.addEventListener('touchcancel', handleCancel);
+elMyCanvas.addEventListener('touchmove', canvas_touchMove);
+
+//https://developer.mozilla.org/en-US/docs/Web/API/Touch_events
+//https://stackoverflow.com/questions/41993176/determine-touch-position-on-tablets-with-javascript
+function canvas_touchMove(e) {
+    //e.preventDefault();
+    lo_mouseMoveX = e.touches[0].clientX 
+    lo_mouseMoveX = -(e.touches[0].clientY)
+    console.log(lo_mouseMoveX, lo_mouseMoveX)
+    paint()
+}
+
+
 resizeCanvas();
 paint();
 
@@ -822,17 +840,19 @@ function paint_author() {
 
     //======== AVTOR
     let tmpStr = "Peter Malovrh, 2022"
-    let font = "italic bold 18px cambria"
-    let wh = gMeasureText(tmpStr, font);
+    let font = "italic bold 18px cambria"; // podpièje pred destrukturiranjem nujno !!!!!
+    //let wh = gMeasureText(tmpStr, font);
+    let [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
+    //console.log("tmpW=" + tmpW + " tmpH=" + tmpH)
     let topMargin = 6
     let rightMargin = 6
     //----
     let dd = 9
     let x1 = ctxW - rightMargin - dd
-    let x0 = x1 - wh[0]
+    let x0 = x1 - tmpW //wh[0]
     let y0 = topMargin + dd
-    let y1 = y0 + wh[1]
+    let y1 = y0 + tmpH //wh[1]
     //----
     gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
 }
@@ -842,32 +862,39 @@ function paint_version() {
     //======== VERZIJA APLIKACIJE
     let tmpStr = gl_versionNr
     let font = "italic bold 14px cambria"
-    let wh = gMeasureText(tmpStr, font);
+    //let wh = gMeasureText(tmpStr, font);
+    let tmpW, tmpH; //podpièje tukaj pred destruktiriranjem nujno !!!!
+    [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
     let topMargin = 33
     let rightMargin = 78
     //----
     let dd = 5
     let x1 = ctxW - rightMargin - dd
-    let x0 = x1 - wh[0]
+    let x0 = x1 - tmpW //wh[0]
     let y0 = topMargin + dd
-    let y1 = y0 + wh[1]
+    let y1 = y0 + tmpH //wh[1]
     //----
     gBannerRectWithText(x0, y0, x1, y1, dd, "#FFF800B0", 1, "lightGray", font, "blue", tmpStr, "#D0D0D040", 3, 3)
 
     //======== DATUM APLIKACIJE
-    tmpStr = gl_versionDate
-    font = "italic bold 12px cambria"
-    wh = gMeasureText(tmpStr, font);
+    tmpStr = gl_versionDate;
+    font = "italic bold 12px cambria"; // PAZI TO!!! brez tega podpièja na koncu naslednji destructuring dela narobe !!!
+    //                                    https://stackoverflow.com/questions/68796011/requerid-semicolon-in-javascript-for-let-variables
+    //                                    http://hassansin.github.io/Object-Destructuring-and-a-Semicolon
+    //                                    https://stackoverflow.com/questions/57851596/use-of-semicolon-terminator-in-js-es6-when-deconstructing
+    //         glej ECMA ASI: https://262.ecma-international.org/10.0/#sec-rules-of-automatic-semicolon-insertion
+    [tmpW, tmpH] = gMeasureText(tmpStr, font);
+    //console.log("tmpW=" + tmpW + " tmpH=" + tmpH)
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
     topMargin = 35
     rightMargin = 6
     //----
     dd = 5
     x1 = ctxW - rightMargin - dd
-    x0 = x1 - wh[0]
+    x0 = x1 - tmpW //wh[0]
     y0 = topMargin + dd
-    y1 = y0 + wh[1]
+    y1 = y0 + tmpH //wh[1]
     gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", "italic 12px cambria", "gray", tmpStr, "", 3, 3)
 }
 
@@ -2256,6 +2283,7 @@ function gText(text, font, color, x, y) {
 function gMeasureText(text, font) {
     ctx.font = font
     let msrText = ctx.measureText(text);
+    //if (text == gl_versionDate) { console.log("msrText.width=" + msrText.width) }
     //let tmpWidth = msrText.width;
     //let tmpHeight = msrText.actualBoundingBoxAscent;
     return [msrText.width, msrText.actualBoundingBoxAscent]
