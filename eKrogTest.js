@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.13"
-const gl_versionDate = "26.12.2022"
+const gl_versionNr = "v1.15"
+const gl_versionDate = "31.12.2022"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -60,22 +60,36 @@ var yCircleCenter, xCircleCenter, radij
 
 //document.getElementById("checkShowZnacilniKoti").innerHTML = "XCVBRREE"
 //document.getElementById("checkShowZnacilniKoti").textContent = "XCVBRREE"
-document.body.style.overflow = 'hidden'; // tole onemogo�i scrollBar-s
+document.body.style.overflow = 'hidden'; // tole onemogoči scrollBar-s
 var elMyCanvas = document.getElementById("myCanvas");
 var ctxW = window.innerWidth - 18;
 var ctxH = window.innerHeight - 10;
+var ctxMinDim = Math.min(ctxW, ctxH)
+const cv_panelGUI_height = 100
+
 var ctx = elMyCanvas.getContext("2d");
 const bckgColor = "#F4F8F8";
 
+const cv_displayMode_landscape = 1
+const  cv_displayMode_portrait = 2
+var lo_displayMode = cv_displayMode_landscape
+var lo_eKrogPanelWidth = 1000
+var lo_eKrogPanelHeight = 700
 var elem = document.documentElement; //23.12.2022 https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_fullscreen2
 
+//---- 3.1.2023 v1.16 font family
+const cv_fontFamily_cambria = "Cambria"
+const cv_fontFamily_verdana = "Verdana"
+const cv_fontFamily_RB = "Open Sans" // "Geostar" // "Rubik Bubbles"
+var lo_fontFamily = cv_fontFamily_RB // cv_fontFamily_cambria //cv_fontFamily_verdana //
+
 //https://www.w3schools.com/tags/canvas_font.asp
-const myFontMathLabels = "bold 11pt Cambria"
-const myFontMathLabelsBig = "bold 14pt Cambria"
-const myFontMathLabelsLargeItalic = "italic bold 14pt Cambria"
-const myFontMathLabelsLargeBoldItalic = "italic bold 14pt Cambria"
-const myFontMathValues = "bold 10pt Cambria"
-const myFontMathValuesSmall = "normal 10pt Cambria"
+const myFontMathLabels = "bold 11pt " + lo_fontFamily    //Cambria"
+const myFontMathLabelsBig = "bold 14pt " + lo_fontFamily //Cambria"
+const myFontMathLabelsLargeItalic = "italic bold 14pt " + lo_fontFamily     //Cambria"
+const myFontMathLabelsLargeBoldItalic = "italic bold 14pt " + lo_fontFamily //Cambria"
+const myFontMathValues = "bold 10pt " + lo_fontFamily        //Cambria"
+const myFontMathValuesSmall = "normal 10pt " + lo_fontFamily //Cambria"
 
 const cv_fun_sin = 1
 const cv_fun_cos = 2
@@ -201,7 +215,16 @@ function checkShowTeorija_click() {
 }
 document.getElementById("checkRulesSupplement").addEventListener("click", checkRulesSupplement_click);
 function checkRulesSupplement_click() {
-    if (document.getElementById("checkRulesSupplement").checked) { lo_showRulesSupplement = true } else { lo_showRulesSupplement = "" }
+    if (document.getElementById("checkRulesSupplement").checked) { 
+        if (lo_showRulesSupplement) {
+            document.getElementById("checkRulesSupplement").checked = ""
+            lo_showRulesSupplement = ""
+            paint()
+            return
+        }
+        lo_showRulesSupplement = true 
+    } 
+    else { lo_showRulesSupplement = "" }
     //console.log("showRulesSupplement=" + lo_showRulesSupplement)
     if (lo_showRulesSupplement) {
         lo_showRulesComplement = ""
@@ -215,7 +238,15 @@ function checkRulesSupplement_click() {
 }
 document.getElementById("checkRulesComplement").addEventListener("click", checkRulesComplement_click);
 function checkRulesComplement_click() {
-    if (document.getElementById("checkRulesComplement").checked) { lo_showRulesComplement = true } else { lo_showRulesComplement = "" }
+    if (document.getElementById("checkRulesComplement").checked) {
+        if (lo_showRulesComplement) {
+            document.getElementById("checkRulesComplement").checked = ""
+            lo_showRulesComplement = ""
+            paint()
+            return
+        }
+        lo_showRulesComplement = true
+    } else { lo_showRulesComplement = "" }
     //console.log("showRulesComplement=" + lo_showRulesComplement)
     if (lo_showRulesComplement) {
         lo_showRulesSupplement = ""
@@ -229,7 +260,15 @@ function checkRulesComplement_click() {
 }
 document.getElementById("checkRules3to1").addEventListener("click", checkRules3to1_click);
 function checkRules3to1_click() {
-    if (document.getElementById("checkRules3to1").checked) { lo_showRules3to1 = true } else { lo_showRules3to1 = "" }
+    if (document.getElementById("checkRules3to1").checked) {
+        if (lo_showRules3to1) {
+            document.getElementById("checkRules3to1").checked = ""
+            lo_showRules3to1 = ""
+            paint()
+            return
+        }
+        lo_showRules3to1 = true
+    } else { lo_showRules3to1 = "" }
     //console.log("showRules3to1=" + lo_showRules3to1)
     if (lo_showRules3to1) {
         lo_showRulesSupplement = ""
@@ -243,7 +282,15 @@ function checkRules3to1_click() {
 }
 document.getElementById("checkRules4to1").addEventListener("click", checkRules4to1_click);
 function checkRules4to1_click() {
-    if (document.getElementById("checkRules4to1").checked) { lo_showRules4to1 = true } else { lo_showRules4to1 = "" }
+    if (document.getElementById("checkRules4to1").checked) {
+        if (lo_showRules4to1) {
+            document.getElementById("checkRules4to1").checked = ""
+            lo_showRules4to1 = ""
+            paint()
+            return
+        }
+        lo_showRules4to1 = true
+    } else { lo_showRules4to1 = "" }
     //console.log("showRules4to1=" + lo_showRules4to1)
     if (lo_showRules4to1) {
         lo_showRulesSupplement = ""
@@ -468,7 +515,7 @@ elMyCanvas.addEventListener('mousedown', (e) => {
     lo_mousedownX = e.offsetX;
     lo_mouseDownY = e.offsetY;
     lo_mouseDown = true
-    //10.12.2022 v1.0.0.0 Ali ho�e vle�i celotno sliko enotskega kroga?
+    //10.12.2022 v1.0.0.0 Ali hoče vleči celotno sliko enotskega kroga?
     lo_dragEnotskiKrogActive = lo_mouseAboveEnotskiKrogCenter
     //console.log("dragEnotskiKrogActive: " + lo_dragEnotskiKrogActive)
 
@@ -483,7 +530,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //console.log("mouse_move() enter")
 
-    //Vle�enje okna / enotskega kroga
+    //Vlečenje okna / enotskega kroga
     if (lo_mouseDown) {
         switch (lo_dragEnotskiKrogActive) {
             case true:
@@ -504,25 +551,25 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         }
     }
 
-    //10.12.2022 v1.0.0.0 Je nad sredi��em enotskega kroga in bo mo�no vle�enje celotne slike enotskega kroga?
+    //10.12.2022 v1.0.0.0 Je nad središšem enotskega kroga in bo mošno vlešenje celotne slike enotskega kroga?
     lo_mouseAboveEnotskiKrogCenter = ""
     let diffX = e.offsetX - lo_xCircleCenter
     let diffY = e.offsetY - lo_yCircleCenter
     let dist = Math.sqrt(diffX * diffX + diffY * diffY)
     //console.log("dist=" + dist)
-    //Je mi�ka znotraj kroga dolo�enega polmera okoli centra enotskega kroga?
+    //Je miška znotraj kroga dološenega polmera okoli centra enotskega kroga?
     if (dist < cv_moveEnotskiKrogMarkerRadij) {
-        //Mi�ka je nekje nad centrom enostkega kroga ...
+        //Miška je nekje nad centrom enostkega kroga ...
         lo_mouseAboveEnotskiKrogCenter = true
     }
 
-    //�e se mi�ka v resnici ni premaknila ne naredim ni� (�e samo prikaz ToolTip-a sprovocira novo generiranje dogodka MouseMove() !!)
+    //še se miška v resnici ni premaknila ne naredim niš (še samo prikaz ToolTip-a sprovocira novo generiranje dogodka MouseMove() !!)
     if (e.offsetX == lo_mouseMoveX && e.offsetY == lo_mouseMoveY) {
         //console.log("mouse_no_move")
         return
     }
 
-    //Mi�ka se je zares premaknila
+    //Miška se je zares premaknila
     //console.log("mouse_move_beforeExecute")
     lo_mouseMoveX = e.offsetX
     lo_mouseMoveY = e.offsetY
@@ -540,7 +587,7 @@ window.addEventListener("wheel", event => {
     let d = Math.sqrt(dx * dx + dy * dy).toFixed()
     //console.log("dx=" + dx + " dy=" + dy + " d=" + d + " radij=" + radij)
     if (d < (radij * 1.3)) {
-        //mi�ko vrti znotraj ali v bli�nji okolici kroga
+        //miško vrti znotraj ali v bližnji okolici kroga
         lf_changeRadij(delta)
     }
 });
@@ -639,7 +686,7 @@ function lf_paint_pravila02(ctx) {
     let x0, y0, x, y, w, h, d
     let tmpStr
 
-    x0 = 6; y0 = 281; d = 4 // 281 = (110+151) + 20 ... prej�nji blok pravil + 20
+    x0 = 6; y0 = 281; d = 4 // 281 = (110+151) + 20 ... prejšnji blok pravil + 20
     w = 295; h = 440
 
     ctx.fillStyle = "#FFFFFFC0"//"#C0C0C020"
@@ -680,7 +727,7 @@ function lf_paint_tabelaKotnihFunkcij(ctx) {
     let x0, y0, x, y, w, h, d
     let tmpStr
 
-    x0 = 6; y0 = 731; d = 4 // 731 = (281+440) + 20 ... prej�nji blok pravil + 20
+    x0 = 6; y0 = 731; d = 4 // 731 = (281+440) + 20 ... prejšnji blok pravil + 20
     w = 343; h = 155
 
     ctx.fillStyle = "#FFFFFFC0"//"#C0C0C020"
@@ -767,6 +814,7 @@ function resizeCanvas() {
     //dimenzioniranje in pozicioniranje canvas-a
     ctxW = window.innerWidth - 6;
     ctxH = window.innerHeight - 6;
+    ctxMinDim = Math.min(ctxW, ctxH)
     elMyCanvas.width = ctxW     //da je na obeh straneh minimalen rob
     elMyCanvas.height = ctxH //da je na obeh straneh minimalen rob
     elMyCanvas.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
@@ -789,6 +837,8 @@ function resizeCanvas() {
 }
 
 function paint() {
+
+    let myTime1 = Date.now()
 
     //console.log("paint()")
     //elMyCanvas = document.getElementById("myCanvas");
@@ -823,7 +873,7 @@ function paint() {
        
 
 
-    //tmpStr = "velikost enotskega kroga spremeni� z vrtenjem kole��ka mi�ke"
+    //tmpStr = "velikost enotskega kroga spremeniš z vrtenjem koleščka miške"
     tmpStr = "velikost enotskega kroga spremeni" + scSchLow + " z vrtenjem kole" + scSchLow + scTchLow + "ka mi" + scSchLow + "ke nad krogom"
     gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 22)
     tmpStr = "enotski krog lahko pri sredi" + scSchLow + scTchLow  + "u prime" + scSchLow + " z mi" + scSchLow + "ko in ga premakne" + scSchLow 
@@ -835,13 +885,19 @@ function paint() {
 
     paint_author();
     paint_version();
+
+    let myTime2 = Date.now()
+    //console.log(myTime2-myTime1 + "ms")
+    tmpStr = "izris: " + (myTime2-myTime1).toString() + " ms"
+    gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 2)
+    
 }
 
 function paint_author() {
 
     //======== AVTOR
     let tmpStr = "Peter Malovrh, 2022"
-    let font = "italic bold 18px cambria"; // podpi�je pred destrukturiranjem nujno !!!!!
+    let font = "italic bold 18px cambria"; // podpičje pred destrukturiranjem nujno !!!!!
     //let wh = gMeasureText(tmpStr, font);
     let [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
@@ -864,7 +920,7 @@ function paint_version() {
     let tmpStr = gl_versionNr
     let font = "italic bold 14px cambria"
     //let wh = gMeasureText(tmpStr, font);
-    let tmpW, tmpH; //podpi�je tukaj pred destruktiriranjem nujno !!!!
+    let tmpW, tmpH; //podpičje tukaj pred destruktiriranjem nujno !!!!
     [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
     let topMargin = 33
@@ -880,12 +936,12 @@ function paint_version() {
 
     //======== DATUM APLIKACIJE
     tmpStr = gl_versionDate;
-    font = "italic bold 12px cambria"; // PAZI TO!!! brez tega podpi�ja na koncu naslednji destructuring dela narobe !!!
+    font = "italic bold 12px cambria"; // PAZI TO!!! brez tega podpičja na koncu naslednji destructuring dela narobe !!!
     //                                    https://stackoverflow.com/questions/68796011/requerid-semicolon-in-javascript-for-let-variables
     //                                    http://hassansin.github.io/Object-Destructuring-and-a-Semicolon
     //                                    https://stackoverflow.com/questions/57851596/use-of-semicolon-terminator-in-js-es6-when-deconstructing
     //         glej ECMA ASI: https://262.ecma-international.org/10.0/#sec-rules-of-automatic-semicolon-insertion
-    [tmpW, tmpH] = gMeasureText(tmpStr, font);
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("tmpW=" + tmpW + " tmpH=" + tmpH)
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
     topMargin = 35
@@ -911,16 +967,11 @@ function paint_eKrog() {
             kRadij *= tmpZoomY;
         }
     }
-    //console.log("lo_radijLevel=" + lo_radijLevel + " kRadij=" + kRadij)
-        
-    let vl_outPart = ctxH / 2 * 0.15 * kRadij
-    if (vl_outPart < 30) { vl_outPart = 30 }
-    radij = ctxH / 2 - vl_outPart
-    if (radij < 10) { radij = 10 }
+    
+    radij = lf_setCircleRadij(kRadij);
     //xCircleCenter = 70 + radij
-    //yCircleCenter = ctxH - 100 - radij
-    let circleCenterPos = lf_setCircleCenterPos()
-    xCircleCenter = circleCenterPos[0]; yCircleCenter = circleCenterPos[1]
+    //yCircleCenter = ctxH - 100 - radij;
+    [xCircleCenter, yCircleCenter] = lf_setCircleCenterPos()
     xCircleCenter += lo_dragEnotskiKrogAddX
     yCircleCenter += lo_dragEnotskiKrogAddY
     lo_xCircleCenter = xCircleCenter
@@ -934,21 +985,28 @@ function paint_eKrog() {
     //ctx.fillRect(20, 20, 150, 100);
     //gArc(1100, 200, 100, 0, 5, "#FA8072", 0, "")
 
-    //==== KRO�NICA
-    //lo_penFrg1.Width = 3
-    //lo_penFrg1.Color = Color.DarkGray
-    //g.FillEllipse(lf_mySolidBrush(Color.GhostWhite), xCircleCenter - radij + 1, yCircleCenter - radij + 1, 2 * radij - 1, 2 * radij - 1)
-    //g.DrawEllipse(lo_penFrg1, xCircleCenter - radij, yCircleCenter - radij, 2 * radij + 1, 2 * radij + 1)
-    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/ellipse
-    gEllipse(xCircleCenter, yCircleCenter, radij, radij, 0, "white", 1, "darkslateGray")
-    //console.log("xCircleCenter=" + xCircleCenter + ", yCircleCenter=" + yCircleCenter + ", radij=" + radij )
+    //==== OZNAČENI KVADRANTI ZA VKLOPLJENA PRAVILA
 
-    ////==== MARKER V SREDI��U KRO�NICE ZA PREMIKANJE ENOTSKEGA KROGA PO OKNU SEM IN TJA ...  10.12.2022 v1.0.0.0
+
+    //==== KROŽNICA
+    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/ellipse
+    //---- polnilo krožnice
+    gEllipse(xCircleCenter, yCircleCenter, radij, radij, 0, "white", 0, "")
+    //console.log("xCircleCenter=" + xCircleCenter + ", yCircleCenter=" + yCircleCenter + ", radij=" + radij )
+    //---- označeni kvadranti za vklopljena pravila
+    if (lo_showRulesSupplement) { gArc(xCircleCenter, yCircleCenter, radij, 0, Math.PI, "#F6F6FA", 0, "") }
+    else if (lo_showRulesComplement) { gArc(xCircleCenter, yCircleCenter, radij, 0, Math.PI / 2, "#F6F6FA", 0, "") }
+    else if (lo_showRules3to1) { gArc(xCircleCenter, yCircleCenter, radij, 0, Math.PI / 2, "#F6F6FA", 0, ""); gArc(xCircleCenter, yCircleCenter, radij, Math.PI, 3 * Math.PI / 2, "#F6F6FA", 0, "") }
+    else if (lo_showRules4to1) { gArc(xCircleCenter, yCircleCenter, radij, -Math.PI/2, Math.PI/2, "#F6F6FA", 0, "") }
+    //---- zdaj pa še obroba krožnice
+    gEllipse(xCircleCenter, yCircleCenter, radij, radij, 0, "", 1, "darkslateGray")
+
+    ////==== MARKER V SREDIŠČU KROŽNICE ZA PREMIKANJE ENOTSKEGA KROGA PO OKNU SEM IN TJA ...  10.12.2022 v1.0.0.0
     if (lo_mouseAboveEnotskiKrogCenter || lo_dragEnotskiKrogActive) {
         gEllipse(xCircleCenter, yCircleCenter, cv_moveEnotskiKrogMarkerRadij, cv_moveEnotskiKrogMarkerRadij, 0, "#64B89680", 2, "#64B896A0")
     }
 
-    //==== MARKERJI NA KRO�NICI ZA ZNA�ILNE KOTE
+    //==== MARKERJI NA KROŽNICI ZA ZNAČILNE KOTE
     checkBox = document.querySelector('#checkShowZnacilniKoti');
     lo_showZnacilniKoti = checkBox.checked
     if (lo_showZnacilniKoti) {
@@ -974,7 +1032,7 @@ function paint_eKrog() {
     gLine(xCircleCenter, yCircleCenter - radij - cv_axisDiff, xCircleCenter, yCircleCenter + radij + cv_axisDiff, 1, "darkSlateGray", [])
     gLine(xCircleCenter - radij - cv_axisDiff, yCircleCenter, xCircleCenter + radij + cv_axisDiff, yCircleCenter, 1, "darkSlateGray", [])
 
-    //======== ENKE NA 4 KONCIH KRO�NICE
+    //======== ENKE NA 4 KONCIH KROŽNICE
     let tmpStr = "1"
     let font = "18px cambria"
     let wh = gMeasureText(tmpStr, font);
@@ -985,7 +1043,7 @@ function paint_eKrog() {
     gText(tmpStr, font, color, xCircleCenter + 2, yCircleBottom + wh[1] + 3)
 
     //======== ALFA
-    //---- 26.12.2022 dolo�anje kota in ostalih parametrov preseljeno v svojo funkcijo
+    //---- 26.12.2022 določanje kota in ostalih parametrov preseljeno v svojo funkcijo
     let alpha, alphaDeg, kvadrant, vl_znacilenKot
     if (lo_showCalculator && lo_alphaLive) {
         //console.log("alpha goes live!")
@@ -999,20 +1057,16 @@ function paint_eKrog() {
         alpha = aData[0]; alphaDeg = aData[1]; kvadrant = aData[2]; vl_znacilenKot = aData[3]; 
         //let tmpStr = "x=" + lo_mouseMoveX.toFixed(0).toString() + "  y=" + lo_mouseMoveY.toFixed(0).toString()
         //gText(tmpStr, "bold 18px cambria", "black", 30, 150)
-        let tmpStr = "ctxW=" + ctxW.toFixed(0).toString() + "  ctxH=" + ctxH.toFixed(0).toString()
-        gText(tmpStr, "bold 18px cambria", "black", 30, 150)
+        //let tmpStr = "ctxW=" + ctxW.toFixed(0).toString() + "  ctxH=" + ctxH.toFixed(0).toString()
+        //gText(tmpStr, "bold 18px cambria", "black", 30, 150)
     }
     
     //alphaDeg = 90
     //alpha = Math.PI / 2
     //vl_znacilenKot = true
 
-    //======== IZRA�UN �TEVIL�NE VREDNOSTI KOTA KOT STRINGA V STOPINJAH IN RADIANIH
-    let drrr = lf_getAlphaStrings(alpha, alphaDeg, vl_znacilenKot)
-    let alphaStrDeg = drrr[0]
-    let alphaStrRad = drrr[1]
-    let alphaStrRad2 = drrr[2]
-    let alphaStrRad3 = drrr[3]
+    //======== IZRAČUN ŠTEVILČNE VREDNOSTI KOTA KOT STRINGA V STOPINJAH IN RADIANIH
+    ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha, alphaDeg, vl_znacilenKot)
     //console.log("alphaStrDeg=" + alphaStrDeg + " alphaStrRad=" + alphaStrRad + " alphaStrRad2=" + alphaStrRad2 + " alphaStrRad3=" + alphaStrRad3)
 
     //let vl_color = "#FFFFFFFF";// "gold"
@@ -1032,17 +1086,17 @@ function paint_eKrog() {
 
     //======== PRAVILA: 1) SUPLEMENTARNI KOTI
     if (lo_showRulesSupplement) {
-        if (alphaDeg > 0 && alphaDeg < 90) {
+        if (alphaDeg >= 0 && alphaDeg < 90) {
             alpha2 = Math.PI - alpha
             alpha2Deg = 180 - alphaDeg
-            //lf_getAlphaStrings(alpha2, alpha2Deg, False, alpha2StrDeg, alpha2StrRad, alpha2StrRad2, alpha2StrRad3)
-            drrr = lf_getAlphaStrings(alpha2, alpha2Deg, "")
-            alphaStrDeg = drrr[0]
-            alphaStrRad = drrr[1]
-            alphaStrRad2 = drrr[2]
-            alphaStrRad3 = drrr[3]
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
             lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "180" + scStopinj + "-" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 2)
-            //GoTo labAfterRules
+        }
+        else if (alphaDeg > 90 && alphaDeg <= 180) {
+            alpha2 = Math.PI - alpha
+            alpha2Deg = 180 - alphaDeg
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
+            lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "180" + scStopinj + "-" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 1)
         }
     }
     //==== PRAVILA: 2) KOMPLEMENTARNI KOTI
@@ -1050,12 +1104,7 @@ function paint_eKrog() {
         if (alphaDeg > 0 && alphaDeg < 90) {
             alpha2 = Math.PI / 2 - alpha
             alpha2Deg = 90 - alphaDeg
-            //lf_getAlphaStrings(alpha2, alpha2Deg, False, alpha2StrDeg, alpha2StrRad, alpha2StrRad2, alpha2StrRad3)
-            drrr = lf_getAlphaStrings(alpha2, alpha2Deg, "")
-            alphaStrDeg = drrr[0]
-            alphaStrRad = drrr[1]
-            alphaStrRad2 = drrr[2]
-            alphaStrRad3 = drrr[3]
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
             lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "90" + scStopinj + "-" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 1)
         }
     }
@@ -1064,49 +1113,77 @@ function paint_eKrog() {
         if (alphaDeg > 0 && alphaDeg < 90) {
             alpha2 = Math.PI + alpha
             alpha2Deg = 180 + alphaDeg
-            //lf_getAlphaStrings(alpha2, alpha2Deg, False, alpha2StrDeg, alpha2StrRad, alpha2StrRad2, alpha2StrRad3)
-            drrr = lf_getAlphaStrings(alpha2, alpha2Deg, "")
-            alphaStrDeg = drrr[0]
-            alphaStrRad = drrr[1]
-            alphaStrRad2 = drrr[2]
-            alphaStrRad3 = drrr[3]
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
             lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "180" + scStopinj + "+" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 3)
+        }
+        else if (alphaDeg > 180 && alphaDeg < 270) {
+            alpha2 = alpha - Math.PI
+            alpha2Deg = alphaDeg - 180
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
+            lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "180" + scStopinj + "+" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 1)
         }
     }
     //==== PRAVILA: 4) PREHOD IV -> I
     else if (lo_showRules4to1) {
         if (alphaDeg > 0 && alphaDeg < 90) {
             alpha2 = 2 * Math.PI - alpha
-            alpha2Deg = 360 + alphaDeg
-            //lf_getAlphaStrings(alpha2, alpha2Deg, False, alpha2StrDeg, alpha2StrRad, alpha2StrRad2, alpha2StrRad3)
-            drrr = lf_getAlphaStrings(alpha2, alpha2Deg, "")
-            alphaStrDeg = drrr[0]
-            alphaStrRad = drrr[1]
-            alphaStrRad2 = drrr[2]
-            alphaStrRad3 = drrr[3]
+            alpha2Deg = 360 - alphaDeg
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
             lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "-" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 4)
+        }
+        else if (alphaDeg > 270 && alphaDeg < 360) {
+            alpha2 = 2 * Math.PI - alpha
+            alpha2Deg = 360 - alphaDeg
+            ;[alphaStrDeg, alphaStrRad, alphaStrRad2, alphaStrRad3] = lf_getAlphaStrings(alpha2, alpha2Deg, "")
+            lf_paint_eKrog_sinCos(ctx, "", xCircleCenter, yCircleCenter, radij, "-" + scAlpha, alpha2, alpha2Deg, alpha2StrDeg, alpha2StrRad3, "", 1)
         }
     }
 
     //==== RISANJE KRIVULJ SIN/COS IN/ALI TAN/COT
-    //---- TOP
-    let vl_graphTop = 50
-    //---- LEFT
-    let vl_graphLeft = lf_getGraphAreaLeft() //xCircleRight + 100
-    //---- WIDTH
+    let vl_graphTop, vl_graphLeft, vl_graphWidth, vl_graphHeight
+    const cv_marginLeft = 40
     const cv_marginRight = 20
     const cv_graphMidGapH = 60
     const cv_minGraphWidth = 100
-    let vl_graphWidth = ctxW - vl_graphLeft - cv_marginRight
-    if (lo_showFunGroup == cv_funGroup_all) { vl_graphWidth = (vl_graphWidth - cv_graphMidGapH) / 2 }
-    if (vl_graphWidth < cv_minGraphWidth) { vl_graphWidth = cv_minGraphWidth }
-    //---- HEIGHT
+    const cv_marginTop = 20
     const cv_marginBottom = 30
     const cv_graphMidGapV = 80
     const cv_minGraphHeight = 50
-    let vl_graphHeight = (ctxH - vl_graphTop - cv_graphMidGapV - cv_marginBottom) / 2
-    if (vl_graphHeight < cv_minGraphHeight) { vl_graphHeight = cv_minGraphHeight }
+    switch (lo_displayMode) {
+        case cv_displayMode_landscape:
+            //---- TOP
+            vl_graphTop = 50
+            //---- LEFT
+            vl_graphLeft = lf_getGraphAreaLeft() //xCircleRight + 100
+            //---- WIDTH
+            vl_graphWidth = ctxW - vl_graphLeft - cv_marginRight
+            if (lo_showFunGroup == cv_funGroup_all) { vl_graphWidth = (vl_graphWidth - cv_graphMidGapH) / 2 }
+            if (vl_graphWidth < cv_minGraphWidth) { vl_graphWidth = cv_minGraphWidth }
+            //---- HEIGHT
+            vl_graphHeight = (ctxH - vl_graphTop - cv_graphMidGapV - cv_marginBottom) / 2
+            if (vl_graphHeight < cv_minGraphHeight) { vl_graphHeight = cv_minGraphHeight }
+            break;
+        default:
+            //---- TOP
 
+            vl_graphTop = lo_yCircleCenter + radij + 100
+            if (vl_graphTop < 2 * radij + 100) { vl_graphTop = 2 * radij + 100 }
+            if (vl_graphTop < 300) { vl_graphTop = 300 }
+
+
+            //vl_graphTop = cv_panelGUI_height + lo_eKrogPanelHeight + cv_marginTop
+            //---- LEFT
+            vl_graphLeft = cv_marginLeft
+            //---- WIDTH
+            vl_graphWidth = ctxW - cv_marginLeft - cv_marginRight
+            if (lo_showFunGroup == cv_funGroup_all) { vl_graphWidth = (vl_graphWidth - cv_graphMidGapH) / 2 }
+            if (vl_graphWidth < cv_minGraphWidth) { vl_graphWidth = cv_minGraphWidth }
+            //---- HEIGHT
+            vl_graphHeight = (ctxH - vl_graphTop - cv_graphMidGapV - cv_marginBottom) / 2
+            if (vl_graphHeight < cv_minGraphHeight) { vl_graphHeight = cv_minGraphHeight }
+            break;
+    }
+    
     //console.log("alphaStrRad2=" + alphaStrRad2)
 
     //---- Prikaz zahtevanih grafov
@@ -1135,12 +1212,12 @@ function paint_eKrog() {
 function lf_getAlphaFromCurrentMousePosition() {
 
     //======== ALFA
-    //---- najprej X in Y koordinati mi�ke v okviru pictureBox-a
+    //---- najprej X in Y koordinati miške v okviru pictureBox-a
     //let currentXpb = Cursor.Position.X - Me.Left - lo_frmBorderWidth - cv_privateFormBorder
-    //let currentYpb = Cursor.Position.Y - Me.Top - lo_frmTitleBarHeight - cv_privateFormBorder //- lo_frmBorderWidth ... zgornji border je �e vsebovan v lo_frmTitleBarHeight
+    //let currentYpb = Cursor.Position.Y - Me.Top - lo_frmTitleBarHeight - cv_privateFormBorder //- lo_frmBorderWidth ... zgornji border je že vsebovan v lo_frmTitleBarHeight
     let currentXpb = lo_mouseMoveX
     let currentYpb = lo_mouseMoveY
-    //---- razdalja mi�ke od sredi��a enotskega kroga po X in po Y
+    //---- razdalja miške od središča enotskega kroga po X in po Y
     let kvadrant
     let dx, dy, alpha, alphaDeg
     dx = (currentXpb - xCircleCenter)
@@ -1148,8 +1225,8 @@ function lf_getAlphaFromCurrentMousePosition() {
     //console.log("dx=" + dx + " dy=" + dy)
     //if (dx > 0) {console.log("dx>0") }
     //g.DrawString(dx.ToString & " " & dy.ToString, mdSignFont10, Brushes.Black, currentXpb + 5, currentYpb - 8)
-    //---- dolo�anje kota alpha[rad] in kvadranta
-    if (dx == 0) { //---- NAVPI�NO
+    //---- določanje kota alpha[rad] in kvadranta
+    if (dx == 0) { //---- NAVPIČNO
         if (dy >= 0) {
             kvadrant = 1
             alpha = Math.PI / 2
@@ -1189,9 +1266,9 @@ function lf_getAlphaFromCurrentMousePosition() {
     // � � ? ?
     //console.log("alphaDeg=" + alphaDeg + "�")
 
-    //======== PREVERJANJE ZNA�ILNIH KOTOV 0,30,45,60,90
+    //======== PREVERJANJE ZNAČILNIH KOTOV 0,30,45,60,90
     let vl_znacilenKot = ""
-    if (true) { //if (!window.event.ctrlKey) { ... test �e dr�i pritisnjeno tipko CTRL ... !TODO!
+    if (true) { //if (!window.event.ctrlKey) { ... test če drži pritisnjeno tipko CTRL ... !TODO!
         if (lo_showZnacilniKoti) {
             vl_znacilenKot = true
             //console.log("vl_znacilenKot=" + vl_znacilenKot)
@@ -1234,14 +1311,57 @@ function lf_getGraphAreaLeft() { //xCircleRight + 100
 
     let vl_graphLeft = lo_xCircleCenter + radij + 100
     if (vl_graphLeft < 2 * radij + 100) { vl_graphLeft = 2 * radij + 100 }
-    if (vl_graphLeft < 800) { vl_graphLeft = 800 }
+    if (vl_graphLeft < 670) { vl_graphLeft = 670 }
     return vl_graphLeft
 
 }
 
+function lf_setCircleRadij(kRadij) {
+
+    //console.log("lo_radijLevel=" + lo_radijLevel + " kRadij=" + kRadij)
+    let vl_radij, vl_outPart, ctxW2, ctxH2, ctxMinDim
+    let kAvailable = 0.5
+    let ctxH1 = ctxH - cv_panelGUI_height //toliko višine je na razpolago brez check/radio boxov od GUI
+    if (ctxW > ctxH1 * 0.8) {//----LANDSCAPE MODE---- grafi bojo desno od kroga
+        //kolikšen del širine bo za enostki krog?
+        //gText("LANDSCAPE MODE", "bold 18px cambria", "blue", 30, 170)
+        lo_displayMode = cv_displayMode_landscape
+        if (lo_showGraphSinCos && lo_showGraphTanCot) { ctxW2 = ctxW * 0.5 }
+        else if (lo_showGraphSinCos || lo_showGraphTanCot) { ctxW2 = ctxW * 0.65 }
+        else { ctxW2 = ctxW }
+        ctxH2 = ctxH1
+    } else { //----PORTRAIT MODE---- grafi bojo pod krogom
+        //gText("PORTRAIT MODE", "bold 18px cambria", "red", 30, 170)
+        lo_displayMode = cv_displayMode_portrait
+        if (lo_showGraphSinCos && lo_showGraphTanCot) { ctxH2 = ctxH1 * 0.5 }
+        else if (lo_showGraphSinCos || lo_showGraphTanCot) { ctxH2 = ctxH1 * 0.65 }
+        else { ctxH2 = ctxH1 }
+        ctxW2 = ctxW
+    }
+    lo_eKrogPanelWidth = ctxW2
+    lo_eKrogPanelHeight = ctxH2
+    ctxMinDim = Math.min(ctxW2, ctxH2)
+    vl_outPart = (ctxMinDim / 2) * 0.15 * kRadij
+    if (vl_outPart < 30) { vl_outPart = 30 }
+    vl_radij = ctxMinDim / 2 - vl_outPart
+    if (vl_radij < 10) { vl_radij = 10 }
+    return (Math.trunc(vl_radij));
+}
+    
 function lf_setCircleCenterPos() {
-    let x = 70 + radij
-    let y = ctxH - 100 - radij
+    
+    let x, y
+
+    switch (lo_displayMode) {
+        case cv_displayMode_landscape:
+            x = ((70 + radij)) // + lo_eKrogPanelWidth / 2) / 2 //vmes med 70+radij in horizontalnim centrom panela kroga
+            y = ((ctxH - 100 - radij) + lo_eKrogPanelHeight / 2) / 2
+            break
+        case cv_displayMode_portrait:
+            x = ((70 + radij) + lo_eKrogPanelWidth / 2) / 2 //vmes med 70+radij in horizontalnim centrom panela kroga
+            y = ((150 + radij) + (cv_panelGUI_height + lo_eKrogPanelHeight / 2)) / 2
+            break
+    }
     return [x, y]
 }
 
@@ -1249,7 +1369,7 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
 
     //On Error GoTo labErr
 
-    // �e se je COT() od enotskega kroga narisal dale� na desno v podro�je teh krivulj, potem tisto, kar je pod krivuljami, posivim
+    // Če se je COT() od enotskega kroga narisal daleč na desno v področje teh krivulj, potem tisto, kar je pod krivuljami, posivim
     if (vp_alpha <= Math.PI / 4 || vp_alpha > 7 * Math.PI / 4) {
         ctx.fillStyle = "#F5F5F5D0"
         ctx.fillRect(vp_left - 25, vp_top, vp_width + 60, vp_height)
@@ -1323,7 +1443,7 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
     gText(scAlpha, myFontMathLabelsLargeBoldItalic, "darkSlateGray", vl_xRight - 9, vl_yXos + 12)
 
 
-    //==== POMO�NE LINIJE VREDNOSTI (SKUPNO ZA VSE 4 FUNCIJE)
+    //==== POMOŽNE LINIJE VREDNOSTI (SKUPNO ZA VSE 4 FUNCIJE)
     gLine(vl_xYos, vl_yXos - ky * 1, vl_xDataEnd, vl_yXos - ky * 1, 1, "lightGray", [5, 2])
     gLine(vl_xYos, vl_yXos + ky * 1, vl_xDataEnd, vl_yXos + ky * 1, 1, "lightGray", [5, 2])
     //==== OZNAKE VREDNOSTI NA Y OSI (SKUPNO ZA VSE 4 FUNCIJE)
@@ -1331,21 +1451,21 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
     gLine(vl_xYos - 2, vl_yXos + ky * 1, vl_xYos + 2, vl_yXos + ky * 1, 1, "darkSlateGray", [])
     //==== VREDNOSTI NA Y OSI (SKUPNO ZA VSE 4 FUNCIJE)
     if ((vp_function == cv_fun_cos) && vp_showZnacilniKoti) {
-        gText("1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 14, vl_yXos - ky * 1 - 7)
+        gText("1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 14, vl_yXos - ky * 1 + 3)
     } else {
-        gText("1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 11, vl_yXos - ky * 1 - 7)
+        gText("1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 11, vl_yXos - ky * 1 + 3)
     }
-    gText("-1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 15, vl_yXos + ky * 1 - 7)
+    gText("-1", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 15, vl_yXos + ky * 1 + 3)
     if (vp_showZnacilniKoti && ((vp_function == cv_fun_sin) || (vp_function == cv_fun_tan))) {
-        gText("0", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 14, vl_yXos - 7)
+        gText("0", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 14, vl_yXos + 3)
     } else {
-        gText("0", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 11, vl_yXos - 7)
+        gText("0", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 11, vl_yXos + 3)
     }
 
     switch (vp_function) {
 
         case cv_fun_sin: case cv_fun_cos:
-            //==== POMO�NE LINIJE VREDNOSTI
+            //==== POMOŽNE LINIJE VREDNOSTI
             gLine(vl_xYos, Math.round(vl_yXos - ky * 0.5), vl_xDataEnd, Math.round(vl_yXos - ky * 0.5), 1, "lightGray", [5, 2])
             gLine(vl_xYos, Math.round(vl_yXos + ky * 0.5), vl_xDataEnd, Math.round(vl_yXos + ky * 0.5), 1, "lightGray", [5, 2])
             gLine(vl_xYos, Math.round(vl_yXos - ky * Math.sqrt(2) / 2), vl_xDataEnd, Math.round(vl_yXos - ky * Math.sqrt(2) / 2), 1, "lightGray", [5, 2])
@@ -1360,16 +1480,16 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
             gLine(vl_xYos - 2, Math.round(vl_yXos - ky * Math.sqrt(3) / 2), vl_xYos + 2, Math.round(vl_yXos - ky * Math.sqrt(3) / 2), 1, "darkSlateGray", [])
             gLine(vl_xYos - 2, Math.round(vl_yXos + ky * Math.sqrt(3) / 2), vl_xYos + 2, Math.round(vl_yXos + ky * Math.sqrt(3) / 2), 1, "darkSlateGray", [])
             //==== VREDNOSTI NA Y OSI
-            gText("1/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 24, vl_yXos - ky * 0.5 - 7)
-            gText("-1/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 28, vl_yXos + ky * 0.5 - 7)
-            gText(scKoren + "2/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(2) / 2 - 7)
-            gText("-" + scKoren + "2/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(2) / 2 - 7)
-            gText(scKoren + "3/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(3) / 2 - 7)
-            gText("-" + scKoren + "3/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(3) / 2 - 7)
+            gText("1/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 24, vl_yXos - ky * 0.5 + 3)
+            gText("-1/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 28, vl_yXos + ky * 0.5 + 3)
+            gText(scKoren + "2/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(2) / 2 + 3)
+            gText("-" + scKoren + "2/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(2) / 2 + 3)
+            gText(scKoren + "3/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(3) / 2 + 3)
+            gText("-" + scKoren + "3/2", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(3) / 2 + 3)
             break
 
         case cv_fun_tan: case cv_fun_cot:
-            //==== POMO�NE LINIJE VREDNOSTI
+            //==== POMOŽNE LINIJE VREDNOSTI
             gLine(vl_xYos, Math.round(vl_yXos - ky * Math.sqrt(3) / 3), vl_xDataEnd, Math.round(vl_yXos - ky * Math.sqrt(3) / 3), 1, "lightGray", [5, 2])
             gLine(vl_xYos, Math.round(vl_yXos + ky * Math.sqrt(3) / 3), vl_xDataEnd, Math.round(vl_yXos + ky * Math.sqrt(3) / 3), 1, "lightGray", [5, 2])
             gLine(vl_xYos, Math.round(vl_yXos - ky * Math.sqrt(3)), vl_xDataEnd, Math.round(vl_yXos - ky * Math.sqrt(3)), 1, "lightGray", [5, 2])
@@ -1384,12 +1504,12 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
             gLine(vl_xYos - 2, Math.round(vl_yXos - ky * 5), vl_xYos + 2, Math.round(vl_yXos - ky * 5), 1, "darkSlateGray", [])
             gLine(vl_xYos - 2, Math.round(vl_yXos + ky * 5), vl_xYos + 2, Math.round(vl_yXos + ky * 5), 1, "darkSlateGray", [])
             //==== VREDNOSTI NA Y OSI
-            gText(scKoren + "3/3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(3) / 3 - 7)
-            gText("-" + scKoren + "3/3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(3) / 3 - 7)
-            gText(scKoren + "3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 24, vl_yXos - ky * Math.sqrt(3) - 7)
-            gText("-" + scKoren + "3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 28, vl_yXos + ky * Math.sqrt(3) - 7)
-            gText("5", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 12, vl_yXos - ky * 5 - 7)
-            gText("-5", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 16, vl_yXos + ky * 5 - 7)
+            gText(scKoren + "3/3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 33, vl_yXos - ky * Math.sqrt(3) / 3 + 3)
+            gText("-" + scKoren + "3/3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 37, vl_yXos + ky * Math.sqrt(3) / 3 + 3)
+            gText(scKoren + "3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 24, vl_yXos - ky * Math.sqrt(3) + 3)
+            gText("-" + scKoren + "3", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 28, vl_yXos + ky * Math.sqrt(3) + 3)
+            gText("5", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 12, vl_yXos - ky * 5 + 3)
+            gText("-5", myFontMathValuesSmall, "darkSlateGray", vl_xYos - 16, vl_yXos + ky * 5 + 3)
             break
     }
 
@@ -1440,7 +1560,7 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
     //======== RISANJE KRIVULJE GRAFA
     lf_paint_graph_single_graph(ctx, vp_function, vl_xDataRange, vl_xYos, vl_yXos, ky, vl_maxFunValue, vl_alpha0rad)
 
-    //==== MARKERJI NA KRO�NICI ZA ZNA�ILNE KOTE
+    //==== MARKERJI NA KROŽNICI ZA ZNAČILNE KOTE
     if (lo_showZnacilniKoti) {
         lf_paint_graph_single_markerZnacilniKot(ctx, vp_function, vl_alpha0rad, 0, vl_xYos, vl_yXos, ky, vl_xDataRange)
         lf_paint_graph_single_markerZnacilniKot(ctx, vp_function, vl_alpha0rad, 30, vl_xYos, vl_yXos, ky, vl_xDataRange)
@@ -1449,14 +1569,14 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
         lf_paint_graph_single_markerZnacilniKot(ctx, vp_function, vl_alpha0rad, 90, vl_xYos, vl_yXos, ky, vl_xDataRange)
     }
 
-    //==== OZNA�ENA VELIKOST KOTNE FUNKCIJE ZA GLAVNI KOT ALFA
+    //==== OZNAČENA VELIKOST KOTNE FUNKCIJE ZA GLAVNI KOT ALFA
     let ret01 // v tej strukturi bo funkcija vrnila koordinate
     ret01 = lf_paint_graph_single_markFunValue(ctx, vl_xDataRange, vl_xYos, vl_yXos, ky, vp_function, vl_alpha0, vl_alpha0rad, vp_alpha, vp_alphaDeg, vp_showZnacilniKoti, vp_znacilenKot)
     xData = ret01[0]; yData = ret01[1]; x = ret01[2]; y = ret01[3]; 
 
-    //==== Z DEBELO RDE�O PIKO POUDAREK, DA SMO NA ZNA�ILNEM KOTU 0, 30, 45, 60 ali 90 STOPINJ, SICER NAVADEN SIV KROGEC
+    //==== Z DEBELO RDEČO PIKO POUDAREK, DA SMO NA ZNAČILNEM KOTU 0, 30, 45, 60 ali 90 STOPINJ, SICER NAVADEN SIV KROGEC
     if (vp_showZnacilniKoti && vp_znacilenKot) {
-        //---- rde� marker
+        //---- rdeč marker
         switch (vp_function) {
             case cv_fun_sin: case cv_fun_cos:
                 gEllipse(x, y, 5, 5, 0, "", 3, "red")
@@ -1465,7 +1585,7 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
                 //console.log("vp_alphaDeg=" + vp_alphaDeg)
                 switch (vp_alphaDeg) {
                     case 90: case 270:
-                        //console.log("--vp_alphaDeg=" + vp_alphaDeg) ... problem je bil spet en manjkajo�i Break
+                        //console.log("--vp_alphaDeg=" + vp_alphaDeg) ... problem je bil spet en manjkajoči Break
                         break;
                     default:
                         gEllipse(x, y, 5, 5, 0, "", 3, "red")
@@ -1497,7 +1617,7 @@ function lf_paint_graph_single(ctx, vp_left, vp_top, vp_width, vp_height, vp_fun
         }
     }
 
-    //==== OZNA�EN SINUS/COSINUS ZA PRIMER KAK�NEGA DODATNO VKLOPLJENEGA PRIKAZA PRAVILA
+    //==== OZNAČEN SINUS/COSINUS ZA PRIMER KAKŠNEGA DODATNO VKLOPLJENEGA PRIKAZA PRAVILA
     if (vp_alpha2 != vp_alpha) {
         ret01 = lf_paint_graph_single_markFunValue(ctx, vl_xDataRange, vl_xYos, vl_yXos, ky, vp_function, vl_alpha0, vl_alpha0rad, vp_alpha2, vp_alpha2Deg, "", "")
         xData = ret01[0]; yData = ret01[1]; x = ret01[2]; y = ret01[3]; 
@@ -1514,7 +1634,7 @@ function lf_paint_graph_single_markFunValue(ctx, vp_xDataRange, vp_xYos, vp_yXos
 
     let x, y, xData, yData
 
-    //==== OZNA�EN SINUS/COSINUS
+    //==== OZNAČEN SINUS/COSINUS
     xData = vp_xDataRange * vp_alpha / 2 / Math.PI
     x = vp_xYos + xData
     //----
@@ -1737,7 +1857,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
         ctx.closePath()
     }
 
-    //======== IZPIS �TEVIL�NE VREDNOSTI KOTA
+    //======== IZPIS ŠTEVILČNE VREDNOSTI KOTA
     if (vp_basicChart) {
         font = "bold 11pt cambria"
         vl_color = "darkSlateGray"
@@ -1755,7 +1875,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     if ((radijKot > 40) && (!vp_basicChart)) { radijKot -= 30 }
     gArc(xCircleCenter, yCircleCenter, radijKot, 0, alpha, vl_color, 0, "")
 
-    //======== �RTA KOTA
+    //======== ČRTA KOTA
     if (vp_basicChart && lo_showTanCot) {
         let kExtra = 1.05
         if (alphaDeg == 360 || alphaDeg == 0) {
@@ -1814,7 +1934,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     //gLine(lf_myPen(Color.Gray, 1), xCircleCenter, yCircleCenter, x, y)
     gLine(xCircleCenter, yCircleCenter, x, y, 1, "gray", [])
 
-    //======== OZNA�BA PRAVEGA KOTA
+    //======== OZNAČBA PRAVEGA KOTA
     if ((alphaDeg >= 4 && alphaDeg <= 86) || (alphaDeg >= 94 && alphaDeg <= 176) || (alphaDeg >= 184 && alphaDeg <= 266) || (alphaDeg >= 274 && alphaDeg <= 356)) { 
         let signCos, signSin 
         signCos = Math.cos(alpha) / Math.abs(Math.cos(alpha))
@@ -1830,7 +1950,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
     gLine(xCircleCenter, yCircleCenter, xCircleCenter, yPointOnCircle, 2, myColorSin, [])
     gLine(xPointOnCircle, yCircleCenter, xPointOnCircle, yPointOnCircle, 5, myColorSin, [])
 
-    //======== Z DEBELO RDE�O PIKO POUDAREK, DA SMO NA ZNA�ILNEM KOTU 0, 30, 45, 60 ali 90 STOPINJ, SICER NAVADEN SIV KROGEC
+    //======== Z DEBELO RDEČO PIKO POUDAREK, DA SMO NA ZNAČILNEM KOTU 0, 30, 45, 60 ali 90 STOPINJ, SICER NAVADEN SIV KROGEC
     if (vl_znacilenKot) {
         gEllipse(xPointOnCircle, yPointOnCircle, 5, 5, 0, "", 4, "red")
     }
@@ -1838,7 +1958,7 @@ function lf_paint_eKrog_sinCos(ctx, vp_basicChart, xCircleCenter, yCircleCenter,
         gEllipse(xPointOnCircle, yPointOnCircle, 4, 4, 0, "", 4, "darkSlategray")
     }
 
-    //======== OZNAKA DOL�INE RADIJA 1 NA �RTI KOTA
+    //======== OZNAKA DOLŽINE RADIJA 1 NA ČRTI KOTA
     let alpha2 
     if (kvadrant == 1 || kvadrant == 3) {
         alpha2 = alpha + 3 * Math.PI / 180
@@ -2139,6 +2259,19 @@ window.onresize = function (event) {
     paint();
 };
 
+document.onvisibilitychange = function() {
+    let cText = document.cookie //decodeURIComponent(document.cookie); //cookie_get("onOff")
+    console.log("cookie: " + cText.toString())
+    if (document.visibilityState === 'hidden') {
+        cookie_set("onOff", "theory", 10);
+        console.log("cookie set")
+        let cookies = document.cookie;
+        console.log(cookies);
+    }
+    cText = decodeURIComponent(document.cookie); //cookie_get("onOff")
+    console.log("cookie: " + cText.toString())
+};
+  
 function openFullscreen() {
     if (elem.requestFullscreen) {
         elem.requestFullscreen();
@@ -2254,6 +2387,7 @@ function gArc(x, y, radius, startAngle, endAngle, fillColor, strokeWidth, stroke
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.arc(x, y, radius, -startAngle, -endAngle, true);
+    ctx.closePath();
     if (fillColor != "") {
         ctx.fillStyle = fillColor;
         ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
@@ -2263,7 +2397,6 @@ function gArc(x, y, radius, startAngle, endAngle, fillColor, strokeWidth, stroke
         ctx.lineWidth = strokeWidth;
         ctx.stroke();
     }
-    ctx.closePath();
 }
 
 function gLine(x0, y0, x1, y1, width, color, dash) {
@@ -2311,7 +2444,7 @@ function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeC
         ctx.lineTo(right + xShaddow, y1 + yShaddow)
         ctx.lineTo(right + xShaddow, y0 + yShaddow)
         ctx.lineTo(x1 + xShaddow, top + yShaddow)
-        ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vle�i �rte, ampak samo zapre� pot
+        ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
         ctx.fillStyle = shaddowColor
         ctx.fill()
     }
@@ -2326,7 +2459,7 @@ function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeC
         ctx.lineTo(right, y1)
         ctx.lineTo(right, y0)
         ctx.lineTo(x1, top)
-        ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vle�i �rte, ampak samo zapre� pot
+        ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
     }
     //----
     if (fillColor != "") {
@@ -2469,10 +2602,10 @@ function lf_calculate_deg() {
         textCalcDeg.value = alphaDegStr
     }
      
-    // //zamenjam vejice v pike zaradi univerzalnosti ra�unanja
+    // //zamenjam vejice v pike zaradi univerzalnosti računanja
     // alphaDegStr = alphaDegStr.replace(/,/g, ".") // !TODO! replace() DONE kje.Replace(kaj,kam) --> kje.replace(rEx-kaj,kam) ... https://www.tutorialrepublic.com/faq/how-to-replace-character-inside-a-string-in-javascript.php
     //console.log("alphaDegStr=" + alphaDegStr)
-    // //�e ima vmes minus in ta minus ni na za�etku, potem ta minus pobri�em
+    // //Če ima vmes minus in ta minus ni na začetku, potem ta minus pobrišem
     // let tmpPos = alphaDegStr.indexOf("-") // InStr(kje,kaj) --> kje.indexOf(kaj, start) !TODO! DONE
     // if (tmpPos > 0) {
     //     alphaDegStr = alphaDegStr.replace("-", "")
@@ -2676,7 +2809,7 @@ function lf_calculate_setAlphaData(vp_alphaDeg, vp_alphaDegStr) {
     
     let alphaDeg = vp_alphaDeg
     //console.log("vp_alphaDeg=" + vp_alphaDeg + " alphaDeg=" + alphaDeg)
-    //�e je kot negativen, ga najprej spravim v prvi kvadrant
+    //Če je kot negativen, ga najprej spravim v prvi kvadrant
     if (alphaDeg < 0) {
         //console.log("vp_alphaDeg=" + vp_alphaDeg + " alphaDeg=" + alphaDeg)
         alphaDeg = alphaDeg + (1 + Math.trunc(-alphaDeg / 360)) * 360
@@ -2686,7 +2819,7 @@ function lf_calculate_setAlphaData(vp_alphaDeg, vp_alphaDegStr) {
         //console.log("vp_alphaDeg=" + vp_alphaDeg + " -> alphaDeg=" + alphaDeg)
     }
 
-    //---- dolo�anje kvadranta
+    //---- določanje kvadranta
     let vl_kvadrant = Math.trunc(alphaDeg / 90) + 1
     if (vl_kvadrant > 4) { vl_kvadrant = 4 }
     //console.log("kvadrant==" + vl_kvadrant)
@@ -2920,5 +3053,47 @@ function lf_getKotRadSpec(alphaDeg) {
 
 }
 
+function cookie_set(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    let expires = "expires=" + d.toUTCString();
+    let cookieStr = cname + "=" + cvalue + "; " + expires + "; path=/";
+    console.log("cookie string: " + cookieStr);
+    document.cookie = cookieStr;
+    //console.log("cookie:: " + document.cookie)
+    let cookies = document.cookie;
+    console.log("document.cookie: " + cookies);
+    const cookieList = document.cookie.split('; ');
+    console.log("cookie[0] " + cookieList[0] + ", cookie[1] " + cookieList[1])
+  }
+  
+  function cookie_get(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+  
+  function cookie_check() {
+    let user = cookie_get("username");
+    if (user != "") {
+      alert("Welcome again " + user);
+    } else {
+       user = prompt("Please enter your name:","");
+       if (user != "" && user != null) {
+         cookie_set("username", user, 30);
+       }
+    }
+}
+  
 
 
