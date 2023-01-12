@@ -2259,17 +2259,33 @@ window.onresize = function (event) {
     paint();
 };
 
-document.onvisibilitychange = function() {
-    let cText = document.cookie //decodeURIComponent(document.cookie); //cookie_get("onOff")
-    console.log("cookie: " + cText.toString())
-    if (document.visibilityState === 'hidden') {
-        cookie_set("onOff", "theory", 10);
-        console.log("cookie set")
-        let cookies = document.cookie;
-        console.log(cookies);
+document.onvisibilitychange = function () {
+    console.log("======= document visibility changed, printing current cookie ...")
+    let docCookie = document.cookie;
+    let cText = decodeURIComponent(docCookie); //cookie_get("onOff") ... decodeURIComponent() je tu zaradi urejanja kod posebnih znakov, recimo %20% itd
+    console.log("document.cookie: " + docCookie)
+    console.log("decodeURIComponent(document.cookie): " + cText)
+    if (docCookie != "" || docCookie != null) { } else { 
+        //console.log("document.cookie: " + cookies);
+        const cookieList = document.cookie.split('; ');
+        console.log("cookie[0]: " + cookieList[0] + "  cookie[1]: " + cookieList[1])
     }
-    cText = decodeURIComponent(document.cookie); //cookie_get("onOff")
-    console.log("cookie: " + cText.toString())
+    if (document.visibilityState === 'hidden') {
+        console.log("... visibility changed to hidden, set the cookie ...")
+        //----
+        cookie_set("onOff", "theory,rulesSupplement", 10);
+        console.log("cookie set (onOff=theory,rulesSupplement)")
+        //----
+        cookie_set("c2", "c2val", 13);
+        console.log("cookie set (c2=c2val)")
+        //----
+        docCookie = document.cookie;
+        cText = decodeURIComponent(docCookie); //cookie_get("onOff") ... decodeURIComponent() je tu zaradi urejanja kod posebnih znakov, recimo %20% itd
+        console.log("new document.cookie: " + docCookie)
+        console.log("new decodeURIComponent(document.cookie): " + cText)
+    } else {
+         console.log("... visibility changed to visible, no need to set cookie")
+    }
 };
   
 function openFullscreen() {
@@ -3062,9 +3078,9 @@ function cookie_set(cname, cvalue, exdays) {
     document.cookie = cookieStr;
     //console.log("cookie:: " + document.cookie)
     let cookies = document.cookie;
-    console.log("document.cookie: " + cookies);
-    const cookieList = document.cookie.split('; ');
-    console.log("cookie[0] " + cookieList[0] + ", cookie[1] " + cookieList[1])
+    //console.log("document.cookie: " + cookies);
+    //const cookieList = document.cookie.split('; ');
+    //console.log("cookie[0] " + cookieList[0] + ", cookie[1] " + cookieList[1])
   }
   
   function cookie_get(cname) {
