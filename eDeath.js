@@ -1,40 +1,40 @@
 //------------------------------------
-const gl_versionNr = "v1.0"
-const gl_versionDate = "24.1.2023"
+const gl_versionNr = "v1.1"
+const gl_versionDate = "25.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
-const cv_eu27 = 1
+const cv_aut = 1
 const cv_bel = 2
 const cv_bul = 3
-const cv_cze = 4
-const cv_den = 5
-const cv_ger = 6
-const cv_est = 7
-const cv_ire = 8
-const cv_gre = 9
-const cv_spa = 10
+const cv_cro = 4
+const cv_cyp = 5
+const cv_cze = 6
+const cv_den = 7
+const cv_est = 8
+const cv_eu27 = 9
+const cv_fin = 10
 const cv_fra = 11
-const cv_cro = 12
-const cv_ita = 13
-const cv_cyp = 14
-const cv_lat = 15
-const cv_lit = 16
-const cv_lux = 17
-const cv_hun = 18
-const cv_mal = 19
-const cv_ned = 20
-const cv_aut = 21
-const cv_pol = 22
-const cv_por = 23
-const cv_rom = 24
-const cv_svn = 25
-const cv_svk = 26
-const cv_fin = 27
-const cv_swe = 28
-const cv_ice = 29
-const cv_lie = 30
-const cv_nor = 31
+const cv_ger = 12
+const cv_gre = 13
+const cv_hun = 14
+const cv_ice = 15
+const cv_ire = 16
+const cv_ita = 17
+const cv_lat = 18
+const cv_lie = 19
+const cv_lit = 20
+const cv_lux = 21
+const cv_mal = 22
+const cv_ned = 23
+const cv_nor = 24
+const cv_pol = 25
+const cv_por = 26
+const cv_rom = 27
+const cv_spa = 28
+const cv_svk = 29
+const cv_svn = 30
+const cv_swe = 31
 const cv_swi = 32
 //----
 const cv_maxCountry = 32
@@ -246,6 +246,13 @@ countryColor[cv_lie] = "tan"
 countryColor[cv_nor] = "indianRed"
 countryColor[cv_swi] = "orchid"
 
+//---- toggles for countries
+var lo_enabledCountryAll = true;
+var lo_enabledCountry = new Array(cv_maxCountry)
+for (country = 1; country <= cv_maxCountry; country++) {
+    lo_enabledCountry[country] = true;
+}
+
 const cv_minMonth = 1
 const cv_minYear = 2020
 const cv_maxMonth = 11
@@ -289,6 +296,9 @@ countryExcessDeath[cv_nor] = [-3.4, -2.4, -0.6, 2.9, -3.0, -1.6, -1.9, 1.7, 4.9,
 countryExcessDeath[cv_swi] = [-3.7, -0.6, 12.1, 27.6, -1.4, 1.5, 1.6, 4.9, 4.5, 15.2, 66.1, 59.9, 23.8, -5.0, -5.5, 3.3, 3.4, 2.8, 2.6, 8.9, 12.7, 7.1, 16.5, 25.7, 4.8, 3.5, 13.8, 14.2, 5.4, 13.3, 21.9, 15.1, 8.4, 13.7, 11.6]
 
 var lo_nrMonthsAvg = 5
+var lo_nrMonthsAvgOld = 5                   // 25.1.2023 v1.1
+var lo_nrMonthsAvgAll = false               // 25.1.2023 v1.1
+var lo_enabledIntChooserNrMonthsAvg = true; // 25.1.2023 v1.1
 var cv_nrMonths = (13 - cv_minMonth) + 12 * (cv_maxYear - cv_minYear - 1) + cv_maxMonth
 var gl_monthEnd = cv_nrMonths
 var gl_tailMonths = 5 //za koliko mesecev nazaj se še riše od trenutno izbranega meseca gl_monthEnd
@@ -445,11 +455,19 @@ elMyCanvas.addEventListener('click', (e) => {
 
     let rslt
     let vl_end = false
-    if (!vl_end) {
+    if (!vl_end && lo_enabledIntChooserNrMonthsAvg) {
         rslt = lf_executeClick_intChooser(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+10, 180, 5, lo_nrMonthsAvg, 1, 1)
         if (rslt >= 1 && rslt != lo_nrMonthsAvg) {
             lo_nrMonthsAvg = rslt
             paint()
+            vl_end = true
+        }
+    }
+    if (!vl_end) {
+        rslt = lf_executeClick_checkBox(e.offsetX, e.offsetY, guiPanelLeft + 200, guiPanelTop - 8, 20, 2, lo_nrMonthsAvgAll)
+        if (rslt != lo_nrMonthsAvgAll) {
+            lf_changeNrMonthsAvgAll(rslt, true)
+            paint();
             vl_end = true
         }
     }
@@ -465,6 +483,32 @@ elMyCanvas.addEventListener('click', (e) => {
         rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1, 0, 0)
         if (rslt >= 1 && rslt != gl_monthEnd) {
             gl_monthEnd = rslt
+            paint()
+            vl_end = true
+        }
+    }
+    if (!vl_end) {
+        rslt = lf_executeClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20, 20);
+        if (rslt >= 1 && rslt <= cv_maxCountry) {
+            lo_enabledCountry[rslt] = !lo_enabledCountry[rslt];
+            paint()
+            vl_end = true
+        }
+    }
+
+});
+
+elMyCanvas.addEventListener('dblclick', (e) => {
+
+    let rslt, country
+    let vl_end = false
+    if (!vl_end) {
+        rslt = lf_executeDoubleClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20);
+        if (rslt) {
+            lo_enabledCountryAll = !lo_enabledCountryAll;
+            for (country = 1; country <= cv_maxCountry; country++) {
+                lo_enabledCountry[country] = lo_enabledCountryAll;
+            }
             paint()
             vl_end = true
         }
@@ -527,7 +571,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
     //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja dolžino "repa"
-    if (lo_keyDownA) {
+    if (lo_keyDownA && lo_enabledIntChooserNrMonthsAvg) {
         lo_nrMonthsAvg -= delta;
         if (lo_nrMonthsAvg > 5) { lo_nrMonthsAvg = 5 };
         if (lo_nrMonthsAvg < 1) { lo_nrMonthsAvg = 1 };
@@ -575,6 +619,8 @@ window.addEventListener("keydown", (event) => {
             gl_monthEnd = cv_nrMonths; paint(); break;
         case 'KeyH':
             lo_showGUI = !lo_showGUI; paint(); break;
+        case 'KeyS':
+            lf_changeNrMonthsAvgAll(!lo_nrMonthsAvgAll, true); break;
     }
 });
 
@@ -702,11 +748,17 @@ function paint_GUI() {
 
     if (!lo_showGUI) { return };
 
-    let tmpStr, tmpStr2
+    let tmpStr, tmpStr2, tmpW, tmpH, color;
 
+    //---- izbiranje števila mesecev za povprečenje
     paint_GUI_intChooser(guiPanelLeft, guiPanelTop+10, 180, 5, lo_nrMonthsAvg, 1, 1)
-    gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 196, guiPanelTop + 3);
+    gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 227, guiPanelTop -1);
     
+    //---- check box za povprečenje čez vse mesece covid epidemije
+    paint_GUI_checkBox(guiPanelLeft + 200, guiPanelTop - 8, 20, 2, 2, "vse", lo_nrMonthsAvgAll);
+    gText("(S)", "italic 10pt serif", "gray", guiPanelLeft + 227, guiPanelTop + 14);
+
+    //---- za koliko časa nazaj se bo risal "rep"
     paint_GUI_slider(guiPanelLeft, guiPanelTop+42, 500, cv_nrMonths, gl_tailMonths, 0, 1)
     tmpStr = "Risanje tudi za predhodnih: " + gl_tailMonths.toString()
     if (gl_tailMonths == 0) { tmpStr2 = " mesecev" }
@@ -720,12 +772,21 @@ function paint_GUI() {
     gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 418, guiPanelTop + 31);
     gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", "gray", guiPanelLeft + 398, guiPanelTop + 11);
 
+    //---- izbira meseca za prikaz
     paint_GUI_slider(guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1)
     tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStr(gl_monthEnd) + ")"
     gText(tmpStr, "normal 10pt verdana", "gray", guiPanelLeft, guiPanelTop+81)
     gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End)", "italic 10pt serif", "gray", guiPanelLeft + 310, guiPanelTop + 80);
 
-    
+    //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
+    font = "bold 10pt verdana"
+    for (country = 1; country <= cv_maxCountry; country++) {
+        ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], font);
+        x = ctxW - tmpW - 5; y = 65 + (country - 1) * 20;
+        color = countryColor[country]
+        if (!lo_enabledCountry[country]) {color="darkGray"}
+        gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, "white", 1, "lightGray", font, color, countryNameShort3[country], "lightGray", 2, 2)
+    }
 }
 
 function lf_monthStr(vp_month) {
@@ -755,6 +816,93 @@ function lf_mesecName(vp_mesec) {
         case 12: return "dec"
     }
     return "?"
+
+}
+
+function lf_changeNrMonthsAvgAll(vp_newValue, vp_paint) {
+
+    lo_nrMonthsAvgAll = vp_newValue;
+    switch (lo_nrMonthsAvgAll) {
+        case true:
+            lo_nrMonthsAvgOld = lo_nrMonthsAvg
+            lo_nrMonthsAvg = cv_nrMonths;
+            lo_enabledIntChooserNrMonthsAvg = false;
+            break;
+        case false:
+            lo_nrMonthsAvg = lo_nrMonthsAvgOld
+            lo_enabledIntChooserNrMonthsAvg = true;
+            break; 
+    }
+    if (vp_paint) { paint() }
+
+}
+
+function lf_executeClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom, vp_countryHeight) {
+
+    //---- če klik ni bil na državah
+    if (!(vp_mouseX >= vp_left && vp_mouseX <= vp_right && vp_mouseY >= vp_top && vp_mouseY <= vp_bottom)) {
+        return -100;
+    }
+
+    //---- na katero državo je bil klik
+    let y0, y1;
+    for (country = 1; country <= cv_maxCountry; country++) {
+        y0 = vp_top + (country - 1) * vp_countryHeight; y1 = vp_top + country * vp_countryHeight;
+        if (vp_mouseY >= y0 && vp_mouseY <= y1) {
+            return country
+        }
+    }
+}
+
+function lf_executeDoubleClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom) {
+
+    //---- če dvojni klik ni bil na državah
+    if (!(vp_mouseX >= vp_left && vp_mouseX <= vp_right && vp_mouseY >= vp_top && vp_mouseY <= vp_bottom))
+         { return false }
+    else { return true };
+}
+
+function paint_GUI_checkBox(vp_left, vp_top, vp_width, vp_lineWidth, vp_smoothPx, vp_text, vp_value) {
+
+    let myColor = "burlyWood"
+    
+    let x1 = vp_left; let x2 = x1 + vp_smoothPx; let x3 = vp_left + vp_width - vp_smoothPx; let x4 = vp_left + vp_width;
+    let y1 = vp_top; let y2 = y1 + vp_smoothPx; let y3 = vp_top + vp_width - vp_smoothPx; let y4 = vp_top + vp_width;
+    ctx.beginPath()
+    ctx.moveTo(x2, y1)
+    ctx.lineTo(x3, y1)
+    ctx.lineTo(x4, y2)
+    ctx.lineTo(x4, y3)
+    ctx.lineTo(x3, y4)
+    ctx.lineTo(x2, y4)
+    ctx.lineTo(x1, y3)
+    ctx.lineTo(x1, y2)
+    ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+    ctx.fillStyle = "white"
+    ctx.fill()
+    ctx.setLineDash([]);
+    ctx.strokeStyle = myColor;
+    ctx.lineWidth = vp_lineWidth;
+    ctx.stroke();
+
+    gText(vp_text, "normal 10pt verdana", "gray", vp_left, vp_top - 4);
+    
+    if (vp_value) {
+        let vl_gap = vp_lineWidth / 2 + 0.25 * (vp_width - vp_lineWidth); // 20% naj bo znotraj še praznega roba do križca
+        x1 = vp_left + vl_gap; x2 = vp_left + vp_width - vl_gap;
+        y1 = vp_top + vl_gap; y2 = vp_top + vp_width - vl_gap;
+        gLine(x1, y1, x2, y2, vp_lineWidth + 1, "peru", []);
+        gLine(x1, y2, x2, y1, vp_lineWidth + 1, "peru", []);
+    }
+}
+
+function lf_executeClick_checkBox(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_width, vp_lineWidth, vp_value) {
+  
+    x0 = vp_left - vp_lineWidth / 2; x1 = vp_left + vp_width + vp_lineWidth / 2;
+    y0 = vp_top - vp_lineWidth / 2; y1 = vp_top + vp_width + vp_lineWidth / 2;
+    if (vp_mouseX >= x0 && vp_mouseX <= x1 && vp_mouseY >= y0 && vp_mouseY <= y1) {
+        return (!vp_value);
+    } else { return vp_value };
 
 }
 
@@ -821,7 +969,8 @@ function lf_executeClick_slider(vp_mouseX, vp_mouseY, vp_left, vp_bodyMiddle, vp
 
 function paint_GUI_intChooser(vp_left, vp_top, vp_width, vp_items, vp_value, vp_minItemValue, vp_step) {
 
-    let myColor="burlyWood"
+    let myColor = "burlyWood"
+    if (!lo_enabledIntChooserNrMonthsAvg) { myColor = "lightGray" }
     let valueItem = Math.round((vp_value - vp_minItemValue) / vp_step) + 1
     let outRadij = 7; let inRadij=5; let selRadij=4
     const cv_bodyWidth = 7; const cv_bodyWidthHalf = 3
@@ -843,12 +992,14 @@ function paint_GUI_intChooser(vp_left, vp_top, vp_width, vp_items, vp_value, vp_
             //gText(vp_value.toString(), font, "darkSlateGray", x - tmpW/2, yBodyMiddle - outRadij - 2)
         }
     }
-    tmpStr = "Povpre" + scTchLow + "enje: " + vp_value.toString()
-    if (vp_value == 1) { tmpStr2 = " mesec (=brez)" }
-    else if (vp_value == 2) { tmpStr2 = " meseca" }
-    else if (vp_value == 3) { tmpStr2 = " mesece" }
-    else if (vp_value == 4) { tmpStr2 = " mesece" }
-    else if (vp_value == 5) {tmpStr2 = " mesecev"}
+    tmpStr = "Povpre" + scTchLow + "enje: "
+    tmpStr2 = vp_value.toString()
+    if (vp_value == 1) { tmpStr2 = "brez" }
+    else if (vp_value == 2) { tmpStr2 += " meseca" }
+    else if (vp_value == 3) { tmpStr2 += " mesece" }
+    else if (vp_value == 4) { tmpStr2 += " mesece" }
+    else if (vp_value == 5) { tmpStr2 += " mesecev" }
+    else { tmpStr2 += " mesecev" }
     tmpStr += tmpStr2
     gText(tmpStr, "normal 10pt verdana", "gray", vp_left, yBodyMiddle - outRadij - 5)
 }
@@ -879,7 +1030,7 @@ function lf_executeClick_intChooser(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_wi
 function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
 
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
-    const cv_graphRight = vp_left + vp_width - 15 //X koordinata konca X osi
+    const cv_graphRight = vp_left + vp_width - 45 //X koordinata konca X osi
     const cv_graphLeftData = cv_graphLeft + 2 //X koordinata začetka področja podatkov
     const cv_graphRightData = cv_graphRight - 5 //X koordinata konca področja podatkov
     const cv_graphRangeX = cv_graphRightData - cv_graphLeftData //X koordinata konca področja podatkov
@@ -983,6 +1134,8 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     font = "bold 10pt verdana"
     let kk = 2; if (gl_tailMonths>10) {kk=1}
     for (country = 1; country <= cv_maxCountry; country++) {
+        //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
+        if (!lo_enabledCountry[country]) { continue };
         //---- najprej za linije med krogci točk
         for (month = gl_monthStart; month <= gl_monthEnd; month++) {
             monthIndex = month - gl_monthStart + 1
@@ -1014,6 +1167,8 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     }
     //---- zdaj pa še za oznake držav, zato da so te v vsakem primeru preko krogcev točk in linij med krogci
     for (country = 1; country <= cv_maxCountry; country++) {
+         //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
+         if (!lo_enabledCountry[country]) { continue };
         month = gl_monthEnd
         monthIndex = month - gl_monthStart + 1
         //xValue = countryVacc[country]
@@ -1090,7 +1245,10 @@ function paint_eDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_
     //console.log("avgVaccLeft=" + avgVaccLeft + " avgExcessDeathLeft=" + avgExcessDeathLeft)
     
     //---- naklonski koeficient smerne linije
-    let k = (avgExcessDeathAll - avgExcessDeathLeft) / (avgVaccAll - avgVaccLeft)
+    let k
+    if ((avgVaccAll - avgVaccLeft) == 0) { k = 1000 }
+    else { k = (avgExcessDeathAll - avgExcessDeathLeft) / (avgVaccAll - avgVaccLeft) }
+
     //console.log("k=" + k)
     //---- začetna in končna točka smerne linije
     //let vacc0 = 22; let vacc1 = 95
@@ -1108,6 +1266,12 @@ function paint_eDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_
     gLine(x0 - 2, y0 - 2, x1 - 2, y1 - 2, 4, "white", [cv_dashWidth, cv_dashWidth])
     gLine(x0+1, y0+1, x1+1, y1+1, 4, "gray", [cv_dashWidth, cv_dashWidth])
     gLine(x0, y0, x1, y1, 4, "darkGray", [cv_dashWidth, cv_dashWidth])
+
+    //---- označitev kota smerne linije
+    let alphaStr
+    if ((avgVaccAll - avgVaccLeft) == 0) { alphaStr = "90" + scStopinj } else { alphaStr = ( Math.abs(Math.atan(k)) * 180 / Math.PI ).toFixed(1) + scStopinj }
+    gText(alphaStr, "italic 10pt serif", "gray", x1 + 5, y1 + 4)
+
 }
 
 function lf_getAvgValue(vp_country, vp_month, vp_nrMonthsAvg) {
@@ -1151,7 +1315,7 @@ function lf_inspectDataValues(vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
 function paint_author() {
 
     //======== AVTOR
-    let tmpStr = "Peter Malovrh, 2022"
+    let tmpStr = "Peter Malovrh, 2023"
     let font = "italic bold 18px cambria"; // podpičje pred destrukturiranjem nujno !!!!!
     let [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
@@ -1618,7 +1782,7 @@ function paint_delay() {
             lo_hasRepaintRequest = true
             return;
         case false:
-            paint()
+            paint();
             setTimeout(tmPaintDelay_tick, 10)
             lo_repaintTimerActive = true
             lo_hasRepaintRequest = false
