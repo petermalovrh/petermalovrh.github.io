@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.2"
-const gl_versionDate = "25.1.2023"
+const gl_versionNr = "v1.3"
+const gl_versionDate = "26.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -310,6 +310,11 @@ var lo_keyDownT = false
 var lo_showGUI = true
 var lo_showTips = true
 
+// 26.1.2023 1.3
+var lo_autoPlay = false  
+var tmAutoPlayId                
+var lo_autoPlayStarting = false 
+
 //var cv_privateFormBorder  = 2
 var lo_backgroundColor = "whiteSmoke"
 //var lo_penFrg1 As Pen = New Pen(Color.DarkSlateGray, 1)
@@ -331,7 +336,9 @@ var lo_mouseAboveSliderMonthEnd = false
 var lo_dragMonthEndActive = false
 var lo_dragMonthEndAddX = 0; var lo_dragMonthEndAddY = 0
 
-const guiPanelLeft = 100; const guiPanelTop = 80
+//---- GUI
+const guiPanelLeft = 100; const guiPanelTop = 80; const guiPanelWidth = 500
+const pickCountrYTop = 75; const pickCountryHeight = 20; const pickCountryLeftDiff = 6;
 
 var lo_repaintTimerActive  = false
 var lo_hasRepaintRequest  = false
@@ -489,7 +496,7 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20, 20);
+        rslt = lf_executeClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, pickCountrYTop - 6, ctxW, pickCountrYTop - 6 + cv_maxCountry * pickCountryHeight, pickCountryHeight);
         if (rslt >= 1 && rslt <= cv_maxCountry) {
             lo_enabledCountry[rslt] = !lo_enabledCountry[rslt];
             paint()
@@ -622,12 +629,24 @@ window.addEventListener("keydown", (event) => {
             lf_changeEnableCountryAll(!lo_enabledCountryAll, true); break;
         case 'KeyN': case 'F2':
             lf_changeShowTips(!lo_showTips, true); break;
+        //case 'F5':
+            //console.log("F5 pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
+        case 'KeyP' :
+            console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
     }
 });
 
 window.addEventListener("keyup", (event) => {
-    if (event.code == 'KeyA') { lo_keyDownA = false }
-    if (event.code == 'KeyT') { lo_keyDownT = false }
+    
+    switch (event.code) {
+        case 'KeyA':
+            lo_keyDownA = false; break;
+        case 'KeyT':
+            lo_keyDownT = false; break;
+        //case 'KeyP':
+            //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
+    }
+
 });
 
 //window.addEventListener('mouseup', (e) => {
@@ -780,21 +799,21 @@ function paint_GUI() {
     paint_GUI_slider(guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1)
     tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStr(gl_monthEnd) + ")"
     gText(tmpStr, "normal 10pt verdana", "gray", guiPanelLeft, guiPanelTop+81)
-    if (lo_showTips) { gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End)", "italic 10pt serif", "gray", guiPanelLeft + 310, guiPanelTop + 80); }
+    if (lo_showTips) { gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", "gray", guiPanelLeft + 232, guiPanelTop + 80); }
 
     //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
     font = "bold 10pt verdana"
-    let countriesTop = 65; let countryHeight = 20;
+    //let pickCountrYTop = 75; let pickCountryHeight = 20; let pickCountryLeftDiff = 6;
     for (country = 1; country <= cv_maxCountry; country++) {
         ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], font);
-        x = ctxW - tmpW - 5; y = countriesTop + (country - 1) * countryHeight;
+        x = ctxW - tmpW - pickCountryLeftDiff; y = pickCountrYTop + (country - 1) * pickCountryHeight;
         color = countryColor[country]
         if (!lo_enabledCountry[country]) {color="darkGray"}
         gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, "white", 1, "lightGray", font, color, countryNameShort3[country], "lightGray", 2, 2)
     }
     if (lo_showTips) {
-        gText("(C)", "italic 10pt serif", "gray", ctxW - 20, countriesTop + country * countryHeight - 11);
-        gText("(dblClick)", "italic 10pt serif", "gray", ctxW - 56, countriesTop + country * countryHeight + 3);
+        gText("(C)", "italic 10pt serif", "gray", ctxW - 20, pickCountrYTop + country * pickCountryHeight - 11);
+        gText("(dblClick)", "italic 10pt serif", "gray", ctxW - 56, pickCountrYTop + country * pickCountryHeight + 3);
     }
 
 }
@@ -863,7 +882,77 @@ function lf_changeShowTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
-function lf_executeClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom, vp_countryHeight) {
+function lf_changeMonthEnd(vp_newValue, vp_paint) {
+
+    console.log("lf_changeMonthEnd: newValue=" + vp_newValue)
+    
+    if (vp_newValue < 1 || vp_newValue > cv_nrMonths) { return };
+
+    gl_monthEnd = vp_newValue;
+
+    
+    if (vp_paint) {
+        console.log("lf_changeMonthEnd: call Paint() now ...")
+        paint()
+    }
+}
+
+function lf_changeAutoPlay(vp_newValue) {
+
+    console.log("lf_changeAutoPlay: newValue=" + vp_newValue);
+
+    lo_autoPlay = vp_newValue;
+
+    switch (lo_autoPlay) {
+        case true:
+            //user je vključil auto play - treba je štartati timer
+            console.log("now start timer ...");
+            lo_autoPlayStarting = true;
+            tmAutoPlayId = setInterval(tmAutoPlay_tick, 200);
+            lo_autoPlayStarting = false;
+            console.log("  timer started");
+            break;
+        case false:
+            //user je izključil auto play - treba je ukiniti timer
+            clearInterval(tmAutoPlayId);
+            console.log("timer cleared");
+    }
+}
+
+function tmAutoPlay_tick() {
+
+    console.log("timer_tick")
+
+    if (lo_autoPlayStarting) {
+        console.log("  exit because start of the timer!");
+        lo_autoPlayStarting = false;
+        //return
+    } else {
+        // če sem že na zadnjem mesecu, potem ustavim animacijo
+        if (gl_monthEnd >= cv_nrMonths) {
+            clearInterval(tmAutoPlayId);
+            tmAutoPlayId = null;
+            console.log("  timer_tick_cleared");
+            lo_autoPlay = false;
+            //return;
+        } else {
+            // grem na naslednji mesec
+            console.log("  set month=" + (gl_monthEnd + 1).toString());
+            lf_changeMonthEnd(gl_monthEnd + 1, true);
+            // če sem že na zadnjem mesecu, potem ustavim animacijo
+            if (gl_monthEnd >= cv_nrMonths) {
+                clearInterval(tmAutoPlayId);
+                tmAutoPlayId = null;
+                console.log("  timer_tick_cleared(pos-end)");
+                lo_autoPlay = false;
+                //return;
+        }
+        }
+    }
+  
+}
+
+function lf_executeClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom, vp_pickCountryHeight) {
 
     //---- če klik ni bil na državah
     if (!(vp_mouseX >= vp_left && vp_mouseX <= vp_right && vp_mouseY >= vp_top && vp_mouseY <= vp_bottom)) {
@@ -873,7 +962,7 @@ function lf_executeClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, v
     //---- na katero državo je bil klik
     let y0, y1;
     for (country = 1; country <= cv_maxCountry; country++) {
-        y0 = vp_top + (country - 1) * vp_countryHeight; y1 = vp_top + country * vp_countryHeight;
+        y0 = vp_top + (country - 1) * vp_pickCountryHeight; y1 = vp_top + country * vp_pickCountryHeight;
         if (vp_mouseY >= y0 && vp_mouseY <= y1) {
             return country
         }
@@ -929,7 +1018,7 @@ function lf_executeClick_checkBox(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_widt
     if (vp_mouseX >= x0 && vp_mouseX <= x1 && vp_mouseY >= y0 && vp_mouseY <= y1) {
         return (!vp_value);
     } else { return vp_value };
-
+    
 }
 
 function paint_GUI_slider(vp_left, vp_bodyMiddle, vp_width, vp_items, vp_value, vp_minItemValue, vp_step) {
