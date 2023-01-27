@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.3"
-const gl_versionDate = "26.1.2023"
+const gl_versionNr = "v1.4"
+const gl_versionDate = "27.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -223,7 +223,7 @@ countryColor[cv_est] = "purple"
 countryColor[cv_ire] = "limeGreen"
 countryColor[cv_gre] = "royalBlue"
 countryColor[cv_spa] = "red"
-countryColor[cv_fra] = "cyan"
+countryColor[cv_fra] = "turquoise" //"cyan"
 countryColor[cv_cro] = "dodgerBlue"
 countryColor[cv_ita] = "darkTurquoise"
 countryColor[cv_cyp] = "indigo"
@@ -338,7 +338,319 @@ var lo_dragMonthEndAddX = 0; var lo_dragMonthEndAddY = 0
 
 //---- GUI
 const guiPanelLeft = 100; const guiPanelTop = 80; const guiPanelWidth = 500
-const pickCountrYTop = 75; const pickCountryHeight = 20; const pickCountryLeftDiff = 6;
+const pickCountryTop = 65; const pickCountryTopText = pickCountryTop + 5; const pickCountryHeight = 20; const pickCountryLeftDiff = 6;
+
+class countryPanel {
+    constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY ) {
+        this.left = left;
+        this.top = top;
+        this.right = right;
+        this.itemHeight = itemHeight;
+        this.enabled = enabled;
+        this.disabledColor = disabledColor;
+        this.font = font;
+        this.fillColor = fillColor;
+        this.strokeWidth = strokeWidth;
+        this.strokeColor = strokeColor;
+        this.shaddowColor = shaddowColor;
+        this.shaddowX = shaddowX;
+        this.shaddowY = shaddowY;
+        //---- additional object properties
+        this.textTop = this.top + 5;
+        this.textRight = this.right - pickCountryLeftDiff;
+    }
+    paint() {
+        let tmpW, tmpH, x, y, color
+        for (country = 1; country <= cv_maxCountry; country++) {
+            ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], this.font);
+            //x = ctxW - tmpW - pickCountryLeftDiff; y = pickCountryTop + (country - 1) * pickCountryHeight;
+            x = this.textRight - tmpW;
+            y = this.textTop + (country - 1) * this.itemHeight;
+            color = countryColor[country]
+            if (!lo_enabledCountry[country]) { color = this.disabledColor }
+            gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, this.fillColor , this.strokeWidth, this.strokeColor, this.font, color, countryNameShort3[country], this.shaddowColor, this.shaddowX, this.shaddowY)
+        }
+    }
+    eventClick(mouseX, mouseY) {
+        //---- če klik ni bil na državah   //ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20
+        if (!(mouseX >= (this.left) && mouseX <= (this.right) && mouseY >= (this.top) && mouseY <= (this.top + cv_maxCountry * this.itemHeight))) {
+            return -100;
+        }
+        //---- na katero državo je bil klik
+        let y0, y1;
+        for (country = 1; country <= cv_maxCountry; country++) {
+            y0 = this.top + (country - 1) * this.itemHeight;
+            y1 = this.top + country * this.itemHeight;
+            if (mouseY >= y0 && mouseY <= y1) {
+                return country
+            }
+        }
+        return -100;
+    }
+    eventDblClick(mouseX, mouseY) {
+        //---- če dvojni klik ni bil na državah
+        if (!(mouseX >= this.left && mouseX <= (this.right) && mouseY >= (this.top) && mouseY <= (this.top + cv_maxCountry * this.itemHeight)))
+             { return false }
+        else { return true };
+    }
+    adjustToCtxWidth() {
+        this.left = ctxW - pickCountryLeftDiff - 45;
+        this.textRight = ctxW - pickCountryLeftDiff;
+        this.right = ctxW;
+    }
+}
+var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "lightGray", 2, 2);
+
+class slider {
+    constructor(left, bodyMiddle, width, items, value, minItemValue, step, enabled, color, disabledColor, bodyWidth, selWidth, selHeight, selShaddowColor, text, font, gap, posAlign, textColor, valueFont, valueColor, valueGap, addZoneUp, addZoneDown) {
+        this.left = left;
+        this.bodyMiddle = bodyMiddle;
+        this.width = width;
+        this.items = items;
+        this.value = value;
+        this.minItemValue = minItemValue;
+        this.step = step;
+        this.enabled = enabled;
+        this.color = color;
+        this.disabledColor = disabledColor;
+        this.bodyWidth = bodyWidth;
+        this.selWidth = selWidth;
+        this.selHeight = selHeight;
+        this.selShaddowColor = selShaddowColor;
+        this.text = text;
+        this.font = font;
+        this.gap = gap;
+        this.posAlign = posAlign;
+        this.textColor = textColor;
+        this.valueFont = valueFont;
+        this.valueColor = valueColor;
+        this.valueGap = valueGap;
+        this.addZoneUp = addZoneUp;
+        this.addZoneDown = addZoneDown;
+    }
+    paint() {
+        let myColor = this.color;
+        if (!this.enabled) { myColor = this.disabledColor }
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        let itemWidth = this.width / this.items;
+        let itemWidthHalf = itemWidth / 2
+        const chooserWidthHalf = Math.trunc(this.selWidth / 2)
+        const bodyHeightHalf = Math.trunc(this.bodyWidth / 2);
+        const bodyBottom = this.bodyMiddle + bodyHeightHalf;
+        const bodyTop = this.bodyMiddle - bodyHeightHalf
+        gLine(this.left, this.bodyMiddle, this.left + this.width, this.bodyMiddle, this.bodyWidth, myColor, [])
+    
+        let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value, x1, x2, y1
+        for (step = 1; step <= this.items; step++) {
+            vl_value = this.minItemValue + (step - 1) * this.step
+            x = this.left + itemWidthHalf + (step - 1) * itemWidth
+            gLine(x, bodyBottom + 2, x, bodyBottom + 4, 3, myColor, [])
+            if (step == valueItem) {
+                //---- risanje trikotnega selektorja v to vrednost
+                x1 = x - chooserWidthHalf;
+                x2 = x + chooserWidthHalf;
+                y1 = bodyBottom + this.selHeight
+                ctx.beginPath()
+                ctx.moveTo(x1, y1)
+                ctx.lineTo(x2, y1)
+                ctx.lineTo(x, bodyBottom)
+                ctx.closePath()  // ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+                ctx.fillStyle = myColor
+                ctx.fill()
+                ctx.setLineDash([]);
+                ctx.strokeStyle = this.selShaddowColor;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                //gLine(x1 + 1, y1 + 1, x2 + 1, y1 + 1, 1, "gray", [])
+                //gLine(x2 + 1, y1 + 1, x + 1, bodyBottom + 1, 1, "gray", [])
+            }
+            else if (step == 1 || step == this.items) {
+                tmpStr = vl_value.toString();
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, this.valueFont);
+                gText(tmpStr, this.valueFont, this.valueColor, x - tmpW / 2, bodyBottom + this.valueGap + tmpH)
+            }
+        }
+        //---- izpis teksta
+        switch (this.posAlign) {
+            case "above-left":
+                ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+                gText(this.text, this.font, this.textColor, this.left, bodyTop - this.gap);
+        }
+    }
+    eventClick(mouseX, mouseY) {
+        //console.log("slider->eventClick()")
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        let itemWidth = this.width / this.items;
+        let itemWidthHalf = itemWidth / 2
+        const chooserWidthHalf = Math.trunc(this.selWidth / 2)
+        const bodyHeightHalf = Math.trunc(this.bodyWidth / 2);
+        const bodyBottom = this.bodyMiddle + bodyHeightHalf;
+        const bodyTop = this.bodyMiddle - bodyHeightHalf
+        let step, x, x0, x1, y0, y1, vl_value;
+        for (step = 1; step <= this.items; step++) {
+            vl_value = this.minItemValue + (step - 1) * this.step;
+            x = this.left + itemWidthHalf + (step - 1) * itemWidth;
+            x0 = x - itemWidthHalf; x1 = x + itemWidthHalf;
+            y0 = bodyTop - 8 - this.addZoneUp; y1 = bodyBottom + 10 + this.addZoneDown
+            if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
+                this.value = vl_value;
+                return this.value
+            }
+        }
+        return (this.minItemValue - 1)
+    }
+    setAddZone(addZoneUp, addZoneDown) {
+        this.addZoneUp = addZoneUp;
+        this.addZoneDown = addZoneDown;
+    }
+}
+var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+
+class intChooser {
+    constructor(left, top, width, items, value, minItemValue, step, enabled, color, fillColor, crossColor, disabledColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.items = items;
+        this.value = value;
+        this.minItemValue = minItemValue;
+        this.step = step;
+        this.enabled = enabled;
+        this.color = color;
+        this.fillColor = fillColor;
+        this.crossColor = crossColor;
+        this.disabledColor = disabledColor;
+        this.outRadij = outRadij;
+        this.inRadij = inRadij;
+        this.selRadij = selRadij;
+        this.bodyWidth = bodyWidth;
+        this.text = text;
+        this.font = font;
+        this.gap = gap;
+        this.posAlign = posAlign;
+        this.textColor = textColor;
+        this.clickGap = clickGap;
+    }
+    paint() {
+        let myColor = this.color; let myCrossColor = this.crossColor;
+        if (!this.enabled) { myColor = this.disabledColor; myCrossColor = this.disabledColor }
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        const cv_bodyWidthHalf = Math.trunc(this.bodyWidth / 2);
+        let yBodyMiddle = this.top - this.outRadij; 
+        gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth, myColor, []);
+                       
+        let xStep = (this.width - 2 * this.outRadij) / (this.items - 1);
+        let step, x, tmpStr, tmpStr2, tmpW, tmpH
+        //let font = "normal verdana 10pt"
+        let font = "italic Cambria 20pt";
+        for (step = 1; step <= this.items; step++) {
+            x = this.left + this.outRadij + (step - 1) * xStep
+            gEllipse(x, yBodyMiddle, this.outRadij, this.outRadij, 0, myColor, 0, "")        
+            gEllipse(x, yBodyMiddle, this.inRadij, this.inRadij, 0, this.fillColor, 0, "") 
+            if (step == valueItem) {
+                gEllipse(x, yBodyMiddle, this.selRadij, this.selRadij, 0, myCrossColor, 0, "") 
+                //tmpStr = this.value.toString();
+                //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                //gText(this.value.toString(), font, "darkSlateGray", x - tmpW/2, yBodyMiddle - this.outRadij - 2)
+            }
+        }
+        //---- izpis teksta
+        switch (this.posAlign) {
+            case "above-left":
+                ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+                gText(this.text, this.font, this.textColor, this.left, yBodyMiddle - this.outRadij - this.gap);
+        }
+    }
+    eventClick(mouseX, mouseY) {
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        let yBodyMiddle = this.top - this.outRadij;
+        let xStep = (this.width - 2 * this.outRadij) / (this.items - 1)
+        let step, x, dx, dy, dist
+        let y = yBodyMiddle
+        for (step = 1; step <= this.items; step++) {
+            x = this.left + this.outRadij + (step - 1) * xStep;
+            dx = x - mouseX;
+            dy = y - mouseY; 
+            dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist <= (this.outRadij + this.clickGap)) {
+                //if (step == valueItem) { return (this.value) }
+                //else { return (this.minItemValue + (step - 1) * this.step) }
+                this.value = this.minItemValue + (step - 1) * this.step
+                return this.value
+            }
+        }
+        return (this.minItemValue - 1) //manj od minimuma, da se potem tam izven ve, da ni bilo klika na to komponento
+    }
+}
+var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 5, "above-left", "gray", 5);
+
+    
+class checkBox {
+    constructor(left, top, width, lineWidth, smoothPx, text, gap, posAlign, value, color, fillColor, crossColor, textColor, font) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.lineWidth = lineWidth;
+        this.smoothPx = smoothPx;
+        this.text = text;
+        this.gap = gap;
+        this.posAlign = posAlign;
+        this.value = value;
+        this.color = color;
+        this.fillColor = fillColor;
+        this.crossColor = crossColor;
+        this.textColor = textColor;
+        this.font = font;
+    }
+    paint() {
+        let tmpW, tmpH
+        let x1 = this.left; let x2 = x1 + this.smoothPx; let x3 = this.left + this.width - this.smoothPx; let x4 = this.left + this.width;
+        let y1 = this.top; let y2 = y1 + this.smoothPx; let y3 = this.top + this.width - this.smoothPx; let y4 = this.top + this.width;
+        //---- risanje okvirčka
+        ctx.beginPath()
+        ctx.moveTo(x2, y1)
+        ctx.lineTo(x3, y1)
+        ctx.lineTo(x4, y2)
+        ctx.lineTo(x4, y3)
+        ctx.lineTo(x3, y4)
+        ctx.lineTo(x2, y4)
+        ctx.lineTo(x1, y3)
+        ctx.lineTo(x1, y2)
+        ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = this.fillColor
+        ctx.fill()
+        ctx.setLineDash([]);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.lineWidth;
+        ctx.stroke();
+        //---- izpis teksta
+        switch (this.posAlign) {
+            case "above-middle": //above-middle
+                ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+                gText(this.text, this.font, this.textColor, this.left + (this.width - tmpW) / 2, this.top - this.gap);
+        }
+        //---- križec glede na vrednost
+        if (this.value) {
+            let vl_gap = this.lineWidth / 2 + 0.25 * (this.width - this.lineWidth); // 20% naj bo znotraj še praznega roba do križca
+            x1 = this.left + vl_gap; x2 = this.left + this.width - vl_gap;
+            y1 = this.top + vl_gap; y2 = this.top + this.width - vl_gap;
+            gLine(x1, y1, x2, y2, this.lineWidth + 1, this.crossColor, []);
+            gLine(x1, y2, x2, y1, this.lineWidth + 1, this.crossColor, []);
+        }
+    }
+    eventClick(mouseX, mouseY) {
+        let x0 = this.left - this.lineWidth / 2;
+        let x1 = this.left + this.width + this.lineWidth / 2;
+        let y0 = this.top - this.lineWidth / 2;
+        let y1 = this.top + this.width + this.lineWidth / 2;
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
+            this.value = !this.value
+        }
+        return (this.value);
+    }
+  }
+var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
 
 var lo_repaintTimerActive  = false
 var lo_hasRepaintRequest  = false
@@ -355,6 +667,9 @@ var ctxW = window.innerWidth - 18;
 var ctxH = window.innerHeight - 10;
 var ctxMinDim = Math.min(ctxW, ctxH)
 const cv_panelGUI_height = 100
+//countryPanelToggle.right = ctxW - pickCountryLeftDiff; // 27.1.2023 v1.4
+//countryPanelToggle.left = countryPanelToggle.right - 41;
+countryPanelToggle.adjustToCtxWidth();
 
 var ctx = elMyCanvas.getContext("2d");
 const bckgColor = "#F4F8F8";
@@ -433,19 +748,12 @@ cvsConvertColors.width = 1;
 var ctxConvertColors = cvsConvertColors.getContext('2d');
 ctxConvertColors.willReadFrequently = true
 
-//---- 26.12.2022
-var tmCalcId
-
-function tmCalc_tick() {
-    lf_calculate()
-}
-
 var lo_noChange = ""
 
 // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
 // Add the event listeners for mousedown, mousemove, and mouseup
 elMyCanvas.addEventListener('mousedown', (e) => {
-    lo_mousedownX = e.offsetX;
+    lo_mouseDownX = e.offsetX;
     lo_mouseDownY = e.offsetY;
     lo_mouseDown = true
     //10.12.2022 v1.0.0.0 Ali hoče vleči celotno sliko enotskega kroga?
@@ -461,42 +769,45 @@ elMyCanvas.addEventListener('mouseup', (e) => {
 
 elMyCanvas.addEventListener('click', (e) => {
 
-    let rslt
+    let rslt = 0; let boolRslt = false;
     let vl_end = false
     if (!vl_end && lo_showGUI && lo_enabledIntChooserNrMonthsAvg) {
-        rslt = lf_executeClick_intChooser(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+10, 180, 5, lo_nrMonthsAvg, 1, 1)
+        rslt = intChooserNrMonthsAvg.eventClick(e.offsetX, e.offsetY)
         if (rslt >= 1 && rslt != lo_nrMonthsAvg) {
-            lo_nrMonthsAvg = rslt
-            paint()
+            //lo_nrMonthsAvg = rslt
+            //paint()
+            lf_changeNrMonthsAvg(rslt, true);
             vl_end = true
         }
     }
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeClick_checkBox(e.offsetX, e.offsetY, guiPanelLeft + 200, guiPanelTop - 8, 20, 2, lo_nrMonthsAvgAll)
-        if (rslt != lo_nrMonthsAvgAll) {
-            lf_changeNrMonthsAvgAll(rslt, true)
-            paint();
+        boolRslt = checkBoxNrMonthsAvgAll.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != lo_nrMonthsAvgAll) {
+            lf_changeNrMonthsAvgAll(boolRslt, true)
             vl_end = true
         }
     }
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+42, 500, cv_nrMonths, gl_tailMonths, 0, 1, 0, 0)
+        rslt = sliderTailMonths.eventClick(e.offsetX, e.offsetY); //0, 0
         if (rslt >= 0 && rslt != gl_tailMonths) {
-            gl_tailMonths = rslt
-            paint()
+            //gl_tailMonths = rslt
+            //lf_setTailMonthsText();
+            //paint()
+            lf_changeTailMonths(rslt, true);
             vl_end = true
         }
     }
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1, 0, 0)
+        rslt = sliderMonthEnd.eventClick(e.offsetX, e.offsetY); //0, 0
         if (rslt >= 1 && rslt != gl_monthEnd) {
-            gl_monthEnd = rslt
-            paint()
+            //gl_monthEnd = rslt
+            //paint()
+            lf_changeMonthEnd(rslt, true);
             vl_end = true
         }
     }
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, pickCountrYTop - 6, ctxW, pickCountrYTop - 6 + cv_maxCountry * pickCountryHeight, pickCountryHeight);
+        rslt = countryPanelToggle.eventClick(e.offsetX, e.offsetY);
         if (rslt >= 1 && rslt <= cv_maxCountry) {
             lo_enabledCountry[rslt] = !lo_enabledCountry[rslt];
             paint()
@@ -511,7 +822,7 @@ elMyCanvas.addEventListener('dblclick', (e) => {
     let rslt, country
     let vl_end = false
     if (!vl_end && lo_showGUI) {
-        rslt = lf_executeDoubleClick_countryToggles(e.offsetX, e.offsetY, ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20);
+        rslt = countryPanelToggle.eventDblClick(e.offsetX, e.offsetY);
         if (rslt) {
             lf_changeEnableCountryAll(!lo_enabledCountryAll, true);
             vl_end = true
@@ -524,7 +835,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //console.log("mouse_move() enter")
 
-    //Vlečenje okna / enotskega kroga
+    //Vlečenje okna / GUI elementov
     if (lo_mouseDown) {
         switch (lo_dragMonthEndActive) {
             case true:
@@ -534,10 +845,14 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                 //lo_dragMonthEndAddX = e.offsetX - vl_xCircleCenter
                 //lo_dragMonthEndAddY = e.offsetY - vl_yCircleCenter
                 //paint()
-                let rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1, 100, 100)
+                //let rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, 100, 100)
+                sliderMonthEnd.setAddZone(100, 100)
+                let rslt = sliderMonthEnd.eventClick(e.offsetX, e.offsetY)
+                sliderMonthEnd.setAddZone(0, 0)
                 if (rslt >= 1) {
-                    gl_monthEnd = rslt
-                    paint()
+                    //gl_monthEnd = rslt
+                    //paint()
+                    lf_changeMonthEnd(rslt, true);
                 }
                 return
             default:
@@ -579,28 +894,27 @@ window.addEventListener("wheel", event => {
         lo_nrMonthsAvg -= delta;
         if (lo_nrMonthsAvg > 5) { lo_nrMonthsAvg = 5 };
         if (lo_nrMonthsAvg < 1) { lo_nrMonthsAvg = 1 };
-        paint();
+        //lf_setNrMonthsAvgText();
+        //paint();
+        lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
         return
     } else if (lo_keyDownT) {
         gl_tailMonths -= delta;
         if (gl_tailMonths > (cv_nrMonths - 1)) { gl_tailMonths = (cv_nrMonths - 1) };
         if (gl_tailMonths < 0) { gl_tailMonths = 0 };
-        paint();
+        //lf_setTailMonthsText();
+        //paint();
+        lf_changeTailMonths(gl_tailMonths, true);
         return
     }
     //---- ... sicer spreminja mesec prikaza
     gl_monthEnd -= delta;
     if (gl_monthEnd > cv_nrMonths) { gl_monthEnd = cv_nrMonths };
     if (gl_monthEnd < 1) { gl_monthEnd = 1 };
-    paint();
+    //lf_setMonthEndText();
+    //paint();
+    lf_changeMonthEnd(gl_monthEnd, true);
 });
-
-function lf_changeVar(vp_var, vp_change, vp_min, vp_max) {
-    vp_var += vp_change;
-    if (vp_var > vp_max) { vp_var = vp_max };
-    if (vp_var < vp_min) { vp_var = vp_min };
-    return vp_var
-}
 
 window.addEventListener("keydown", (event) => {
 
@@ -610,17 +924,15 @@ window.addEventListener("keydown", (event) => {
         case 'KeyT':
             lo_keyDownT = true; break;
         case 'ArrowRight':
-            gl_monthEnd = lf_changeVar(gl_monthEnd, 1, 1, cv_nrMonths);
-            paint();
+            lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, cv_nrMonths), true)
             break;
         case 'ArrowLeft':
-            gl_monthEnd = lf_changeVar(gl_monthEnd, -1, 1, cv_nrMonths);
-            paint();
+            lf_changeMonthEnd(lf_changeVar(gl_monthEnd, -1, 1, cv_nrMonths), true)
             break;
         case 'Home':
-            gl_monthEnd = 1; paint(); break;
+            lf_changeMonthEnd(1, true); break;
         case 'End':
-            gl_monthEnd = cv_nrMonths; paint(); break;
+            lf_changeMonthEnd(cv_nrMonths, true); break;
         case 'KeyH':
             lo_showGUI = !lo_showGUI; paint(); break;
         case 'KeyS':
@@ -683,6 +995,9 @@ function canvas_touchMove(e) {
 
 
 resizeCanvas();
+lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
+lf_changeTailMonths(gl_tailMonths, false);
+lf_changeMonthEnd(gl_monthEnd, false);
 paint();
 
 
@@ -706,6 +1021,10 @@ function resizeCanvas() {
     elMyCanvas.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     elMyCanvas.style.left = "2px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     elMyCanvas.style.top = "2px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+
+    //countryPanelToggle.right = ctxW - pickCountryLeftDiff; // 27.1.2023 v1.4
+    //countryPanelToggle.left = countryPanelToggle.right - 41;
+    countryPanelToggle.adjustToCtxWidth();
 
     //if (window.innerHeight == screen.height) {
         // browser is fullscreen
@@ -747,7 +1066,9 @@ function paint() {
     //tmpStr = "enotski krog lahko pri sredi" + scSchLow + scTchLow  + "u prime" + scSchLow + " z mi" + scSchLow + "ko in ga premakne" + scSchLow 
     //gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 8)
 
-    paint_eDeath(8, 8, ctxW - 16, ctxH - 22); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+    const marginLeft = 8; const marginRight = 8;
+    const marginTop = 16; const marginBottom = 23;
+    paint_eDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
     paint_GUI()
     paint_author();
     paint_version();
@@ -757,6 +1078,41 @@ function paint() {
     tmpStr = "izris: " + (myTime2-myTime1).toString() + " ms"
     gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 3)
     
+}
+
+function lf_setNrMonthsAvgText() {
+
+    let tmpStr, tmpStr2;
+    tmpStr = "Povpre" + scTchLow + "enje: "
+    tmpStr2 = lo_nrMonthsAvg.toString()
+    if (lo_nrMonthsAvg == 1) { tmpStr2 = "brez" }
+    else if (lo_nrMonthsAvg == 2) { tmpStr2 += " meseca" }
+    else if (lo_nrMonthsAvg == 3) { tmpStr2 += " mesece" }
+    else if (lo_nrMonthsAvg == 4) { tmpStr2 += " mesece" }
+    else if (lo_nrMonthsAvg == 5) { tmpStr2 += " mesecev" }
+    else { tmpStr2 += " mesecev" }
+    tmpStr += tmpStr2
+    intChooserNrMonthsAvg.text = tmpStr;
+}
+
+function lf_setTailMonthsText() {
+
+    let tmpStr, tmpStr2;
+    tmpStr = "Risanje tudi za predhodnih: " + gl_tailMonths.toString()
+    if (gl_tailMonths == 0) { tmpStr2 = " mesecev" }
+    else if (gl_tailMonths == 1) { tmpStr2 = " mesec" }
+    else if (gl_tailMonths == 2) { tmpStr2 = " meseca" }
+    else if (gl_tailMonths == 3) { tmpStr2 = " mesece" }
+    else if (gl_tailMonths == 4) { tmpStr2 = " mesece" }
+    else {tmpStr2 = " mesecev"}
+    tmpStr += tmpStr2
+    sliderTailMonths.text = tmpStr;
+}
+
+function lf_setMonthEndText() {
+
+    let tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStr(gl_monthEnd) + ")"
+    sliderMonthEnd.text = tmpStr;
 }
 
 function paint_GUI() {
@@ -770,52 +1126,32 @@ function paint_GUI() {
 
     let tmpStr, tmpStr2, tmpW, tmpH, color;
 
-    //---- izbiranje števila mesecev za povprečenje
-    paint_GUI_intChooser(guiPanelLeft, guiPanelTop+10, 180, 5, lo_nrMonthsAvg, 1, 1)
-    if (lo_showTips) { gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 227, guiPanelTop - 1); }
+    //---- izbiranje števila mesecev za povprečenje   
+    intChooserNrMonthsAvg.paint()
     
     //---- check box za povprečenje čez vse mesece covid epidemije
-    paint_GUI_checkBox(guiPanelLeft + 200, guiPanelTop - 8, 20, 2, 2, "vse", lo_nrMonthsAvgAll);
-    if (lo_showTips) { gText("(S)", "italic 10pt serif", "gray", guiPanelLeft + 227, guiPanelTop + 14); }
-
+    checkBoxNrMonthsAvgAll.paint();
+    
     //---- za koliko časa nazaj se bo risal "rep"
-    paint_GUI_slider(guiPanelLeft, guiPanelTop+42, 500, cv_nrMonths, gl_tailMonths, 0, 1)
-    tmpStr = "Risanje tudi za predhodnih: " + gl_tailMonths.toString()
-    if (gl_tailMonths == 0) { tmpStr2 = " mesecev" }
-    else if (gl_tailMonths == 1) { tmpStr2 = " mesec" }
-    else if (gl_tailMonths == 2) { tmpStr2 = " meseca" }
-    else if (gl_tailMonths == 3) { tmpStr2 = " mesece" }
-    else if (gl_tailMonths == 4) { tmpStr2 = " mesece" }
-    else {tmpStr2 = " mesecev"}
-    tmpStr += tmpStr2
-    gText(tmpStr, "normal 10pt verdana", "gray", guiPanelLeft, guiPanelTop+33)
+    sliderTailMonths.paint();
+
+    //---- izbira meseca za prikaz
+    sliderMonthEnd.paint();
+
+    //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
+    countryPanelToggle.paint();
+
+    //---- on-screen namigi/pomoč
     if (lo_showTips) {
+        gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 6);
+        gText("(S)", "italic 10pt serif", "gray", checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 20);
         gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 418, guiPanelTop + 31);
         gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", "gray", guiPanelLeft + 398, guiPanelTop + 11);
         gText("(F2=tips)", "italic 10pt serif", "gray", guiPanelLeft + 439, guiPanelTop - 9);
+        gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", "gray", guiPanelLeft + 232, guiPanelTop + 80);
+        gText("(C)", "italic 10pt serif", "gray", ctxW - 20, pickCountryTop + cv_maxCountry * pickCountryHeight + 13);
+        gText("(dblClick)", "italic 10pt serif", "gray", ctxW - 56, pickCountryTop + cv_maxCountry * pickCountryHeight + 27);
     }
-
-    //---- izbira meseca za prikaz
-    paint_GUI_slider(guiPanelLeft, guiPanelTop+90, 500, cv_nrMonths, gl_monthEnd, 1, 1)
-    tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStr(gl_monthEnd) + ")"
-    gText(tmpStr, "normal 10pt verdana", "gray", guiPanelLeft, guiPanelTop+81)
-    if (lo_showTips) { gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", "gray", guiPanelLeft + 232, guiPanelTop + 80); }
-
-    //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
-    font = "bold 10pt verdana"
-    //let pickCountrYTop = 75; let pickCountryHeight = 20; let pickCountryLeftDiff = 6;
-    for (country = 1; country <= cv_maxCountry; country++) {
-        ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], font);
-        x = ctxW - tmpW - pickCountryLeftDiff; y = pickCountrYTop + (country - 1) * pickCountryHeight;
-        color = countryColor[country]
-        if (!lo_enabledCountry[country]) {color="darkGray"}
-        gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, "white", 1, "lightGray", font, color, countryNameShort3[country], "lightGray", 2, 2)
-    }
-    if (lo_showTips) {
-        gText("(C)", "italic 10pt serif", "gray", ctxW - 20, pickCountrYTop + country * pickCountryHeight - 11);
-        gText("(dblClick)", "italic 10pt serif", "gray", ctxW - 56, pickCountrYTop + country * pickCountryHeight + 3);
-    }
-
 }
 
 function lf_monthStr(vp_month) {
@@ -825,7 +1161,6 @@ function lf_monthStr(vp_month) {
     let mesec = vp_month - 12 * nrLet
     
     return (lf_mesecName(mesec) + "/" + leto.toString())
-    
 }
 
 function lf_mesecName(vp_mesec) {
@@ -862,6 +1197,9 @@ function lf_changeNrMonthsAvgAll(vp_newValue, vp_paint) {
             lo_enabledIntChooserNrMonthsAvg = true;
             break; 
     }
+    lf_setNrMonthsAvgText();
+    checkBoxNrMonthsAvgAll.value = lo_nrMonthsAvgAll;
+    intChooserNrMonthsAvg.enabled = lo_enabledIntChooserNrMonthsAvg;
     if (vp_paint) { paint() }
 
 }
@@ -882,24 +1220,60 @@ function lf_changeShowTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
+function lf_changeNrMonthsAvg(vp_newValue, vp_paint) {
+
+    //console.log("lf_changeNrMonthsAvg: newValue=" + vp_newValue)
+    
+    if (vp_newValue < 1 || vp_newValue > cv_nrMonths) { return };
+
+    lo_nrMonthsAvg = vp_newValue;
+
+    lf_setNrMonthsAvgText();
+    intChooserNrMonthsAvg.value = lo_nrMonthsAvg;
+
+    if (vp_paint) {
+        //console.log("lf_changeNrMonthsAvg: call Paint() now ...")
+        paint()
+    }
+}
+
+function lf_changeTailMonths(vp_newValue, vp_paint) {
+
+    //console.log("lf_changeTailMonths: newValue=" + vp_newValue)
+    
+    if (vp_newValue < 0 || vp_newValue >= cv_nrMonths) { return };
+
+    gl_tailMonths = vp_newValue;
+
+    lf_setTailMonthsText();
+    sliderTailMonths.value = gl_tailMonths;
+    
+    if (vp_paint) {
+        //console.log("lf_changeTailMonths: call Paint() now ...")
+        paint()
+    }
+}
+
 function lf_changeMonthEnd(vp_newValue, vp_paint) {
 
-    console.log("lf_changeMonthEnd: newValue=" + vp_newValue)
+    //console.log("lf_changeMonthEnd: newValue=" + vp_newValue)
     
     if (vp_newValue < 1 || vp_newValue > cv_nrMonths) { return };
 
     gl_monthEnd = vp_newValue;
 
-    
+    lf_setMonthEndText();
+    sliderMonthEnd.value = gl_monthEnd;
+
     if (vp_paint) {
-        console.log("lf_changeMonthEnd: call Paint() now ...")
+        //console.log("lf_changeMonthEnd: call Paint() now ...")
         paint()
     }
 }
 
 function lf_changeAutoPlay(vp_newValue) {
 
-    console.log("lf_changeAutoPlay: newValue=" + vp_newValue);
+    //console.log("lf_changeAutoPlay: newValue=" + vp_newValue);
 
     lo_autoPlay = vp_newValue;
 
@@ -910,12 +1284,12 @@ function lf_changeAutoPlay(vp_newValue) {
             lo_autoPlayStarting = true;
             tmAutoPlayId = setInterval(tmAutoPlay_tick, 200);
             lo_autoPlayStarting = false;
-            console.log("  timer started");
+            //console.log("  timer started");
             break;
         case false:
             //user je izključil auto play - treba je ukiniti timer
             clearInterval(tmAutoPlayId);
-            console.log("timer cleared");
+            //console.log("timer cleared");
     }
 }
 
@@ -952,196 +1326,6 @@ function tmAutoPlay_tick() {
   
 }
 
-function lf_executeClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom, vp_pickCountryHeight) {
-
-    //---- če klik ni bil na državah
-    if (!(vp_mouseX >= vp_left && vp_mouseX <= vp_right && vp_mouseY >= vp_top && vp_mouseY <= vp_bottom)) {
-        return -100;
-    }
-
-    //---- na katero državo je bil klik
-    let y0, y1;
-    for (country = 1; country <= cv_maxCountry; country++) {
-        y0 = vp_top + (country - 1) * vp_pickCountryHeight; y1 = vp_top + country * vp_pickCountryHeight;
-        if (vp_mouseY >= y0 && vp_mouseY <= y1) {
-            return country
-        }
-    }
-}
-
-function lf_executeDoubleClick_countryToggles(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_right, vp_bottom) {
-
-    //---- če dvojni klik ni bil na državah
-    if (!(vp_mouseX >= vp_left && vp_mouseX <= vp_right && vp_mouseY >= vp_top && vp_mouseY <= vp_bottom))
-         { return false }
-    else { return true };
-}
-
-function paint_GUI_checkBox(vp_left, vp_top, vp_width, vp_lineWidth, vp_smoothPx, vp_text, vp_value) {
-
-    let myColor = "burlyWood"
-    
-    let x1 = vp_left; let x2 = x1 + vp_smoothPx; let x3 = vp_left + vp_width - vp_smoothPx; let x4 = vp_left + vp_width;
-    let y1 = vp_top; let y2 = y1 + vp_smoothPx; let y3 = vp_top + vp_width - vp_smoothPx; let y4 = vp_top + vp_width;
-    ctx.beginPath()
-    ctx.moveTo(x2, y1)
-    ctx.lineTo(x3, y1)
-    ctx.lineTo(x4, y2)
-    ctx.lineTo(x4, y3)
-    ctx.lineTo(x3, y4)
-    ctx.lineTo(x2, y4)
-    ctx.lineTo(x1, y3)
-    ctx.lineTo(x1, y2)
-    ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
-    ctx.fillStyle = "white"
-    ctx.fill()
-    ctx.setLineDash([]);
-    ctx.strokeStyle = myColor;
-    ctx.lineWidth = vp_lineWidth;
-    ctx.stroke();
-
-    gText(vp_text, "normal 10pt verdana", "gray", vp_left, vp_top - 4);
-    
-    if (vp_value) {
-        let vl_gap = vp_lineWidth / 2 + 0.25 * (vp_width - vp_lineWidth); // 20% naj bo znotraj še praznega roba do križca
-        x1 = vp_left + vl_gap; x2 = vp_left + vp_width - vl_gap;
-        y1 = vp_top + vl_gap; y2 = vp_top + vp_width - vl_gap;
-        gLine(x1, y1, x2, y2, vp_lineWidth + 1, "peru", []);
-        gLine(x1, y2, x2, y1, vp_lineWidth + 1, "peru", []);
-    }
-}
-
-function lf_executeClick_checkBox(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_width, vp_lineWidth, vp_value) {
-  
-    x0 = vp_left - vp_lineWidth / 2; x1 = vp_left + vp_width + vp_lineWidth / 2;
-    y0 = vp_top - vp_lineWidth / 2; y1 = vp_top + vp_width + vp_lineWidth / 2;
-    if (vp_mouseX >= x0 && vp_mouseX <= x1 && vp_mouseY >= y0 && vp_mouseY <= y1) {
-        return (!vp_value);
-    } else { return vp_value };
-    
-}
-
-function paint_GUI_slider(vp_left, vp_bodyMiddle, vp_width, vp_items, vp_value, vp_minItemValue, vp_step) {
-
-    let myColor="burlyWood"
-    let valueItem = Math.round((vp_value - vp_minItemValue) / vp_step) + 1
-    let itemWidth = vp_width / vp_items; let itemWidthHalf = itemWidth / 2
-    const chooserHeight = 12; const chooserWidth = 13; const chooserWidthHalf = Math.trunc(chooserWidth / 2)
-    const bodyHeight = 7; const bodyHeightHalf = Math.trunc(bodyHeight / 2);
-    const bodyBottom = vp_bodyMiddle + bodyHeightHalf; const bodyTop = vp_bodyMiddle - bodyHeightHalf
-    gLine(vp_left, vp_bodyMiddle, vp_left + vp_width, vp_bodyMiddle, bodyHeight, myColor, [])
-    
-    let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value
-    //let font = "normal verdana 10pt"
-    let font="italic Cambria 20pt"
-    for (step = 1; step <= vp_items; step++) {
-        vl_value = vp_minItemValue + (step - 1) * vp_step
-        x = vp_left + itemWidthHalf + (step - 1) * itemWidth
-        gLine(x, bodyBottom + 2, x, bodyBottom + 4, 3, myColor, [])
-        if (step == valueItem) {
-            let x1 = x - chooserWidthHalf; let x2 = x + chooserWidthHalf;
-            let y1 = bodyBottom + chooserHeight
-            ctx.beginPath()
-            ctx.moveTo(x1, y1)
-            ctx.lineTo(x2, y1)
-            ctx.lineTo(x, bodyBottom)
-            ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
-            ctx.fillStyle = myColor
-            ctx.fill()
-            ctx.strokeStyle = "gray";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            //gLine(x1 + 1, y1 + 1, x2 + 1, y1 + 1, 1, "gray", [])
-            //gLine(x2 + 1, y1 + 1, x + 1, bodyBottom + 1, 1, "gray", [])
-        }
-        else if (step == 1 || step == vp_items) {
-            tmpStr = vl_value.toString();
-            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-            gText(tmpStr, "bold 9pt cambria", "gray", x - tmpW/2, bodyBottom + 6 + tmpH)
-        }
-    }
-}
-
-function lf_executeClick_slider(vp_mouseX, vp_mouseY, vp_left, vp_bodyMiddle, vp_width, vp_items, vp_value, vp_minItemValue, vp_step, vp_addZoneUp, vp_addZoneBottom) {
-
-    let valueItem = Math.round((vp_value - vp_minItemValue) / vp_step) + 1
-    let itemWidth = vp_width / vp_items; let itemWidthHalf = itemWidth / 2
-    const chooserHeight = 12; const chooserWidth = 13; const chooserWidthHalf = Math.trunc(chooserWidth / 2)
-    const bodyHeight = 7; const bodyHeightHalf = Math.trunc(bodyHeight / 2);
-    const bodyBottom = vp_bodyMiddle + bodyHeightHalf; const bodyTop = vp_bodyMiddle - bodyHeightHalf
-    let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value
-    for (step = 1; step <= vp_items; step++) {
-        vl_value = vp_minItemValue + (step - 1) * vp_step
-        x = vp_left + itemWidthHalf + (step - 1) * itemWidth
-        x0 = x - itemWidthHalf; x1 = x + itemWidthHalf
-        y0 = bodyTop - 8 - vp_addZoneUp; y1 = bodyBottom + 10 + vp_addZoneBottom
-        if (vp_mouseX >= x0 && vp_mouseX <= x1 && vp_mouseY >= y0 && vp_mouseY <= y1) {
-            return vl_value
-        }
-    }
-    return (vp_minItemValue - 1)
-}
-
-function paint_GUI_intChooser(vp_left, vp_top, vp_width, vp_items, vp_value, vp_minItemValue, vp_step) {
-
-    let myColor = "burlyWood"
-    if (!lo_enabledIntChooserNrMonthsAvg) { myColor = "lightGray" }
-    let valueItem = Math.round((vp_value - vp_minItemValue) / vp_step) + 1
-    let outRadij = 7; let inRadij=5; let selRadij=4
-    const cv_bodyWidth = 7; const cv_bodyWidthHalf = 3
-    let yBodyMiddle=vp_top-outRadij 
-    gLine(vp_left + 2 * outRadij - 2, yBodyMiddle, vp_left + vp_width - 2 * outRadij + 2, yBodyMiddle, cv_bodyWidth, myColor, [])
-                   
-    let xStep = (vp_width-2*outRadij) / (vp_items - 1)
-    let step, x, tmpStr, tmpStr2, tmpW, tmpH
-    //let font = "normal verdana 10pt"
-    let font="italic Cambria 20pt"
-    for (step = 1; step <= vp_items; step++) {
-        x = vp_left + outRadij + (step - 1) * xStep
-        gEllipse(x, yBodyMiddle, outRadij, outRadij, 0, myColor, 0, "")        
-        gEllipse(x, yBodyMiddle, inRadij, inRadij, 0, "white", 0, "") 
-        if (step == valueItem) {
-            gEllipse(x, yBodyMiddle, selRadij, selRadij, 0, "orangeRed", 0, "") 
-            //tmpStr = vp_value.toString();
-            //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-            //gText(vp_value.toString(), font, "darkSlateGray", x - tmpW/2, yBodyMiddle - outRadij - 2)
-        }
-    }
-    tmpStr = "Povpre" + scTchLow + "enje: "
-    tmpStr2 = vp_value.toString()
-    if (vp_value == 1) { tmpStr2 = "brez" }
-    else if (vp_value == 2) { tmpStr2 += " meseca" }
-    else if (vp_value == 3) { tmpStr2 += " mesece" }
-    else if (vp_value == 4) { tmpStr2 += " mesece" }
-    else if (vp_value == 5) { tmpStr2 += " mesecev" }
-    else { tmpStr2 += " mesecev" }
-    tmpStr += tmpStr2
-    gText(tmpStr, "normal 10pt verdana", "gray", vp_left, yBodyMiddle - outRadij - 5)
-}
-
-function lf_executeClick_intChooser(vp_mouseX, vp_mouseY, vp_left, vp_top, vp_width, vp_items, vp_value, vp_minItemValue, vp_step) {
-
-    let valueItem = Math.round((vp_value - vp_minItemValue) / vp_step) + 1
-    let outRadij = 7; let inRadij=5; let selRadij=4
-    const cv_bodyWidth = 7; const cv_bodyWidthHalf = 3
-    let yBodyMiddle=vp_top-outRadij 
-    let xStep = (vp_width - 2 * outRadij) / (vp_items - 1)
-    let step, x, dx, dy, dist
-    let y = yBodyMiddle
-    for (step = 1; step <= vp_items; step++) {
-        x = vp_left + outRadij + (step - 1) * xStep
-        dx = x - vp_mouseX; dy = y - vp_mouseY; 
-        dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist <= (outRadij + 5)) {
-            //if (step == valueItem) { return (vp_value) }
-            //else { return (vp_minItemValue + (step - 1) * vp_step) }
-            return (vp_minItemValue + (step - 1) * vp_step)
-        }
-    }
-    return (vp_minItemValue - 1)
-
-}
-
 function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
 
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
@@ -1175,7 +1359,7 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     gLine(cv_graphLeft, cv_graphY0, cv_graphRight, cv_graphY0, 2, "gray", [])
     
     //---- oznake na Y osi
-    gText("Excess death [%]", "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 3);
+    gText("Excess death [%]", "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 7);
     let x, y, font, tmpW, tmpH
     let tmpExcessDeath, tmpExcessDeathAbs
     let yMark10 = true; let yMark5 = true; let yMark1 = true;
@@ -1913,6 +2097,13 @@ function tmPaintDelay_tick() {
     }
     //console.log(lo_mouseMoveX)
 
+}
+
+function lf_changeVar(vp_var, vp_change, vp_min, vp_max) {
+    vp_var += vp_change;
+    if (vp_var > vp_max) { vp_var = vp_max };
+    if (vp_var < vp_min) { vp_var = vp_min };
+    return vp_var
 }
 
 function cookie_set(cname, cvalue, exdays) {
