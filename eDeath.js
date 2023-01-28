@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.4"
-const gl_versionDate = "27.1.2023"
+const gl_versionNr = "v1.5"
+const gl_versionDate = "28.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -750,6 +750,62 @@ ctxConvertColors.willReadFrequently = true
 
 var lo_noChange = ""
 
+//---- 27.1.2023 v1.5
+var tmHideTipsId;
+var lo_hideTipsCounter = 0;
+var lo_tipsColor = "gray";
+const cv_hideTipsSteps = 30;
+const cv_hideTipsDuration = 700;
+const cv_hideTipsTick = cv_hideTipsDuration / cv_hideTipsSteps;
+const cv_hideTipsStepAlpha = 255 / cv_hideTipsSteps;
+
+main();
+
+//---- main()
+function main() {
+
+    resizeCanvas();
+    lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
+    lf_changeTailMonths(gl_tailMonths, false);
+    lf_changeMonthEnd(gl_monthEnd, false);
+    paint();
+    
+    tmHideTipsId = setTimeout(tmHideTips_tick, 6000); //po 6 sekundah naj se tipsi sami postopoma ugasnejo
+
+    // var elMainDate = document.getElementById("mainDate");
+// elMainDate.width = 300     //
+// elMainDate.height = 30 //
+// elMainDate.style.left = "30px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+// elMainDate.style.top = "1px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+// elMainDate.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+    
+}
+
+function tmHideTips_tick() {
+
+    if (!lo_showTips) {
+        lo_tipsColor = "gray";
+        lo_hideTipsCounter = 0;
+        return
+    }
+
+    let alpha = Math.trunc(255 - lo_hideTipsCounter * cv_hideTipsStepAlpha);
+    if (alpha < 0) { alpha = 0 };
+    lo_tipsColor = gf_alphaColor(alpha, "gray");
+    paint();
+
+    if (lo_hideTipsCounter >= cv_hideTipsSteps) {
+        lo_tipsColor = "gray";
+        lo_hideTipsCounter = 0;
+        lf_changeShowTips(false, true);
+        return
+    }
+
+    tmHideTipsId = setTimeout(tmHideTips_tick, cv_hideTipsTick);
+    lo_hideTipsCounter += 1;
+
+}
+
 // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
 // Add the event listeners for mousedown, mousemove, and mouseup
 elMyCanvas.addEventListener('mousedown', (e) => {
@@ -993,24 +1049,6 @@ function canvas_touchMove(e) {
     paint()
 }
 
-
-resizeCanvas();
-lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
-lf_changeTailMonths(gl_tailMonths, false);
-lf_changeMonthEnd(gl_monthEnd, false);
-paint();
-
-
-
-// var elMainDate = document.getElementById("mainDate");
-// elMainDate.width = 300     //
-// elMainDate.height = 30 //
-// elMainDate.style.left = "30px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
-// elMainDate.style.top = "1px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
-// elMainDate.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
-
-
-
 function resizeCanvas() {
     //dimenzioniranje in pozicioniranje canvas-a
     ctxW = window.innerWidth - 6;
@@ -1143,14 +1181,14 @@ function paint_GUI() {
 
     //---- on-screen namigi/pomoč
     if (lo_showTips) {
-        gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 6);
-        gText("(S)", "italic 10pt serif", "gray", checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 20);
-        gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", "gray", guiPanelLeft + 418, guiPanelTop + 31);
-        gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", "gray", guiPanelLeft + 398, guiPanelTop + 11);
-        gText("(F2=tips)", "italic 10pt serif", "gray", guiPanelLeft + 439, guiPanelTop - 9);
-        gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", "gray", guiPanelLeft + 232, guiPanelTop + 80);
-        gText("(C)", "italic 10pt serif", "gray", ctxW - 20, pickCountryTop + cv_maxCountry * pickCountryHeight + 13);
-        gText("(dblClick)", "italic 10pt serif", "gray", ctxW - 56, pickCountryTop + cv_maxCountry * pickCountryHeight + 27);
+        gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 6);
+        gText("(S)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 20);
+        gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 418, guiPanelTop + 31);
+        gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 398, guiPanelTop + 11);
+        gText("(F2=tips)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 439, guiPanelTop - 9);
+        gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 232, guiPanelTop + 80);
+        gText("(C)", "italic 10pt serif", lo_tipsColor, ctxW - 20, pickCountryTop + cv_maxCountry * pickCountryHeight + 13);
+        gText("(dblClick)", "italic 10pt serif", lo_tipsColor, ctxW - 56, pickCountryTop + cv_maxCountry * pickCountryHeight + 27);
     }
 }
 
