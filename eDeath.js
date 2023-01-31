@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.6"
+const gl_versionNr = "v1.7"
 const gl_versionDate = "31.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -680,6 +680,68 @@ class checkBox {
         return (this.value);
     }
 }
+
+class button {
+    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, fillColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+        this.text = text;
+        this.font = font;
+        this.textColor = textColor;
+        this.lineWidth = lineWidth;
+        this.lineColor = lineColor;
+        this.smoothPx = smoothPx;
+        this.gapLeft = gapLeft;
+        this.gapTop = gapTop;
+        this.gapRight = gapRight;
+        this.gapBottom = gapBottom;
+        this.hAlign = hAlign;
+        this.vAlign = vAlign;
+        this.fillColor = fillColor;
+        this.shaddowColor = shaddowColor;
+        this.xShaddow = xShaddow;
+        this.yShaddow = yShaddow;
+        this.shaddowAll = shaddowAll;
+    }
+    paint() {
+        //---- pravokotnik
+        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, this.fillColor, this.lineWidth, this.lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
+        //---- text
+        let tmpW, tmpH, x, y;
+        ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+        let x0 = this.left + this.gapLeft; let x1 = this.left + this.width - this.gapRight;
+        switch (this.hAlign) {
+            case "left":
+                x = x0;
+            case "top":
+                x = x1 - tmpW;
+            case "middle":
+                x = x0 + (x1 - x0) / 2 - tmpW / 2;
+        }
+        let y0 = this.top + this.gapTop; let y1 = this.top + this.height - this.gapBottom;
+        switch (this.vAlign) {
+            case "top":
+                y = y0 + tmpH;
+            case "bottom":
+                y = y1;
+            case "middle":
+                y = y1 - (y1 - y0) / 2 + tmpH / 2;
+        }
+        gText(this.text, this.font, this.textColor, x, y);
+    }
+    eventClick(mouseX, mouseY) {
+        let x0 = this.left - this.lineWidth / 2;
+        let x1 = this.left + this.width + this.lineWidth / 2;
+        let y0 = this.top - this.lineWidth / 2;
+        let y1 = this.top + this.height + this.lineWidth / 2;
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
+                 return true;
+        } else { return false; }
+    }
+}
+
 //---------------------------------------------------------------------------
 //================ GUI
 //---------------------------------------------------------------------------
@@ -699,6 +761,7 @@ switch (lo_GUI_layout) {
         var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
+        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", 2, 0, 0, 0, 0, "middle", "middle", "lightGoldenrodYellow", "lightGray", 2, 2, false);
         var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
@@ -907,6 +970,13 @@ elMyCanvas.addEventListener('click', (e) => {
 
     let rslt = 0; let boolRslt = false;
     let vl_end = false
+    if (!vl_end && lo_showGUI) {
+        boolRslt = buttonMode.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt) {
+            lf_changeMode(true)
+            vl_end = true
+        }
+    }
     if (!vl_end && lo_showGUI && lo_enabledIntChooserNrMonthsAvg) {
         rslt = intChooserNrMonthsAvg.eventClick(e.offsetX, e.offsetY)
         if (rslt >= 1 && rslt != lo_nrMonthsAvg) {
@@ -1290,8 +1360,9 @@ function paint_GUI() {
 
     if (!lo_showGUI) { return };
 
-    let tmpStr, tmpStr2, tmpW, tmpH, color;
-
+    //---- check box za povprečenje čez vse mesece covid epidemije
+    buttonMode.paint();
+    
     //---- izbiranje števila mesecev za povprečenje   
     intChooserNrMonthsAvg.paint()
     
@@ -1403,7 +1474,10 @@ function paint_GUI_layoutB() {
     if (guiPanelWidth < 300) { guiPanelWidth = 300 };
     lo_layout_marginTop = guiPanelTop + guiPanelHeight;
     //----
-    intChooserNrMonthsAvg.left = guiPanelLeft;
+    buttonMode.left = guiPanelLeft;
+    buttonMode.top = guiPanelTop + 2;
+    //----
+    intChooserNrMonthsAvg.left = buttonMode.left + buttonMode.width + 15;
     intChooserNrMonthsAvg.top = guiPanelTop + 30;
     intChooserNrMonthsAvg.width = 180;
     //----
