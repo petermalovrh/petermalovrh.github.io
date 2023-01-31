@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.5"
-const gl_versionDate = "28.1.2023"
+const gl_versionNr = "v1.6"
+const gl_versionDate = "31.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -38,6 +38,7 @@ const cv_swe = 31
 const cv_swi = 32
 //----
 const cv_maxCountry = 32
+const cv_allCountry = -1
 
 const countryNameShort2 = new Array(cv_maxCountry)
 countryNameShort2[cv_eu27] = "EU27"
@@ -108,7 +109,7 @@ countryNameShort3[cv_nor] = "NOR"
 countryNameShort3[cv_swi] = "SUI"
 
 const countryNameLong = new Array(cv_maxCountry)
-countryNameLong[cv_eu27] = "European Union - 27 countries (from 2020)"
+countryNameLong[cv_eu27] = "European Union - 27 countries" // (from 2020)"
 countryNameLong[cv_bel] = "Belgium"
 countryNameLong[cv_bul] = "Bulgaria"
 countryNameLong[cv_cze] = "Czechia"
@@ -295,6 +296,16 @@ countryExcessDeath[cv_lie] = [-15.9, 46.0, -10.1, -0.2, 12.2, -17.4, -4.3, 11.0,
 countryExcessDeath[cv_nor] = [-3.4, -2.4, -0.6, 2.9, -3.0, -1.6, -1.9, 1.7, 4.9, 1.9, 0.7, -2.2, -5.4, -10.5, -8.4, -3.3, -1.7, -1.3, 1.5, 8.7, 11.5, 11.4, 20.5, 16.5, -1.9, 6.3, 16.0, 11.9, 11.0, 14.0, 15.5, 11.1, 13.4, 12.5, 12.8]
 countryExcessDeath[cv_swi] = [-3.7, -0.6, 12.1, 27.6, -1.4, 1.5, 1.6, 4.9, 4.5, 15.2, 66.1, 59.9, 23.8, -5.0, -5.5, 3.3, 3.4, 2.8, 2.6, 8.9, 12.7, 7.1, 16.5, 25.7, 4.8, 3.5, 13.8, 14.2, 5.4, 13.3, 21.9, 15.1, 8.4, 13.7, 11.6]
 
+const cv_mode_vaccExcessDeath = 1;
+const cv_mode_vaccExcessDeathMulti = 2;
+const cv_mode_timeExcessDeathSingle = 3;
+const cv_mode_timeExcessDeathMulti = 4;
+const cv_maxMode = 4;
+var gl_mode = cv_mode_vaccExcessDeath;
+
+const cv_graphType_vaccExcessDeath = 1;
+const cv_graphType_timeExcessDeath = 2;
+
 var lo_nrMonthsAvg = 5
 var lo_nrMonthsAvgOld = 5                   // 25.1.2023 v1.1
 var lo_nrMonthsAvgAll = false               // 25.1.2023 v1.1
@@ -332,16 +343,12 @@ var lo_mouseDown = false
 var lo_borderless = false
 var lo_lastMouseLocation 
 
-var lo_mouseAboveSliderMonthEnd = false
+//var lo_mouseAboveSliderMonthEnd = false
 var lo_dragMonthEndActive = false
-var lo_dragMonthEndAddX = 0; var lo_dragMonthEndAddY = 0
-
-//---- GUI
-const guiPanelLeft = 100; const guiPanelTop = 80; const guiPanelWidth = 500
-const pickCountryTop = 65; const pickCountryTopText = pickCountryTop + 5; const pickCountryHeight = 20; const pickCountryLeftDiff = 6;
+var lo_dragTailMonthsActive = false
 
 class countryPanel {
-    constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY ) {
+    constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor ) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -355,12 +362,29 @@ class countryPanel {
         this.shaddowColor = shaddowColor;
         this.shaddowX = shaddowX;
         this.shaddowY = shaddowY;
+        this.backColor = backColor;
         //---- additional object properties
         this.textTop = this.top + 5;
         this.textRight = this.right - pickCountryLeftDiff;
     }
     paint() {
         let tmpW, tmpH, x, y, color
+        if (this.backColor != "") {
+            for (country = 1; country <= cv_maxCountry; country++) {
+                ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], this.font);
+                x = this.textRight - tmpW;
+                y = this.textTop + (country - 1) * this.itemHeight;
+                if (!lo_enabledCountry[country]) { color = this.disabledColor }
+                switch (country) {
+                    case 1: gBannerRectWithText(x, y, x + tmpW, y + tmpH, 10, 9, this.backColor, 0, "", "", "", "", "", 0, 0); break;
+                    case cv_maxCountry: gBannerRectWithText(x, y, x + tmpW, y + tmpH, 10, 11, this.backColor, 0, "", "", "", "", "", 0, 0); break;
+                    default: gBannerRectWithText(x, y, x + tmpW, y + tmpH, 10, 16, this.backColor, 0, "", "", "", "", "", 0, 0); break;
+                }
+                //if (country == 1 || country == cv_maxCountry) {
+                //    gBannerRectWithText(x, y, x + tmpW, y + tmpH, 10, 9, this.backColor, 0, "", "", "", "", "", 0, 0)
+                //} else { gBannerRectWithText(x, y, x + tmpW, y + tmpH, 10, 16, this.backColor, 0, "", "", "", "", "", 0, 0) }
+            }
+        }
         for (country = 1; country <= cv_maxCountry; country++) {
             ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], this.font);
             //x = ctxW - tmpW - pickCountryLeftDiff; y = pickCountryTop + (country - 1) * pickCountryHeight;
@@ -368,7 +392,7 @@ class countryPanel {
             y = this.textTop + (country - 1) * this.itemHeight;
             color = countryColor[country]
             if (!lo_enabledCountry[country]) { color = this.disabledColor }
-            gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, this.fillColor , this.strokeWidth, this.strokeColor, this.font, color, countryNameShort3[country], this.shaddowColor, this.shaddowX, this.shaddowY)
+            gBannerRectWithText(x, y, x + tmpW, y + tmpH, 3, 3, this.fillColor, this.strokeWidth, this.strokeColor, this.font, color, countryNameShort3[country], this.shaddowColor, this.shaddowX, this.shaddowY)
         }
     }
     eventClick(mouseX, mouseY) {
@@ -399,7 +423,6 @@ class countryPanel {
         this.right = ctxW;
     }
 }
-var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "lightGray", 2, 2);
 
 class slider {
     constructor(left, bodyMiddle, width, items, value, minItemValue, step, enabled, color, disabledColor, bodyWidth, selWidth, selHeight, selShaddowColor, text, font, gap, posAlign, textColor, valueFont, valueColor, valueGap, addZoneUp, addZoneDown) {
@@ -499,13 +522,22 @@ class slider {
         }
         return (this.minItemValue - 1)
     }
+    eventMouseWithin(mouseX, mouseY) {
+        const bodyHeightHalf = Math.trunc(this.bodyWidth / 2);
+        const bodyBottom = this.bodyMiddle + bodyHeightHalf;
+        const bodyTop = this.bodyMiddle - bodyHeightHalf
+        let x0, x1, y0, y1;
+        x0 = this.left; x1 = x0 + this.width;
+        y0 = bodyTop; y1 = bodyBottom + this.selHeight;
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
+            return true;
+        } else { return false; };
+    }
     setAddZone(addZoneUp, addZoneDown) {
         this.addZoneUp = addZoneUp;
         this.addZoneDown = addZoneDown;
     }
 }
-var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
-var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
 
 class intChooser {
     constructor(left, top, width, items, value, minItemValue, step, enabled, color, fillColor, crossColor, disabledColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap) {
@@ -583,8 +615,6 @@ class intChooser {
         return (this.minItemValue - 1) //manj od minimuma, da se potem tam izven ve, da ni bilo klika na to komponento
     }
 }
-var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 5, "above-left", "gray", 5);
-
     
 class checkBox {
     constructor(left, top, width, lineWidth, smoothPx, text, gap, posAlign, value, color, fillColor, crossColor, textColor, font) {
@@ -649,18 +679,39 @@ class checkBox {
         }
         return (this.value);
     }
-  }
-var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
-
+}
+//---------------------------------------------------------------------------
+//================ GUI
+//---------------------------------------------------------------------------
+var lo_layout_marginTop = 8;
+let guiPanelLeft, guiPanelTop, guiPanelWidth, guiPanelHeight;
+const pickCountryTop = 65; const pickCountryTopText = pickCountryTop + 5; const pickCountryHeight = 20; const pickCountryLeftDiff = 10; //6
+const cv_guiLayoutA = 1;
+const cv_guiLayoutB = 2;
+var lo_GUI_layout = cv_guiLayoutB;
+switch (lo_GUI_layout) {
+    case cv_guiLayoutA:
+        guiPanelLeft = 100; guiPanelTop = 80; guiPanelWidth = 500; guiPanelHeight = 80;
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
+        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
+        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+    case cv_guiLayoutB:
+        guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
+        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
+}
+var lo_GUIlayoutHasChanged = true;
+var lo_currentMonthTextLeft = 400; var lo_currentMonthTextTop = 20;
 var lo_repaintTimerActive  = false
 var lo_hasRepaintRequest  = false
-
 var lo_fullScreen = false
-
 var vl_frmW, vl_frmH
 
-//document.getElementById("checkShowZnacilniKoti").innerHTML = "XCVBRREE"
-//document.getElementById("checkShowZnacilniKoti").textContent = "XCVBRREE"
 document.body.style.overflow = 'hidden'; // tole onemogoči scrollBar-s
 var elMyCanvas = document.getElementById("myCanvas");
 var ctxW = window.innerWidth - 18;
@@ -753,7 +804,8 @@ var lo_noChange = ""
 //---- 27.1.2023 v1.5
 var tmHideTipsId;
 var lo_hideTipsCounter = 0;
-var lo_tipsColor = "gray";
+var lo_tipsColorDefault = "darkSlateGray";
+var lo_tipsColor = lo_tipsColorDefault;
 const cv_hideTipsSteps = 30;
 const cv_hideTipsDuration = 700;
 const cv_hideTipsTick = cv_hideTipsDuration / cv_hideTipsSteps;
@@ -764,6 +816,8 @@ main();
 //---- main()
 function main() {
 
+    //lf_focusCanvas(); // ne deluje!!! 30.1.2023 v1.6 ... ostaja torej problem, da je na začetku focus na address bar-u namesto na canvas DOM objektu. Ampak izgleda je problem samo v debug mode v VCCode!
+   
     resizeCanvas();
     lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
     lf_changeTailMonths(gl_tailMonths, false);
@@ -781,21 +835,45 @@ function main() {
     
 }
 
+function lf_focusCanvas() {
+     // focus: https://html.spec.whatwg.org/multipage/interaction.html ... tabindex=0 pomeni da je focusable, >0 pa da je "tabelarizable"
+     elMyCanvas.setAttribute('tabindex','1'); //če ta še ni bil nastavljen v HTML
+     //elMyCanvas.focus();
+ 
+     var keyboardEvent = document.createEvent("KeyboardEvent");
+     var initMethod = typeof keyboardEvent.initKeyboardEvent !== 'undefined' ? "initKeyboardEvent" : "initKeyEvent";
+     //var initMethod = typeof keyboardEvent.initKeyEvent;
+     keyboardEvent[initMethod](
+       "keydown", // event type: keydown, keyup, keypress
+       true,      // bubbles
+       true,      // cancelable
+       window,    // view: should be window
+       false,     // ctrlKey
+       false,     // altKey
+       false,     // shiftKey
+       false,     // metaKey
+       65,        // keyCode: unsigned long - the virtual key code, else 0. 65 - 'a'
+       0          // charCode: unsigned long - the Unicode character associated with the depressed key, else 0
+     );
+    elMyCanvas.dispatchEvent(keyboardEvent);
+    //window.dispatchEvent(keyboardEvent);
+ }
+
 function tmHideTips_tick() {
 
     if (!lo_showTips) {
-        lo_tipsColor = "gray";
+        lo_tipsColor = lo_tipsColorDefault;
         lo_hideTipsCounter = 0;
         return
     }
 
     let alpha = Math.trunc(255 - lo_hideTipsCounter * cv_hideTipsStepAlpha);
     if (alpha < 0) { alpha = 0 };
-    lo_tipsColor = gf_alphaColor(alpha, "gray");
+    lo_tipsColor = gf_alphaColor(alpha, lo_tipsColorDefault);
     paint();
 
     if (lo_hideTipsCounter >= cv_hideTipsSteps) {
-        lo_tipsColor = "gray";
+        lo_tipsColor = lo_tipsColorDefault;
         lo_hideTipsCounter = 0;
         lf_changeShowTips(false, true);
         return
@@ -813,13 +891,15 @@ elMyCanvas.addEventListener('mousedown', (e) => {
     lo_mouseDownY = e.offsetY;
     lo_mouseDown = true
     //10.12.2022 v1.0.0.0 Ali hoče vleči celotno sliko enotskega kroga?
-    lo_dragMonthEndActive = lo_mouseAboveSliderMonthEnd
+    lo_dragMonthEndActive = sliderMonthEnd.eventMouseWithin(e.offsetX, e.offsetY); //lo_mouseAboveSliderMonthEnd
+    lo_dragTailMonthsActive = sliderTailMonths.eventMouseWithin(e.offsetX, e.offsetY); 
     //console.log("dragEnotskiKrogActive: " + lo_dragMonthEndActive)
 
 });
 elMyCanvas.addEventListener('mouseup', (e) => {
     lo_mouseDown = false
     lo_dragMonthEndActive = false
+    lo_dragTailMonthsActive = false
     //console.log("dragEnotskiKrogActive: FALSE")
 });
 
@@ -893,39 +973,35 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //Vlečenje okna / GUI elementov
     if (lo_mouseDown) {
-        switch (lo_dragMonthEndActive) {
-            case true:
-                //let circleCenterPos = lf_setCircleCenterPos()
-                //let vl_xCircleCenter = circleCenterPos[0]
-                //let vl_yCircleCenter = circleCenterPos[1]
-                //lo_dragMonthEndAddX = e.offsetX - vl_xCircleCenter
-                //lo_dragMonthEndAddY = e.offsetY - vl_yCircleCenter
-                //paint()
-                //let rslt = lf_executeClick_slider(e.offsetX, e.offsetY, guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, 100, 100)
-                sliderMonthEnd.setAddZone(100, 100)
-                let rslt = sliderMonthEnd.eventClick(e.offsetX, e.offsetY)
-                sliderMonthEnd.setAddZone(0, 0)
-                if (rslt >= 1) {
-                    //gl_monthEnd = rslt
-                    //paint()
-                    lf_changeMonthEnd(rslt, true);
-                }
-                return
-            default:
-                //Me.Location = New Point((Me.Location.X - lo_lastMouseLocation.X) + e.X, (Me.Location.Y - lo_lastMouseLocation.Y) + e.Y)
-                //Me.Update()
-                //console.log("mouse_move-drag")
-                //return
+        if (lo_dragMonthEndActive) {
+            sliderMonthEnd.setAddZone(100, 100)
+            let rslt = sliderMonthEnd.eventClick(e.offsetX, e.offsetY)
+            sliderMonthEnd.setAddZone(0, 0)
+            if (rslt >= 1) { lf_changeMonthEnd(rslt, true); }
+            return;
+        }
+        else if (lo_dragTailMonthsActive) {
+            sliderTailMonths.setAddZone(100, 100)
+            let rslt = sliderTailMonths.eventClick(e.offsetX, e.offsetY)
+            sliderTailMonths.setAddZone(0, 0)
+            if (rslt >= 0) { lf_changeTailMonths(rslt, true); }
+            return;
+        }
+        else {
+            //Me.Location = New Point((Me.Location.X - lo_lastMouseLocation.X) + e.X, (Me.Location.Y - lo_lastMouseLocation.Y) + e.Y)
+            //Me.Update()
+            //console.log("mouse_move-drag")
+            //return;
         }
     }
 
     //23.1.2023 v1.0 Je miška nad sliderjem za izbiro meseca?
-    lo_mouseAboveSliderMonthEnd = false
-    let x0, x1, y0, y1;
-    x0 = guiPanelLeft; x1 = x0 + 500; y0 = guiPanelTop + 79; y1 = guiPanelTop + 103;
-    if (e.offsetX >= x0 && e.offsetX <= x1 && e.offsetY >= y0 && e.offsetY <= y1) {
-        lo_mouseAboveSliderMonthEnd = true
-    }
+    //lo_mouseAboveSliderMonthEnd = false
+    //let x0, x1, y0, y1;
+    //x0 = guiPanelLeft; x1 = x0 + 500; y0 = guiPanelTop + 79; y1 = guiPanelTop + 103;
+    //if (e.offsetX >= x0 && e.offsetX <= x1 && e.offsetY >= y0 && e.offsetY <= y1) {
+    //    lo_mouseAboveSliderMonthEnd = true
+    //}
 
     //če se miška v resnici ni premaknila ne naredim nič
     if (e.offsetX == lo_mouseMoveX && e.offsetY == lo_mouseMoveY) {
@@ -1000,7 +1076,11 @@ window.addEventListener("keydown", (event) => {
         //case 'F5':
             //console.log("F5 pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
         case 'KeyP' :
-            console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
+            //console.log("P pressed");
+            lf_changeAutoPlay(!lo_autoPlay); break;
+        case 'KeyM' :
+            //console.log("M pressed"); 
+            lf_changeMode(true); break;
     }
 });
 
@@ -1076,7 +1156,7 @@ function resizeCanvas() {
             //checkFullScreen.checked = ""
         }
     }
-
+    lo_GUIlayoutHasChanged = true;
 }
 
 function paint() {
@@ -1104,9 +1184,37 @@ function paint() {
     //tmpStr = "enotski krog lahko pri sredi" + scSchLow + scTchLow  + "u prime" + scSchLow + " z mi" + scSchLow + "ko in ga premakne" + scSchLow 
     //gText(tmpStr, "italic 11pt cambria", "gray", 6, ctxH - 8)
 
-    const marginLeft = 8; const marginRight = 8;
-    const marginTop = 16; const marginBottom = 23;
-    paint_eDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+        //---- 30.1.2023 v1.6
+    if (lo_GUIlayoutHasChanged) {
+        switch (lo_GUI_layout) {
+            case cv_guiLayoutA: break;
+            case cv_guiLayoutB: paint_GUI_layoutB(); break;
+        }
+        lo_GUIlayoutHasChanged = false;
+    }
+    
+    let marginLeft = 8; let marginRight = 8;
+    var marginTop = lo_layout_marginTop; let marginBottom = 25;
+    //paint_graph_vaccExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+    //paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+    
+    switch (gl_mode) {
+        case cv_mode_vaccExcessDeath:
+            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            break;
+        case cv_mode_vaccExcessDeathMulti:
+            if (lo_showGUI) { marginRight += 55 };
+            paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            break;
+        case cv_mode_timeExcessDeathSingle:
+            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            break;
+        case cv_mode_timeExcessDeathMulti:
+            if (lo_showGUI) { marginRight += 55 };
+            paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            break;
+    }
+    
     paint_GUI()
     paint_author();
     paint_version();
@@ -1121,35 +1229,55 @@ function paint() {
 function lf_setNrMonthsAvgText() {
 
     let tmpStr, tmpStr2;
-    tmpStr = "Povpre" + scTchLow + "enje: "
-    tmpStr2 = lo_nrMonthsAvg.toString()
-    if (lo_nrMonthsAvg == 1) { tmpStr2 = "brez" }
-    else if (lo_nrMonthsAvg == 2) { tmpStr2 += " meseca" }
-    else if (lo_nrMonthsAvg == 3) { tmpStr2 += " mesece" }
-    else if (lo_nrMonthsAvg == 4) { tmpStr2 += " mesece" }
-    else if (lo_nrMonthsAvg == 5) { tmpStr2 += " mesecev" }
-    else { tmpStr2 += " mesecev" }
-    tmpStr += tmpStr2
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            tmpStr = "Povpre" + scTchLow + "enje: "
+            tmpStr2 = lo_nrMonthsAvg.toString()
+            if (lo_nrMonthsAvg == 1) { tmpStr2 = "brez" }
+            else if (lo_nrMonthsAvg == 2) { tmpStr2 += " meseca" }
+            else if (lo_nrMonthsAvg == 3) { tmpStr2 += " mesece" }
+            else if (lo_nrMonthsAvg == 4) { tmpStr2 += " mesece" }
+            else if (lo_nrMonthsAvg == 5) { tmpStr2 += " mesecev" }
+            else { tmpStr2 += " mesecev" }
+            tmpStr += tmpStr2
+        case cv_guiLayoutB:
+            tmpStr = "Average: "
+            tmpStr2 = lo_nrMonthsAvg.toString()
+            if (lo_nrMonthsAvg == 1) { tmpStr2 = "none" }
+            else { tmpStr2 += " months" }
+            tmpStr += tmpStr2
+    }
     intChooserNrMonthsAvg.text = tmpStr;
 }
 
 function lf_setTailMonthsText() {
 
     let tmpStr, tmpStr2;
-    tmpStr = "Risanje tudi za predhodnih: " + gl_tailMonths.toString()
-    if (gl_tailMonths == 0) { tmpStr2 = " mesecev" }
-    else if (gl_tailMonths == 1) { tmpStr2 = " mesec" }
-    else if (gl_tailMonths == 2) { tmpStr2 = " meseca" }
-    else if (gl_tailMonths == 3) { tmpStr2 = " mesece" }
-    else if (gl_tailMonths == 4) { tmpStr2 = " mesece" }
-    else {tmpStr2 = " mesecev"}
-    tmpStr += tmpStr2
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            tmpStr = "Risanje tudi za predhodnih: " + gl_tailMonths.toString()
+            if (gl_tailMonths == 0) { tmpStr2 = " mesecev" }
+            else if (gl_tailMonths == 1) { tmpStr2 = " mesec" }
+            else if (gl_tailMonths == 2) { tmpStr2 = " meseca" }
+            else if (gl_tailMonths == 3) { tmpStr2 = " mesece" }
+            else if (gl_tailMonths == 4) { tmpStr2 = " mesece" }
+            else { tmpStr2 = " mesecev" }
+            tmpStr += tmpStr2
+        case cv_guiLayoutB:
+            tmpStr = "Tail months: " + gl_tailMonths.toString() + " months";
+    }
     sliderTailMonths.text = tmpStr;
 }
 
 function lf_setMonthEndText() {
 
-    let tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStr(gl_monthEnd) + ")"
+    let tmpStr;
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            tmpStr = "Risanje za mesec: " + gl_monthEnd.toString() + " (" + lf_monthStrMY(gl_monthEnd) + ")"
+        case cv_guiLayoutB:
+            tmpStr = "Month: " + gl_monthEnd.toString() + " (" + lf_monthStrMY(gl_monthEnd) + ")"  
+    }
     sliderMonthEnd.text = tmpStr;
 }
 
@@ -1180,25 +1308,193 @@ function paint_GUI() {
     countryPanelToggle.paint();
 
     //---- on-screen namigi/pomoč
-    if (lo_showTips) {
-        gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 6);
-        gText("(S)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 20);
-        gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 418, guiPanelTop + 31);
-        gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 398, guiPanelTop + 11);
-        gText("(F2=tips)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 439, guiPanelTop - 9);
-        gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 232, guiPanelTop + 80);
-        gText("(C)", "italic 10pt serif", lo_tipsColor, ctxW - 20, pickCountryTop + cv_maxCountry * pickCountryHeight + 13);
-        gText("(dblClick)", "italic 10pt serif", lo_tipsColor, ctxW - 56, pickCountryTop + cv_maxCountry * pickCountryHeight + 27);
+    if (lo_showTips) { paint_tips() };
+
+}
+
+function paint_tips() {
+
+    switch (lo_GUI_layout) {
+
+        case cv_guiLayoutA:
+            gText("(A+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 6);
+            gText("(S)", "italic 10pt serif", lo_tipsColor, checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 8, checkBoxNrMonthsAvgAll.top + 20);
+            gText("(T+kole" + scSchLow + scTchLow + "ek)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 418, guiPanelTop + 31);
+            gText("(H=skrij/prika" + scZhLow + "i)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 398, guiPanelTop + 11);
+            gText("(F2=tips)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 439, guiPanelTop - 9);
+            gText("(kole" + scSchLow + scTchLow + "ek, levo/desno, Home/End, P=Play/Stop)", "italic 10pt serif", lo_tipsColor, guiPanelLeft + 232, guiPanelTop + 80);
+            gText("(C)", "italic 10pt serif", lo_tipsColor, ctxW - 20, pickCountryTop + cv_maxCountry * pickCountryHeight + 17);
+            gText("(dblClick)", "italic 10pt serif", lo_tipsColor, ctxW - 56, pickCountryTop + cv_maxCountry * pickCountryHeight + 31);
+            break;
+        
+        case cv_guiLayoutB:
+            
+            let x0 = 20; let x1 = x0 + 160;
+            let y0 = 70; let vStep = 25; let y = y0 - vStep;
+            let font = "normal 12pt serif";
+            let font2 = "italic 12pt serif";
+            let font3 = "bold 12pt serif";
+            let nrTipRows = 10;
+            let backHeight = nrTipRows * vStep + 15;
+
+            gBannerRect(x0 - 15, y0 - 13, 380, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
+            //
+            y += vStep;
+            gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... hide/show these tips", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("mouseWheel", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... select month", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("Home", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("End", x0 + 49, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("left", x0 + 85, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("right", x0 + 116, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... change month", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... play/stop", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("A", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... change average period", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... all time average", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... change tail months", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... hide/show controls", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("/", x0 + 21, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("dblClick", x0 + 35, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... select/unselect all countries", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("F11", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... full screen mode on/off", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            break;
     }
 }
 
-function lf_monthStr(vp_month) {
+function paint_GUI_layoutB() {
+
+    const xAuthor = 200;
+    guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = ctxW - guiPanelLeft - xAuthor; guiPanelHeight = 50;
+    if (guiPanelWidth < 300) { guiPanelWidth = 300 };
+    lo_layout_marginTop = guiPanelTop + guiPanelHeight;
+    //----
+    intChooserNrMonthsAvg.left = guiPanelLeft;
+    intChooserNrMonthsAvg.top = guiPanelTop + 30;
+    intChooserNrMonthsAvg.width = 180;
+    //----
+    checkBoxNrMonthsAvgAll.left = intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width + 10;
+    checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 17;
+    checkBoxNrMonthsAvgAll.width = 18;
+    //----
+    const gap1 = 30; // od checkBox-a do prvega sliderja
+    let x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
+    let x2 = ctxW - xAuthor;
+    let d1 = x2 - x1;
+    const gap2 = 200; //med obema sliderjema
+    let dHalf = (d1 - gap2) / 2;  
+    //----
+    sliderTailMonths.left = x1;
+    sliderTailMonths.bodyMiddle = guiPanelTop + 22;
+    const minTailWidth = 100; const maxTailWidth = 300;
+    if (dHalf > maxTailWidth) { sliderTailMonths.width = maxTailWidth; }
+    else if (dHalf < minTailWidth) { sliderTailMonths.width = minTailWidth; }
+    else { sliderTailMonths.width = dHalf; };
+    //----
+    sliderMonthEnd.left = sliderTailMonths.left + sliderTailMonths.width + gap2;
+    sliderMonthEnd.bodyMiddle = sliderTailMonths.bodyMiddle;
+    const minMonthEndWidth = 100; const maxMonthEndWidth = 500;
+    let d2 = x2 - sliderTailMonths.left - sliderTailMonths.width - gap2;
+    if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
+    else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
+    else { sliderMonthEnd.width = d2; };
+    //----
+    lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
+    lo_currentMonthTextTop = 17;
+
+}
+
+function lf_monthStrMY(vp_month) {
 
     let nrLet = Math.trunc((vp_month - 1) / 12)
     let leto = 2020 + nrLet
     let mesec = vp_month - 12 * nrLet
     
     return (lf_mesecName(mesec) + "/" + leto.toString())
+}
+
+function lf_monthStrMMYY(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return (mesec.toString() + "/" + leto.toString().substring(2, 4))
+}
+
+function lf_monthStrMMM(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return (lf_mesecName(mesec))
+}
+
+function lf_monthStrM(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return (lf_mesecNameM(mesec))
+}
+
+function lf_monthValue(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return (mesec)
+}
+
+function lf_yearValue(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return (leto)
+}
+
+function lf_yearStrShort(vp_month) {
+
+    let nrLet = Math.trunc((vp_month - 1) / 12)
+    let leto = 2020 + nrLet
+    let mesec = vp_month - 12 * nrLet
+    
+    return ("'" + leto.toString().substring(2, 4));
 }
 
 function lf_mesecName(vp_mesec) {
@@ -1216,6 +1512,26 @@ function lf_mesecName(vp_mesec) {
         case 10: return "oct"
         case 11: return "nov"
         case 12: return "dec"
+    }
+    return "?"
+
+}
+
+function lf_mesecNameM(vp_mesec) {
+
+    switch (vp_mesec) {
+        case 1: return "J"
+        case 2: return "F"
+        case 3: return "M"
+        case 4: return "A"
+        case 5: return "M"
+        case 6: return "J"
+        case 7: return "J"
+        case 8: return "A"
+        case 9: return "S"
+        case 10: return "O"
+        case 11: return "N"
+        case 12: return "D"
     }
     return "?"
 
@@ -1255,6 +1571,13 @@ function lf_changeEnableCountryAll(vp_newValue, vp_paint) {
 function lf_changeShowTips(vp_newValue, vp_paint) {
 
     lo_showTips = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
+function lf_changeMode(vp_paint) {
+
+    gl_mode += 1;
+    if (gl_mode > cv_maxMode) { gl_mode = 1 };
     if (vp_paint) { paint() }
 }
 
@@ -1361,10 +1684,432 @@ function tmAutoPlay_tick() {
         }
         }
     }
-  
 }
 
-function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
+function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
+
+    let rows, cols, row, col, x, y, w, h, itemWidth, itemHeight, country, ih, newY, yDiff;
+    let vGap = 10; let hGap = 10;
+    //---- koliko je selektiranih držav
+    let nrCountries = 0;
+    for (country = 1; country <= cv_maxCountry; country++) {
+        if (lo_enabledCountry[country]) { nrCountries += 1 };
+    }
+    if (nrCountries <= 0) { return };
+    //---- dimenzije matrike
+    cols = Math.trunc(Math.sqrt(nrCountries - 1)) + 1;
+    let ratio = ctxW / (ctxH + 1);
+    if (ratio > 1.7) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 };
+    if (cols > nrCountries) { cols = nrCountries };
+    rows = Math.trunc((nrCountries - 1) / cols) + 1;
+    //----
+    itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
+    itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
+    //----
+    col = 1; row = 1;
+    for (country = 1; country <= cv_maxCountry; country++) {
+        if (!lo_enabledCountry[country]) { continue };
+        x = marginLeft + (col - 1) * (hGap + itemWidth);
+        y = marginTop + (row - 1) * (vGap + itemHeight);
+        ih = itemHeight;
+        if (col == cols && row == 1) {
+            newY = 59; yDiff = newY - y;
+            if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+        }   
+        gLine(x + 1, y + 2, x + itemWidth - 1, y + 2, 2, "white", []);
+        gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
+        gLine(x + 1, y + ih + 2, x + itemWidth + 1, y + ih + 2, 2, "white", []);
+        gLine(x + itemWidth + 2, y + 1, x + itemWidth + 2, y + ih + 1, 2, "white", []);
+        ctx.beginPath(); ctx.rect(x, y, itemWidth, ih); ctx.closePath();
+        ctx.fillStyle = "#FBFBFBFF";
+        ctx.fill();
+        ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
+        //paint_graph_timeExcessDeath(x, y, itemWidth, ih, cv_graphType_timeExcessDeath, country, 2);
+        paint_graph_timeExcessDeath(x, y, itemWidth, ih, vp_graphType, country, 2);
+        col += 1;
+        if (col > cols) { col = 1; row += 1 };
+    }
+}
+
+function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_country, vp_marginRight) {
+
+    let cv_graphMarginLeft, cv_graphMarginRight, cv_graphMarginTop, cv_graphMarginBottom;
+    let cv_graphGapLeft, cv_graphGapRight, cv_graphGapTop, cv_graphGapBottom;
+    switch (vp_graphType) {
+        case cv_graphType_vaccExcessDeath:
+            cv_graphMarginLeft = 20; cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
+            cv_graphGapLeft = 0; cv_graphGapRight = 5; cv_graphGapTop = 5; cv_graphGapBottom = 0;
+            break;
+        case cv_graphType_timeExcessDeath:
+            cv_graphMarginLeft = 20; cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
+            cv_graphGapLeft = 14; cv_graphGapRight = 70; cv_graphGapTop = 5; cv_graphGapBottom = 0;
+            if (vp_country != cv_allCountry) { cv_graphGapRight = 20 };
+            break;
+    }
+    const cv_graphLeft = vp_left + cv_graphMarginLeft //X koordinata Y osi oziroma začetka X osi
+    const cv_graphRight = vp_left + vp_width - vp_marginRight //X koordinata konca X osi
+    const cv_graphLeftData = cv_graphLeft + cv_graphGapLeft //X koordinata začetka področja podatkov
+    const cv_graphRightData = cv_graphRight - cv_graphGapRight //X koordinata konca področja podatkov
+    const cv_graphRangeX = cv_graphRightData - cv_graphLeftData //X koordinata konca področja podatkov
+    //----
+    const cv_graphTopAxis = vp_top + cv_graphMarginTop //Y koordinata vrha Y osi
+    const cv_graphTopData = cv_graphTopAxis + cv_graphGapTop //Y koordinata vrha območja podatkov
+    const cv_graphBottom = vp_top + vp_height - cv_graphMarginBottom //Y koordinata dna grafa
+    const cv_graphRangeY = cv_graphBottom - cv_graphTopData //X koordinata konca področja podatkov
+    
+    //---- določanje začetnega meseca
+    switch (vp_graphType) {
+        case cv_graphType_vaccExcessDeath: gl_monthStart = gl_monthEnd - gl_tailMonths; break;
+        case cv_graphType_timeExcessDeath: gl_monthStart = 1; break;
+    }
+    let vl_nrMonths = gl_monthEnd - gl_monthStart + 1;
+    let kx;
+    switch (vp_graphType) {
+        case cv_graphType_vaccExcessDeath:
+            kx = cv_graphRangeX / 100; break; // največ je 100% vaccinated
+        case cv_graphType_timeExcessDeath:
+            switch (vl_nrMonths - 1) {
+                case 0: kx = 100; break; //raje nisem dal 0, ker bi bil potem problem pri označevanju pozicije miške na X osi!
+                default: kx = cv_graphRangeX / (vl_nrMonths - 1); break;
+            }
+    }
+    //---- pregled Y vrednosti presežne smrtnosti in določanje ky
+    let vl_minY, vl_maxY, vl_dataRange;
+    ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_country, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+    const ky = cv_graphRangeY / vl_dataRange
+    
+    //---- Y koordinata vodoravne X osi
+    let cv_graphY0 = cv_graphBottom // Y koordinata X osi
+    if (vl_minY<0) {cv_graphY0=cv_graphBottom-ky*Math.abs(vl_minY)}
+
+    //---- risanje koordinatnih osi
+    gLine(cv_graphLeft, cv_graphBottom, cv_graphLeft, cv_graphTopAxis, 2, "gray", [])
+    gLine(cv_graphLeft, cv_graphY0, cv_graphRight, cv_graphY0, 2, "gray", [])
+    
+    //---- oznake na Y osi
+    gText("Excess death [%]", "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 6);
+    let x, y, font, tmpW, tmpH
+    let tmpExcessDeath, tmpExcessDeathAbs
+    let yMark10 = true; let yMark5 = true; let yMark1 = true;
+    if (vl_dataRange > 30) { yMark1 = false }
+    if (vl_dataRange > 100) { yMark5 = false }
+    font = "italic 9pt cambria";
+    for (tmpExcessDeath = -150; tmpExcessDeath <= 150; tmpExcessDeath++) {
+        if (tmpExcessDeath == 0) {
+            tmpStr = tmpExcessDeath.toString(); 
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            x = cv_graphLeft - tmpW - 4
+            y = cv_graphY0
+            gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
+            continue
+        }
+        tmpExcessDeathAbs = Math.abs(tmpExcessDeath)
+        //---- gosta temnejša linija na vsakih 10% presežne smrtnosti
+        if (yMark10 && (Math.abs(tmpExcessDeathAbs - 10 * Math.trunc(tmpExcessDeathAbs / 10)) < 0.00001)) {
+            y = cv_graphY0 - ky * tmpExcessDeath
+            if (y <= cv_graphBottom && y >= cv_graphTopData) {
+                gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "darkGray", [2, 2])
+                tmpStr = tmpExcessDeath.toString();
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                x = cv_graphLeft - tmpW - 4
+                gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
+            }
+            continue;
+        }
+        //---- srednje gosta srednje temna linija na vsakih 5% presežne smrtnosti
+        if (yMark5 && (Math.abs(tmpExcessDeathAbs - 5 * Math.trunc(tmpExcessDeathAbs / 5)) < 0.00001)) {
+            y = cv_graphY0 - ky * tmpExcessDeath
+            if (y <= cv_graphBottom && y >= cv_graphTopData) {
+                gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "darkGray", [2, 5])
+                tmpStr = tmpExcessDeath.toString();
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                x = cv_graphLeft - tmpW - 4
+                gText(tmpStr, font, "darkGray", x, y + tmpH / 2 - 1);
+            }
+            continue;
+        }
+        //---- redka svetlejša linija na vsakih 1% presežne smrtnosti
+        if (yMark1 && ky > 12) {
+            y = cv_graphY0 - ky * tmpExcessDeath
+            if (y <= cv_graphBottom && y >= cv_graphTopData) {
+                gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "silver", [2, 10])
+            }
+        }
+    }
+    
+    //---- oznake na X osi
+    let tmpVacc, tmpMonth, vl_xOld, vl_yOld;
+    switch (vp_graphType) {
+        case cv_graphType_vaccExcessDeath:
+            switch (vp_country) {
+                case cv_allCountry:
+                    font = "bold italic 11pt cambria";
+                    tmpStr = "Vaccinated [%]";
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    x = cv_graphRight - tmpW + 10;
+                    y = cv_graphY0 + 15;
+                    break;
+                default:
+                    font = "bold italic 10pt cambria";
+                    tmpStr = "V";
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    x = cv_graphRight - tmpW - 2;
+                    y = cv_graphY0 + 13;
+                    break;
+            }
+            gText(tmpStr, font, "darkSlateGray", x, y);
+            font = "italic 9pt cambria";
+            for (tmpVacc = 10; tmpVacc <= 100; tmpVacc += 10) {
+                x = cv_graphLeftData + kx * tmpVacc
+                if (x >= cv_graphLeftData && x <= cv_graphRightData) {
+                    gLine(x, cv_graphY0 - 2, x, cv_graphY0 + 2, 1, "darkSlateGray", [])
+                    if (tmpVacc != 100) {
+                        tmpStr = tmpVacc.toString();
+                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                        gText(tmpStr, font, "dimGray", x - tmpW / 2, cv_graphY0 + tmpH + 4);
+                    }
+                }
+            }
+            break;
+        case cv_graphType_timeExcessDeath:
+            //---- oznake mesecev
+            font = "normal 9pt cambria";
+            vl_xOld = 0;
+            let singleYear = false;
+            if (lf_yearValue(gl_monthStart) == lf_yearValue(gl_monthEnd)) { singleYear = true };
+            for (tmpMonth = gl_monthStart; tmpMonth <= gl_monthEnd; tmpMonth++) {
+                x = cv_graphLeftData + kx * (tmpMonth - gl_monthStart);
+                if (x >= cv_graphLeftData && x <= cv_graphRightData) {
+                    gLine(x, cv_graphY0 - 2, x, cv_graphY0 + 2, 1, "darkSlateGray", [])
+                    tmpStr = ""
+                    if (kx < 4) {
+                        if (lf_monthValue(tmpMonth) == 1 && tmpMonth != gl_monthStart) {
+                            tmpStr = lf_yearStrShort(tmpMonth);
+                            x -= (x - vl_xOld) / 2;
+                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "darkGray", []);
+                            x += 8;
+                        };
+                    }
+                    else if (kx < 17) {
+                        if (lf_monthValue(tmpMonth) == 1 && tmpMonth != gl_monthStart) {
+                            tmpStr = lf_yearValue(tmpMonth);
+                            x -= (x - vl_xOld) / 2;
+                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "darkGray", []);
+                            x += 15;
+                        } else {
+                            if (singleYear && kx > 6) { tmpStr = lf_monthStrM(tmpMonth); }
+                        }
+                    }
+                    else if (kx < 25) { tmpStr = tmpMonth.toString(); }
+                    else if (kx < 37) { tmpStr = lf_monthStrMMM(tmpMonth); }
+                    else if (kx < 60) { tmpStr = lf_monthStrMMYY(tmpMonth); }
+                    else { tmpStr = lf_monthStrMY(tmpMonth); }
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    gText(tmpStr, font, "dimGray", x - tmpW / 2, cv_graphY0 + 13);
+                }
+                vl_xOld = x;
+            }
+            //---- oznaka osi
+            font = "bold italic 11pt cambria";
+            switch (vp_country) {
+                case cv_allCountry:
+                    tmpStr = "Time";
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    x = cv_graphRight - tmpW + 10
+                    y = cv_graphY0 + 15;
+                    break;
+                default:
+                    tmpStr = "t";
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    x = cv_graphRight - tmpW - 2;
+                    y = cv_graphY0 + 14;
+                    break;
+            }
+            ctx.beginPath; ctx.rect(x - 1, y - tmpH - 1, tmpW + 2, tmpH + 2); ctx.closePath; ctx.fillStyle = bckgColor; ctx.fill();
+            gText(tmpStr, font, "darkSlateGray", x, y);
+    }
+
+    //---- risanje koralacijske linije precepljenost/excessDeaths
+    if (vp_graphType == cv_graphType_vaccExcessDeath) {
+        paint_graph_vaccExcessDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0, cv_graphTopData, cv_graphBottom, vp_country)
+    }
+
+    //---- risanje diagrama    
+    let xValue, xValue0, yValue, monthIndex, dataLineColor, dataPointColor;
+    switch (vp_graphType) {
+        case cv_graphType_vaccExcessDeath: xValue0 = 0; break;
+        case cv_graphType_timeExcessDeath: xValue0 = gl_monthStart; break;
+    }
+    font = "bold 10pt verdana"
+    let kk = 0;
+    if (gl_monthEnd > 26) {
+        kk = 2; if (gl_tailMonths > 10) { kk = 1 }; if (gl_tailMonths > 20) { kk = 0 }
+    }
+    kk = 0;
+
+    //---- debelina markerja je odvisna od gostote izpsa
+    let countryStart, countryEnd;
+    let dataPointRadij = 3;
+    switch (vp_country) {
+        case cv_allCountry:
+            countryStart = 1; countryEnd = cv_maxCountry; break;
+        default:
+            countryStart = vp_country; countryEnd = vp_country;
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath:
+                    if (kx < 1.3) { dataPointRadij=1 }
+                    else if (kx < 2.6) { dataPointRadij = 2 };
+                    break;
+                case cv_graphType_timeExcessDeath:
+                    if (kx < 4) { dataPointRadij=1 }
+                    else if (kx < 7) { dataPointRadij = 2 };
+                    break;
+            }
+            break;
+    }
+    for (country = countryStart; country <= countryEnd; country++) {
+        //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
+        if (!lo_enabledCountry[country]) { continue };
+        switch (vp_graphType) {
+            case cv_graphType_vaccExcessDeath:
+                switch (vp_country) {
+                    case cv_allCountry: dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(80, countryColor[country]); break;
+                    default: dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
+                }
+                break;
+            case cv_graphType_timeExcessDeath: dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
+        }
+        //---- najprej za linije med krogci točk
+        for (month = gl_monthStart; month <= gl_monthEnd; month++) {
+            monthIndex = month - gl_monthStart + 1
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath: xValue = countryVaccByMonth[country][month - 1]; break;
+                case cv_graphType_timeExcessDeath: xValue = month; break;
+            }
+            x = cv_graphLeftData + kx * (xValue - xValue0);
+            yValue = lf_getAvgValue(country, month, lo_nrMonthsAvg)
+            y = cv_graphY0 - ky * yValue
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath:
+                    kk = 0; if (month > 26) { kk = 2; if (gl_tailMonths > 10) { kk = 1 }; } // if (gl_tailMonths > 20) { kk = 0 }
+                    kk = 0;
+                    x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
+                    break;
+            }
+            if (monthIndex > 1) { gLine(vl_xOld, vl_yOld, x, y, 1, dataLineColor, []) }
+            vl_xOld = x; vl_yOld = y
+        }
+        //---- zdaj pa še za krogce točk, zato da so ti risani preko linij
+        for (month = gl_monthStart; month <= gl_monthEnd; month++) {
+            monthIndex = month - gl_monthStart +1
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath: xValue = countryVaccByMonth[country][month - 1]; break;
+                case cv_graphType_timeExcessDeath: xValue = month; break;
+            }
+            x = cv_graphLeftData + kx * (xValue - xValue0);
+            yValue = lf_getAvgValue(country, month, lo_nrMonthsAvg)
+            y = cv_graphY0 - ky * yValue
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath:
+                    kk = 0; if (month > 26) { kk = 2; if (gl_tailMonths > 10) { kk = 1 }; } // if (gl_tailMonths > 20) { kk = 0 }
+                    kk = 0;
+                    x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
+                    break;
+            }
+            if (month == gl_monthEnd) {
+                switch (vp_graphType) {
+                    case cv_graphType_vaccExcessDeath: gEllipse(x, y, 5, 5, 0, countryColor[country], 1, "dimGray"); break;
+                    case cv_graphType_timeExcessDeath: gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColor, 0, ""); break;
+                }
+            } else {
+                gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColor, 0, "");
+            }
+            vl_xOld = x; vl_yOld = y
+        }
+    }
+    //---- zdaj pa še za oznake držav, zato da so te v vsakem primeru preko krogcev točk in linij med krogci (ta problem je sicer le pri VACC-ExcessDeath diagramu)
+    for (country = countryStart; country <= countryEnd; country++) {
+        //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
+        if (!lo_enabledCountry[country]) { continue };
+        month = gl_monthEnd
+        monthIndex = month - gl_monthStart + 1
+        switch (vp_graphType) {
+            case cv_graphType_vaccExcessDeath: xValue = countryVaccByMonth[country][month - 1]; break;
+            case cv_graphType_timeExcessDeath: xValue = month; break;
+        }
+        x = cv_graphLeftData + kx * (xValue - xValue0);
+        yValue = lf_getAvgValue(country, month, lo_nrMonthsAvg)
+        y = cv_graphY0 - ky * yValue
+        //switch (vp_graphType) {
+        //    case cv_graphType_vaccExcessDeath: x = x - kk * (vl_nrMonths / 2 - monthIndex + 1); break;
+        //}
+        switch (vp_graphType) {
+            case cv_graphType_vaccExcessDeath:
+                kk = 0;
+                x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
+                switch (vp_country) {
+                    case cv_allCountry:
+                        tmpStr = countryNameShort3[country];
+                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                        gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], tmpStr, "lightGray", 2, 2)
+                        break;
+                    default:
+                        tmpStr = countryNameLong[country];
+                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                        //gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], tmpStr, "lightGray", 2, 2)
+                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], tmpStr, "lightGray", 2, 2);
+                        break;
+                }
+                break;
+            case cv_graphType_timeExcessDeath:
+                //tmpStr = countryNameShort3[country];
+                tmpStr = countryNameLong[country];
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                //gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "", 1, "lightGray", "bold 10pt verdana", countryColor[country], tmpStr, "lightGray", 2, 2)
+                switch (vp_country) {
+                    case cv_allCountry:
+                        gText(tmpStr, "normal 9pt verdana", countryColor[country], x + 8, y + 3);
+                        break;
+                    default:
+                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], tmpStr, "lightGray", 2, 2);
+                        break;
+                }
+                break;
+        }
+        vl_xOld = x; vl_yOld = y 
+    }
+
+    //Izpis tekočega meseca
+    tmpStr = lf_monthStrMY(gl_monthEnd);
+    font = "bold 14pt verdana";
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+    //let tmpLeft = 400; let tmpTop = 20;
+    //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+    gBannerRectWithText(lo_currentMonthTextLeft, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+
+    //oznake koordinat miške
+    font = "italic 9pt cambria";
+    let tmpValue;
+    if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData) {
+        gLine(lo_mouseMoveX, cv_graphY0 - 30, lo_mouseMoveX, cv_graphY0 + 10, 1, "gray", [2, 2]);
+        tmpValue = xValue0 + (lo_mouseMoveX - cv_graphLeftData) / kx;
+        switch (vp_graphType) {
+            case cv_graphType_vaccExcessDeath: tmpStr = tmpValue.toFixed(2) + "%"; break;
+            case cv_graphType_timeExcessDeath: tmpStr = tmpValue.toFixed(2); break;
+        }
+        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+        gText(tmpStr, font, "dimGray", lo_mouseMoveX +2, cv_graphY0 -4);
+    }
+    if (lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom && ky != 0) {
+        gLine(cv_graphLeft - 10, lo_mouseMoveY, cv_graphLeft + 40, lo_mouseMoveY, 1, "gray", [2, 2]);
+        tmpExcessDeath = (cv_graphY0 - lo_mouseMoveY) / ky;
+        tmpStr = tmpExcessDeath.toFixed(1) + "%";
+        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+        gText(tmpStr, font, "dimGray", cv_graphLeft + 3, lo_mouseMoveY - 3);
+    }
+}
+
+function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
 
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
     const cv_graphRight = vp_left + vp_width - 45 //X koordinata konca X osi
@@ -1378,17 +2123,16 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     const cv_graphBottom = vp_top + vp_height - 15 //Y koordinata X osi oziroma začetka Y osi
     const cv_graphRangeY = cv_graphBottom - cv_graphTopData //X koordinata konca področja podatkov
     
-    //---- konfiguracija diagrama
-    //gl_monthEnd = cv_nrMonths
+    //---- določanje začetnega meseca
     gl_monthStart = gl_monthEnd - gl_tailMonths //30 //25//1  28=apr2022 30=jun2022 35=nov2022
 
     //---- pregled Y vrednosti presežne smrtnosti in določanje ky
     let vl_nrMonths = gl_tailMonths + 1
     let vl_minY, vl_maxY, vl_dataRange;
-    ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+    ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(cv_allCountry, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
     const ky = cv_graphRangeY / vl_dataRange
     
-    //---- Y koordinata Y osi
+    //---- Y koordinata vodoravne X osi
     let cv_graphY0 = cv_graphBottom
     if (vl_minY<0) {cv_graphY0=cv_graphBottom-ky*Math.abs(vl_minY)}
 
@@ -1464,7 +2208,7 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     }
 
     //---- risanje koralacijske linije precepljenost/excessDeaths
-    paint_eDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0)
+    paint_graph_vaccExcessDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0)
 
     //---- risanje raztresenega diagrama    
     let xValue, yValue, monthIndex, vl_xOld, vl_yOld
@@ -1515,16 +2259,16 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
         y = cv_graphY0 - ky * yValue
         x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
         ;[tmpW, tmpH] = gMeasureText(countryNameShort3[country], font);
-        gBannerRectWithText(x + 10, y - 8, x + tmpW+9, y + 4, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], countryNameShort3[country], "lightGray", 2, 2)
+        gBannerRectWithText(x + 10, y - 8, x + tmpW+9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", countryColor[country], countryNameShort3[country], "lightGray", 2, 2)
         vl_xOld = x; vl_yOld = y 
     }
 
     //Izpis tekočega meseca
-    tmpStr = lf_monthStr(gl_monthEnd);
+    tmpStr = lf_monthStrMY(gl_monthEnd);
     font = "bold 14pt verdana";
     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
     let tmpLeft = 400; let tmpTop = 20;
-    gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+    gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
     
     //oznake koordinat miške
     font = "italic 9pt cambria";
@@ -1537,14 +2281,14 @@ function paint_eDeath(vp_left, vp_top, vp_width, vp_height) {
     }
     if (lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom && ky != 0) {
         gLine(cv_graphLeft - 10, lo_mouseMoveY, cv_graphLeft + 40, lo_mouseMoveY, 1, "gray", [2, 2]);
-        tmpExcessDeath = (lo_mouseMoveY - cv_graphY0) / ky;
+        tmpExcessDeath = (cv_graphY0 - lo_mouseMoveY) / ky;
         tmpStr = tmpExcessDeath.toFixed(1) + "%";
         ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
         gText(tmpStr, font, "dimGray", cv_graphLeft + 3, lo_mouseMoveY - 3);
     }
 }
 
-function paint_eDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_graphLeftData, vp_graphY0) {
+function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_graphLeftData, vp_graphY0, vp_topData, vp_bottomData, vp_country) {
 
     //---- pred feb 2021 ne rišem korelacije, ker je še premalo cepljenih
     if (vp_month < 14) { return };
@@ -1598,6 +2342,28 @@ function paint_eDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_
     let y0 = vp_graphY0 - vp_ky * excessDeath0
     let y1 = vp_graphY0 - vp_ky * excessDeath1
 
+    //---- če je cela linija izven podatkovnega področja okna potem nimam kaj risati 29.1.2023 v1.6
+    if ((y0 >= vp_bottomData && y1 >= vp_bottomData) || (y0 <= vp_topData && y1 <= vp_topData)) {
+        return;
+    }
+
+    //---- del linije izven podatkovnega področja okna ni prav da se riše! 29.1.2023 v1.6
+    let dx, dy
+    let kGraph = k * vp_ky / vp_kx;
+      //gLine(x0, y0, x1, y1, 1, "red", []) //ta je bila samo za kontrolo!
+    if (y0 > vp_bottomData) {
+        dy = y0 - vp_bottomData; dx = dy / kGraph; x0 += dx; y0 = vp_bottomData;
+    }
+    else if (y0 < vp_topData) {
+        dy = y0 - vp_topData; dx = dy / kGraph; x0 += dx; y0 = vp_topData;
+    };
+    if (y1 > vp_bottomData) {
+        dy = vp_bottomData - y1; dx = dy / kGraph; x1 -= dx; y1 = vp_bottomData;
+    }
+    else if (y1 < vp_topData) {
+        dy = vp_topData - y1; dx = dy / kGraph; x1 -= dx; y1 = vp_topData;
+    };
+
     //---- risanje smerne linije
     const cv_dashWidth = 7
     gLine(x0 - 2, y0 - 2, x1 - 2, y1 - 2, 4, "white", [cv_dashWidth, cv_dashWidth])
@@ -1605,10 +2371,11 @@ function paint_eDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp_kx, vp_ky, vp_
     gLine(x0, y0, x1, y1, 4, "darkGray", [cv_dashWidth, cv_dashWidth])
 
     //---- označitev kota smerne linije
-    let alphaStr
-    if ((avgVaccAll - avgVaccLeft) == 0) { alphaStr = "90" + scStopinj } else { alphaStr = ( Math.abs(Math.atan(k)) * 180 / Math.PI ).toFixed(1) + scStopinj }
-    gText(alphaStr, "italic 10pt serif", "gray", x1 + 5, y1 + 4)
-
+    if (vp_country == cv_allCountry) {
+        let alphaStr
+        if ((avgVaccAll - avgVaccLeft) == 0) { alphaStr = "90" + scStopinj } else { alphaStr = (Math.abs(Math.atan(k)) * 180 / Math.PI).toFixed(1) + scStopinj }
+        gText(alphaStr, "italic 10pt serif", "gray", x1 + 5, y1 + 4)
+    }
 }
 
 function lf_getAvgValue(vp_country, vp_month, vp_nrMonthsAvg) {
@@ -1625,14 +2392,18 @@ function lf_getAvgValue(vp_country, vp_month, vp_nrMonthsAvg) {
     return tmpValue
 }
 
-function lf_inspectDataValues(vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
+function lf_inspectDataValues(vp_country, vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
 
     //console.log("------------------------")
 
     let minY = 1000
     let maxY = 0
-    let tmpValue
-    for (country = 1; country <= cv_maxCountry; country++) {
+    let tmpValue, countryStart, countryEnd;
+    switch (vp_country) {
+        case cv_allCountry: countryStart = 1; countryEnd = cv_maxCountry; break;
+        default: countryStart = vp_country; countryEnd = vp_country; break;
+    }
+    for (country = countryStart; country <= countryEnd; country++) {
         for (month = vp_monthStart; month <= vp_monthEnd; month++) {
             tmpValue = lf_getAvgValue(country, month, vp_nrMonthsAvg)
             if (tmpValue < minY) {
@@ -1666,7 +2437,7 @@ function paint_author() {
     let y0 = topMargin + dd
     let y1 = y0 + tmpH //wh[1]
     //----
-    gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
+    gBannerRectWithText(x0, y0, x1, y1, dd, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
 }
 
 function paint_version() {
@@ -1687,7 +2458,7 @@ function paint_version() {
     let y0 = topMargin + dd
     let y1 = y0 + tmpH //wh[1]
     //----
-    gBannerRectWithText(x0, y0, x1, y1, dd, "#FFF800B0", 1, "lightGray", font, "blue", tmpStr, "#D0D0D040", 3, 3)
+    gBannerRectWithText(x0, y0, x1, y1, dd, dd, "#FFF800B0", 1, "lightGray", font, "blue", tmpStr, "#D0D0D040", 3, 3)
 
     //======== DATUM APLIKACIJE
     tmpStr = gl_versionDate;
@@ -1707,7 +2478,7 @@ function paint_version() {
     x0 = x1 - tmpW //wh[0]
     y0 = topMargin + dd
     y1 = y0 + tmpH //wh[1]
-    gBannerRectWithText(x0, y0, x1, y1, dd, "white", 1, "lightGray", "italic 12px cambria", "gray", tmpStr, "", 3, 3)
+    gBannerRectWithText(x0, y0, x1, y1, dd, dd, "white", 1, "lightGray", "italic 12px cambria", "gray", tmpStr, "", 3, 3)
 }
 
 
@@ -1908,16 +2679,16 @@ function gMeasureText(text, font) {
     return [msrText.width, msrText.actualBoundingBoxAscent]
 }
 
-function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeColor, font, fontColor, tmpStr, shaddowColor, xShaddow, yShaddow) {
+function gBannerRectWithText(x0, y0, x1, y1, ddx, ddy, fillColor, strokeWidth, strokeColor, font, fontColor, tmpStr, shaddowColor, xShaddow, yShaddow) {
     //-------------------------------
     // x0,y0,x1,y1 ... notranji nevidni okvir, tudi tekst se spodaj izpisuje na y1 (nad y1)
     // dd          ... toliko od notranjega okvirja od zunanjega izrisanega okvirja
     // x(y)Shaddow ... kako daleč pade senca desno in navzdol
     //-------------------------------
-    let top = y0 - dd
-    let left = x0 - dd
-    let bottom = y1 + dd
-    let right = x1 + dd
+    let top = y0 - ddy
+    let left = x0 - ddx
+    let bottom = y1 + ddy
+    let right = x1 + ddx
     //----
     if (shaddowColor != "") {
         ctx.beginPath()
@@ -1961,6 +2732,141 @@ function gBannerRectWithText(x0, y0, x1, y1, dd, fillColor, strokeWidth, strokeC
     //gText(tmpStr, font, "lightYellow", x0 + 2, y1 +2)
     if (tmpStr != "") {
         gText(tmpStr, font, fontColor, x0, y1)
+    }
+}
+
+function gBannerRectWithText2(text, xiLeft, yiTop, font, xGap, yGap, ddx, ddy, fillColor, strokeWidth, strokeColor, fontColor, shaddowColor, xShaddow, yShaddow) {
+    //-------------------------------
+    // xiLeft,yiTop,x1,y1 ... notranji nevidni okvir, tudi tekst se spodaj izpisuje na y1 (nad y1)
+    // dd          ... toliko od notranjega okvirja od zunanjega izrisanega okvirja
+    // x(y)Shaddow ... kako daleč pade senca desno in navzdol
+    //-------------------------------
+    let w, h;
+
+    //;[w, h] = gMeasureText("jgP", font); console.log("jgP-" + h); // 11
+    //;[w, h] = gMeasureText("PP", font); console.log("PP-" + h);   // 10
+    //;[w, h] = gMeasureText("jg", font); console.log("jg-" + h);   // 11
+    //;[w, h] = gMeasureText("aa", font); console.log("aa-" + h);   //  7
+
+    ;[w, h] = gMeasureText(text, font);
+    let xiRight = xiLeft + w; let yiBottom = yiTop + h;
+    let top = yiTop - yGap;
+    let left = xiLeft - xGap;
+    let bottom = yiBottom + yGap;
+    let right = xiRight + xGap;
+    let x1, x2, x3, x4, y1, y2, y3, y4;
+    x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
+    y1 = top; y2 = top + ddy; y3 = bottom - ddy; y4 = bottom;
+    //----
+    if (shaddowColor != "") {
+        ctx.beginPath()
+        ctx.moveTo(x2 + xShaddow, y1 + yShaddow)
+        ctx.lineTo(x3 + xShaddow, y1 + yShaddow)
+        ctx.lineTo(x4 + xShaddow, y2 + yShaddow)
+        ctx.lineTo(x4 + xShaddow, y3 + yShaddow)
+        ctx.lineTo(x3 + xShaddow, y4 + yShaddow)
+        ctx.lineTo(x2 + xShaddow, y4 + yShaddow)
+        ctx.lineTo(x1 + xShaddow, y3 + yShaddow)
+        ctx.lineTo(x1 + xShaddow, y2 + yShaddow)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = shaddowColor
+        ctx.fill()
+    }
+    //----
+    if (fillColor != "" || strokeWidth > 0) {
+        ctx.beginPath()
+        ctx.moveTo(x2, y1)
+        ctx.lineTo(x3, y1)
+        ctx.lineTo(x4, y2)
+        ctx.lineTo(x4, y3)
+        ctx.lineTo(x3, y4)
+        ctx.lineTo(x2, y4)
+        ctx.lineTo(x1, y3)
+        ctx.lineTo(x1, y2)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+    }
+    //----
+    if (fillColor != "") {
+        ctx.fillStyle = fillColor
+        ctx.fill()
+    }
+    //----
+    if (strokeWidth > 0) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = strokeColor
+        ctx.lineWidth = strokeWidth
+        ctx.stroke();
+    }
+    //gText(text, font, "lightYellow", xiLeft + 2, y1 +2)
+    if (text != "") {
+        gText(text, font, fontColor, xiLeft, yiBottom)
+    }
+}
+
+function gBannerRect(left, top, width, height, ddx, ddy, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+    //-------------------------------
+    // left, top, width, height ... okvir
+    // ddx, ddy                 ... koliko poreže vogale
+    // xShaddow, yShaddow       ... kako daleč pade senca desno in navzdol
+    // shaddowAll               ... ali mora biti senčeno okoli in okoli (boolean)
+    //-------------------------------
+    let w, h;
+
+    let right = left + width; let bottom = top + height;
+    let x1, x2, x3, x4, y1, y2, y3, y4;
+    x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
+    y1 = top; y2 = top + ddy; y3 = bottom - ddy; y4 = bottom;
+    //----
+    if (shaddowColor != "") {
+        ctx.beginPath()
+        switch (shaddowAll) {
+            case true:
+                ctx.moveTo(x2 - xShaddow, y1 - yShaddow);
+                ctx.lineTo(x3 + xShaddow, y1 - yShaddow);
+                ctx.lineTo(x4 + xShaddow, y2 - yShaddow);
+                ctx.lineTo(x4 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x2 - xShaddow, y4 + yShaddow);
+                ctx.lineTo(x1 - xShaddow, y3 + yShaddow);
+                ctx.lineTo(x1 - xShaddow, y2 - yShaddow);
+            case false:
+                ctx.moveTo(x2 + xShaddow, y1 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y1 + yShaddow);
+                ctx.lineTo(x4 + xShaddow, y2 + yShaddow);
+                ctx.lineTo(x4 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x2 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x1 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x1 + xShaddow, y2 + yShaddow);
+        }
+        ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = shaddowColor;
+        ctx.fill();
+    }
+    //----
+    if (fillColor != "" || strokeWidth > 0) {
+        ctx.beginPath()
+        ctx.moveTo(x2, y1)
+        ctx.lineTo(x3, y1)
+        ctx.lineTo(x4, y2)
+        ctx.lineTo(x4, y3)
+        ctx.lineTo(x3, y4)
+        ctx.lineTo(x2, y4)
+        ctx.lineTo(x1, y3)
+        ctx.lineTo(x1, y2)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+    }
+    //----
+    if (fillColor != "") {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+    }
+    //----
+    if (strokeWidth > 0) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.stroke();
     }
 }
 
