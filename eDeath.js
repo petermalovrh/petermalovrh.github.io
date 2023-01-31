@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.7"
+const gl_versionNr = "v1.8"
 const gl_versionDate = "31.1.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -347,6 +347,10 @@ var lo_lastMouseLocation
 var lo_dragMonthEndActive = false
 var lo_dragTailMonthsActive = false
 
+const disabledControlLineColor = "silver";
+const disabledControlBackColor = "#F0F0F0FF";
+const disabledControlTextColor = "silver";
+
 class countryPanel {
     constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor ) {
         this.left = left;
@@ -617,21 +621,18 @@ class intChooser {
 }
     
 class checkBox {
-    constructor(left, top, width, lineWidth, smoothPx, text, gap, posAlign, value, color, fillColor, crossColor, textColor, font) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
+    constructor(left, top, width, lineWidth, smoothPx, text, textColor, font, gap, posAlign, value, color, fillColor, crossColor, enabled, disabledLineColor, disabledFillColor, disabledTextColor) {
+        this.left = left; this.top = top; this.width = width;
         this.lineWidth = lineWidth;
         this.smoothPx = smoothPx;
-        this.text = text;
+        this.text = text; this.textColor = textColor; this.font = font;
         this.gap = gap;
         this.posAlign = posAlign;
         this.value = value;
         this.color = color;
         this.fillColor = fillColor;
         this.crossColor = crossColor;
-        this.textColor = textColor;
-        this.font = font;
+        this.enabled = enabled; this.disabledLineColor = disabledLineColor, this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
     }
     paint() {
         let tmpW, tmpH
@@ -648,17 +649,19 @@ class checkBox {
         ctx.lineTo(x1, y3)
         ctx.lineTo(x1, y2)
         ctx.closePath()  //ctx.lineTo(x0, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
-        ctx.fillStyle = this.fillColor
+        //ctx.fillStyle = this.fillColor
+        ctx.fillStyle = this.enabled ? this.fillColor : this.disabledFillColor
         ctx.fill()
         ctx.setLineDash([]);
-        ctx.strokeStyle = this.color;
+        ctx.strokeStyle = this.enabled ? this.color : this.disabledLineColor;
         ctx.lineWidth = this.lineWidth;
         ctx.stroke();
         //---- izpis teksta
         switch (this.posAlign) {
             case "above-middle": //above-middle
                 ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
-                gText(this.text, this.font, this.textColor, this.left + (this.width - tmpW) / 2, this.top - this.gap);
+                let textColor = this.enabled ? this.textColor : this.disabledTextColor;
+                gText(this.text, this.font, textColor, this.left + (this.width - tmpW) / 2, this.top - this.gap);
         }
         //---- križec glede na vrednost
         if (this.value) {
@@ -670,75 +673,69 @@ class checkBox {
         }
     }
     eventClick(mouseX, mouseY) {
+        if (!this.enabled) { return this.value; };
+        if (this.eventMouseWithin(mouseX, mouseY)) { this.value = !this.value }
+        return (this.value);
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        if (!this.enabled) { return false; };
         let x0 = this.left - this.lineWidth / 2;
         let x1 = this.left + this.width + this.lineWidth / 2;
         let y0 = this.top - this.lineWidth / 2;
         let y1 = this.top + this.width + this.lineWidth / 2;
-        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
-            this.value = !this.value
-        }
-        return (this.value);
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) 
+             { return true; }
+        else { return false; }
     }
 }
 
 class button {
-    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, fillColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.height = height;
-        this.text = text;
-        this.font = font;
-        this.textColor = textColor;
-        this.lineWidth = lineWidth;
-        this.lineColor = lineColor;
-        this.smoothPx = smoothPx;
-        this.gapLeft = gapLeft;
-        this.gapTop = gapTop;
-        this.gapRight = gapRight;
-        this.gapBottom = gapBottom;
-        this.hAlign = hAlign;
-        this.vAlign = vAlign;
+    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor) {
+        this.left = left; this.top = top; this.width = width; this.height = height;
+        this.text = text; this.font = font; this.textColor = textColor;
+        this.lineWidth = lineWidth; this.lineColor = lineColor;
         this.fillColor = fillColor;
-        this.shaddowColor = shaddowColor;
-        this.xShaddow = xShaddow;
-        this.yShaddow = yShaddow;
-        this.shaddowAll = shaddowAll;
+        this.smoothPx = smoothPx;
+        this.gapLeft = gapLeft; this.gapTop = gapTop; this.gapRight = gapRight; this.gapBottom = gapBottom;
+        this.hAlign = hAlign; this.vAlign = vAlign;
+        this.shaddowColor = shaddowColor; this.xShaddow = xShaddow; this.yShaddow = yShaddow; this.shaddowAll = shaddowAll;
+        this.enabled = enabled; this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
     }
     paint() {
         //---- pravokotnik
-        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, this.fillColor, this.lineWidth, this.lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
+        let fillColor = this.enabled ? this.fillColor : this.disabledFillColor;
+        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, this.lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
         //---- text
         let tmpW, tmpH, x, y;
         ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
         let x0 = this.left + this.gapLeft; let x1 = this.left + this.width - this.gapRight;
         switch (this.hAlign) {
-            case "left":
-                x = x0;
-            case "top":
-                x = x1 - tmpW;
-            case "middle":
-                x = x0 + (x1 - x0) / 2 - tmpW / 2;
+            case "left": x = x0; break;
+            case "top": x = x1 - tmpW; break;
+            case "middle": x = x0 + (x1 - x0) / 2 - tmpW / 2; break;
         }
         let y0 = this.top + this.gapTop; let y1 = this.top + this.height - this.gapBottom;
         switch (this.vAlign) {
-            case "top":
-                y = y0 + tmpH;
-            case "bottom":
-                y = y1;
-            case "middle":
-                y = y1 - (y1 - y0) / 2 + tmpH / 2;
+            case "top": y = y0 + tmpH; break;
+            case "bottom": y = y1; break;
+            case "middle": y = y1 - (y1 - y0) / 2 + tmpH / 2; break;
         }
-        gText(this.text, this.font, this.textColor, x, y);
+        let textColor = this.enabled ? this.textColor : this.disabledTextColor;
+        gText(this.text, this.font, textColor, x, y);
     }
     eventClick(mouseX, mouseY) {
+        if (!this.enabled) { return false; };
+        if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        if (!this.enabled) { return false; };
         let x0 = this.left - this.lineWidth / 2;
         let x1 = this.left + this.width + this.lineWidth / 2;
         let y0 = this.top - this.lineWidth / 2;
         let y1 = this.top + this.height + this.lineWidth / 2;
-        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
-                 return true;
-        } else { return false; }
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) 
+             { return true; }
+        else { return false; }
     }
 }
 
@@ -754,16 +751,16 @@ var lo_GUI_layout = cv_guiLayoutB;
 switch (lo_GUI_layout) {
     case cv_guiLayoutA:
         guiPanelLeft = 100; guiPanelTop = 80; guiPanelWidth = 500; guiPanelHeight = 80;
-        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor);
         var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
         var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
         var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
-        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", 2, 0, 0, 0, 0, "middle", "middle", "lightGoldenrodYellow", "lightGray", 2, 2, false);
+        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor);
         var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
-        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", "gray", "normal 10pt verdana");
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
         var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
         var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
@@ -1041,6 +1038,8 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //console.log("mouse_move() enter")
 
+    // mouse cursors: https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_style_cursor2
+
     //Vlečenje okna / GUI elementov
     if (lo_mouseDown) {
         if (lo_dragMonthEndActive) {
@@ -1065,13 +1064,10 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         }
     }
 
-    //23.1.2023 v1.0 Je miška nad sliderjem za izbiro meseca?
-    //lo_mouseAboveSliderMonthEnd = false
-    //let x0, x1, y0, y1;
-    //x0 = guiPanelLeft; x1 = x0 + 500; y0 = guiPanelTop + 79; y1 = guiPanelTop + 103;
-    //if (e.offsetX >= x0 && e.offsetX <= x1 && e.offsetY >= y0 && e.offsetY <= y1) {
-    //    lo_mouseAboveSliderMonthEnd = true
-    //}
+    //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
+    if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+    else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+    else { document.body.style.cursor = "default" }
 
     //če se miška v resnici ni premaknila ne naredim nič
     if (e.offsetX == lo_mouseMoveX && e.offsetY == lo_mouseMoveY) {
