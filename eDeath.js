@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.9"
+const gl_versionNr = "v1.10"
 const gl_versionDate = "1.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -327,7 +327,6 @@ var tmAutoPlayId
 var lo_autoPlayStarting = false 
 
 //var cv_privateFormBorder  = 2
-var lo_backgroundColor = "whiteSmoke"
 //var lo_penFrg1 As Pen = New Pen(Color.DarkSlateGray, 1)
 //var lo_tmpPen As Pen = New Pen(Color.DarkSlateGray, 1)
 //var lo_tmpBrush As SolidBrush = New SolidBrush(Color.DarkSlateGray)
@@ -347,9 +346,11 @@ var lo_lastMouseLocation
 var lo_dragMonthEndActive = false
 var lo_dragTailMonthsActive = false
 
+const lo_backgroundColor = "whiteSmoke"
 const disabledControlLineColor = "silver";
 const disabledControlBackColor = "#F0F0F0FF";
 const disabledControlTextColor = "silver";
+const focusedColor = "lightYellow";
 
 class countryPanel {
     constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor, visible ) {
@@ -472,8 +473,11 @@ class slider {
         const bodyHeightHalf = Math.trunc(this.bodyWidth / 2);
         const bodyBottom = this.bodyMiddle + bodyHeightHalf;
         const bodyTop = this.bodyMiddle - bodyHeightHalf
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        if (focused) {
+            let addM = 4; gBannerRect(this.left - addM, bodyTop - addM, this.width + 2 * addM, this.bodyWidth + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false);
+        }
         gLine(this.left, this.bodyMiddle, this.left + this.width, this.bodyMiddle, this.bodyWidth, myColor, [])
-    
         let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value, x1, x2, y1, myTextColor;
         for (step = 1; step <= this.items; step++) {
             vl_value = this.minItemValue + (step - 1) * this.step
@@ -556,13 +560,8 @@ class slider {
 
 class intChooser {
     constructor(left, top, width, items, value, minItemValue, step, color, fillColor, crossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
-        this.left = left;
-        this.top = top;
-        this.width = width;
-        this.items = items;
-        this.value = value;
-        this.minItemValue = minItemValue;
-        this.step = step;
+        this.left = left; this.top = top; this.width = width; // top: zgornji rob krogcev
+        this.items = items; this.value = value; this.minItemValue = minItemValue; this.step = step;
         this.color = color;
         this.fillColor = fillColor;
         this.crossColor = crossColor;
@@ -576,20 +575,22 @@ class intChooser {
         this.posAlign = posAlign;
         this.textColor = textColor;
         this.clickGap = clickGap;
-        this.enabled = enabled;
-        this.disabledColor = disabledColor;
-        this.disabledTextColor = disabledTextColor;
+        this.enabled = enabled; this.disabledColor = disabledColor; this.disabledTextColor = disabledTextColor;
         this.visible = visible;
     }
     paint() {
         if (!this.visible) { return };
         let myColor = this.color; let myCrossColor = this.crossColor;
         if (!this.enabled) { myColor = this.disabledColor; myCrossColor = this.disabledColor }
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
         const cv_bodyWidthHalf = Math.trunc(this.bodyWidth / 2);
-        let yBodyMiddle = this.top - this.outRadij; 
-        gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth, myColor, []);
-                       
+        let yBodyMiddle = this.top + this.outRadij; 
+        if (focused) {
+            let addM = 3; gBannerRect(this.left - addM, this.top - addM, this.width + 2 * addM, 2 * this.outRadij + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false);
+            //gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth + 2, "limeGreen", []);
+        }
+        gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth, myColor, []);            
         let xStep = (this.width - 2 * this.outRadij) / (this.items - 1);
         let step, x, tmpStr, tmpStr2, tmpW, tmpH
         //let font = "normal verdana 10pt"
@@ -615,8 +616,14 @@ class intChooser {
     }
     eventClick(mouseX, mouseY) {
         if (!this.visible || !this.enabled) { return (this.minItemValue - 1); };
+        let tmpItemValue = this.eventMouseOverOption(mouseX, mouseY, true);
+        if (tmpItemValue >= this.minItemValue) {
+            this.value = tmpItemValue
+            return this.value
+        } else { return (this.minItemValue - 1) }  //manj od minimuma, da se potem tam izven ve, da ni bilo klika na to komponento
+
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
-        let yBodyMiddle = this.top - this.outRadij;
+        let yBodyMiddle = this.top + this.outRadij;
         let xStep = (this.width - 2 * this.outRadij) / (this.items - 1)
         let step, x, dx, dy, dist
         let y = yBodyMiddle
@@ -633,6 +640,36 @@ class intChooser {
             }
         }
         return (this.minItemValue - 1) //manj od minimuma, da se potem tam izven ve, da ni bilo klika na to komponento
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        //console.log("eventMouseWithin(mouseX=" + mouseX + ", mouseY=" + mouseY + ")")
+        if (!this.visible || !this.enabled) { return false; };
+        let x0 = this.left;
+        let x1 = this.left + this.width;
+        let y0 = this.top;
+        let y1 = this.top + 2 * this.outRadij;
+        //console.log("x0=" + x0 + " x1=" + x1 + " y0=" + y0 + " y1=" + y1);
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) { return true; } else { return false; }
+    }
+    eventMouseOverOption(mouseX, mouseY, returnItem) {
+        //console.log("eventMouseWithin(mouseX=" + mouseX + ", mouseY=" + mouseY + ")")
+        if (!this.visible || !this.enabled) { return (this.minItemValue - 1); };
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        let yBodyMiddle = this.top + this.outRadij;
+        let xStep = (this.width - 2 * this.outRadij) / (this.items - 1)
+        let step, x, dx, dy, dist
+        let y = yBodyMiddle
+        for (step = 1; step <= this.items; step++) {
+            x = this.left + this.outRadij + (step - 1) * xStep;
+            dx = x - mouseX;
+            dy = y - mouseY; 
+            dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist <= (this.outRadij + this.clickGap)) {
+                //this.value = this.minItemValue + (step - 1) * this.step
+                if (returnItem) { return (this.minItemValue + (step - 1) * this.step) } else { return true };
+            }
+        }
+        if (returnItem) { return (this.minItemValue - 1) } else { return false }; //manj od minimuma, da se potem tam izven ve, da ni bilo klika na to komponento
     }
 }
     
@@ -656,6 +693,9 @@ class checkBox {
         let tmpW, tmpH
         let x1 = this.left; let x2 = x1 + this.smoothPx; let x3 = this.left + this.width - this.smoothPx; let x4 = this.left + this.width;
         let y1 = this.top; let y2 = y1 + this.smoothPx; let y3 = this.top + this.width - this.smoothPx; let y4 = this.top + this.width;
+        //---- če je miška nad njim, je treba to v GUI označiti
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        if (focused) { let addM = 4; gBannerRect(x1 - addM, y1 - addM, this.width + 2 * addM, this.width + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false); }
         //---- risanje okvirčka
         ctx.beginPath()
         ctx.moveTo(x2, y1)
@@ -708,10 +748,10 @@ class checkBox {
 }
 
 class button {
-    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible) {
+    constructor(left, top, width, height, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible) {
         this.left = left; this.top = top; this.width = width; this.height = height;
-        this.text = text; this.font = font; this.textColor = textColor;
-        this.lineWidth = lineWidth; this.lineColor = lineColor;
+        this.text = text; this.font = font; this.textColor = textColor; this.focusedTextColor = focusedTextColor;
+        this.lineWidth = lineWidth; this.lineColor = lineColor; this.focusedLineColor = focusedLineColor;
         this.fillColor = fillColor;
         this.smoothPx = smoothPx;
         this.gapLeft = gapLeft; this.gapTop = gapTop; this.gapRight = gapRight; this.gapBottom = gapBottom;
@@ -723,8 +763,10 @@ class button {
     paint() {
         if (!this.visible) { return };
         //---- pravokotnik
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        let lineColor = focused ? this.focusedLineColor : this.lineColor;
         let fillColor = this.enabled ? this.fillColor : this.disabledFillColor;
-        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, this.lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
+        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
         //---- text
         let tmpW, tmpH, x, y;
         ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
@@ -740,7 +782,8 @@ class button {
             case "bottom": y = y1; break;
             case "middle": y = y1 - (y1 - y0) / 2 + tmpH / 2; break;
         }
-        let textColor = this.enabled ? this.textColor : this.disabledTextColor;
+        let textColor = this.disabledTextColor;
+        if (this.enabled) { textColor = focused ? this.focusedTextColor : this.textColor; }
         gText(this.text, this.font, textColor, x, y);
     }
     eventClick(mouseX, mouseY) {
@@ -772,14 +815,14 @@ switch (lo_GUI_layout) {
     case cv_guiLayoutA:
         guiPanelLeft = 100; guiPanelTop = 80; guiPanelWidth = 500; guiPanelHeight = 80;
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop - 4, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
         var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
-        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
+        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
@@ -1079,6 +1122,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
     if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+    else if (intChooserNrMonthsAvg.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
     else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
     else { document.body.style.cursor = "default" }
 
@@ -1485,11 +1529,11 @@ function paint_GUI_layoutB() {
     buttonMode.top = guiPanelTop + 2;
     //----
     intChooserNrMonthsAvg.left = buttonMode.left + buttonMode.width + 15;
-    intChooserNrMonthsAvg.top = guiPanelTop + 30;
+    intChooserNrMonthsAvg.top = guiPanelTop + 16;
     intChooserNrMonthsAvg.width = 180;
     //----
     checkBoxNrMonthsAvgAll.left = intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width + 10;
-    checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 17;
+    checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 3;
     checkBoxNrMonthsAvgAll.width = 18;
     //----
     let x1, x2, gap1, gap2, d1, d2, dHalf;
@@ -1751,7 +1795,7 @@ function lf_changeAutoPlay(vp_newValue) {
     switch (lo_autoPlay) {
         case true:
             //user je vključil auto play - treba je štartati timer
-            console.log("now start timer ...");
+            //console.log("now start timer ...");
             lo_autoPlayStarting = true;
             tmAutoPlayId = setInterval(tmAutoPlay_tick, 200);
             lo_autoPlayStarting = false;
@@ -1766,10 +1810,10 @@ function lf_changeAutoPlay(vp_newValue) {
 
 function tmAutoPlay_tick() {
 
-    console.log("timer_tick")
+    //console.log("timer_tick")
 
     if (lo_autoPlayStarting) {
-        console.log("  exit because start of the timer!");
+        //console.log("  exit because start of the timer!");
         lo_autoPlayStarting = false;
         //return
     } else {
@@ -1777,18 +1821,18 @@ function tmAutoPlay_tick() {
         if (gl_monthEnd >= cv_nrMonths) {
             clearInterval(tmAutoPlayId);
             tmAutoPlayId = null;
-            console.log("  timer_tick_cleared");
+            //console.log("  timer_tick_cleared");
             lo_autoPlay = false;
             //return;
         } else {
             // grem na naslednji mesec
-            console.log("  set month=" + (gl_monthEnd + 1).toString());
+            //console.log("  set month=" + (gl_monthEnd + 1).toString());
             lf_changeMonthEnd(gl_monthEnd + 1, true);
             // če sem že na zadnjem mesecu, potem ustavim animacijo
             if (gl_monthEnd >= cv_nrMonths) {
                 clearInterval(tmAutoPlayId);
                 tmAutoPlayId = null;
-                console.log("  timer_tick_cleared(pos-end)");
+                //console.log("  timer_tick_cleared(pos-end)");
                 lo_autoPlay = false;
                 //return;
         }
