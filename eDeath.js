@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.8"
-const gl_versionDate = "31.1.2023"
+const gl_versionNr = "v1.9"
+const gl_versionDate = "1.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -352,7 +352,7 @@ const disabledControlBackColor = "#F0F0F0FF";
 const disabledControlTextColor = "silver";
 
 class countryPanel {
-    constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor ) {
+    constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor, visible ) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -367,11 +367,13 @@ class countryPanel {
         this.shaddowX = shaddowX;
         this.shaddowY = shaddowY;
         this.backColor = backColor;
+        this.visible = visible;
         //---- additional object properties
         this.textTop = this.top + 5;
         this.textRight = this.right - pickCountryLeftDiff;
     }
     paint() {
+        if (!this.visible) { return };
         let tmpW, tmpH, x, y, color
         if (this.backColor != "") {
             for (country = 1; country <= cv_maxCountry; country++) {
@@ -400,6 +402,7 @@ class countryPanel {
         }
     }
     eventClick(mouseX, mouseY) {
+        if (!this.visible) { return -100 };
         //---- če klik ni bil na državah   //ctxW - 47, 59, ctxW, 65 + cv_maxCountry * 20
         if (!(mouseX >= (this.left) && mouseX <= (this.right) && mouseY >= (this.top) && mouseY <= (this.top + cv_maxCountry * this.itemHeight))) {
             return -100;
@@ -416,6 +419,7 @@ class countryPanel {
         return -100;
     }
     eventDblClick(mouseX, mouseY) {
+        if (!this.visible) { return false };
         //---- če dvojni klik ni bil na državah
         if (!(mouseX >= this.left && mouseX <= (this.right) && mouseY >= (this.top) && mouseY <= (this.top + cv_maxCountry * this.itemHeight)))
              { return false }
@@ -429,7 +433,7 @@ class countryPanel {
 }
 
 class slider {
-    constructor(left, bodyMiddle, width, items, value, minItemValue, step, enabled, color, disabledColor, bodyWidth, selWidth, selHeight, selShaddowColor, text, font, gap, posAlign, textColor, valueFont, valueColor, valueGap, addZoneUp, addZoneDown) {
+    constructor(left, bodyMiddle, width, items, value, minItemValue, step, enabled, color, disabledColor, bodyWidth, selWidth, selHeight, selShaddowColor, text, font, gap, posAlign, textColor, disabledTextColor, valueFont, valueColor, valueGap, addZoneUp, addZoneDown, visible) {
         this.left = left;
         this.bodyMiddle = bodyMiddle;
         this.width = width;
@@ -449,15 +453,18 @@ class slider {
         this.gap = gap;
         this.posAlign = posAlign;
         this.textColor = textColor;
+        this.disabledTextColor = disabledTextColor;
         this.valueFont = valueFont;
         this.valueColor = valueColor;
         this.valueGap = valueGap;
         this.addZoneUp = addZoneUp;
         this.addZoneDown = addZoneDown;
+        this.visible = visible;
     }
     paint() {
-        let myColor = this.color;
-        if (!this.enabled) { myColor = this.disabledColor }
+        if (!this.visible) { return };
+        let myColor = this.enabled ? this.color : this.disabledColor;
+        let selStrokeColor = this.enabled ? this.selShaddowColor : this.disabledColor;
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
         let itemWidth = this.width / this.items;
         let itemWidthHalf = itemWidth / 2
@@ -467,7 +474,7 @@ class slider {
         const bodyTop = this.bodyMiddle - bodyHeightHalf
         gLine(this.left, this.bodyMiddle, this.left + this.width, this.bodyMiddle, this.bodyWidth, myColor, [])
     
-        let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value, x1, x2, y1
+        let step, x, tmpStr, tmpStr2, tmpW, tmpH, vl_value, x1, x2, y1, myTextColor;
         for (step = 1; step <= this.items; step++) {
             vl_value = this.minItemValue + (step - 1) * this.step
             x = this.left + itemWidthHalf + (step - 1) * itemWidth
@@ -485,7 +492,7 @@ class slider {
                 ctx.fillStyle = myColor
                 ctx.fill()
                 ctx.setLineDash([]);
-                ctx.strokeStyle = this.selShaddowColor;
+                ctx.strokeStyle = selStrokeColor;
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 //gLine(x1 + 1, y1 + 1, x2 + 1, y1 + 1, 1, "gray", [])
@@ -494,18 +501,21 @@ class slider {
             else if (step == 1 || step == this.items) {
                 tmpStr = vl_value.toString();
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, this.valueFont);
-                gText(tmpStr, this.valueFont, this.valueColor, x - tmpW / 2, bodyBottom + this.valueGap + tmpH)
+                myTextColor = this.enabled ? this.valueColor : this.disabledTextColor;
+                gText(tmpStr, this.valueFont, myTextColor, x - tmpW / 2, bodyBottom + this.valueGap + tmpH)
             }
         }
         //---- izpis teksta
         switch (this.posAlign) {
             case "above-left":
                 ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
-                gText(this.text, this.font, this.textColor, this.left, bodyTop - this.gap);
+                myTextColor = this.enabled ? this.textColor : this.disabledTextColor;
+                gText(this.text, this.font, myTextColor, this.left, bodyTop - this.gap);
         }
     }
     eventClick(mouseX, mouseY) {
         //console.log("slider->eventClick()")
+        if (!this.visible || !this.enabled) { return (this.minItemValue - 1); };
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
         let itemWidth = this.width / this.items;
         let itemWidthHalf = itemWidth / 2
@@ -527,6 +537,7 @@ class slider {
         return (this.minItemValue - 1)
     }
     eventMouseWithin(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
         const bodyHeightHalf = Math.trunc(this.bodyWidth / 2);
         const bodyBottom = this.bodyMiddle + bodyHeightHalf;
         const bodyTop = this.bodyMiddle - bodyHeightHalf
@@ -544,7 +555,7 @@ class slider {
 }
 
 class intChooser {
-    constructor(left, top, width, items, value, minItemValue, step, enabled, color, fillColor, crossColor, disabledColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap) {
+    constructor(left, top, width, items, value, minItemValue, step, color, fillColor, crossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
         this.left = left;
         this.top = top;
         this.width = width;
@@ -552,11 +563,9 @@ class intChooser {
         this.value = value;
         this.minItemValue = minItemValue;
         this.step = step;
-        this.enabled = enabled;
         this.color = color;
         this.fillColor = fillColor;
         this.crossColor = crossColor;
-        this.disabledColor = disabledColor;
         this.outRadij = outRadij;
         this.inRadij = inRadij;
         this.selRadij = selRadij;
@@ -567,8 +576,13 @@ class intChooser {
         this.posAlign = posAlign;
         this.textColor = textColor;
         this.clickGap = clickGap;
+        this.enabled = enabled;
+        this.disabledColor = disabledColor;
+        this.disabledTextColor = disabledTextColor;
+        this.visible = visible;
     }
     paint() {
+        if (!this.visible) { return };
         let myColor = this.color; let myCrossColor = this.crossColor;
         if (!this.enabled) { myColor = this.disabledColor; myCrossColor = this.disabledColor }
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
@@ -595,10 +609,12 @@ class intChooser {
         switch (this.posAlign) {
             case "above-left":
                 ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
-                gText(this.text, this.font, this.textColor, this.left, yBodyMiddle - this.outRadij - this.gap);
+                let myTextColor = this.enabled ? this.textColor : this.disabledTextColor;
+                gText(this.text, this.font, myTextColor, this.left, yBodyMiddle - this.outRadij - this.gap);
         }
     }
     eventClick(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return (this.minItemValue - 1); };
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
         let yBodyMiddle = this.top - this.outRadij;
         let xStep = (this.width - 2 * this.outRadij) / (this.items - 1)
@@ -621,7 +637,7 @@ class intChooser {
 }
     
 class checkBox {
-    constructor(left, top, width, lineWidth, smoothPx, text, textColor, font, gap, posAlign, value, color, fillColor, crossColor, enabled, disabledLineColor, disabledFillColor, disabledTextColor) {
+    constructor(left, top, width, lineWidth, smoothPx, text, textColor, font, gap, posAlign, value, color, fillColor, crossColor, enabled, disabledLineColor, disabledFillColor, disabledTextColor, visible) {
         this.left = left; this.top = top; this.width = width;
         this.lineWidth = lineWidth;
         this.smoothPx = smoothPx;
@@ -633,8 +649,10 @@ class checkBox {
         this.fillColor = fillColor;
         this.crossColor = crossColor;
         this.enabled = enabled; this.disabledLineColor = disabledLineColor, this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
+        this.visible = visible;
     }
     paint() {
+        if (!this.visible) { return };
         let tmpW, tmpH
         let x1 = this.left; let x2 = x1 + this.smoothPx; let x3 = this.left + this.width - this.smoothPx; let x4 = this.left + this.width;
         let y1 = this.top; let y2 = y1 + this.smoothPx; let y3 = this.top + this.width - this.smoothPx; let y4 = this.top + this.width;
@@ -673,12 +691,12 @@ class checkBox {
         }
     }
     eventClick(mouseX, mouseY) {
-        if (!this.enabled) { return this.value; };
+        if (!this.visible || !this.enabled) { return this.value; };
         if (this.eventMouseWithin(mouseX, mouseY)) { this.value = !this.value }
         return (this.value);
     }
     eventMouseWithin(mouseX, mouseY) {
-        if (!this.enabled) { return false; };
+        if (!this.visible || !this.enabled) { return false; };
         let x0 = this.left - this.lineWidth / 2;
         let x1 = this.left + this.width + this.lineWidth / 2;
         let y0 = this.top - this.lineWidth / 2;
@@ -690,7 +708,7 @@ class checkBox {
 }
 
 class button {
-    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor) {
+    constructor(left, top, width, height, text, font, textColor, lineWidth, lineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible) {
         this.left = left; this.top = top; this.width = width; this.height = height;
         this.text = text; this.font = font; this.textColor = textColor;
         this.lineWidth = lineWidth; this.lineColor = lineColor;
@@ -700,8 +718,10 @@ class button {
         this.hAlign = hAlign; this.vAlign = vAlign;
         this.shaddowColor = shaddowColor; this.xShaddow = xShaddow; this.yShaddow = yShaddow; this.shaddowAll = shaddowAll;
         this.enabled = enabled; this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
+        this.visible = visible;
     }
     paint() {
+        if (!this.visible) { return };
         //---- pravokotnik
         let fillColor = this.enabled ? this.fillColor : this.disabledFillColor;
         gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, this.lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
@@ -724,11 +744,11 @@ class button {
         gText(this.text, this.font, textColor, x, y);
     }
     eventClick(mouseX, mouseY) {
-        if (!this.enabled) { return false; };
+        if (!this.visible || !this.enabled) { return false; };
         if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
     }
     eventMouseWithin(mouseX, mouseY) {
-        if (!this.enabled) { return false; };
+        if (!this.visible || !this.enabled) { return false; };
         let x0 = this.left - this.lineWidth / 2;
         let x1 = this.left + this.width + this.lineWidth / 2;
         let y0 = this.top - this.lineWidth / 2;
@@ -751,19 +771,19 @@ var lo_GUI_layout = cv_guiLayoutB;
 switch (lo_GUI_layout) {
     case cv_guiLayoutA:
         guiPanelLeft = 100; guiPanelTop = 80; guiPanelWidth = 500; guiPanelHeight = 80;
-        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
-        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
-        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
-        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "vse", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
+        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
+        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
+        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
-        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, lo_enabledIntChooserNrMonthsAvg, "burlyWood", "white", "orangeRed", "lightGray", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5);
-        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor);
-        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
-        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", "bold 9pt cambria", "gray", 6, 0, 0);
-        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF");
+        var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "darkSlateGray", 1, "gray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 10, 180, 5, lo_nrMonthsAvg, 1, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
+        var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
+        var sliderMonthEnd = new slider(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
+        var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
 }
 var lo_GUIlayoutHasChanged = true;
 var lo_currentMonthTextLeft = 400; var lo_currentMonthTextTop = 20;
@@ -977,8 +997,6 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI && lo_enabledIntChooserNrMonthsAvg) {
         rslt = intChooserNrMonthsAvg.eventClick(e.offsetX, e.offsetY)
         if (rslt >= 1 && rslt != lo_nrMonthsAvg) {
-            //lo_nrMonthsAvg = rslt
-            //paint()
             lf_changeNrMonthsAvg(rslt, true);
             vl_end = true
         }
@@ -993,9 +1011,6 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI) {
         rslt = sliderTailMonths.eventClick(e.offsetX, e.offsetY); //0, 0
         if (rslt >= 0 && rslt != gl_tailMonths) {
-            //gl_tailMonths = rslt
-            //lf_setTailMonthsText();
-            //paint()
             lf_changeTailMonths(rslt, true);
             vl_end = true
         }
@@ -1003,8 +1018,6 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI) {
         rslt = sliderMonthEnd.eventClick(e.offsetX, e.offsetY); //0, 0
         if (rslt >= 1 && rslt != gl_monthEnd) {
-            //gl_monthEnd = rslt
-            //paint()
             lf_changeMonthEnd(rslt, true);
             vl_end = true
         }
@@ -1088,29 +1101,27 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
     //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja dolžino "repa"
-    if (lo_keyDownA && lo_enabledIntChooserNrMonthsAvg) {
-        lo_nrMonthsAvg -= delta;
-        if (lo_nrMonthsAvg > 5) { lo_nrMonthsAvg = 5 };
-        if (lo_nrMonthsAvg < 1) { lo_nrMonthsAvg = 1 };
-        //lf_setNrMonthsAvgText();
-        //paint();
-        lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
+    if (lo_keyDownA) {
+        if (lo_enabledIntChooserNrMonthsAvg) {
+            lo_nrMonthsAvg -= delta;
+            if (lo_nrMonthsAvg > 5) { lo_nrMonthsAvg = 5 };
+            if (lo_nrMonthsAvg < 1) { lo_nrMonthsAvg = 1 };
+            lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
+        }
         return
     } else if (lo_keyDownT) {
-        gl_tailMonths -= delta;
-        if (gl_tailMonths > (cv_nrMonths - 1)) { gl_tailMonths = (cv_nrMonths - 1) };
-        if (gl_tailMonths < 0) { gl_tailMonths = 0 };
-        //lf_setTailMonthsText();
-        //paint();
-        lf_changeTailMonths(gl_tailMonths, true);
+        if (sliderTailMonths.visible && sliderTailMonths.enabled) {
+            gl_tailMonths -= delta;
+            if (gl_tailMonths > (cv_nrMonths - 1)) { gl_tailMonths = (cv_nrMonths - 1) };
+            if (gl_tailMonths < 0) { gl_tailMonths = 0 };
+            lf_changeTailMonths(gl_tailMonths, true);
+        }
         return
     }
     //---- ... sicer spreminja mesec prikaza
     gl_monthEnd -= delta;
     if (gl_monthEnd > cv_nrMonths) { gl_monthEnd = cv_nrMonths };
     if (gl_monthEnd < 1) { gl_monthEnd = 1 };
-    //lf_setMonthEndText();
-    //paint();
     lf_changeMonthEnd(gl_monthEnd, true);
 });
 
@@ -1481,31 +1492,51 @@ function paint_GUI_layoutB() {
     checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 17;
     checkBoxNrMonthsAvgAll.width = 18;
     //----
-    const gap1 = 30; // od checkBox-a do prvega sliderja
-    let x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
-    let x2 = ctxW - xAuthor;
-    let d1 = x2 - x1;
-    const gap2 = 200; //med obema sliderjema
-    let dHalf = (d1 - gap2) / 2;  
-    //----
-    sliderTailMonths.left = x1;
-    sliderTailMonths.bodyMiddle = guiPanelTop + 22;
+    let x1, x2, gap1, gap2, d1, d2, dHalf;
     const minTailWidth = 100; const maxTailWidth = 300;
-    if (dHalf > maxTailWidth) { sliderTailMonths.width = maxTailWidth; }
-    else if (dHalf < minTailWidth) { sliderTailMonths.width = minTailWidth; }
-    else { sliderTailMonths.width = dHalf; };
-    //----
-    sliderMonthEnd.left = sliderTailMonths.left + sliderTailMonths.width + gap2;
-    sliderMonthEnd.bodyMiddle = sliderTailMonths.bodyMiddle;
     const minMonthEndWidth = 100; const maxMonthEndWidth = 500;
-    let d2 = x2 - sliderTailMonths.left - sliderTailMonths.width - gap2;
-    if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
-    else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
-    else { sliderMonthEnd.width = d2; };
-    //----
-    lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
-    lo_currentMonthTextTop = 17;
-
+    switch (sliderTailMonths.visible) {
+        case true:
+            gap1 = 30; // od checkBox-a do prvega sliderja
+            x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
+            x2 = ctxW - xAuthor;
+            d1 = x2 - x1;
+            gap2 = 200; //med obema sliderjema
+            dHalf = (d1 - gap2) / 2;
+            //----
+            sliderTailMonths.left = x1;
+            sliderTailMonths.bodyMiddle = guiPanelTop + 22;
+            if (dHalf > maxTailWidth) { sliderTailMonths.width = maxTailWidth; }
+            else if (dHalf < minTailWidth) { sliderTailMonths.width = minTailWidth; }
+            else { sliderTailMonths.width = dHalf; };
+            //----
+            sliderMonthEnd.left = sliderTailMonths.left + sliderTailMonths.width + gap2;
+            sliderMonthEnd.bodyMiddle = sliderTailMonths.bodyMiddle;
+            d2 = x2 - sliderTailMonths.left - sliderTailMonths.width - gap2;
+            if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
+            else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
+            else { sliderMonthEnd.width = d2; };
+            //----
+            lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
+            lo_currentMonthTextTop = 17;
+            break;
+        case false:
+            gap2 = 200; //prostor za izpis tekočega meseca
+            x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
+            x2 = x1 + gap2;
+            x3 = ctxW - xAuthor;
+            //----
+            lo_currentMonthTextLeft = x1 + 50;
+            lo_currentMonthTextTop = 17;
+            //----
+            sliderMonthEnd.left = x2;
+            sliderMonthEnd.bodyMiddle = sliderTailMonths.bodyMiddle;
+            d2 = x3 - x2;
+            if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
+            else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
+            else { sliderMonthEnd.width = d2; };
+            break;
+    }
 }
 
 function lf_monthStrMY(vp_month) {
@@ -1652,6 +1683,11 @@ function lf_changeMode(vp_paint) {
 
     gl_mode += 1;
     if (gl_mode > cv_maxMode) { gl_mode = 1 };
+    switch (gl_mode) {
+        case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti: sliderTailMonths.visible = true; break;
+        case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti: sliderTailMonths.visible = false; break;
+    }
+    lo_GUIlayoutHasChanged = true;
     if (vp_paint) { paint() }
 }
 
