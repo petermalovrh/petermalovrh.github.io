@@ -1,8 +1,13 @@
 //------------------------------------
-const gl_versionNr = "v1.11"
-const gl_versionDate = "2.2.2023"
+const gl_versionNr = "v1.12"
+const gl_versionDate = "4.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
+
+// https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Excess_mortality_-_statistics
+// https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Excess_mortality_-_statistics#Excess_mortality_in_the_EU_between_January_2020_and_November_2022
+// https://jsfiddle.net/ ... code snippets, playground
+// https://codepen.io/   ... The best place to build, test, and discover front-end code. (primer: https://codepen.io/alterebro/pen/VNJmEJ)
 
 const cv_aut = 1
 const cv_bel = 2
@@ -340,6 +345,8 @@ var lo_mouseMoveX  = 0
 var lo_mouseMoveY  = 0 
 
 var lo_mouseDown = false
+var lo_mouseDownX, lo_mouseDownY;
+
 var lo_borderless = false
 var lo_lastMouseLocation 
 
@@ -348,12 +355,18 @@ var lo_dragMonthEndActive = false
 var lo_dragIntervalStartActive = false //2.2.2023 v1.11
 var lo_dragIntervalEndActive = false   //2.2.2023 v1.11
 var lo_dragTailMonthsActive = false
+var lo_dragIntervalIgnoreFirstClick = false;
 
 const lo_backgroundColor = "whiteSmoke"
 const disabledControlLineColor = "silver";
 const disabledControlBackColor = "#F0F0F0FF";
 const disabledControlTextColor = "silver";
 const focusedColor = "lightYellow";
+
+var lo_linearGradientFill = false
+var lgfc1x, lgfc1y, lgfc2x, lgfc2y, lgfc1, lgfc2, lgfc3, lgfcs1, lgfcs2, lgfcs3;
+var lo_radialGradientFill = false
+var rgfc1x, rgfc1y, rgfc1r, rgfc2x, rgfc2y, rgfc2r, rgfc1, rgfc2, rgfc3, rgfcs1, rgfcs2, rgfcs3;
 
 class countryPanel {
     constructor(left, top, right, itemHeight, enabled, disabledColor, font, fillColor, strokeWidth, strokeColor, shaddowColor, shaddowX, shaddowY, backColor, visible ) {
@@ -1195,14 +1208,18 @@ elMyCanvas.addEventListener('mousedown', (e) => {
 elMyCanvas.addEventListener('mouseup', (e) => {
     lo_mouseDown = false
     lo_dragMonthEndActive = false
+    if (lo_dragIntervalStartActive || lo_dragIntervalEndActive) { lo_dragIntervalIgnoreFirstClick = true; };
     lo_dragIntervalStartActive = false
     lo_dragIntervalEndActive = false
     lo_dragTailMonthsActive = false
+    lo_mouseDownX = 0;
+    lo_mouseDownY = 0;
     //console.log("mouseup(): dragMonthEndActive=" + lo_dragMonthEndActive)
 });
 
 elMyCanvas.addEventListener('click', (e) => {
 
+    //console.log("click(): dragMonthEndActive=" + lo_dragMonthEndActive)
     let rslt = 0; let boolRslt = false; let rslt2 = [0, 0];
     let vl_end = false
     if (!vl_end && lo_showGUI) {
@@ -1233,9 +1250,9 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     }
-    if (!vl_end && lo_showGUI) {
+    if (!vl_end && lo_showGUI & !lo_dragIntervalIgnoreFirstClick) {
         rslt2 = sliderMonthEnd.eventClick(e.offsetX, e.offsetY);
-        //console.log("click(): [value0, value]=" + rslt2)
+        //console.log("  [value0, value]=" + rslt2)
         if (rslt2[0] >= 1 && rslt2[0] != gl_monthStart) {
             //console.log("  rslt2[0]=" + rslt2[0])
             lf_changeMonthStart(rslt2[0], true);
@@ -1254,7 +1271,7 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     }
-
+    if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 });
 
 elMyCanvas.addEventListener('dblclick', (e) => {
@@ -1281,12 +1298,6 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     if (lo_mouseDown) {
         if (lo_dragMonthEndActive) {
             //console.log("mousemove(): drag interval:")
-            //sliderMonthEnd.setAddZone(100, 100)
-            //let rslt2 = sliderMonthEnd.eventClick(e.offsetX, e.offsetY)
-            //sliderMonthEnd.setAddZone(0, 0)
-            //console.log("  rslt2=" + rslt2)
-            //if (rslt2[0] >= 1) { lf_changeMonthStart(rslt2[0], true); }
-            //if (rslt2[1] >= 1) { lf_changeMonthEnd(rslt2[1], true); }
             sliderMonthEnd.setAddZone(100, 100)
             let rslt = sliderMonthEnd.eventMouseOverValue(e.offsetX, e.offsetY)
             sliderMonthEnd.setAddZone(0, 0)
@@ -1392,7 +1403,7 @@ window.addEventListener("keydown", (event) => {
         case 'End':
             lf_changeMonthEnd(cv_nrMonths, true); break;
         case 'KeyH':
-            lo_showGUI = !lo_showGUI; paint(); break;
+            lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); break;
         case 'KeyS':
             lf_changeNrMonthsAvgAll(!lo_nrMonthsAvgAll, true); break;
         case 'KeyC':
@@ -1546,12 +1557,81 @@ function paint() {
     paint_GUI()
     paint_author();
     paint_version();
+    //test_arcTo();
+    //test_bezierCurveTo()
 
     let myTime2 = Date.now()
     //console.log(myTime2-myTime1 + "ms")
     tmpStr = "izris: " + (myTime2-myTime1).toString() + " ms"
     gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 3)
     
+}
+
+function test_bezierCurveTo() {
+
+    // Define the points as {x, y}
+    //let start = { x: 50, y: 20 };
+    //let cp1 = { x: 230, y: 30 };
+    //let cp2 = { x: 150, y: 80 };
+    //let end = { x: 250, y: 100 };
+
+    let start = { x: 100, y: 100 };
+    let cp1 = { x: 120, y: 130 };
+    let cp2 = { x: 120, y: 170 };
+    let end = { x: 100, y: 200 };
+
+    // Cubic Bézier curve
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, end.x, end.y);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "orchid";
+    ctx.stroke();
+
+    // Start and end points
+    ctx.fillStyle = 'blue';
+    ctx.beginPath();
+    ctx.arc(start.x, start.y, 5, 0, 2 * Math.PI);  // Start point
+    ctx.arc(end.x, end.y, 5, 0, 2 * Math.PI);      // End point
+    ctx.fill();
+
+    // Control points
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(cp1.x, cp1.y, 5, 0, 2 * Math.PI);  // Control point one
+    ctx.arc(cp2.x, cp2.y, 5, 0, 2 * Math.PI);  // Control point two
+    ctx.fill();
+}
+
+function test_arcTo() {
+    // Tangential lines
+ctx.beginPath();
+ctx.strokeStyle = 'gray';
+ctx.moveTo(200, 20);
+ctx.lineTo(200, 330);
+ctx.lineTo(50, 20);
+ctx.stroke();
+
+// Arc
+ctx.beginPath();
+ctx.strokeStyle = 'black';
+ctx.lineWidth = 5;
+ctx.moveTo(200, 20);
+ctx.arcTo(200,330, 50,20, 40);
+ctx.stroke();
+
+// Start point
+ctx.beginPath();
+ctx.fillStyle = 'blue';
+ctx.arc(200, 20, 5, 0, 2 * Math.PI);
+ctx.fill();
+
+// Control points
+ctx.beginPath();
+ctx.fillStyle = 'red';
+ctx.arc(200, 330, 5, 0, 2 * Math.PI); // Control point one
+ctx.arc(50, 20, 5, 0, 2 * Math.PI);   // Control point two
+ctx.fill();
 }
 
 function lf_dragInterval(value) {
@@ -1724,7 +1804,11 @@ function paint_GUI() {
     x = 8; y = ctxH - 8; //kar vedno spodaj levo naj bo
     gText("data: Eurostat (excess death), OWID (vaccination)", "italic 11pt serif", "maroon", x, y);
 
-    if (!lo_showGUI) { return };
+    if (!lo_showGUI) {
+        //---- on-screen namigi/pomoč
+        if (lo_showTips) { paint_tips() };
+        return
+    };
 
     //---- check box za povprečenje čez vse mesece covid epidemije
     buttonMode.paint();
@@ -1751,6 +1835,8 @@ function paint_GUI() {
 
 function paint_tips() {
 
+    // text baselines: https://www.javascripttutorial.net/web-apis/javascript-filltext/
+
     switch (lo_GUI_layout) {
 
         case cv_guiLayoutA:
@@ -1774,7 +1860,8 @@ function paint_tips() {
             let nrTipRows = 12;
             let backHeight = nrTipRows * vStep + 15;
 
-            gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
+            //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
+            gBannerRoundRect(x0 - 15, y0 - 13, 415, backHeight, 20, gf_alphaColor(160, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
             //
             y += vStep;
             gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -1845,6 +1932,16 @@ function paint_GUI_layoutB() {
     guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = ctxW - guiPanelLeft - xAuthor; guiPanelHeight = 50;
     if (guiPanelWidth < 300) { guiPanelWidth = 300 };
     lo_layout_marginTop = guiPanelTop + guiPanelHeight;
+    if (!lo_showGUI) {
+        switch (gl_mode) {
+            case cv_mode_vaccExcessDeathMulti: case cv_mode_timeExcessDeathMulti:
+                guiPanelHeight = 0;
+                lo_layout_marginTop = guiPanelTop + guiPanelHeight;
+                lo_currentMonthTextLeft = 10;
+                lo_currentMonthTextTop = 11;
+                return;
+        }
+    }; //4.2.2023 v1.12
     //----
     buttonMode.left = guiPanelLeft;
     buttonMode.top = guiPanelTop + 2;
@@ -2236,6 +2333,10 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
         x = marginLeft + (col - 1) * (hGap + itemWidth);
         y = marginTop + (row - 1) * (vGap + itemHeight);
         ih = itemHeight;
+        if (col == 1 && row == 1 && !lo_showGUI) {
+            newY = 42; yDiff = newY - y;
+            if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+        } 
         if (col == cols && row == 1) {
             newY = 59; yDiff = newY - y;
             if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
@@ -2611,7 +2712,15 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
     //let tmpLeft = 400; let tmpTop = 20;
     //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
-    gBannerRectWithText(lo_currentMonthTextLeft, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+    //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+
+    lo_radialGradientFill = true;
+    rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
+    rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
+    rgfcs1 = 0; rgfc1 = "greenYellow";
+    rgfcs2 = 0.6; rgfc2 = "gold";
+    rgfcs3 = 1; rgfc3 = "azure";
+    gBannerRoundRectWithText(lo_currentMonthTextLeft, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 15, "azure", 1, "lightGray", "lightGray", 3, 3, false)
 
     //oznake koordinat miške
     font = "italic 9pt cambria";
@@ -2963,7 +3072,11 @@ function paint_author() {
     let y0 = topMargin + dd
     let y1 = y0 + tmpH //wh[1]
     //----
-    gBannerRectWithText(x0, y0, x1, y1, dd, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
+    //gBannerRectWithText(x0, y0, x1, y1, dd, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
+    lo_linearGradientFill = true;
+    rgfc1x = x0; rgfc1y = y0; rgfc2x = x0 + tmpW; rgfc2y = y0 + tmpH;
+    rgfcs1 = 0; rgfc1 = "#F4F4F4FF"; rgfcs2 = 0.3; rgfc2 = "white"; rgfcs3 = 1; rgfc3 = "#F4F4F4FF";
+    gBannerRoundRectWithText(x0, y0, tmpW, tmpH, font, "gray", tmpStr, dd, dd, 14, "white", 1, "lightGray", "#D0D0D040", 4, 4, false)
 }
 
 function paint_version() {
@@ -3329,6 +3442,102 @@ function gBannerRectWithText2(text, xiLeft, yiTop, font, xGap, yGap, ddx, ddy, f
     }
 }
 
+function gBannerRoundRect(left, top, width, height, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+    //-------------------------------
+    // funkcija nariše pobarvan (opcija), osenčen (opcija), obkrožen (opcija), in zaobljen (nastavljiv radius) okvir
+    // left, top, width, height ... okvir
+    // radius                   ... vogali zaoljeni s krogom tega polmera
+    // fillColor                ... notranja barva (če je "" potem se ne polni)
+    // strokeWidth              ... debelina črte okoli okvirja (če je 0, potem se črte ne riše)
+    // strokeColor              ... barva črte okoli okvirja
+    // shaddowColor             ... barva senčenja okvirja
+    // xShaddow, yShaddow       ... kako daleč pade senca desno in navzdol
+    // shaddowAll               ... ali mora biti senčeno okoli in okoli (=true), ali pač desno navzdol (=false)
+    //-------------------------------
+
+    let right = left + width;
+    let bottom = top + height;
+    let ddx = radius; let ddy = radius;
+    //----
+    if (shaddowColor != "") {
+        switch (shaddowAll) {
+            case true:  gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, -xShaddow, xShaddow, -yShaddow, yShaddow); break;
+            case false: gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShaddow, xShaddow, yShaddow, yShaddow); break;
+        }
+        ctx.fillStyle = shaddowColor;
+        ctx.fill();
+    }
+    //----
+    if (fillColor != "" || strokeWidth > 0) {
+        gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, 0, 0, 0, 0);
+        //----
+        if (fillColor != "") {
+            if (lo_linearGradientFill) {
+                const gradient = ctx.createLinearGradient(left, top, left + width, top + height);
+                gradient.addColorStop(rgfcs1, rgfc1);
+                gradient.addColorStop(rgfcs2, rgfc2);
+                if (rgfc3 != "") { gradient.addColorStop(rgfcs3, rgfc3); }
+                ctx.fillStyle = gradient;
+            } else if (lo_radialGradientFill) {
+                const gradient = ctx.createRadialGradient(left + 0.7 * width, top + 0.3 * height, 0.5 * height, left + 0.7 * width, top + 0.7 * height, Math.max(width, height));
+                gradient.addColorStop(rgfcs1, rgfc1);
+                gradient.addColorStop(rgfcs2, rgfc2);
+                if (rgfc3 != "") { gradient.addColorStop(rgfcs3, rgfc3); }
+                ctx.fillStyle = gradient;
+            } else {
+                ctx.fillStyle = fillColor;
+            }
+            ctx.fill();
+            lo_linearGradientFill = false;
+            lo_radialGradientFill = false;
+        }
+        //----
+        if (strokeWidth > 0) {
+            ctx.setLineDash([]);
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.stroke();
+        }
+    }
+}
+
+function gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShaddowLeft, xShaddowRight, yShaddowTop, yShaddowBottom) {
+
+    ctx.beginPath();
+
+    ctx.moveTo(left + ddx + xShaddowLeft, top + yShaddowTop);
+    ctx.arcTo(right + xShaddowRight, top + yShaddowTop, right + xShaddowRight, top + ddy + yShaddowTop, radius);             // naredi linijo do desne zgornje strani in potem četrt kroga navzdol proti navpičnici
+    ctx.arcTo(right + xShaddowRight, bottom + yShaddowBottom, right - ddx + xShaddowRight, bottom + yShaddowBottom, radius); // naredi linijo do desne spodnje strani in potem četrt kroga levo proti vodoravnici
+    ctx.arcTo(left + xShaddowLeft, bottom + yShaddowBottom, left + xShaddowLeft, bottom - ddy + yShaddowBottom, radius);     // naredi linijo do leve spodnje strani in potem četrt kroga navzgor proti navpičnici
+    ctx.arcTo(left + xShaddowLeft, top + yShaddowTop, left + ddx + xShaddowLeft, top + yShaddowTop, radius);                 // naredi linijo do leve zgornje strani in potem četrt kroga desno proti vodoravnici
+
+    ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+}
+    
+function gBannerRoundRectWithText(left, top, width, height, font, fontColor, text, ddx, ddy, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+    //-------------------------------
+    // funkcija nariše pobarvan (opcija), osenčen (opcija), obkrožen (opcija), in zaobljen (nastavljiv radius) okvir s tekstom (opcija)
+    // left, top, width, height ... okvir
+    // font, fontColor          ... parametri za tekst
+    // text                     ... tekst za izpis (če je prazen se ne izpiše nič)
+    // ddx, ddy                 ... koliko praznega prostora po X in Y je okoli virtualnega okvirja teksta
+    // radius                   ... vogali zaoljeni s krogom tega polmera
+    // fillColor                ... notranja barva (če je "" potem se ne polni)
+    // strokeWidth              ... debelina črte okoli okvirja (če je 0, potem se črte ne riše)
+    // strokeColor              ... barva črte okoli okvirja
+    // shaddowColor             ... barva senčenja okvirja
+    // xShaddow, yShaddow       ... kako daleč pade senca desno in navzdol
+    // shaddowAll               ... ali mora biti senčeno okoli in okoli (=true), ali pač desno navzdol (=false)
+    //-------------------------------
+
+    //---- banner
+    gBannerRoundRect(left - ddx, top - ddy, width + 2 * ddx, height + 2 * ddy, radius, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll);
+    //---- text
+    if (text != "") {
+        gText(text, font, fontColor, left, top + height)
+    }
+}
+
 function gBannerRect(left, top, width, height, ddx, ddy, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
     //-------------------------------
     // left, top, width, height ... okvir
@@ -3355,6 +3564,7 @@ function gBannerRect(left, top, width, height, ddx, ddy, fillColor, strokeWidth,
                 ctx.lineTo(x2 - xShaddow, y4 + yShaddow);
                 ctx.lineTo(x1 - xShaddow, y3 + yShaddow);
                 ctx.lineTo(x1 - xShaddow, y2 - yShaddow);
+                break;
             case false:
                 ctx.moveTo(x2 + xShaddow, y1 + yShaddow);
                 ctx.lineTo(x3 + xShaddow, y1 + yShaddow);
@@ -3364,6 +3574,7 @@ function gBannerRect(left, top, width, height, ddx, ddy, fillColor, strokeWidth,
                 ctx.lineTo(x2 + xShaddow, y4 + yShaddow);
                 ctx.lineTo(x1 + xShaddow, y3 + yShaddow);
                 ctx.lineTo(x1 + xShaddow, y2 + yShaddow);
+                break;
         }
         ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
         ctx.fillStyle = shaddowColor;
