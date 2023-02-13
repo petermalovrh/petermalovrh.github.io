@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.12"
-const gl_versionDate = "4.2.2023"
+const gl_versionNr = "v1.13"
+const gl_versionDate = "13.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -114,7 +114,7 @@ countryNameShort3[cv_nor] = "NOR"
 countryNameShort3[cv_swi] = "SUI"
 
 const countryNameLong = new Array(cv_maxCountry)
-countryNameLong[cv_eu27] = "European Union - 27 countries" // (from 2020)"
+countryNameLong[cv_eu27] = "EU - 27 countries" //"European Union - 27 countries" // (from 2020)"
 countryNameLong[cv_bel] = "Belgium"
 countryNameLong[cv_bul] = "Bulgaria"
 countryNameLong[cv_cze] = "Czechia"
@@ -258,6 +258,7 @@ var lo_enabledCountry = new Array(cv_maxCountry)
 for (country = 1; country <= cv_maxCountry; country++) {
     lo_enabledCountry[country] = true;
 }
+var nrSelectedCountries = 0; //12.2.2023 v1.13
 
 const cv_minMonth = 1
 const cv_minYear = 2020
@@ -319,13 +320,16 @@ var cv_nrMonths = (13 - cv_minMonth) + 12 * (cv_maxYear - cv_minYear - 1) + cv_m
 var gl_monthEnd = cv_nrMonths
 var gl_tailMonths = 5  //za koliko mesecev nazaj se še riše od trenutno izbranega meseca gl_monthEnd
 var gl_monthStart = 1; //gl_monthEnd - gl_tailMonths  //28=apr2022 30=jun2022 35=nov2022
+var lo_tipMonth = 0;
 
 var lo_keyDownA = false
 var lo_keyDownT = false
 var lo_keyDown0 = false; //2.2.2023 v1.11
 
 var lo_showGUI = true
-var lo_showTips = true
+var lo_showHelpTips = true
+
+var lo_showToolTips = true
 
 // 26.1.2023 1.3
 var lo_autoPlay = false  
@@ -1169,7 +1173,7 @@ function lf_focusCanvas() {
 
 function tmHideTips_tick() {
 
-    if (!lo_showTips) {
+    if (!lo_showHelpTips) {
         lo_tipsColor = lo_tipsColorDefault;
         lo_hideTipsCounter = 0;
         return
@@ -1183,7 +1187,7 @@ function tmHideTips_tick() {
     if (lo_hideTipsCounter >= cv_hideTipsSteps) {
         lo_tipsColor = lo_tipsColorDefault;
         lo_hideTipsCounter = 0;
-        lf_changeShowTips(false, true);
+        lf_changeShowHelpTips(false, true);
         return
     }
 
@@ -1409,7 +1413,9 @@ window.addEventListener("keydown", (event) => {
         case 'KeyC':
             lf_changeEnableCountryAll(!lo_enabledCountryAll, true); break;
         case 'KeyN': case 'F2':
-            lf_changeShowTips(!lo_showTips, true); break;
+            lf_changeShowHelpTips(!lo_showHelpTips, true); break;
+        case 'KeyI':
+            lf_changeShowToolTips(!lo_showToolTips, true); break;
         //case 'F5':
             //console.log("F5 pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
         case 'KeyP' :
@@ -1537,6 +1543,9 @@ function paint() {
     //paint_graph_vaccExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
     //paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
     
+    //preštetje selektiranih držav
+    lf_getNrSelectedCountries();
+
     switch (gl_mode) {
         case cv_mode_vaccExcessDeath:
             paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
@@ -1559,12 +1568,31 @@ function paint() {
     paint_version();
     //test_arcTo();
     //test_bezierCurveTo()
+    //test_rotate();
 
     let myTime2 = Date.now()
     //console.log(myTime2-myTime1 + "ms")
     tmpStr = "izris: " + (myTime2-myTime1).toString() + " ms"
     gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 3)
     
+}
+
+function test_rotate() {
+
+    // Non-rotated rectangle
+    ctx.fillStyle = 'gray';
+    ctx.fillRect(80, 60, 140, 30);
+
+    // Matrix transformation
+    ctx.translate(150, 75);
+    ctx.rotate(Math.PI / 2);
+    ctx.translate(-150, -75);
+
+    // Rotated rectangle
+    ctx.fillStyle = 'red';
+    ctx.fillRect(80, 60, 140, 30);
+    ctx.rotate(3*Math.PI / 2);
+
 }
 
 function test_bezierCurveTo() {
@@ -1806,7 +1834,7 @@ function paint_GUI() {
 
     if (!lo_showGUI) {
         //---- on-screen namigi/pomoč
-        if (lo_showTips) { paint_tips() };
+        if (lo_showHelpTips) { paint_tips() };
         return
     };
 
@@ -1829,7 +1857,7 @@ function paint_GUI() {
     countryPanelToggle.paint();
 
     //---- on-screen namigi/pomoč
-    if (lo_showTips) { paint_tips() };
+    if (lo_showHelpTips) { paint_tips() };
 
 }
 
@@ -1857,7 +1885,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 12;
+            let nrTipRows = 13;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -1917,6 +1945,10 @@ function paint_tips() {
             gBannerRectWithText2("/", x0 + 21, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("dblClick", x0 + 35, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... select/unselect all countries", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... hide/show tool tips", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("F11", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -2150,9 +2182,15 @@ function lf_changeEnableCountryAll(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
-function lf_changeShowTips(vp_newValue, vp_paint) {
+function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 
-    lo_showTips = vp_newValue;
+    lo_showHelpTips = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
+function lf_changeShowToolTips(vp_newValue, vp_paint) {
+
+    lo_showToolTips = vp_newValue;
     if (vp_paint) { paint() }
 }
 
@@ -2307,22 +2345,26 @@ function tmAutoPlay_tick() {
     }
 }
 
+function lf_getNrSelectedCountries() {
+
+    nrSelectedCountries = 0;
+    for (let country = 1; country <= cv_maxCountry; country++) {
+        if (lo_enabledCountry[country]) { nrSelectedCountries += 1 };
+    }
+}
+
 function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
 
     let rows, cols, row, col, x, y, w, h, itemWidth, itemHeight, country, ih, newY, yDiff;
     let vGap = 10; let hGap = 10;
-    //---- koliko je selektiranih držav
-    let nrCountries = 0;
-    for (country = 1; country <= cv_maxCountry; country++) {
-        if (lo_enabledCountry[country]) { nrCountries += 1 };
-    }
-    if (nrCountries <= 0) { return };
+    //---- kakšna država mora biti selektirana
+    if (nrSelectedCountries <= 0) { return };
     //---- dimenzije matrike
-    cols = Math.trunc(Math.sqrt(nrCountries - 1)) + 1;
+    cols = Math.trunc(Math.sqrt(nrSelectedCountries - 1)) + 1;
     let ratio = ctxW / (ctxH + 1);
     if (ratio > 1.7) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 };
-    if (cols > nrCountries) { cols = nrCountries };
-    rows = Math.trunc((nrCountries - 1) / cols) + 1;
+    if (cols > nrSelectedCountries) { cols = nrSelectedCountries };
+    rows = Math.trunc((nrSelectedCountries - 1) / cols) + 1;
     //----
     itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
@@ -2358,6 +2400,8 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
 
 function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_country, vp_marginRight) {
 
+    let country, yValue;
+    //
     let cv_graphMarginLeft, cv_graphMarginRight, cv_graphMarginTop, cv_graphMarginBottom;
     let cv_graphGapLeft, cv_graphGapRight, cv_graphGapTop, cv_graphGapBottom;
     switch (vp_graphType) {
@@ -2556,13 +2600,16 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             gText(tmpStr, font, "darkSlateGray", x, y);
     }
 
-    //---- risanje koralacijske linije precepljenost/excessDeaths
+    //---- risanje backround tullTip krogcev in vertikalne linije zanje
+    paint_graph_timeExcessDeath_tipBeforeGraph(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom);
+
+    //---- risanje korelacijske linije precepljenost/excessDeaths
     if (vp_graphType == cv_graphType_vaccExcessDeath) {
         paint_graph_vaccExcessDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0, cv_graphTopData, cv_graphBottom, vp_country)
     }
 
     //---- risanje diagrama    
-    let xValue, xValue0, yValue, monthIndex, dataLineColor, dataPointColor;
+    let xValue, xValue0, monthIndex, dataLineColor, dataPointColor;
     switch (vp_graphType) {
         case cv_graphType_vaccExcessDeath: xValue0 = 0; break;
         case cv_graphType_timeExcessDeath: xValue0 = vl_monthStart; break;
@@ -2706,6 +2753,9 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
         vl_xOld = x; vl_yOld = y 
     }
 
+    //---- foreground toolTip krogci
+    paint_graph_timeExcessDeath_tipAfterGraph(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+
     //Izpis tekočega meseca
     tmpStr = lf_monthStrMY(gl_monthEnd);
     font = "bold 14pt verdana";
@@ -2725,7 +2775,8 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     //oznake koordinat miške
     font = "italic 9pt cambria";
     let tmpValue;
-    if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData) {
+    //if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData) {
+    if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData && lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom) {
         gLine(lo_mouseMoveX, cv_graphY0 - 30, lo_mouseMoveX, cv_graphY0 + 10, 1, "gray", [2, 2]);
         tmpValue = xValue0 + (lo_mouseMoveX - cv_graphLeftData) / kx;
         switch (vp_graphType) {
@@ -2733,15 +2784,210 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             case cv_graphType_timeExcessDeath: tmpStr = tmpValue.toFixed(2); break;
         }
         ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-        gText(tmpStr, font, "dimGray", lo_mouseMoveX +2, cv_graphY0 -4);
+        gText(tmpStr, font, "dimGray", lo_mouseMoveX + 2, cv_graphY0 - 4);
+        //if (lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom && ky != 0) {
+        if (ky != 0) {
+            gLine(cv_graphLeft - 10, lo_mouseMoveY, cv_graphLeft + 40, lo_mouseMoveY, 1, "gray", [2, 2]);
+            tmpExcessDeath = (cv_graphY0 - lo_mouseMoveY) / ky;
+            tmpStr = tmpExcessDeath.toFixed(1) + "%";
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            gText(tmpStr, font, "dimGray", cv_graphLeft + 3, lo_mouseMoveY - 3);
+        }
     }
-    if (lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom && ky != 0) {
-        gLine(cv_graphLeft - 10, lo_mouseMoveY, cv_graphLeft + 40, lo_mouseMoveY, 1, "gray", [2, 2]);
-        tmpExcessDeath = (cv_graphY0 - lo_mouseMoveY) / ky;
-        tmpStr = tmpExcessDeath.toFixed(1) + "%";
+
+    //---- risanje toolTip okvirja in vsebine
+    paint_graph_timeExcessDeath_tipContent(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom);
+
+    
+}
+
+function paint_graph_timeExcessDeath_tipContent(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom) {
+
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+    
+    //miška mora biti nad tekočim grafom
+    if (lo_tipMonth <= 0) { return };
+    
+    const basicFrameWidth = 170;
+    let frameWidth = basicFrameWidth;
+    const cv_heightMonth = 30;
+    const cv_heightSingle = 16;
+    let cv_heightBody;
+    switch (vp_country) {
+        case cv_allCountry:
+            if (!lo_enabledCountry[cv_eu27]) {
+                frameWidth = basicFrameWidth - 20;
+                if (!lo_enabledCountry[cv_lie] && !lo_enabledCountry[cv_lux] && !lo_enabledCountry[cv_ned] && !lo_enabledCountry[cv_swi]) {
+                    frameWidth = basicFrameWidth - 45;
+                };
+            };
+            cv_heightBody = nrSelectedCountries * cv_heightSingle
+            break;
+        default:
+            if (vp_country!=cv_eu27) {
+                frameWidth = basicFrameWidth - 20;
+                if (vp_country!=cv_lie && vp_country!=cv_lux && vp_country!=cv_ned && vp_country!=cv_swi) {
+                    frameWidth = basicFrameWidth - 45;
+                };
+            };
+            cv_heightBody = cv_heightSingle
+            break
+    }
+    const frameHeight = cv_heightMonth + cv_heightBody - 3;
+    let frameTop = lo_mouseMoveY - frameHeight / 2;
+    if (frameTop < cv_graphTopData) { frameTop = cv_graphTopData };
+    let frameLeft = lo_mouseMoveX - 8 - frameWidth;
+    if (frameLeft < cv_graphLeft) { frameLeft = lo_mouseMoveX + 10 };
+    if (frameTop + frameHeight > cv_graphBottom) { frameTop = cv_graphBottom - frameHeight };
+    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "", 16, 16, false);
+
+    //---- izpis meseca na vrhu
+    let tmpStr, tmpW, tmpH, font, x, y, country;
+    font = "bold 13px verdana";
+    tmpStr = lf_monthStrMMMYY(lo_tipMonth) + "  (#" + lo_tipMonth.toString() + ")";
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+    x = frameLeft + frameWidth / 2 - tmpW / 2;
+    y = frameTop + 4 + tmpH;
+    gText(tmpStr, font, "darkSlateGray", x, y);
+
+    //---- pa še podatki za državo/države
+    const cv_gapLeft = 6; const cv_gapRight = 10; const cv_xDvopicje = frameLeft + frameWidth - 50;
+    y += 20;
+    font = "normal 12px verdana";
+    for (country = 1; country <= cv_maxCountry; country++) {
+        if (!lo_enabledCountry[country]) { continue };
+        if (vp_country != cv_allCountry && country != vp_country) { continue };
+        //----
+        tmpStr = countryNameLong[country];
         ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-        gText(tmpStr, font, "dimGray", cv_graphLeft + 3, lo_mouseMoveY - 3);
+        x = cv_xDvopicje - cv_gapLeft - tmpW;
+        gText(tmpStr, font, countryColor[country], x, y);
+        //----
+        gText(":", font, "darkSlateGray", cv_xDvopicje, y);
+        //----
+        gText(lf_getAvgValue(country, lo_tipMonth, lo_nrMonthsAvg).toFixed(1), font, countryColor[country], cv_xDvopicje + cv_gapRight, y);
+        //----
+        y += cv_heightSingle;
     }
+
+    return;
+    //---- risanje foreground toolTip krogcev
+
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathSingle:
+            for (country = 1; country <= cv_maxCountry; country++) {
+                paint_graph_timeExcessDeath_tipMarkerUp(country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            }
+            break;
+        case cv_mode_timeExcessDeathMulti:
+            paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            break;
+    }
+}
+
+function paint_graph_timeExcessDeath_tipBeforeGraph(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom) {
+
+    lo_tipMonth = 0;
+
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+    
+    let country;
+
+    if (lo_mouseMoveX > cv_graphLeft && lo_mouseMoveX < cv_graphRight && lo_mouseMoveY > cv_graphTopData && lo_mouseMoveY < cv_graphBottom) {
+        //---- določanje tipMonth
+        switch (gl_mode) {
+            case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+                lo_tipMonth = Math.round(vl_monthStart + (lo_mouseMoveX - cv_graphLeftData) / kx);
+                if (lo_tipMonth < vl_monthStart) { lo_tipMonth = vl_monthStart };
+                if (lo_tipMonth > gl_monthEnd) { lo_tipMonth = gl_monthEnd };
+        }
+        //---- risanje background toolTip krogcev
+        switch (gl_mode) {
+            case cv_mode_timeExcessDeathSingle:
+                for (country = 1; country <= cv_maxCountry; country++) {
+                    paint_graph_timeExcessDeath_tipMarkerDown(country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                }
+                break;
+            case cv_mode_timeExcessDeathMulti:
+                paint_graph_timeExcessDeath_tipMarkerDown(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                break;
+        }
+        //---- risanje vertikalne linije za toolTip
+        switch (gl_mode) {
+            case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+                paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graphLeftData, cv_graphTopData, cv_graphBottom);
+        }
+    }
+}
+
+function paint_graph_timeExcessDeath_tipAfterGraph(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky) {
+
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+    
+    //miška mora biti nad tekočim grafom
+    if (lo_tipMonth <= 0) { return };
+    
+    //---- risanje foreground toolTip krogcev
+    let country;
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathSingle:
+            for (country = 1; country <= cv_maxCountry; country++) {
+                paint_graph_timeExcessDeath_tipMarkerUp(country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            }
+            break;
+        case cv_mode_timeExcessDeathMulti:
+            paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            break;
+    }
+}
+
+function paint_graph_timeExcessDeath_tipMarkerDown(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky) {
+    
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+
+    //država mora biti selektirana
+    if (!lo_enabledCountry[vp_country]) { return };
+    
+    //risanje background krogca za to državo in mesec
+    let x, y, yValue;
+    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+    yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
+    y = cv_graphY0 - ky * yValue
+    gEllipse(x, y, 9, 9, 0, gf_alphaColor(96, countryColor[vp_country]), 0, "");
+
+}
+
+function paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky) {
+    
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+
+    //država mora biti selektirana
+    if (!lo_enabledCountry[vp_country]) { return };
+    
+    //risanje foreground krogca za to državo in mesec
+    let x, y, yValue;
+    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+    yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
+    y = cv_graphY0 - ky * yValue
+    gEllipse(x, y, 5, 5, 0, "white", 0, "");
+    gEllipse(x, y, 3, 3, 0, gf_alphaColor(192, countryColor[vp_country]), 0, "");
+
+}
+
+function paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graphLeftData, cv_graphTopData, cv_graphBottom) {
+    
+    //prikaz tipsov mora biti vključen
+    if (!lo_showToolTips) { return };
+    
+    //risanje background krogca za to državo in mesec
+    let x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+    gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "silver", [3, 1]);
+
 }
 
 function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
