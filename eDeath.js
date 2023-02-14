@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.14"
+const gl_versionNr = "v1.15"
 const gl_versionDate = "14.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -47,6 +47,7 @@ const cv_maxCountry = 32
 const cv_allCountry = -1
 const cv_countryNone = 0
 var lo_focusCountry = cv_countryNone;
+var lo_focusMonth = 0;
 
 const countryNameShort2 = new Array(cv_maxCountry)
 countryNameShort2[cv_eu27] = "EU27"
@@ -190,7 +191,7 @@ countryVacc[cv_swi] = 69
 const countryVaccByMonth = new Array(cv_maxCountry)
 countryVaccByMonth[cv_aut] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2, 2.8, 5.3, 9.8, 17.9, 35.7, 52.5, 59.3, 61.7, 63.9, 67.7, 73.4, 76.3, 76, 76, 76, 76, 76, 76, 76, 76, 76, 76]
 countryVaccByMonth[cv_bel] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2, 3.0, 4.9, 7.5, 19.2, 35.2, 59.5, 70.4, 72.7, 74.0, 74.9, 75.8, 76.3, 78, 78, 78, 78, 79, 79, 79, 79, 79, 79]
-countryVaccByMonth[cv_bul] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2, 0.6, 1.4, 8.2, 11.9, 14.7, 17.3, 19.6, 22.3, 26.1, 28.2, 29.4, 30.2, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
+countryVaccByMonth[cv_bul] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2, 0.6, 1.4, 8.2, 11.9, 14.7, 17.3, 19.6, 22.3, 26.1, 28.2, 29.4, 30.0, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]
 countryVaccByMonth[cv_cro] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.4, 1.5, 2.2, 4.4, 11.9, 26.9, 35.5, 40.0, 41.3, 44.6, 47.9, 48.4, 54.7, 55, 56, 56, 56, 56, 56, 56, 56, 56, 56]
 countryVaccByMonth[cv_cze] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.4, 2.3, 5.0, 9.7, 14.4, 31.5, 46.4, 54.9, 57.0, 58.2, 60.8, 63.4, 64.7, 65, 65, 65, 66, 66, 66, 66, 66, 66, 66]
 countryVaccByMonth[cv_cyp] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 2.5, 5.0, 7.7, 21.4, 38.7, 50.2, 58.1, 62.1, 63.7, 65.3, 68.2, 70.5, 71, 72, 72, 72, 72, 72, 72, 72, 72, 72]
@@ -255,10 +256,57 @@ countryColor[cv_lie] = "tan"
 countryColor[cv_nor] = "indianRed"
 countryColor[cv_swi] = "orchid"
 
+//---- koordinate multi-country grafov (14.2.2023 v1.15)
+const countryGraphLeft = new Array(cv_maxCountry)
+const countryGraphLeftAxis = new Array(cv_maxCountry)
+const countryGraphLeftData = new Array(cv_maxCountry)
+const countryGraphRightData = new Array(cv_maxCountry)
+const countryGraphRight = new Array(cv_maxCountry)
+const countryGraphKx = new Array(cv_maxCountry)
+//
+const countryGraphTop = new Array(cv_maxCountry)
+const countryGraphTopData = new Array(cv_maxCountry)
+const countryGraphBottomAxis = new Array(cv_maxCountry)
+const countryGraphBottom = new Array(cv_maxCountry)
+const countryGraphKy = new Array(cv_maxCountry)
+//
+const countryGraphWidth = new Array(cv_maxCountry)
+const countryGraphHeight = new Array(cv_maxCountry)
+//
+for (country = cv_minCountry; country <= cv_maxCountry; country++) {
+    countryGraphLeft[country] = 0;
+    countryGraphLeftAxis[country] = 0;
+    countryGraphLeftData[country] = 0;
+    countryGraphRightData[country] = 0;
+    countryGraphRight[country] = 0;
+    countryGraphKx[country] = 0;
+    countryGraphTop[country] = 0;
+    countryGraphTopData[country] = 0;
+    countryGraphBottomAxis[country] = 0;
+    countryGraphBottom[country] = 0;
+    countryGraphKy[country] = 0;
+    countryGraphWidth[country] = 0;
+    countryGraphHeight[country] = 0;
+}
+// še za primer all-country gradov - bodo kar globalne spremenljivke (14.2.2023 v1.15)
+var lo_graphLeft = 0;
+var lo_graphLeftAxis = 0;
+var lo_graphLeftData = 0;
+var lo_graphRightData = 0;
+var lo_graphRight = 0;
+var lo_graphKx = 0;
+var lo_graphTop = 0;
+var lo_graphTopData = 0;
+var lo_graphBottomAxis = 0;
+var lo_graphBottom = 0;
+var lo_graphKy = 0;
+var lo_graphWidth = 0;
+var lo_graphHeight = 0;
+
 //---- toggles for countries
 var lo_enabledCountryAll = true;
 var lo_enabledCountry = new Array(cv_maxCountry)
-for (country = 1; country <= cv_maxCountry; country++) {
+for (country = cv_minCountry; country <= cv_maxCountry; country++) {
     lo_enabledCountry[country] = true;
 }
 var nrSelectedCountries = 0; //12.2.2023 v1.13
@@ -328,6 +376,8 @@ var lo_tipMonth = 0;
 var lo_keyDownA = false
 var lo_keyDownT = false
 var lo_keyDown0 = false; //2.2.2023 v1.11
+
+var lo_graphMarginLeft, lo_graphMarginTop, lo_graphMarginRight, lo_graphMarginBottom;
 
 var lo_showGUI = true
 var lo_showHelpTips = true
@@ -1332,9 +1382,11 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         lo_focusCountry = cv_countryNone;
         if (lf_regularCountry(country)) {
             if (lo_enabledCountry[country]) { lo_focusCountry = country; };
+        } else {
+            document.body.style.cursor = "default"
         }
-        else { document.body.style.cursor = "default" }
     }
+    else if (lf_mouseOverScatterPlotDataPoint(e.offsetX, e.offsetY)) { };
     if (lo_focusCountry != vl_oldFocusCountry) {
         //console.log("focusCountry=" + lo_focusCountry);
         //paint_delay()
@@ -1556,19 +1608,25 @@ function paint() {
     //preštetje selektiranih držav
     lf_getNrSelectedCountries();
 
+    lo_graphMarginLeft = marginLeft;
+    lo_graphMarginTop = marginTop;
+    lo_graphMarginRight = marginRight;
+    lo_graphMarginBottom = marginBottom;
+    lo_graphWidth = ctxW - marginLeft - marginRight;
+    lo_graphHeight = ctxH - marginTop - marginBottom;
     switch (gl_mode) {
         case cv_mode_vaccExcessDeath:
             paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_vaccExcessDeathMulti:
-            if (lo_showGUI) { marginRight += 55 };
+            if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
             paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
         case cv_mode_timeExcessDeathSingle:
             paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_timeExcessDeathMulti:
-            if (lo_showGUI) { marginRight += 55 };
+            if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
             paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
     }
@@ -1587,9 +1645,71 @@ function paint() {
     
 }
 
+function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
+
+    lo_focusCountry = cv_countryNone;
+    lo_focusMonth = 0;
+    
+    //---- mora biti raztreseni diagram vacc-excDeaths
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathMulti: case cv_mode_timeExcessDeathSingle: { return false; }
+    }
+    //---- miška mora biti znotraj področja grafa
+    if (mouseX < lo_graphLeft || mouseX > lo_graphRight || mouseY < lo_graphTop || mouseY > lo_graphBottom) { return false };
+    //--- gremo po državah in pogledamo, ali je miška blizu kakšnega dataPint-a
+    let x, y, yValue, dx, dy, dist;
+    let vl_startMonth = gl_monthEnd - gl_tailMonths;
+    if (vl_startMonth < 1) { vl_startMonth = 1 };
+    for (country = cv_minCountry; country <= cv_maxCountry; country++) {
+        //---- država ne sme biti disabled
+        if (!lo_enabledCountry[country]) { continue };
+        if (country == cv_aut) {
+            country = country;
+        }
+        //---- če v multi-country mode nisem z miško znotraj področja grafa tekoče države, ne smem nič skenirati
+        if (gl_mode == cv_mode_vaccExcessDeathMulti) {
+            if (mouseX < countryGraphLeft[country] || mouseX > countryGraphRight[country] || mouseY < countryGraphTop[country] || mouseY > countryGraphBottom[country]) {
+                continue;
+            }
+        };
+        //---- zdaj sledi skeniranje data point-s znotraj grafa tekoče države
+        for (month = vl_startMonth; month <= gl_monthEnd; month++) {
+            //---- izračun koordinat tekočega data point-a
+            switch (gl_mode) {
+                case cv_mode_vaccExcessDeathMulti:
+                    x = countryGraphLeftData[country] + countryVaccByMonth[country][month - 1] * countryGraphKx[country];
+                    yValue = lf_getAvgValue(country, month, lo_nrMonthsAvg);
+                    y = countryGraphBottomAxis[country] - yValue * countryGraphKy[country];
+                    break;
+                case cv_mode_vaccExcessDeath:
+                    x = lo_graphLeftData + countryVaccByMonth[country][month - 1] * lo_graphKx;
+                    yValue = lf_getAvgValue(country, month, lo_nrMonthsAvg);
+                    y = lo_graphBottomAxis - yValue * lo_graphKy;
+                    break;
+            }
+            //---- koliko je točka data point-a (x,y) oddaljena od pozicije miške v oknu (mouseX,mouseY)?
+            dx = x - mouseX;
+            dy = y - mouseY; 
+            dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist <= 5) {
+                //našli smo data point, na katerega kaže miška
+                lo_focusCountry = country;
+                lo_focusMonth = month;
+                return true;
+            }
+        }
+
+    }
+}
+
 function lf_regularCountry(vp_country) {
 
     if (valueBetween(vp_country, cv_minCountry, cv_maxCountry)) { return true } else { return false };
+}
+
+function lf_regularMonth(vp_month) {
+
+    if (valueBetween(vp_month, 1, cv_nrMonths)) { return true } else { return false };
 }
 
 function test_rotate() {
@@ -2473,6 +2593,39 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     gLine(cv_graphLeft, cv_graphBottom, cv_graphLeft, cv_graphTopAxis, 2, "gray", [])
     gLine(cv_graphLeft, cv_graphY0, cv_graphRight, cv_graphY0, 2, "gray", [])
     
+    //---- nastavitev globalnih spremenljivk za pozicije in dimenzije multi-country ter all-country grafov
+    switch (vp_country) {
+        case cv_allCountry:
+            lo_graphLeft = vp_left;
+            lo_graphLeftAxis = cv_graphLeft;
+            lo_graphLeftData = cv_graphLeftData;
+            lo_graphRightData = cv_graphRightData;
+            lo_graphRight = cv_graphRight;
+            lo_graphKx = kx;
+            lo_graphTop = vp_top;
+            lo_graphTopData = cv_graphTopData;
+            lo_graphBottomAxis = cv_graphY0;
+            lo_graphBottom = cv_graphBottom;
+            lo_graphKy = ky;
+            lo_graphWidth = vp_width;
+            lo_graphHeight = vp_height;
+            break;
+        default:
+            countryGraphLeft[vp_country] = vp_left;
+            countryGraphLeftAxis[vp_country] = cv_graphLeft;
+            countryGraphLeftData[vp_country] = cv_graphLeftData;
+            countryGraphRightData[vp_country] = cv_graphRightData;
+            countryGraphRight[vp_country] = cv_graphRight;
+            countryGraphKx[vp_country] = kx;
+            countryGraphTop[vp_country] = vp_top;
+            countryGraphTopData[vp_country] = cv_graphTopData;
+            countryGraphBottomAxis[vp_country] = cv_graphY0;
+            countryGraphBottom[vp_country] = cv_graphBottom;
+            countryGraphKy[vp_country] = ky;
+            countryGraphWidth[vp_country] = vp_width;
+            countryGraphHeight[vp_country] = vp_height;
+            break;
+    }
     //---- oznake na Y osi
     gText("Excess death [%]", "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 6);
     let x, y, font, tmpW, tmpH
@@ -2854,13 +3007,82 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     //---- risanje toolTip okvirja in vsebine
     paint_graph_timeExcessDeath_tipContent(vp_country, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom);
 
-    
 }
 
 function paint_graph_timeExcessDeath_tipContent(vp_country, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom) {
 
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    
+    //prikaz tipsov glede na vrsto grafa
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+            paint_graph_timeExcessDeath_tipContent_timeExcessDeath(vp_country, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom);
+            break;
+        case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti:
+            if (lf_regularCountry(lo_focusCountry) && lf_regularMonth(lo_focusMonth)) {
+                if (gl_mode == cv_mode_vaccExcessDeath || (gl_mode == cv_mode_vaccExcessDeathMulti && vp_country == lo_focusCountry)) {
+                    paint_graph_timeExcessDeath_tipContent_vaccExcessDeath(lo_focusCountry, lo_focusMonth, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom);    
+                }
+            }
+            break;
+    }
+}
+
+function paint_graph_timeExcessDeath_tipContent_vaccExcessDeath(vp_country, vp_month, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom) {
+    
+    if (!lo_enabledCountry[vp_country]) { return };
+
+    const basicFrameWidth = 160;
+    let frameWidth = basicFrameWidth;
+    const cv_heightMonth = 30;
+    const cv_heightSingle = 16;
+    let cv_heightBody = 2 * cv_heightSingle;
+    const frameHeight = cv_heightMonth + cv_heightBody - 3;
+    //---- postavitev toolTip okvirja znotraj okna
+    //---- postavitev po Y-u
+    let frameTop = lo_mouseMoveY - frameHeight / 2; //po Y postavi tako, da je cursor na sredini toolTip-a
+    if (frameTop < vp_top) { frameTop = vp_top };   //če zgoraj gre ven, naj se začne na vrhu
+    if (frameTop + frameHeight > cv_graphBottom) { frameTop = cv_graphBottom - frameHeight }; //če spodaj gre ven, naj gre spodaj ravno do roba
+    //---- postavitev po X-u
+    let frameLeft = lo_mouseMoveX - 8 - frameWidth;                   //postavi toolTip malce levo od kurzorja miške
+    if (frameLeft < cv_graphLeft) { frameLeft = lo_mouseMoveX + 10 }; //če levo gre ven, naj se začne na levi na začetku
+    if (frameLeft + frameWidth > cv_graphRight) { frameLeft = cv_graphRight - frameWidth }; //če desno gre ven, naj gre desno ravno do roba
+
+    //---- background toolTip okvir
+    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "", 16, 16, false);
+
+    //---- izpis meseca na vrhu
+    let tmpStr, tmpW, tmpH, font, x, y, country;
+    font = "bold 13px verdana";
+    tmpStr = lf_monthStrMMMYY(vp_month) + "  (#" + vp_month.toString() + ")";
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+    x = frameLeft + frameWidth / 2 - tmpW / 2;
+    y = frameTop + 4 + tmpH;
+    gText(tmpStr, font, "darkSlateGray", x, y);
+
+    //---- pa še podatki za konkreten data-point
+    const cv_gapLeft = 6; const cv_gapRight = 10; const cv_xDvopicje = frameLeft + frameWidth - 65;
+    y += 20;
+    font = "normal 12px verdana";
+    //----
+    tmpStr = "vaccinated";
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+    x = cv_xDvopicje - cv_gapLeft - tmpW;
+    gText(tmpStr, font, "darkSlateGray", x, y);
+    gText(":", font, "darkSlateGray", cv_xDvopicje, y);
+    gText(countryVaccByMonth[vp_country][vp_month - 1].toFixed(1) + "%", font, "darkSlateGray", cv_xDvopicje + cv_gapRight, y);
+    //----
+    y += cv_heightSingle;
+    tmpStr = "excess death";
+    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+    x = cv_xDvopicje - cv_gapLeft - tmpW;
+    gText(tmpStr, font, "darkSlateGray", x, y);
+    gText(":", font, "darkSlateGray", cv_xDvopicje, y);
+    gText(lf_getAvgValue(vp_country, vp_month, lo_nrMonthsAvg).toFixed(1)+"%", font, "darkSlateGray", cv_xDvopicje + cv_gapRight, y);
+}
+
+function paint_graph_timeExcessDeath_tipContent_timeExcessDeath(vp_country, vp_left, vp_top, cv_graphLeft, cv_graphRight, cv_graphBottom) {
     
     //miška mora biti nad tekočim grafom
     if (lo_tipMonth <= 0) { return };
@@ -2870,6 +3092,7 @@ function paint_graph_timeExcessDeath_tipContent(vp_country, vp_left, vp_top, cv_
     const cv_heightMonth = 30;
     const cv_heightSingle = 16;
     let cv_heightBody;
+    //prilagoditev širine in višine toolTip okvirja
     switch (vp_country) {
         case cv_allCountry:
             if (!lo_enabledCountry[cv_eu27]) {
@@ -2891,15 +3114,17 @@ function paint_graph_timeExcessDeath_tipContent(vp_country, vp_left, vp_top, cv_
             break
     }
     const frameHeight = cv_heightMonth + cv_heightBody - 3;
+    //---- postavitev toolTip okvirja znotraj okna
     //---- postavitev po Y-u
     let frameTop = lo_mouseMoveY - frameHeight / 2; //po Y postavi tako, da je cursor na sredini toolTip-a
     if (frameTop < vp_top) { frameTop = vp_top };   //če zgoraj gre ven, naj se začne na vrhu
     if (frameTop + frameHeight > cv_graphBottom) { frameTop = cv_graphBottom - frameHeight }; //če spodaj gre ven, naj gre spodaj ravno do roba
-    //---- še po X-u
+    //---- postavitev po X-u
     let frameLeft = lo_mouseMoveX - 8 - frameWidth;                   //postavi toolTip malce levo od kurzorja miške
     if (frameLeft < cv_graphLeft) { frameLeft = lo_mouseMoveX + 10 }; //če levo gre ven, naj se začne na levi na začetku
     if (frameLeft + frameWidth > cv_graphRight) { frameLeft = cv_graphRight - frameWidth }; //če desno gre ven, naj gre desno ravno do roba
 
+    //---- background toolTip okvir
     gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "", 16, 16, false);
 
     //---- izpis meseca na vrhu
@@ -2959,6 +3184,11 @@ function paint_graph_timeExcessDeath_tipBeforeGraph(vp_country, vl_monthStart, k
             case cv_mode_timeExcessDeathMulti:
                 paint_graph_timeExcessDeath_tipMarkerDown(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
                 break;
+            case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti:
+                if (lf_regularCountry(lo_focusCountry) && lf_regularMonth(lo_focusMonth)) {
+                    paint_graph_timeExcessDeath_tipMarkerDown(lo_focusCountry, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                }
+                break;
         }
         //---- risanje vertikalne linije za toolTip
         switch (gl_mode) {
@@ -2973,19 +3203,27 @@ function paint_graph_timeExcessDeath_tipAfterGraph(vp_country, vl_monthStart, kx
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
     
-    //miška mora biti nad tekočim grafom
-    if (lo_tipMonth <= 0) { return };
-    
     //---- risanje foreground toolTip krogcev
     let country;
     switch (gl_mode) {
         case cv_mode_timeExcessDeathSingle:
+            //miška mora biti nad grafom
+            if (lo_tipMonth <= 0) { return };
+            //grem čez vse države in pri vsaki za lo_tipMonth narišem foreground marker
             for (country = 1; country <= cv_maxCountry; country++) {
                 paint_graph_timeExcessDeath_tipMarkerUp(country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
             }
             break;
         case cv_mode_timeExcessDeathMulti:
+            //miška mora biti nad tekočim grafom
+            if (lo_tipMonth <= 0) { return };
+            //za to državo za lo_tipMonth narišem foreground marker
             paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            break;
+        case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti:
+            if (lf_regularCountry(lo_focusCountry) && lf_regularMonth(lo_focusMonth)) {
+                paint_graph_timeExcessDeath_tipMarkerUp(lo_focusCountry, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            }
             break;
     }
 }
@@ -2997,14 +3235,29 @@ function paint_graph_timeExcessDeath_tipMarkerDown(vp_country, vl_monthStart, kx
 
     //država mora biti selektirana
     if (!lo_enabledCountry[vp_country]) { return };
+
+    //---- izračun koordinat tekočega data point-a
+    let x, y, yValue;
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+            x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+            yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
+            y = cv_graphY0 - ky * yValue
+            break;
+        case cv_mode_vaccExcessDeathMulti:
+            x = countryGraphLeftData[vp_country] + countryVaccByMonth[vp_country][lo_focusMonth - 1] * countryGraphKx[vp_country];
+            yValue = lf_getAvgValue(vp_country, lo_focusMonth, lo_nrMonthsAvg);
+            y = countryGraphBottomAxis[vp_country] - yValue * countryGraphKy[vp_country];
+            break;
+        case cv_mode_vaccExcessDeath:
+            x = lo_graphLeftData + countryVaccByMonth[vp_country][lo_focusMonth - 1] * lo_graphKx;
+            yValue = lf_getAvgValue(vp_country, lo_focusMonth, lo_nrMonthsAvg);
+            y = lo_graphBottomAxis - yValue * lo_graphKy;
+            break;
+    }
     
     //risanje background krogca za to državo in mesec
-    let x, y, yValue;
-    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
-    yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
-    y = cv_graphY0 - ky * yValue
     gEllipse(x, y, 9, 9, 0, gf_alphaColor(96, countryColor[vp_country]), 0, "");
-
 }
 
 function paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky) {
@@ -3015,11 +3268,27 @@ function paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, 
     //država mora biti selektirana
     if (!lo_enabledCountry[vp_country]) { return };
     
-    //risanje foreground krogca za to državo in mesec
+    //---- izračun koordinat tekočega data point-a
     let x, y, yValue;
-    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
-    yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
-    y = cv_graphY0 - ky * yValue
+    switch (gl_mode) {
+        case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+            x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+            yValue = lf_getAvgValue(vp_country, lo_tipMonth, lo_nrMonthsAvg)
+            y = cv_graphY0 - ky * yValue
+            break;
+        case cv_mode_vaccExcessDeathMulti:
+            x = countryGraphLeftData[vp_country] + countryVaccByMonth[vp_country][lo_focusMonth - 1] * countryGraphKx[vp_country];
+            yValue = lf_getAvgValue(vp_country, lo_focusMonth, lo_nrMonthsAvg);
+            y = countryGraphBottomAxis[vp_country] - yValue * countryGraphKy[vp_country];
+            break;
+        case cv_mode_vaccExcessDeath:
+            x = lo_graphLeftData + countryVaccByMonth[vp_country][lo_focusMonth - 1] * lo_graphKx;
+            yValue = lf_getAvgValue(vp_country, lo_focusMonth, lo_nrMonthsAvg);
+            y = lo_graphBottomAxis - yValue * lo_graphKy;
+            break;
+    }
+    
+    //risanje foreground krogca za to državo in mesec
     gEllipse(x, y, 5, 5, 0, "white", 0, "");
     gEllipse(x, y, 3, 3, 0, gf_alphaColor(192, countryColor[vp_country]), 0, "");
 
