@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.15"
-const gl_versionDate = "14.2.2023"
+const gl_versionNr = "v1.16"
+const gl_versionDate = "15.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -1386,7 +1386,9 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             document.body.style.cursor = "default"
         }
     }
-    else if (lf_mouseOverScatterPlotDataPoint(e.offsetX, e.offsetY)) { };
+    else if (lf_mouseOverScatterPlotDataPoint(e.offsetX, e.offsetY)) { }
+    else { document.body.style.cursor = "default"; };
+
     if (lo_focusCountry != vl_oldFocusCountry) {
         //console.log("focusCountry=" + lo_focusCountry);
         //paint_delay()
@@ -1614,6 +1616,14 @@ function paint() {
     lo_graphMarginBottom = marginBottom;
     lo_graphWidth = ctxW - marginLeft - marginRight;
     lo_graphHeight = ctxH - marginTop - marginBottom;
+    //
+    lo_graphLeft = marginLeft;
+    lo_graphRight = ctxW - marginRight;
+    lo_graphTop = marginTop;
+    lo_graphBottom = ctxH - marginBottom;
+    lo_graphWidth = ctxW - marginLeft - marginRight;
+    lo_graphHeight = ctxH - marginTop - marginBottom;
+    //
     switch (gl_mode) {
         case cv_mode_vaccExcessDeath:
             paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
@@ -3050,7 +3060,7 @@ function paint_graph_timeExcessDeath_tipContent_vaccExcessDeath(vp_country, vp_m
     if (frameLeft + frameWidth > cv_graphRight) { frameLeft = cv_graphRight - frameWidth }; //če desno gre ven, naj gre desno ravno do roba
 
     //---- background toolTip okvir
-    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "", 16, 16, false);
+    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "#C0C0C080", 3, 3, false);
 
     //---- izpis meseca na vrhu
     let tmpStr, tmpW, tmpH, font, x, y, country;
@@ -3125,7 +3135,7 @@ function paint_graph_timeExcessDeath_tipContent_timeExcessDeath(vp_country, vp_l
     if (frameLeft + frameWidth > cv_graphRight) { frameLeft = cv_graphRight - frameWidth }; //če desno gre ven, naj gre desno ravno do roba
 
     //---- background toolTip okvir
-    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "", 16, 16, false);
+    gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "#C0C0C080", 3, 3, false);
 
     //---- izpis meseca na vrhu
     let tmpStr, tmpW, tmpH, font, x, y, country;
@@ -4021,12 +4031,14 @@ function gBannerRoundRect(left, top, width, height, radius,  fillColor, strokeWi
     let ddx = radius; let ddy = radius;
     //----
     if (shaddowColor != "") {
+        ctx.save(); //zapomnim si ctx brez clipping region-a
         switch (shaddowAll) {
             case true:  gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, -xShaddow, xShaddow, -yShaddow, yShaddow); break;
             case false: gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShaddow, xShaddow, yShaddow, yShaddow); break;
         }
         ctx.fillStyle = shaddowColor;
         ctx.fill();
+        ctx.restore(); //s tem se znebim clipping region-a na ctx-u
     }
     //----
     if (fillColor != "" || strokeWidth > 0) {
@@ -4065,6 +4077,19 @@ function gBannerRoundRect(left, top, width, height, radius,  fillColor, strokeWi
 function gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShaddowLeft, xShaddowRight, yShaddowTop, yShaddowBottom) {
 
     ctx.beginPath();
+
+    // Create clipping path (15.2.2023 v1.16)
+    if (xShaddowLeft != 0 || xShaddowRight != 0 || yShaddowTop != 0 || yShaddowBottom != 0) {
+        let region = new Path2D();
+        region.rect(left + xShaddowLeft, top + yShaddowTop, right + xShaddowRight - left - xShaddowLeft, bottom + yShaddowBottom - top - yShaddowTop);
+        //region.rect(left, top, right - left, bottom - top);
+        region.moveTo(left + ddx, top);
+        region.arcTo(right, top, right, top + ddy, radius);             // naredi linijo do desne zgornje strani in potem četrt kroga navzdol proti navpičnici
+        region.arcTo(right, bottom, right - ddx, bottom, radius); // naredi linijo do desne spodnje strani in potem četrt kroga levo proti vodoravnici
+        region.arcTo(left, bottom, left, bottom - ddy, radius);     // naredi linijo do leve spodnje strani in potem četrt kroga navzgor proti navpičnici
+        region.arcTo(left, top, left + ddx, top, radius);                 // naredi linijo do leve zgornje strani in potem četrt kroga desno proti vodoravnici
+        ctx.clip(region, "evenodd");
+    }
 
     ctx.moveTo(left + ddx + xShaddowLeft, top + yShaddowTop);
     ctx.arcTo(right + xShaddowRight, top + yShaddowTop, right + xShaddowRight, top + ddy + yShaddowTop, radius);             // naredi linijo do desne zgornje strani in potem četrt kroga navzdol proti navpičnici
