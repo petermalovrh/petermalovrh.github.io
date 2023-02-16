@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.16"
-const gl_versionDate = "15.2.2023"
+const gl_versionNr = "v1.17"
+const gl_versionDate = "16.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -2354,6 +2354,10 @@ function lf_setMode(vp_mode, vp_paint) {
             sliderMonthEnd.useValue0 = false;
             sliderTailMonths.visible = true; break;
         case cv_mode_timeExcessDeathSingle: case cv_mode_timeExcessDeathMulti:
+            if (gl_monthEnd < gl_monthStart) { //16.2.2023 v1.17
+                gl_monthEnd = cv_nrMonths;
+                sliderMonthEnd.value = gl_monthEnd;
+            }
             sliderMonthEnd.useValue0 = true;
             sliderTailMonths.visible = false; break;
     }
@@ -2446,6 +2450,15 @@ function lf_changeAutoPlay(vp_newValue) {
         case true:
             //user je vključil auto play - treba je štartati timer
             //console.log("now start timer ...");
+            //16.2.2023 v1.17 če je bil zadnji mesec, potem auto-play samodejno pričnem od začetnega meseca
+            if (gl_monthEnd == cv_nrMonths) {
+                switch (gl_mode) {
+                    case cv_mode_timeExcessDeathMulti: case cv_mode_timeExcessDeathSingle: gl_monthEnd = gl_monthStart; break;
+                    case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti: gl_monthEnd = 1; break;
+                }
+                sliderMonthEnd.value = gl_monthEnd;
+                paint();
+            }
             lo_autoPlayStarting = true;
             tmAutoPlayId = setInterval(tmAutoPlay_tick, 200);
             lo_autoPlayStarting = false;
@@ -4078,7 +4091,7 @@ function gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShadd
 
     ctx.beginPath();
 
-    // Create clipping path (15.2.2023 v1.16)
+    // Create clipping path (15.2.2023 v1.16) https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip
     if (xShaddowLeft != 0 || xShaddowRight != 0 || yShaddowTop != 0 || yShaddowBottom != 0) {
         let region = new Path2D();
         region.rect(left + xShaddowLeft, top + yShaddowTop, right + xShaddowRight - left - xShaddowLeft, bottom + yShaddowBottom - top - yShaddowTop);
