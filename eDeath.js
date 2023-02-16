@@ -1,5 +1,5 @@
 //------------------------------------
-const gl_versionNr = "v1.17"
+const gl_versionNr = "v1.18"
 const gl_versionDate = "16.2.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1033,6 +1033,74 @@ class button {
     }
 }
 
+class buttonPlayPauseStop {
+    constructor(left, top, width, height, value, lineWidth, lineColor, focusedLineColor, fillColor, smoothPx, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, visible) {
+        this.left = left; this.top = top; this.width = width; this.height = height;
+        this.value = value;
+        this.lineWidth = lineWidth; this.lineColor = lineColor; this.focusedLineColor = focusedLineColor;
+        this.fillColor = fillColor;
+        this.smoothPx = smoothPx;
+        this.shaddowColor = shaddowColor; this.xShaddow = xShaddow; this.yShaddow = yShaddow; this.shaddowAll = shaddowAll;
+        this.enabled = enabled; this.disabledFillColor = disabledFillColor;
+        this.visible = visible;
+    }
+    paint() {
+        if (!this.visible) { return };
+        //---- pravokotnik
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        let lineColor = focused ? this.focusedLineColor : this.lineColor;
+        let fillColor = this.enabled ? this.fillColor : this.disabledFillColor;
+        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
+        //---- value symbol
+        let x, y;
+        let x0 = this.left + 0.3 * this.width; let x1 = this.left + 0.7 * this.width;
+        let y0 = this.top + 0.3 * this.height; let y1 = this.top + 0.5 * this.height; let y2 = this.top + 0.7 * this.height
+        switch (this.value) {
+            case "play":
+                ctx.beginPath()
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.lineTo(x0, y2);
+                ctx.closePath()
+                ctx.fillStyle = "mediumSeaGreen";
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "darkGreen";
+                ctx.stroke();
+                break;
+            case "pause":
+                break;
+            case "stop":
+                ctx.beginPath()
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y0);
+                ctx.lineTo(x1, y2);
+                ctx.lineTo(x0, y2);
+                ctx.closePath()
+                ctx.fillStyle = "firebrick";
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "darkRed";
+                ctx.stroke();
+                break;
+        }
+    }
+    eventClick(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        let x0 = this.left - this.lineWidth / 2;
+        let x1 = this.left + this.width + this.lineWidth / 2;
+        let y0 = this.top - this.lineWidth / 2;
+        let y1 = this.top + this.height + this.lineWidth / 2;
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) 
+             { return true; }
+        else { return false; }
+    }
+}
+
 //---------------------------------------------------------------------------
 //================ GUI
 //---------------------------------------------------------------------------
@@ -1057,6 +1125,7 @@ switch (lo_GUI_layout) {
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, cv_nrMonths, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, cv_nrMonths, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
+        var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
         var countryPanelToggle = new countryPanel(ctxW - pickCountryLeftDiff - 41, pickCountryTop, ctxW, pickCountryHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
 }
 var lo_GUIlayoutHasChanged = true;
@@ -1313,6 +1382,13 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
     if (!vl_end && lo_showGUI) {
+        boolRslt = buttonPlay.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt) {
+            lf_changeAutoPlay(!lo_autoPlay);
+            vl_end = true
+        }
+    }
+    if (!vl_end && lo_showGUI) {
         rslt = countryPanelToggle.eventClick(e.offsetX, e.offsetY);
         if (rslt >= 1 && rslt <= cv_maxCountry) {
             lo_enabledCountry[rslt] = !lo_enabledCountry[rslt];
@@ -1376,6 +1452,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
     else if (intChooserNrMonthsAvg.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
     else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+    else if (buttonPlay.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
     else if (countryPanelToggle.eventMouseWithin(e.offsetX, e.offsetY)) {
         document.body.style.cursor = "pointer";
         let country = countryPanelToggle.eventMouseOverValue(e.offsetX, e.offsetY);
@@ -1983,7 +2060,7 @@ function paint_GUI() {
         return
     };
 
-    //---- check box za povprečenje čez vse mesece covid epidemije
+    //---- mode button
     buttonMode.paint();
     
     //---- izbiranje števila mesecev za povprečenje   
@@ -1998,6 +2075,9 @@ function paint_GUI() {
     //---- izbira meseca za prikaz
     sliderMonthEnd.paint();
 
+    //---- button play/stop
+    buttonPlay.paint();
+    
     //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
     countryPanelToggle.paint();
 
@@ -2034,7 +2114,8 @@ function paint_tips() {
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
-            gBannerRoundRect(x0 - 15, y0 - 13, 415, backHeight, 20, gf_alphaColor(160, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
+            //gBannerRoundRect(x0 - 15, y0 - 13, 415, backHeight, 20, gf_alphaColor(160, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
+            gBannerRoundRect(x0 - 15, y0 - 13, 415, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             //
             y += vStep;
             gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -2156,13 +2237,15 @@ function paint_GUI_layoutB() {
             else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
             else { sliderMonthEnd.width = d2; };
             //----
-            lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
+            //lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
+            lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 37; //zaradi buttonPlay
             lo_currentMonthTextTop = 17;
             break;
         case false:
             gap2 = 200; //prostor za izpis tekočega meseca
             x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
-            x2 = x1 + gap2;
+            //x2 = x1 + gap2;
+            x2 = x1 + gap2 + 20;
             x3 = ctxW - xAuthor;
             //----
             lo_currentMonthTextLeft = x1 + 50;
@@ -2176,6 +2259,7 @@ function paint_GUI_layoutB() {
             else { sliderMonthEnd.width = d2; };
             break;
     }
+    buttonPlay.left = sliderMonthEnd.left - 31; // + sliderMonthEnd.width +5;
 }
 
 function fixForRange(value, minValue, maxValue) {
@@ -2451,13 +2535,13 @@ function lf_changeAutoPlay(vp_newValue) {
             //user je vključil auto play - treba je štartati timer
             //console.log("now start timer ...");
             //16.2.2023 v1.17 če je bil zadnji mesec, potem auto-play samodejno pričnem od začetnega meseca
+            buttonPlay.value = "stop";
             if (gl_monthEnd == cv_nrMonths) {
                 switch (gl_mode) {
                     case cv_mode_timeExcessDeathMulti: case cv_mode_timeExcessDeathSingle: gl_monthEnd = gl_monthStart; break;
                     case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti: gl_monthEnd = 1; break;
                 }
                 sliderMonthEnd.value = gl_monthEnd;
-                paint();
             }
             lo_autoPlayStarting = true;
             tmAutoPlayId = setInterval(tmAutoPlay_tick, 200);
@@ -2466,9 +2550,11 @@ function lf_changeAutoPlay(vp_newValue) {
             break;
         case false:
             //user je izključil auto play - treba je ukiniti timer
+            buttonPlay.value = "play";
             clearInterval(tmAutoPlayId);
             //console.log("timer cleared");
     }
+    paint();
 }
 
 function tmAutoPlay_tick() {
@@ -2486,6 +2572,8 @@ function tmAutoPlay_tick() {
             tmAutoPlayId = null;
             //console.log("  timer_tick_cleared");
             lo_autoPlay = false;
+            buttonPlay.value = "play";
+            paint();
             //return;
         } else {
             // grem na naslednji mesec
@@ -2497,6 +2585,8 @@ function tmAutoPlay_tick() {
                 tmAutoPlayId = null;
                 //console.log("  timer_tick_cleared(pos-end)");
                 lo_autoPlay = false;
+                buttonPlay.value = "play";
+                paint();
                 //return;
         }
         }
@@ -3659,7 +3749,7 @@ function paint_author() {
     //gBannerRectWithText(x0, y0, x1, y1, dd, dd, "white", 1, "lightGray", font, "gray", tmpStr, "#D0D0D040", 4, 4)
     lo_linearGradientFill = true;
     rgfc1x = x0; rgfc1y = y0; rgfc2x = x0 + tmpW; rgfc2y = y0 + tmpH;
-    rgfcs1 = 0; rgfc1 = "#F4F4F4FF"; rgfcs2 = 0.3; rgfc2 = "white"; rgfcs3 = 1; rgfc3 = "#F4F4F4FF";
+    rgfcs1 = 0; rgfc1 = "#F0F0F0FF"; rgfcs2 = 0.3; rgfc2 = "white"; rgfcs3 = 1; rgfc3 = "#F0F0F0FF";
     gBannerRoundRectWithText(x0, y0, tmpW, tmpH, font, "gray", tmpStr, dd, dd, 14, "white", 1, "lightGray", "#D0D0D040", 4, 4, false)
 }
 
@@ -4097,10 +4187,10 @@ function gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShadd
         region.rect(left + xShaddowLeft, top + yShaddowTop, right + xShaddowRight - left - xShaddowLeft, bottom + yShaddowBottom - top - yShaddowTop);
         //region.rect(left, top, right - left, bottom - top);
         region.moveTo(left + ddx, top);
-        region.arcTo(right, top, right, top + ddy, radius);             // naredi linijo do desne zgornje strani in potem četrt kroga navzdol proti navpičnici
+        region.arcTo(right, top, right, top + ddy, radius);       // naredi linijo do desne zgornje strani in potem četrt kroga navzdol proti navpičnici
         region.arcTo(right, bottom, right - ddx, bottom, radius); // naredi linijo do desne spodnje strani in potem četrt kroga levo proti vodoravnici
-        region.arcTo(left, bottom, left, bottom - ddy, radius);     // naredi linijo do leve spodnje strani in potem četrt kroga navzgor proti navpičnici
-        region.arcTo(left, top, left + ddx, top, radius);                 // naredi linijo do leve zgornje strani in potem četrt kroga desno proti vodoravnici
+        region.arcTo(left, bottom, left, bottom - ddy, radius);   // naredi linijo do leve spodnje strani in potem četrt kroga navzgor proti navpičnici
+        region.arcTo(left, top, left + ddx, top, radius);         // naredi linijo do leve zgornje strani in potem četrt kroga desno proti vodoravnici
         ctx.clip(region, "evenodd");
     }
 
