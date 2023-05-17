@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.21"
-const gl_versionDate = "8.5.2023"
+const gl_versionNr = "v1.22"
+const gl_versionDate = "17.5.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -3053,15 +3053,26 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             break;
     }
     let vl_focus, vl_disabled;
-    for (country = countryStart; country <= countryEnd; country++) {
-        //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
-        if (!lo_enabledCountry[country]) { continue };
+    //---- risanje grafov po vrsti za vsako državo
+    for (countryLoopIndex = countryStart; countryLoopIndex <= countryEnd; countryLoopIndex++) {
+        
+        country = countryLoopIndex;
         //13.2.2023 v1.14
         vl_focus = false; vl_disabled = false;
         if (lf_regularCountry(lo_focusCountry)) {
             if (country == lo_focusCountry) { vl_focus = true }
             else { vl_disabled = true };
         }
+        //17.5.2023 v1.22 državo, ki je v fokusu (miška nad državo v legendi držav) izrišem zadnjo, da je risana čez sive črte drugih držav in jo te ne prekrivajo
+        if (vl_focus && countryLoopIndex < countryEnd) {
+            vl_focus = false; vl_disabled = false;
+            country = countryLoopIndex + 1;
+        } else if (!vl_focus && lf_regularCountry(lo_focusCountry) && countryLoopIndex == countryEnd) {
+            vl_focus = true; vl_disabled = false;
+            country = lo_focusCountry;
+        }
+        //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
+        if (!lo_enabledCountry[country]) { continue };
         //
         //if (country == cv_fin) {
         //    country = country
@@ -3104,6 +3115,7 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             vl_xOld = x; vl_yOld = y
         }
         //---- zdaj pa še za krogce točk, zato da so ti risani preko linij
+        ctx.setLineDash([]);
         for (month = vl_monthStart; month <= gl_monthEnd; month++) {
             monthIndex = month - vl_monthStart +1
             switch (vp_graphType) {
@@ -3133,7 +3145,22 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
         }
     }
     //---- zdaj pa še za oznake držav, zato da so te v vsakem primeru preko krogcev točk in linij med krogci (ta problem je sicer le pri VACC-ExcessDeath diagramu)
-    for (country = countryStart; country <= countryEnd; country++) {
+    for (countryLoopIndex = countryStart; countryLoopIndex <= countryEnd; countryLoopIndex++) {
+        country = countryLoopIndex;
+        //13.2.2023 v1.14
+        vl_focus = false; vl_disabled = false;
+        if (lf_regularCountry(lo_focusCountry)) {
+            if (country == lo_focusCountry) { vl_focus = true }
+            else { vl_disabled = true };
+        }
+        //17.5.2023 v1.22 državo, ki je v fokusu (miška nad državo v legendi držav) izrišem zadnjo, da je risana čez sive črte drugih držav in jo te ne prekrivajo
+        if (vl_focus && countryLoopIndex < countryEnd) {
+            vl_focus = false; vl_disabled = false;
+            country = countryLoopIndex + 1;
+        } else if (!vl_focus && lf_regularCountry(lo_focusCountry) && countryLoopIndex == countryEnd) {
+            vl_focus = true; vl_disabled = false;
+            country = lo_focusCountry;
+        }
         //---- če je prikaz države izključen, potem to državo preskočim (25.1.2023 v1.1)
         if (!lo_enabledCountry[country]) { continue };
         month = gl_monthEnd
@@ -3148,12 +3175,7 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
         //switch (vp_graphType) {
         //    case cv_graphType_vaccExcessDeath: x = x - kk * (vl_nrMonths / 2 - monthIndex + 1); break;
         //}
-        //13.2.2023 v1.14
-        vl_focus = false; vl_disabled = false;
-        if (lf_regularCountry(lo_focusCountry)) {
-            if (country == lo_focusCountry) { vl_focus = true }
-            else { vl_disabled = true };
-        }
+        
         //
         //if (country == cv_fin) {
         //    country = country
@@ -3646,7 +3668,7 @@ function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
 
     //---- risanje koralacijske linije precepljenost/excessDeaths
     paint_graph_vaccExcessDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0)
-
+    //ctx.setLineDash([]);
     //---- risanje raztresenega diagrama    
     let xValue, yValue, monthIndex, vl_xOld, vl_yOld
     font = "bold 10pt verdana"
