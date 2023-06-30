@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.24"
-const gl_versionDate = "23.6.2023"
+const gl_versionNr = "v1.25"
+const gl_versionDate = "28.6.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -1957,6 +1957,11 @@ function paint() {
     paint_GUI()
     paint_author();
     paint_version();
+
+    //28.6.2023 dodan izpis trenutnega mode
+    tmpStr=gl_mode.toString()
+    gBannerRoundRectWithText(buttonMode.left+buttonMode.width-15-(4-gl_mode)*13, buttonMode.top+buttonMode.height-1, 9, 9, "bold 10pt verdana", "darkSlateGray", tmpStr, 4, 4, 8, "white", 1, "lightGray", "lightGray", 2, 2, false)
+   
     //test_arcTo();
     //test_bezierCurveTo()
     //test_rotate();
