@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.26"
-const gl_versionDate = "17.7.2023"
+const gl_versionNr = "v1.27"
+const gl_versionDate = "24.7.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -3181,7 +3181,7 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     }
     kk = 0;
 
-    //---- debelina markerja je odvisna od gostote izpsa
+    //---- debelina markerja je odvisna od gostote izpisa
     let countryStart, countryEnd;
     let dataPointRadij = 3;
     switch (vp_country) {
@@ -3215,12 +3215,33 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
         //17.5.2023 v1.22 državo, ki je v fokusu (miška nad državo v legendi držav) izrišem zadnjo, da je risana čez sive črte drugih držav in jo te ne prekrivajo
         switch (vp_country) {
             case cv_allCountry:
-                if (vl_focus && countryLoopIndex < countryEnd) {
-                    vl_focus = false; vl_disabled = false;
-                    country = countryLoopIndex + 1;
-                } else if (!vl_focus && lf_regularCountry(lo_focusCountry) && countryLoopIndex == countryEnd) {
-                    vl_focus = true; vl_disabled = false;
-                    country = lo_focusCountry;
+                switch (vl_focus) { 
+                    case true: //smo na državi s fokusom
+                        //če država s fokusom ni zadnja država, potem najprej prikažem naslednjo državo in to kot disabled
+                        if (countryLoopIndex < countryEnd) {
+                            vl_focus = false; vl_disabled = true;  //false;
+                            country = countryLoopIndex + 1;
+                        }
+                        break;
+                    default: //nismo na državi s fokusom
+                        //če ena država ima fokus, in je ta država že pred trenutno državo, potem je treba prikazati naslednjo državo, razen če je to zadnja država v zanki (takrat je treba prikazati državo s fokusom)
+                        switch (lf_regularCountry(lo_focusCountry)) { 
+                            case true: //na eni drugi državi je trenutno fokus
+                                if (countryLoopIndex == countryEnd) {
+                                    //ena država ima fokus, mi pa smo sedaj na zadnji državi v zanki, zato je zdaj čas, da se nariše še državo v fokusu, ki bo tako narisana čez vse
+                                    vl_focus = true; vl_disabled = false;
+                                    country = lo_focusCountry;
+                                } else if (countryLoopIndex > lo_focusCountry) {
+                                    //ena država ima fokus, mi pa smo sedaj za njo, kar pomeni, da moramo risati eno naprej in to v disabled načinu 
+                                    vl_focus = false; vl_disabled = true;
+                                    country = countryLoopIndex + 1;
+                                }
+                                break;
+                            default: //nobena država nima fokusa
+                                //normalno rišemo tekočo državo
+                                break;
+                        }
+                        break;
                 }
                 break;
             default:
@@ -3241,10 +3262,18 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
                     default: dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
                 }
                 break;
-            case cv_graphType_timeExcessDeath: dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
+            case cv_graphType_timeExcessDeath:
+                dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
+                //24.7.2023 tole spodaj sem raje spet ukinil, ker je delalo narobe
+                //switch (vp_country) {
+                //    case cv_allCountry: dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(80, countryColor[country]); break;
+                //    default: dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; break;
+                //}
+                //break;            
         }
         if (vl_focus) { dataLineColor = countryColor[country]; dataPointColor = countryColor[country]; dataLineWidth = 2;};
-        if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; countryNameColor = "lightGray" };
+        //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; countryNameColor = "lightGray"; };
+        if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(35, countryColor[country]); countryNameColor = "lightGray";};
         //console.log("countryNameColor=" + countryNameColor);
         //---- najprej za linije med krogci točk
         for (month = vl_monthStart; month <= gl_monthEnd; month++) {
@@ -3289,7 +3318,6 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             }
             if (month == gl_monthEnd) {
                 switch (vp_graphType) {
-                    //case cv_graphType_vaccExcessDeath: gEllipse(x, y, 5, 5, 0, countryColor[country], 1, "dimGray"); break;
                     case cv_graphType_vaccExcessDeath: gEllipse(x, y, 5, 5, 0, countryNameColor, 1, "dimGray"); break;
                     case cv_graphType_timeExcessDeath: gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColor, 0, ""); break;
                 }
@@ -3309,10 +3337,14 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
             else { vl_disabled = true };
         }
         //17.5.2023 v1.22 državo, ki je v fokusu (miška nad državo v legendi držav) izrišem zadnjo, da je risana čez sive črte drugih držav in jo te ne prekrivajo
+        //srednji pogoj spodaj dodal 24.7.2023, da naslednje države od fokusirane ne izpiše z neko srednje močno barvo
         switch (vp_country) {
             case cv_allCountry:
                 if (vl_focus && countryLoopIndex < countryEnd) {
-                    vl_focus = false; vl_disabled = false;
+                    vl_focus = false; vl_disabled = true;
+                    country = countryLoopIndex + 1;
+                } else if (!vl_focus && lf_regularCountry(lo_focusCountry) && countryLoopIndex > lo_focusCountry && countryLoopIndex < countryEnd) {
+                    vl_focus = false; vl_disabled = true;
                     country = countryLoopIndex + 1;
                 } else if (!vl_focus && lf_regularCountry(lo_focusCountry) && countryLoopIndex == countryEnd) {
                     vl_focus = true; vl_disabled = false;
