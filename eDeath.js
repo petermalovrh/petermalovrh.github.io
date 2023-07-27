@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.27"
-const gl_versionDate = "24.7.2023"
+const gl_versionNr = "v1.28"
+const gl_versionDate = "27.7.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -1994,10 +1994,7 @@ function paint() {
     paint_author();
     paint_version();
 
-    //28.6.2023 dodan izpis trenutnega mode
-    tmpStr=gl_mode.toString()
-    gBannerRoundRectWithText(buttonMode.left+buttonMode.width-15-(4-gl_mode)*13, buttonMode.top+buttonMode.height-1, 9, 9, "bold 10pt verdana", "darkSlateGray", tmpStr, 4, 4, 8, "white", 1, "lightGray", "lightGray", 2, 2, false)
-   
+ 
     //test_arcTo();
     //test_bezierCurveTo()
     //test_rotate();
@@ -2358,6 +2355,10 @@ function paint_GUI() {
     //---- toggle za države (zahteval Žiga Vipotnik @ZVipotnik 25.1.2023)
     countryPanelToggle.paint();
 
+    //28.6.2023 dodan izpis trenutnega mode
+    tmpStr=gl_mode.toString()
+    gBannerRoundRectWithText(buttonMode.left+buttonMode.width-15-(4-gl_mode)*13, buttonMode.top+buttonMode.height-1, 9, 9, "bold 10pt verdana", "darkSlateGray", tmpStr, 4, 4, 8, "white", 1, "lightGray", "lightGray", 2, 2, false)
+    
     //---- on-screen namigi/pomoč
     if (lo_showHelpTips) { paint_tips() };
 
