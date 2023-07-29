@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.29"
-const gl_versionDate = "28.7.2023"
+const gl_versionNr = "v1.30"
+const gl_versionDate = "29.7.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -3464,7 +3464,7 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     font = "italic 9pt cambria";
     let tmpValue;
     //if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData) {
-    if (lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData && lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom) {
+    if (!lo_mouseOut && lo_mouseMoveX > 1.005 * cv_graphLeftData && lo_mouseMoveX < 0.995 * cv_graphRightData && lo_mouseMoveY > 1.005 * cv_graphTopData && lo_mouseMoveY < 0.995 * cv_graphBottom) {
         gLine(lo_mouseMoveX, cv_graphY0 - 30, lo_mouseMoveX, cv_graphY0 + 10, 1, "gray", [2, 2]);
         tmpValue = xValue0 + (lo_mouseMoveX - cv_graphLeftData) / kx;
         switch (vp_graphType) {
