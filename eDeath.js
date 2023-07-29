@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.28"
-const gl_versionDate = "27.7.2023"
+const gl_versionNr = "v1.29"
+const gl_versionDate = "28.7.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -655,6 +655,10 @@ var lo_showGUI = true
 var lo_showHelpTips = true
 
 var lo_showToolTips = true
+
+// 29.7.2023 1.29
+var tmMouseOutOfWindowId 
+var lo_mouseOut = true  
 
 // 26.1.2023 1.3
 var lo_autoPlay = false  
@@ -1531,6 +1535,8 @@ function main() {
 // elMainDate.style.top = "1px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
 // elMainDate.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     
+    tmMouseOutOfWindowId = setInterval(tmMouseOutOfWindow_tick, 500); //na pol sekunde čekiram, če je miška izven okna
+    
 }
 
 function lf_focusCanvas() {
@@ -1605,6 +1611,11 @@ elMyCanvas.addEventListener('mouseup', (e) => {
     lo_mouseDownX = 0;
     lo_mouseDownY = 0;
     //console.log("mouseup(): dragMonthEndActive=" + lo_dragMonthEndActive)
+});
+elMyCanvas.addEventListener('mouseout', (e) => {
+    lo_mouseOut = true
+    //console.log("mouseOut()")
+    paint_delay() //ker je šla miška ven iz okna se vse ponovno izriše, da izginejo eventuelni toolTip-s
 });
 
 elMyCanvas.addEventListener('click', (e) => {
@@ -1688,6 +1699,10 @@ elMyCanvas.addEventListener('dblclick', (e) => {
 elMyCanvas.addEventListener('mousemove', (e) => {
 
     //console.log("mouse_move() enter")
+    //console.log("mouseMove:mouseIn x=" + e.offsetX.toString() + " y=" + e.offsetY.toString())
+    
+    //if (lo_mouseOut) { console.log("mouseMove:mouseIn x=" + e.offsetX.) }
+    lo_mouseOut = false; //29.7.2023
 
     // mouse cursors: https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_style_cursor2
 
@@ -2871,6 +2886,13 @@ function tmAutoPlay_tick() {
     }
 }
 
+function tmMouseOutOfWindow_tick() {
+
+    
+
+    
+}
+
 function lf_getNrSelectedCountries() {
 
     nrSelectedCountries = 0;
@@ -3470,6 +3492,7 @@ function paint_graph_timeExcessDeath_tipContent(vp_country, vp_left, vp_top, cv_
 
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
     
     //prikaz tipsov glede na vrsto grafa
     switch (gl_mode) {
@@ -3620,6 +3643,7 @@ function paint_graph_timeExcessDeath_tipBeforeGraph(vp_country, vl_monthStart, k
 
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
     
     let country;
 
@@ -3659,7 +3683,8 @@ function paint_graph_timeExcessDeath_tipAfterGraph(vp_country, vl_monthStart, kx
 
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
-    
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
+
     //---- risanje foreground toolTip krogcev
     let country;
     switch (gl_mode) {
@@ -3689,6 +3714,7 @@ function paint_graph_timeExcessDeath_tipMarkerDown(vp_country, vl_monthStart, kx
     
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
 
     //država mora biti selektirana
     if (!lo_enabledCountry[vp_country]) { return };
@@ -3721,6 +3747,7 @@ function paint_graph_timeExcessDeath_tipMarkerUp(vp_country, vl_monthStart, kx, 
     
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
 
     //država mora biti selektirana
     if (!lo_enabledCountry[vp_country]) { return };
@@ -3755,6 +3782,7 @@ function paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graph
     
     //prikaz tipsov mora biti vključen
     if (!lo_showToolTips) { return };
+    if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
     
     //risanje background krogca za to državo in mesec
     let x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
