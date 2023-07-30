@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.30"
-const gl_versionDate = "29.7.2023"
+const gl_versionNr = "v1.31"
+const gl_versionDate = "30.7.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -2903,7 +2903,8 @@ function lf_getNrSelectedCountries() {
 
 function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
 
-    let rows, cols, row, col, x, y, w, h, itemWidth, itemHeight, country, ih, newY, yDiff;
+    let rows, cols, row, col, x, y, itemWidth, itemHeight, country, ih, iw, k;
+    let fx, fy, fiw, fih, haveFocusCountry;
     let vGap = 10; let hGap = 10;
     //---- kakšna država mora biti selektirana
     if (nrSelectedCountries <= 0) { return };
@@ -2918,33 +2919,73 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
     //----
     col = 1; row = 1;
+    k = 0.15; //30.7.2023 v1.31
+    haveFocusCountry = false;
     for (country = 1; country <= cv_maxCountry; country++) {
         if (!lo_enabledCountry[country]) { continue };
-        x = marginLeft + (col - 1) * (hGap + itemWidth);
-        y = marginTop + (row - 1) * (vGap + itemHeight);
-        ih = itemHeight;
-        if (col == 1 && row == 1 && !lo_showGUI) {
-            newY = 42; yDiff = newY - y;
-            if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
-        } 
-        if (col == cols && row == 1) {
-            newY = 59; yDiff = newY - y;
-            if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
-        }   
-        gLine(x + 1, y + 2, x + itemWidth - 1, y + 2, 2, "white", []);
-        gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
-        gLine(x + 1, y + ih + 2, x + itemWidth + 1, y + ih + 2, 2, "white", []);
-        gLine(x + itemWidth + 2, y + 1, x + itemWidth + 2, y + ih + 1, 2, "white", []);
-        ctx.beginPath(); ctx.rect(x, y, itemWidth, ih); ctx.closePath();
-        ctx.fillStyle = "#FBFBFBFF";
-        if (country == lo_focusCountry) { ctx.fillStyle = "floralWhite"; };
-        ctx.fill();
-        ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
-        //paint_graph_timeExcessDeath(x, y, itemWidth, ih, cv_graphType_timeExcessDeath, country, 2);
-        paint_graph_timeExcessDeath(x, y, itemWidth, ih, vp_graphType, country, 2);
+        ;[x, y, iw, ih] = paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, country, row, col, itemWidth, itemHeight, k)
+        //30.7.2023 državo v fokusu preskočim in jo izrišem na koncu po zani držav
+        if (country == lo_focusCountry) {
+            ;[fx, fy, fiw, fih] = [x, y, iw, ih];
+            haveFocusCountry = true;
+        } else {
+            paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType)
+        }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
     }
+    //30.7.2023 po potrebi izrišem še državo v fokusu
+    if (haveFocusCountry) {
+        paint_graph_timeExcessDeath_multi_drawSingleCountry(lo_focusCountry, fx, fy, fiw, fih, vp_graphType)
+    }
+}
+
+function paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, country, row, col, itemWidth, itemHeight, k) {
+
+    let x, y, iw, ih, newY, yDiff, x0, y0;
+ 
+    x = marginLeft + (col - 1) * (hGap + itemWidth);
+    y = marginTop + (row - 1) * (vGap + itemHeight);
+    iw = itemWidth; ih = itemHeight;
+        
+    //30.7.2023 državo v fokusu izrišem nekoliko večjo
+    if (cols > 1 && rows > 1) {
+        if (country == lo_focusCountry) {
+            x0 = x; y0 = y;
+            if (x > (marginLeft + k * iw)) { x -= k * iw; }
+            if (y > (marginTop + k * ih)) { y -= k * ih; }
+            iw += 2 * k * iw; ih += 2 * k * ih;
+            if ((x + iw) > (ctxW - marginRight)) { x = ctxW - marginRight - iw; }
+            if ((y + ih) > (ctxH - marginBottom)) { y = ctxH - marginBottom - ih; }
+        };
+    }
+        
+    if (col == 1 && row == 1 && !lo_showGUI) {
+        newY = 42; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+    }
+    if (col == cols && row == 1) {
+        newY = 59; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+    }
+        
+    return [x, y, iw, ih]
+}
+
+function paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType) {
+
+    gLine(x + 1, y + 2, x + iw - 1, y + 2, 2, "white", []);
+    gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
+    gLine(x + 1, y + ih + 2, x + iw + 1, y + ih + 2, 2, "white", []);
+    gLine(x + iw + 2, y + 1, x + iw + 2, y + ih + 1, 2, "white", []);
+    ctx.beginPath(); ctx.rect(x, y, iw, ih); ctx.closePath();
+    ctx.fillStyle = "#FBFBFBFF";
+    if (country == lo_focusCountry) { ctx.fillStyle = "floralWhite"; };
+    ctx.fill();
+    ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
+    //paint_graph_timeExcessDeath(x, y, iw, ih, cv_graphType_timeExcessDeath, country, 2);
+    paint_graph_timeExcessDeath(x, y, iw, ih, vp_graphType, country, 2);
+    
 }
 
 function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_country, vp_marginRight) {
