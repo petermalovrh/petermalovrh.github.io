@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.33"
-const gl_versionDate = "18.9.2023"
+const gl_versionNr = "v1.34"
+const gl_versionDate = "19.9.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -4096,7 +4096,7 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     let minVacc = 1000; let maxVacc = 0;
     let sumVacc = 0; let sumExcessDeath = 0; let sumCountry = 0;
     for (country = 1; country <= cv_maxCountry; country++) {
-        if (country==cv_eu27) {continue}
+        if (country == cv_eu27) { continue }
         //sumVacc += countryVacc[country]
         sumVacc += countryVaccByMonth[country][vp_month - 1]
         sumExcessDeath += lf_getAvgValue(country, vp_month, vp_nrMonthsAvg)
@@ -4108,10 +4108,10 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     let avgExcessDeathAll = sumExcessDeath / sumCountry
     //console.log("avgVaccAll=" + avgVaccAll + " avgExcessDeathAll=" + avgExcessDeathAll)
 
-    //---- ugotavljanje težišča za vse države skupaj
+    //---- ugotavljanje težišča za države levo od težišča
     let sumVaccLeft = 0; let sumExcessDeathLeft = 0; let sumCountryLeft = 0;
     for (country = 1; country <= cv_maxCountry; country++) {
-        if (country==cv_eu27) {continue}
+        if (country == cv_eu27) { continue }
         //if (countryVacc[country] < avgVaccAll) {
         if (countryVaccByMonth[country][vp_month - 1] < avgVaccAll) {
             //sumVaccLeft += countryVacc[country]
@@ -4133,7 +4133,7 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     //---- začetna in končna točka smerne linije
     //let vacc0 = 22; let vacc1 = 95
     let vacc0 = minVacc - 4; if (vacc0 < 0) { vacc0 = 0 };
-    let vacc1 = maxVacc + 4; if (vacc1 >100) { vacc1 = 100 };
+    let vacc1 = maxVacc + 4; if (vacc1 > 100) { vacc1 = 100 };
     let excessDeath0 = avgExcessDeathAll - k * (avgVaccAll - vacc0)
     let excessDeath1 = avgExcessDeathAll + k * (vacc1 - avgVaccAll)
     let x0 = vp_graphLeftData + vp_kx * vacc0
@@ -4149,7 +4149,7 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     //---- del linije izven podatkovnega področja okna ni prav da se riše! 29.1.2023 v1.6
     let dx, dy
     let kGraph = k * vp_ky / vp_kx;
-      //gLine(x0, y0, x1, y1, 1, "red", []) //ta je bila samo za kontrolo!
+    //gLine(x0, y0, x1, y1, 1, "red", []) //ta je bila samo za kontrolo!
     if (y0 > vp_bottomData) {
         dy = y0 - vp_bottomData; dx = dy / kGraph; x0 += dx; y0 = vp_bottomData;
     }
@@ -4166,8 +4166,19 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     //---- risanje smerne linije
     const cv_dashWidth = 7
     gLine(x0 - 2, y0 - 2, x1 - 2, y1 - 2, 4, "white", [cv_dashWidth, cv_dashWidth])
-    gLine(x0+1, y0+1, x1+1, y1+1, 4, "gray", [cv_dashWidth, cv_dashWidth])
+    gLine(x0 + 1, y0 + 1, x1 + 1, y1 + 1, 4, "gray", [cv_dashWidth, cv_dashWidth])
     gLine(x0, y0, x1, y1, 4, "darkGray", [cv_dashWidth, cv_dashWidth])
+
+    //---- označitev težišča (19.9.2023)
+    let x = vp_graphLeftData + vp_kx * avgVaccAll
+    let y = vp_graphY0 - vp_ky * avgExcessDeathAll
+    let d = 4;
+    if (valueBetween(x, x0, x1)) {
+        if (valueBetween(y, y0, y1) || valueBetween(y, y1, y0)) {
+            gLine(x - d, y - d, x + d, y + d, 3, "dimGray", []);
+            gLine(x + d, y - d, x - d, y + d, 3, "dimGray", []);
+        };
+    };
 
     //---- označitev kota smerne linije
     if (vp_country == cv_allCountry) {
