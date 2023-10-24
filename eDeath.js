@@ -1,6 +1,6 @@
 //------------------------------------
-const gl_versionNr = "v1.35"
-const gl_versionDate = "21.10.2023"
+const gl_versionNr = "v1.36"
+const gl_versionDate = "24.10.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -749,6 +749,7 @@ const cv_mode_timeExcessDeathSingle = 3;
 const cv_mode_timeExcessDeathMulti = 4;
 const cv_maxMode = 4;
 var gl_mode = cv_mode_vaccExcessDeath;
+var gl_sameScaleY = false; //24.10.2023
 
 const cv_graphType_vaccExcessDeath = 1;
 const cv_graphType_timeExcessDeath = 2;
@@ -1969,6 +1970,9 @@ window.addEventListener("keydown", (event) => {
         case 'KeyM' :
             //console.log("M pressed"); 
             lf_changeMode(true); break;
+        case 'KeyY' : case 'KeyZ' : //24.10.2023
+            //console.log("Y pressed");
+            lf_changeSameScaleY(!gl_sameScaleY, true); break;
     }
 });
 
@@ -2107,14 +2111,14 @@ function paint() {
     //
     switch (gl_mode) {
         case cv_mode_vaccExcessDeath:
-            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allCountry, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_vaccExcessDeathMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
             paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
         case cv_mode_timeExcessDeathSingle:
-            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            paint_graph_timeExcessDeath(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeExcessDeath, cv_allCountry, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_timeExcessDeathMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
@@ -2520,7 +2524,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 13;
+            let nrTipRows = 14;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -2529,6 +2533,8 @@ function paint_tips() {
             //
             y += vStep;
             gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("/", x0 + 27, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("N", x0 + 41, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... hide/show these tips", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
@@ -2571,6 +2577,10 @@ function paint_tips() {
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... change tail months", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("Y", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... normalize Y scale", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -2840,6 +2850,12 @@ function lf_changeMode(vp_paint) {
     lf_setMode(gl_mode, vp_paint);
 }
 
+function lf_changeSameScaleY(vp_newValue, vp_paint) {
+    //24.10.2023
+    gl_sameScaleY = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
 function lf_setMode(vp_mode, vp_paint) {
 
     gl_mode = vp_mode;
@@ -3034,6 +3050,13 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
     //----
     itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
+    //---- pregled Y vrednosti presežne smrtnosti in določanje ky
+    let vl_minY, vl_maxY, vl_dataRange;
+    let vl_forceDataRangeY = false;
+    if (gl_sameScaleY && vp_graphType==cv_graphType_timeExcessDeath) { //24.10.2023 normalizacija po Y v Mode=4       
+        ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(cv_allCountry, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+        vl_forceDataRangeY = true;
+    }
     //----
     col = 1; row = 1;
     k = 0.15; //30.7.2023 v1.31
@@ -3041,19 +3064,19 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
     for (country = 1; country <= cv_maxCountry; country++) {
         if (!lo_enabledCountry[country]) { continue };
         ;[x, y, iw, ih] = paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, country, row, col, itemWidth, itemHeight, k)
-        //30.7.2023 državo v fokusu preskočim in jo izrišem na koncu po zani držav
+        //30.7.2023 državo v fokusu preskočim in jo izrišem na koncu po zanki držav
         if (country == lo_focusCountry) {
             ;[fx, fy, fiw, fih] = [x, y, iw, ih];
             haveFocusCountry = true;
         } else {
-            paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType)
+            paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
         }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
     }
     //30.7.2023 po potrebi izrišem še državo v fokusu
     if (haveFocusCountry) {
-        paint_graph_timeExcessDeath_multi_drawSingleCountry(lo_focusCountry, fx, fy, fiw, fih, vp_graphType)
+        paint_graph_timeExcessDeath_multi_drawSingleCountry(lo_focusCountry, fx, fy, fiw, fih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
     }
 }
 
@@ -3089,8 +3112,8 @@ function paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, ma
     return [x, y, iw, ih]
 }
 
-function paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType) {
-
+function paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+    //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
     gLine(x + 1, y + 2, x + iw - 1, y + 2, 2, "white", []);
     gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
     gLine(x + 1, y + ih + 2, x + iw + 1, y + ih + 2, 2, "white", []);
@@ -3101,12 +3124,13 @@ function paint_graph_timeExcessDeath_multi_drawSingleCountry(country, x, y, iw, 
     ctx.fill();
     ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
     //paint_graph_timeExcessDeath(x, y, iw, ih, cv_graphType_timeExcessDeath, country, 2);
-    paint_graph_timeExcessDeath(x, y, iw, ih, vp_graphType, country, 2);
+    paint_graph_timeExcessDeath(x, y, iw, ih, vp_graphType, country, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
     
 }
 
-function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_country, vp_marginRight) {
-
+function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_country, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+    //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
+    
     let country, yValue;
     //
     let cv_graphMarginLeft, cv_graphMarginRight, cv_graphMarginTop, cv_graphMarginBottom;
@@ -3153,7 +3177,14 @@ function paint_graph_timeExcessDeath(vp_left, vp_top, vp_width, vp_height, vp_gr
     }
     //---- pregled Y vrednosti presežne smrtnosti in določanje ky
     let vl_minY, vl_maxY, vl_dataRange;
-    ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_country, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+    switch (vp_forceDataRangeY) { //24.10.2023 je Y range že vnaprej določen za vse države enako?
+        case false:
+            ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_country, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+            break;
+        default:
+            vl_minY = vp_minY; vl_maxY = vp_maxY; vl_dataRange = vp_dataRange;
+            break;
+    }
     const ky = cv_graphRangeY / vl_dataRange
     
     //---- Y koordinata vodoravne X osi
@@ -3949,7 +3980,9 @@ function paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graph
 }
 
 function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
-
+    //----
+    //24.10.2023 ta funkcija se že nekaj mesecev ne uporablja več. Nadomeščata jo univerzalni funkciji paint_graph_timeExcessDeath() in paint_graph_timeExcessDeath_multi() !!
+    //----
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
     const cv_graphRight = vp_left + vp_width - 45 //X koordinata konca X osi
     const cv_graphLeftData = cv_graphLeft + 2 //X koordinata začetka področja podatkov
