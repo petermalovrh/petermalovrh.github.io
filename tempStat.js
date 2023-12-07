@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.1"
+const gl_versionNr = "v0.2"
 const gl_versionDate = "6.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -74,12 +74,18 @@ var avgTemp = [];
 
 const cv_placeSkofjaLoka = 1;
 addPlace(scSch + "kofja Loka", scSch + "k.Loka", scSch + "KL", "slateBlue");
-const cv_placeMariborVrbanskiPlato = 2;
+const cv_placeMariborVrbanskiPlato = 2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
 addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
-const cv_placeMariborTabor = 3;
+const cv_placeMariborTabor = 3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
 addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
-const cv_placeLjubljanaBezigrad = 4;
-addPlace("Ljubljana Bezigrad (275m)", "LJ Bezigrad", "LJBE", "limeGreen");
+const cv_placeLjubljanaBezigrad = 4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
+addPlace("Ljubljana Bezigrad (299m)", "LJ Bezigrad", "LJBE", "limeGreen");
+const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
+addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "firebrick");
+const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
+addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "firebrick");
+const cv_placeNovoMesto = 7; // NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
+addPlace("Novo Mesto (220m)", "NM", "NM", "firebrick");
 
 //const cv_placeKoseze = 3
 //addPlace("Ljubljana Koseze", "Lj. Koseze", "LKS", "orchid");
@@ -309,6 +315,85 @@ addAvgTempYear(cv_placeLjubljanaBezigrad, 2019, 1, [0.7, 4.9, 9, 11.6, 12.9, 23.
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2020, 1, [1.9, 6.8, 7.2, 13, 15.3, 19.6, 21.8, 22.2, 17.5, 11.9, 5.3, 2.9]);
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2021, 1, [1.2, 5.9, 6.7, 9.1, 13.5, 23.1, 23.3, 21, 17.5, 9.8, 5.9, 1.3]);
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2022, 1, [0.8, 5.1, 6.6, 10.4, 18.1, 23.4, 24.5, 23, 16, 14.4, 7.9, 4.4]);
+
+addAvgTempYear(cv_placeNovoMestoKandija, 1948, 1, [4, 0, 5.7, 11.4, 16, 16.9, 17.2, 18.9, 15.3, 11.1, 4.4, -1.4]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1949, 1, [1.5, 1.2, 2.5, 12, 14.1, 16.4, 19.1, 18, 16.1, 11.1, 6.8, 2.3]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1950, 1, [-3.2, 2.9, 6.4, 10, 16.7, 20.3, 21.7, 20, 15.7, 8.4, 5.3, 1.2]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1951, 1, [2.3, 4.1, 5.3, 9.7, 14.5, 18.1, 19, 19.4, 17.2, 8.8, 8.1, 1.7]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1952, 1, [-1.1, -1.1, 4.1, 12.5, 14, 19, 21.3, 20.8, 13.3, 10.3, 4, -0.3]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1953, 1, [-2.1, -0.6, 4.3, 10.6, 14, 17.9, 20.2, 17.6, 15.6, 12.3, 3.2, 0.8]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1954, 1, [-5.5, -4.4, 6.2, 8.3, 13.4, 19.2, 17.9, 18, 16, 9.6, 4.8, 3.1]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1955, 1, [1, 2.2, 1.6, 8.1, 13, 17.2, 19.5, 17.8, 14.3, 9.5, 3.8, 2.4]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1956, 1, [2.3, -8, 2.3, 9.3, 14.8, 16.4, 20, 19, 15.7, 9.1, 1.7, -0.4]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1957, 1, [-3.4, 4.8, 7, 9.6, 11.6, 19.8, 20.1, 17.6, 14.3, 9.8, 6.4, 1.4]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1958, 1, [-1.8, 4.6, 2.1, 7.8, 17.9, 17.6, 20.4, 19.5, 14.8, 10.8, 6.5, 3.2]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1959, 1, [0.2, -1.1, 8.1, 10.7, 13.9, 17.4, 20.8, 18.2, 13, 8, 5.6, 3.5]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1960, 1, [-0.7, 2, 5.6, 9.4, 14, 18.1, 17.9, 18.7, 13.3, 11.5, 6.6, 3.6]);
+addAvgTempYear(cv_placeNovoMestoKandija, 1961, 1, [-1.4, 3.1]);
+
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1961, 4, [12.6, 13, 18.1, 17.8, 18, 16, 11.4, 5.3, -1.5]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1962, 1, [-0.3, 0.1, 2.1, 9, 13.2, 15.5, 17.7, 19.5, 14, 9.7, 3.7, -4]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1963, 1, [-6.8, -4.1, 3.3, 10.6, 13.7, 18.2, 20.2, 19.3, 15.6, 9.3, 10, -3.4]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1964, 1, [-5.8, -0.2, 2.8, 10.1, 14.1, 19.3, 19.1, 17.3, 14.2, 9.5, 6, 0.1]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1965, 1, [-0.5, -3.3, 4.9, 8, 12.9, 17.4, 18.9, 16.3, 14.9, 8.4, 3.5, 1.6]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1966, 1, [-4, 7.3, 4.4, 11.5, 14.2, 18.6, 18.1, 17.3, 15.1, 13.3, 2.6, 0.3]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1967, 1, [-2.9, 1.2, 6.6, 8.6, 15.3, 17, 20.6, 18.7, 15.5, 11, 5.1, -1.2]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1968, 1, [-3.7, 3, 5.7, 11.8, 14.4, 17.2, 19, 17.4, 14.8, 10.7, 5.3, -2.6]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1969, 1, [-2.6, -1.7, 3.2, 9.1, 16.1, 16.6, 19, 17.2, 15.2, 8.8, 7.5, -3.4]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1970, 1, [-0.5, 0.2, 3, 8.4, 12, 18, 18.7, 18.7, 14.8, 8.8, 7.2, -0.9]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1971, 1, [-1.4, 1.7, 2.3, 10.7, 15.2, 16.7, 19.6, 19.6, 11.7, 7.9, 4, -0.2]);
+addAvgTempYear(cv_placeNovoMestoGotnaVas, 1972, 1, [-1.9, 2.5, 6.9, 9.7, 13.5, 17.9, 19.3, 17.9, 11.7, 8.4, 4.1]);
+
+addAvgTempYear(cv_placeNovoMesto, 1973, 1, [-1, 1.1, 4.6, 7.7, 15.6, 18, 19.2, 18.7, 15.4, 8, 2.8, 0.2]);
+addAvgTempYear(cv_placeNovoMesto, 1974, 1, [0.8, 5.6, 6.8, 8.9, 13.5, 16.1, 19.3, 20.1, 14.9, 5.9, 5.6, 2.1]);
+addAvgTempYear(cv_placeNovoMesto, 1975, 1, [3.9, 1.1, 6, 9.8, 15.5, 16.3, 19.3, 17.9, 17.1, 9.2, 3.6, 0.4]);
+addAvgTempYear(cv_placeNovoMesto, 1976, 1, [0.2, 0.3, 1.6, 9.4, 14.6, 17.5, 20.1, 15.6, 13.6, 10, 6.5, 0]);
+addAvgTempYear(cv_placeNovoMesto, 1977, 1, [1.9, 4.7, 8.3, 8.3, 13.9, 18.2, 19.1, 18.2, 12.4, 11.3, 5.4, -0.4]);
+addAvgTempYear(cv_placeNovoMesto, 1978, 1, [-0.2, 0.4, 6.9, 8.4, 11.9, 17, 17.8, 17.1, 14.1, 9.2, 0.7, 0.4]);
+addAvgTempYear(cv_placeNovoMesto, 1979, 1, [-2.2, 1.7, 7.4, 8.9, 15.3, 19.3, 18.5, 17.3, 14.8, 9, 4.6, 3.3]);
+addAvgTempYear(cv_placeNovoMesto, 1980, 1, [-2.4, 2.7, 5.4, 7.6, 11.8, 17, 18.6, 18.9, 15, 9.8, 2.8, -1.8]);
+addAvgTempYear(cv_placeNovoMesto, 1981, 1, [-3.1, -0.1, 7.8, 10.3, 14.3, 18.4, 19.2, 18.7, 15.7, 12, 3.9, 0.2]);
+addAvgTempYear(cv_placeNovoMesto, 1982, 1, [-2.2, -1.1, 4.5, 7.5, 14.9, 19, 20.6, 19.2, 17.4, 11.3, 5.6, 3.6]);
+addAvgTempYear(cv_placeNovoMesto, 1983, 1, [2, -1.1, 6.3, 12.5, 15.7, 17.8, 21.8, 19.3, 15.3, 9.8, 2.2, 0.3]);
+addAvgTempYear(cv_placeNovoMesto, 1984, 1, [0, -0.1, 4.2, 9.1, 13.1, 17.4, 18.5, 17.9, 15, 11.5, 5.1, 0.6]);
+addAvgTempYear(cv_placeNovoMesto, 1985, 1, [-5.7, -3.2, 4.3, 9.5, 15.3, 16.1, 20.2, 19.1, 15.5, 9.2, 2.7, 3.8]);
+addAvgTempYear(cv_placeNovoMesto, 1986, 1, [0.5, -3.7, 2.6, 10.4, 17.3, 16.5, 19, 19.7, 14.1, 9.5, 5.2, -1.1]);
+addAvgTempYear(cv_placeNovoMesto, 1987, 1, [-3.6, 0.8, 0.9, 10.8, 13.3, 18, 20.7, 18, 18.3, 11.3, 4.2, 1.4]);
+addAvgTempYear(cv_placeNovoMesto, 1988, 1, [3.7, 3.4, 5.1, 9.7, 15, 17.2, 21.5, 19.7, 15.2, 10.4, 1.2, 0.5]);
+addAvgTempYear(cv_placeNovoMesto, 1989, 1, [-0.4, 4.3, 8.5, 11, 14.1, 16.2, 19.8, 19.2, 15.1, 10.1, 3.5, 2.7]);
+addAvgTempYear(cv_placeNovoMesto, 1990, 1, [-0.4, 5.7, 8.4, 9.2, 15.7, 17.8, 19.7, 19.4, 14, 11.1, 5, 0.5]);
+addAvgTempYear(cv_placeNovoMesto, 1991, 1, [0.7, -1.7, 8.4, 8.4, 11.6, 18.1, 21.2, 19.7, 16.8, 8.7, 5.4, -1.7]);
+addAvgTempYear(cv_placeNovoMesto, 1992, 1, [0.6, 3.1, 6, 11, 15.4, 18.1, 20.7, 23.1, 16.1, 9.4, 6.2, 0.5]);
+addAvgTempYear(cv_placeNovoMesto, 1993, 1, [1.1, 0.3, 5.2, 10.8, 17.1, 19, 20.2, 20.6, 14.9, 11.6, 1.5, 1.9]);
+addAvgTempYear(cv_placeNovoMesto, 1994, 1, [3.2, 2, 10.3, 10, 15.2, 18.9, 22.1, 21.5, 17.3, 8.2, 7.6, 1.9]);
+addAvgTempYear(cv_placeNovoMesto, 1995, 1, [0.1, 4.9, 4.7, 11.3, 14.9, 16.9, 21.8, 18.5, 13.9, 11.6, 4.6, 0.5]);
+addAvgTempYear(cv_placeNovoMesto, 1996, 1, [-1.5, -1, 3, 9.9, 16, 19.3, 18.6, 19, 12.6, 10.6, 7.3, -2.4]);
+addAvgTempYear(cv_placeNovoMesto, 1997, 1, [-1.3, 3.8, 6, 7.4, 16.2, 18.9, 19.6, 19.2, 15.6, 8.8, 5.3, 2.1]);
+addAvgTempYear(cv_placeNovoMesto, 1998, 1, [3, 5, 4.8, 11.7, 15, 19.9, 21, 20.7, 14.9, 11, 3, -2.9]);
+addAvgTempYear(cv_placeNovoMesto, 1999, 1, [0.5, 0.8, 7.7, 11.6, 16.1, 18.9, 20.2, 19.9, 17.5, 11.4, 2.7, 0.3]);
+addAvgTempYear(cv_placeNovoMesto, 2000, 1, [-2, 4, 7.5, 13.4, 16.8, 20.9, 20, 22.1, 15.9, 12.5, 8.8, 4.3]);
+addAvgTempYear(cv_placeNovoMesto, 2001, 1, [3.4, 3.9, 9.1, 9.9, 17, 18.1, 21.7, 22.2, 13.6, 13.6, 2.7, -2.1]);
+addAvgTempYear(cv_placeNovoMesto, 2002, 1, [0.1, 5.5, 8.2, 9.6, 17.2, 20.5, 20.8, 19.9, 14, 11, 9.2, 1.5]);
+addAvgTempYear(cv_placeNovoMesto, 2003, 1, [-1.4, -2.2, 6.5, 9.9, 18.2, 23.2, 22.2, 24, 15.1, 8.4, 7.7, 1.1]);
+addAvgTempYear(cv_placeNovoMesto, 2004, 1, [-1, 1.7, 4.4, 10.6, 13.8, 18.2, 20.3, 20.1, 15, 12.7, 5.9, 1]);
+addAvgTempYear(cv_placeNovoMesto, 2005, 1, [-0.4, -1.7, 4.8, 10.9, 15.9, 19.2, 20.6, 17.8, 15.8, 11.2, 4.5, 0.5]);
+addAvgTempYear(cv_placeNovoMesto, 2006, 1, [-1.9, 0.5, 4.5, 11.5, 14.9, 19.6, 22.7, 17.6, 16.8, 12.6, 8.5, 4]);
+addAvgTempYear(cv_placeNovoMesto, 2007, 1, [4.9, 6.2, 8.1, 13.5, 16.9, 20.6, 21.5, 20, 14, 9.4, 4.4, -0.3]);
+addAvgTempYear(cv_placeNovoMesto, 2008, 1, [2.3, 4.4, 6.4, 10.9, 16.1, 20, 20.8, 20.1, 14.4, 11.8, 6.5, 2.2]);
+addAvgTempYear(cv_placeNovoMesto, 2009, 1, [-1.7, 2, 6.6, 13, 17.5, 18.7, 21.4, 21.3, 16.9, 10.8, 7.4, 2.1]);
+addAvgTempYear(cv_placeNovoMesto, 2010, 1, [-1.5, 1.1, 5.8, 11, 15.1, 19.6, 22.6, 20, 14.1, 8.7, 7.7, -1.6]);
+addAvgTempYear(cv_placeNovoMesto, 2011, 1, [1.4, 1, 6.5, 12.8, 15.6, 19.8, 20.7, 22, 18.6, 9.6, 3.5, 3.5]);
+addAvgTempYear(cv_placeNovoMesto, 2012, 1, [1.3, -2.4, 9.3, 11.4, 15.6, 21.1, 22.4, 22.7, 16.6, 11, 8.6, 0.7]);
+addAvgTempYear(cv_placeNovoMesto, 2013, 1, [0.9, 0.6, 3.4, 12.1, 14.9, 19.4, 22.8, 22, 15.3, 12.7, 6.9, 2.7]);
+addAvgTempYear(cv_placeNovoMesto, 2014, 1, [5, 4.5, 9.6, 12.7, 15.1, 19.4, 20.8, 19.3, 15.7, 13, 8.8, 3.5]);
+addAvgTempYear(cv_placeNovoMesto, 2015, 1, [2.3, 1.8, 7.2, 11.3, 16.8, 20.2, 23.8, 22, 16.5, 10.8, 7.2, 3.2]);
+addAvgTempYear(cv_placeNovoMesto, 2016, 1, [1.2, 5.7, 7, 12.3, 15.4, 19.8, 22.5, 19.8, 17.3, 9.7, 6.4, -0.2]);
+addAvgTempYear(cv_placeNovoMesto, 2017, 1, [-4, 4.4, 9.4, 11.6, 16.5, 21.4, 23.3, 22.4, 14, 10.9, 5.9, 3]);
+addAvgTempYear(cv_placeNovoMesto, 2018, 1, [4.7, -0.9, 3.9, 14.7, 17.9, 19.9, 21, 21.8, 16.7, 12.7, 7.3, 1.9]);
+addAvgTempYear(cv_placeNovoMesto, 2019, 1, [0.1, 4.3, 8.5, 11.2, 12.8, 22.9, 21.9, 22, 15.9, 12.7, 8.4, 3.6]);
+addAvgTempYear(cv_placeNovoMesto, 2020, 1, [1.5, 6.5, 7.4, 12.2, 14.8, 19.4, 21, 21.8, 16.7, 11.6, 4.9, 3]);
+addAvgTempYear(cv_placeNovoMesto, 2021, 1, [1.4, 5.1, 6.2, 8.9, 13.6, 22.5, 22.8, 20.2, 16.3, 9.4, 5.7, 2.2]);
+addAvgTempYear(cv_placeNovoMesto, 2022, 1, [1.3, 4.6, 5.7, 10, 17.5, 22.1, 23, 21.7, 15.4, 13.8, 7.1, 3.7]);
 
 //addAvgTempYear(cv_placeKoseze, 2021, 1, [-0.2, 3.9, 5.2, 7.8, 12.6, 21.7, 21.9, 19.5, 16.4, 8.9, 4.7, -0.1]);
 //addAvgTempYear(cv_placeKoseze, 2022, 1, [-0.2, 3.7, 4.9, 9.9, 16.9, 21.8, 22.9, 21.9, 14.9, 13.5, 6.8, 2.9]);
@@ -3741,7 +3826,7 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_left, vp_to
                 if (tmpW > maxWidth) { maxWidth = tmpW }
             }
             cv_heightBody = tipPlacesWithData * cv_heightSingle
-            if (maxWidth > 120) { frameWidth = maxWidth + 64 };
+            if (maxWidth > 110) { frameWidth = maxWidth + 64 };
             break;
         default:
             if (vp_place!=cv_placeSkofjaLoka) {
