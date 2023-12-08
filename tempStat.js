@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.2"
-const gl_versionDate = "6.12.2023"
+const gl_versionNr = "v0.3"
+const gl_versionDate = "7.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -73,7 +73,7 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 var avgTemp = [];
 
 const cv_placeSkofjaLoka = 1;
-addPlace(scSch + "kofja Loka", scSch + "k.Loka", scSch + "KL", "slateBlue");
+addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "slateBlue");
 const cv_placeMariborVrbanskiPlato = 2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
 addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
 const cv_placeMariborTabor = 3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
@@ -81,11 +81,23 @@ addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
 const cv_placeLjubljanaBezigrad = 4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
 addPlace("Ljubljana Bezigrad (299m)", "LJ Bezigrad", "LJBE", "limeGreen");
 const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
-addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "firebrick");
+addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
 const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
-addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "firebrick");
+addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
 const cv_placeNovoMesto = 7; // NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
-addPlace("Novo Mesto (220m)", "NM", "NM", "firebrick");
+addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
+const cv_placePostojna = 8; // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
+addPlace("Postojna (533m)", "Postojna", "PO", "goldenrod");
+//const cv_placeNovaGoricaBilje51m = 9; // NOVA GORICA BILJE (51m) (lon=13.6315, lat=45.8911, viš=51m) ... 8.12.2023
+//addPlace("Nova Gorica Bilje (51m)", "NG Bilje", "NGBI51", "darkSalmon");
+//const cv_placeNovaGoricaBilje55m = 10; // NOVA GORICA BILJE (55m) (lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
+//addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
+const cv_placeNovaGoricaBilje = 9; // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
+addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+//---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
+//genPlaceTemplate("cv_placePostojna", 1950, 2022)
+//genPlaceTemplate("cv_placeNovaGoricaBilje55m", 1991, 2022)
+genPlaceTemplate("cv_placeNovaGoricaBilje51m", 1962, 1991)
 
 //const cv_placeKoseze = 3
 //addPlace("Ljubljana Koseze", "Lj. Koseze", "LKS", "orchid");
@@ -395,15 +407,206 @@ addAvgTempYear(cv_placeNovoMesto, 2020, 1, [1.5, 6.5, 7.4, 12.2, 14.8, 19.4, 21,
 addAvgTempYear(cv_placeNovoMesto, 2021, 1, [1.4, 5.1, 6.2, 8.9, 13.6, 22.5, 22.8, 20.2, 16.3, 9.4, 5.7, 2.2]);
 addAvgTempYear(cv_placeNovoMesto, 2022, 1, [1.3, 4.6, 5.7, 10, 17.5, 22.1, 23, 21.7, 15.4, 13.8, 7.1, 3.7]);
 
-//addAvgTempYear(cv_placeKoseze, 2021, 1, [-0.2, 3.9, 5.2, 7.8, 12.6, 21.7, 21.9, 19.5, 16.4, 8.9, 4.7, -0.1]);
-//addAvgTempYear(cv_placeKoseze, 2022, 1, [-0.2, 3.7, 4.9, 9.9, 16.9, 21.8, 22.9, 21.9, 14.9, 13.5, 6.8, 2.9]);
-//addAvgTempYear(cv_placeKoseze, 2023, 1, [2.5, 1.8, 6.9, 9.6, 14.9, 19.8, 21.8, 20.7, 17.6, 13.8, 5.8]);
+//---- POSTOJNA ... https://meteo.arso.gov.si/uploads/probase/www/climate/text/sl/stations/postojna.pdf
+addAvgTempYear(cv_placePostojna, 1950, 1, [-2.8, 3.2, 5.1, 7.7, 14.1, 17.9, 20.5, 18.5, 13.9, 8.4, 5.2, 0.7]);
+addAvgTempYear(cv_placePostojna, 1951, 1, [2.7, 3.6, 3.1, 8.1, 12.2, 16.4, 17.4, 17.9, 15.7, 8.4, 7.1, 2.3]);
+addAvgTempYear(cv_placePostojna, 1952, 1, [-1.5, -2, 2.4, 10.1, 12, 16.9, 20.2, 18.2, 12.1, 9.1, 3.7, 0.6]);
+addAvgTempYear(cv_placePostojna, 1953, 1, [-3, -3, 3.7, 8.3, 11.8, 17, 18.1, 17, 13.4, 9, 3, 1.7]); //od jan-okt manjkajo podatki, nadomestil s povprečjem mesecev iz leta 1952 in 1954
+addAvgTempYear(cv_placePostojna, 1954, 1, [-4.6, -3.9, 4.9, 6.6, 11.7, 17, 16.1, 15.9, 14.7, 8.8, 5.2, 3.1]);
+addAvgTempYear(cv_placePostojna, 1955, 1, [1.1, 1.7, 0.9, 6.7, 10.9, 15.3, 17.6, 16.1, 13.7, 9, 3.4, 3.2]);
+addAvgTempYear(cv_placePostojna, 1956, 1, [1.6, -8.3, 1.2, 6.7, 12.6, 14.4, 17.8, 17.2, 14, 7.9, 1.3, -0.2]);
+addAvgTempYear(cv_placePostojna, 1957, 1, [-1.5, 3.8, 5.3, 7.5, 9.5, 17.6, 17.6, 16.1, 12.9, 9.3, 5.4, 1.6]);
+addAvgTempYear(cv_placePostojna, 1958, 1, [-1, 3.6, 0, 5.6, 15, 15.3, 18.2, 17.4, 13.9, 9.8, 5.2, 3.5]);
+addAvgTempYear(cv_placePostojna, 1959, 1, [-0.3, -1, 5.8, 8.5, 12, 15.7, 19.1, 16.4, 12.1, 7.6, 4.9, 3.5]);
+addAvgTempYear(cv_placePostojna, 1960, 1, [-0.4, 0.7, 4.1, 7.9, 12.4, 15.8, 15.7, 16.5, 12.3, 10.4, 6.5, 3]);
+addAvgTempYear(cv_placePostojna, 1961, 1, [-1.6, 3, 2.3, 7.8, 11.6, 15, 16.1, 17.8, 12.8, 10.1, 4.8, 0.3]); //od mar-dec manjkajo podatki, nadomestil s povprečjem mesecev iz leta 1952 in 1954
+addAvgTempYear(cv_placePostojna, 1962, 1, [0.8, -0.6, 0.6, 7.8, 10.8, 14.1, 16.5, 19.1, 13.3, 9.9, 3.1, -2.3]);
+addAvgTempYear(cv_placePostojna, 1963, 1, [-5.6, -4.1, 2.4, 8.5, 12.1, 15.7, 18.5, 17.1, 14.7, 8.8, 9, -2.8]);
+addAvgTempYear(cv_placePostojna, 1964, 1, [-4.3, 0, 1.7, 8.4, 12.6, 17.5, 17.8, 16.3, 13.3, 9.1, 5.2, 0.1]);
+addAvgTempYear(cv_placePostojna, 1965, 1, [0.4, -2.7, 4, 5.6, 10.5, 15.5, 16.6, 15.1, 13.5, 8.5, 3.8, 2.2]);
+addAvgTempYear(cv_placePostojna, 1966, 1, [-2.8, 5.6, 2.9, 9.5, 12.2, 16.4, 16.3, 15.9, 14.2, 12.5, 2.3, 1.1]);
+addAvgTempYear(cv_placePostojna, 1967, 1, [-2.2, 1, 5.2, 6.6, 12.9, 14.5, 19.1, 17.4, 14.3, 10.4, 5.6, -0.3]);
+addAvgTempYear(cv_placePostojna, 1968, 1, [-3.1, 2.9, 4.6, 9.5, 12.5, 15.6, 17.5, 15.6, 13.6, 10.3, 4.6, -2.6]);
+addAvgTempYear(cv_placePostojna, 1969, 1, [-0.8, -0.8, 2.4, 7.1, 13.8, 14.3, 17.9, 16.1, 14.3, 10.1, 6.9, -3.4]);
+addAvgTempYear(cv_placePostojna, 1970, 1, [0.3, 0.1, 1.2, 6.2, 10.1, 16.2, 17.1, 17.2, 14.2, 8.5, 6.5, -0.8]);
+addAvgTempYear(cv_placePostojna, 1971, 1, [0, 1.4, 0.9, 9, 13, 14.6, 18.5, 18.7, 11.7, 7.7, 3.6, 0.1]);
+addAvgTempYear(cv_placePostojna, 1972, 1, [-2.4, 2.4, 6.4, 8, 11.4, 15.7, 18, 16.5, 10.4, 7.9, 4.9, 0.2]);
+addAvgTempYear(cv_placePostojna, 1973, 1, [-0.5, 0.6, 3.1, 5.8, 13, 16, 17.5, 17.8, 14.7, 8.3, 3.3, 0.4]);
+addAvgTempYear(cv_placePostojna, 1974, 1, [1.4, 4.2, 5.3, 7.3, 11.2, 13.7, 17.3, 18.6, 13.9, 4.9, 5, 2.1]);
+addAvgTempYear(cv_placePostojna, 1975, 1, [3.1, 0.9, 4, 8.1, 13.4, 14.7, 18, 16.9, 16.1, 8.5, 3.9, 0.4]);
+addAvgTempYear(cv_placePostojna, 1976, 1, [-0.1, -0.6, 0.8, 7.1, 13, 16.2, 18.2, 14.1, 12.4, 9.6, 5.9, 0]);
+addAvgTempYear(cv_placePostojna, 1977, 1, [2.2, 3.9, 6.4, 6.4, 11.6, 15.6, 17, 16.2, 11.5, 10.8, 4.5, -0.8]);
+addAvgTempYear(cv_placePostojna, 1978, 1, [0, -0.4, 4.8, 6.3, 10.4, 14.8, 16.2, 15.5, 12.5, 9.2, 1.8, 0.5]);
+addAvgTempYear(cv_placePostojna, 1979, 1, [-1.8, 1.1, 5.2, 6.5, 12.9, 17.8, 16.9, 15.6, 13.3, 8.7, 4.5, 2.3]);
+addAvgTempYear(cv_placePostojna, 1980, 1, [-2.1, 2.4, 3.6, 5.6, 10.2, 14.2, 16.2, 17.4, 13.7, 9.4, 2.4, -2]);
+addAvgTempYear(cv_placePostojna, 1981, 1, [-2.9, -1.2, 5.7, 8.2, 11.5, 15.8, 16.9, 16.8, 14.2, 11.1, 3.2, 0.5]);
+addAvgTempYear(cv_placePostojna, 1982, 1, [-1.3, -1.4, 2.9, 6.2, 12.9, 16.8, 19, 17.4, 16.4, 10, 5.8, 2.7]);
+addAvgTempYear(cv_placePostojna, 1983, 1, [1, -2.3, 4.4, 8.8, 12.6, 16, 20.6, 17.6, 14, 9.4, 2.4, 0.7]);
+addAvgTempYear(cv_placePostojna, 1984, 1, [-0.8, -0.9, 2.7, 7, 10.1, 14.7, 16.7, 16.3, 12.8, 10.6, 5.2, 0.9]);
+addAvgTempYear(cv_placePostojna, 1985, 1, [-4.7, -2, 3, 7.1, 12.8, 14.5, 19.2, 18, 14.6, 8.9, 2, 3.8]);
+addAvgTempYear(cv_placePostojna, 1986, 1, [-0.8, -4, 2.1, 7.7, 14.7, 15.3, 17.4, 17.8, 12.8, 9.4, 5.6, -0.7]);
+addAvgTempYear(cv_placePostojna, 1987, 1, [-3.6, 0.5, -0.4, 8.5, 10.9, 15.3, 18.9, 16.5, 16.6, 10.5, 4.6, 0.9]);
+addAvgTempYear(cv_placePostojna, 1988, 1, [3.8, 1.9, 3.2, 7.9, 13.2, 14.9, 19.5, 18.2, 13.2, 10.4, 1.4, 1.1]);
+addAvgTempYear(cv_placePostojna, 1989, 1, [0.2, 3, 6.1, 8.5, 12.3, 14.2, 17.8, 17.2, 13.6, 8.6, 3.5, 2.5]);
+addAvgTempYear(cv_placePostojna, 1990, 1, [0.2, 4.9, 6.5, 6.9, 13, 15.1, 17.6, 17.3, 12.4, 10.4, 5.1, -0.1]);
+addAvgTempYear(cv_placePostojna, 1991, 1, [0.2, -1.5, 6.3, 6.9, 9.3, 15.5, 19.5, 18.5, 15.4, 7.9, 4.6, -1.7]);
+addAvgTempYear(cv_placePostojna, 1992, 1, [0.3, 1.6, 4.1, 8.4, 13.9, 16.1, 18.4, 20, 13.5, 8.9, 6.6, 0.5]);
+addAvgTempYear(cv_placePostojna, 1993, 1, [0.4, -0.2, 2.6, 7.9, 14.3, 16.6, 17.1, 18.6, 12.9, 10.2, 1.5, 2.4]);
+addAvgTempYear(cv_placePostojna, 1994, 1, [2.7, 1.2, 7.9, 7.9, 12.7, 16.3, 20.3, 19.5, 15, 8.3, 7, 2.1]);
+addAvgTempYear(cv_placePostojna, 1995, 1, [0.1, 3.7, 2.7, 7.9, 12.3, 14.3, 20.2, 17.1, 12.2, 11.1, 4.1, 0.4]);
+addAvgTempYear(cv_placePostojna, 1996, 1, [-1.1, -1.6, 1.6, 8, 13.3, 16.7, 16.8, 17.1, 10.8, 9.2, 6.1, -1.2]);
+addAvgTempYear(cv_placePostojna, 1997, 1, [-0.7, 3, 5.6, 5.3, 13.4, 16.6, 17.1, 17.8, 14.6, 8.2, 5, 2.3]);
+addAvgTempYear(cv_placePostojna, 1998, 1, [2.7, 4.1, 3.6, 8.7, 13.2, 17.5, 19.2, 19.5, 13.6, 9.8, 2.3, -3.1]);
+addAvgTempYear(cv_placePostojna, 1999, 1, [0.8, -0.3, 5.8, 8.6, 14.2, 16.8, 18.7, 18.2, 15.7, 9.7, 2.1, 0.9]);
+addAvgTempYear(cv_placePostojna, 2000, 1, [-2, 2.7, 5.1, 10.4, 14.2, 17.8, 16.9, 19.1, 14.2, 11.8, 7.6, 4.3]);
+addAvgTempYear(cv_placePostojna, 2001, 1, [2.5, 2.8, 7.3, 7.4, 15.4, 15.9, 18.9, 20.1, 11.6, 12.8, 3.3, -2.1]);
+addAvgTempYear(cv_placePostojna, 2002, 1, [-0.1, 3.7, 7.1, 7.9, 13.7, 18.3, 19.1, 17.8, 12.7, 10.2, 8.8, 1.4]);
+addAvgTempYear(cv_placePostojna, 2003, 1, [-1, -2.4, 5, 7.8, 15.1, 20.6, 20.2, 21.6, 13.1, 7.7, 7, 1.7]);
+addAvgTempYear(cv_placePostojna, 2004, 1, [-1.3, 0.5, 3, 8.5, 11.5, 16.5, 18.4, 18.3, 14.2, 12, 5.2, 1]);
+addAvgTempYear(cv_placePostojna, 2005, 1, [-0.7, -1.8, 3.3, 8, 14.3, 17.9, 19.6, 16.8, 14.6, 10.5, 4.2, -0.3]);
+addAvgTempYear(cv_placePostojna, 2006, 1, [-2.1, -0.4, 2.8, 9.1, 13.4, 18.2, 22.4, 15.9, 15.9, 12.5, 7.3, 3.7]);
+addAvgTempYear(cv_placePostojna, 2007, 1, [3.7, 4.9, 6.8, 12.2, 15, 18.6, 19.4, 18.2, 12.5, 8.6, 3.9, -0.2]);
+addAvgTempYear(cv_placePostojna, 2008, 1, [3, 2.6, 4, 8.3, 14.4, 18.3, 19.4, 18.9, 13.2, 10.9, 5.8, 1.4]);
+addAvgTempYear(cv_placePostojna, 2009, 1, [-1.3, 1.2, 4.7, 10.8, 15.8, 17.1, 19.4, 20.4, 16.4, 9.8, 7.2, 1.8]);
+addAvgTempYear(cv_placePostojna, 2010, 1, [-2.3, 0.7, 3.9, 9.4, 12.8, 17.7, 20.4, 18, 13.3, 8.6, 6.9, 0]);
+addAvgTempYear(cv_placePostojna, 2011, 1, [0.8, 0.3, 4.9, 10.5, 14.5, 17.9, 18.7, 20.2, 17.5, 8.9, 3.9, 3.1]);
+addAvgTempYear(cv_placePostojna, 2012, 1, [0.3, -2.8, 7.8, 9.1, 13.5, 19, 20.9, 21.4, 15.5, 11, 7.9, 0.7]);
+addAvgTempYear(cv_placePostojna, 2013, 1, [1.1, 0, 3.1, 9.9, 12.6, 17.2, 21.2, 20.1, 14.5, 11.5, 6.5, 3.2]);
+addAvgTempYear(cv_placePostojna, 2014, 1, [4.7, 3.9, 7.6, 10.9, 13, 17.8, 18.5, 17.8, 14.6, 12.2, 8.4, 3.3]);
+addAvgTempYear(cv_placePostojna, 2015, 1, [2.6, 1.2, 5.7, 9.1, 14.7, 18.5, 22, 20, 14.9, 10.1, 6.2, 3.5]);
+addAvgTempYear(cv_placePostojna, 2016, 1, [1.3, 4.3, 5.3, 10, 12.7, 17.7, 20.9, 18.9, 16.3, 9.2, 6.6, 0.5]);
+addAvgTempYear(cv_placePostojna, 2017, 1, [-3.2, 3.7, 8, 9.4, 14.2, 19.3, 20.5, 20.5, 12.7, 10.3, 5.5, 1.6]);
+addAvgTempYear(cv_placePostojna, 2018, 1, [4.2, -1.8, 3.1, 12.3, 15.9, 18.3, 20, 20.7, 15.6, 12.6, 7.2, 1.8]);
+addAvgTempYear(cv_placePostojna, 2019, 1, [-0.2, 4.2, 7, 9.6, 10.4, 21, 20.4, 20.4, 15.1, 11.4, 7.9, 4]);
+addAvgTempYear(cv_placePostojna, 2020, 1, [2.7, 5.2, 5.4, 10.3, 13.1, 17, 19.5, 19.8, 15.7, 10.2, 5.6, 3.4]);
+addAvgTempYear(cv_placePostojna, 2021, 1, [0.9, 5.3, 4.5, 6.7, 11.7, 20, 20.5, 18.7, 15.6, 8.9, 5.7, 1.8]);
+addAvgTempYear(cv_placePostojna, 2022, 1, [1.1, 3.5, 4.3, 8.4, 15.7, 21.1, 22.5, 20.8, 14.1, 13.2, 6.9, 4]);
 
-//addAvgTempYear(cv_placeKoper, 2007, 10, [8.9, 4.7, -0.1]);
-//addAvgTempYear(cv_placeKoper, 2008, 1, [-0.2, 3.7, 4.9, 9.9, 16.9, 21.8, 22.9, 21.9, 14.9, 13.5, 6.8, 2.9]);
-//addAvgTempYear(cv_placeKoper, 2009, 1, [-0.2, 3.7, 4.9, 9.9, 16.9, 21.8, 22.9, 21.9, 14.9, 13.5, 6.8, 2.9]);
-//addAvgTempYear(cv_placeKoper, 2010, 1, [-0.2, 3.7, 4.9, 9.9, 16.9, 21.8, 22.9, 21.9, 14.9, 13.5, 6.8, 2.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1962, 4, [11.4, 14.9, 18.4, 20.4, 23.8, 17.9, 13, 7.9, 1.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1963, 1, [-0.4, 0.9, 5.1, 11.1, 16.5, 19.3, 22.3, 21.2, 17.7, 12.4, 11.1, 2.3]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1964, 1, [0.8, 3.1, 6, 11.2, 16.4, 21.7, 22.2, 20.2, 16.4, 12.6, 8.2, 4.6]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1965, 1, [4.9, 2.2, 7.4, 10.1, 14.9, 19.4, 20.4, 19.4, 16.4, 11.1, 8.3, 5.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1966, 1, [1, 7, 7.1, 12.7, 16.9, 21, 20.8, 20.5, 17.3, 15.9, 7, 4.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1967, 1, [2.3, 4.2, 8.9, 10.6, 17, 18.5, 23.5, 21.6, 17.3, 13.2, 9.3, 3.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1968, 1, [2, 6.6, 8.2, 13.1, 16.2, 19.9, 21.5, 19.4, 16.8, 13.1, 9, 2.3]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1969, 1, [3.7, 3.6, 7.1, 10.8, 17.9, 18.8, 21.8, 20, 17, 12.6, 9.3, 2.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1970, 1, [4.2, 3, 6.7, 10.6, 14.2, 20.3, 21.1, 20.4, 17.4, 11.5, 8.9, 3.4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1971, 1, [4.8, 4.7, 4.8, 12.1, 16.9, 18.6, 22, 22.7, 14.4, 10.7, 7.8, 2.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1972, 1, [3.4, 6.4, 9.3, 11.4, 14.7, 20.2, 22.2, 20.2, 14.2, 11, 7.7, 4.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1973, 1, [4.3, 4.3, 6.9, 9.9, 16.4, 19.9, 21.5, 22, 18.4, 11.6, 6.1, 3.3]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1974, 1, [5.1, 7.1, 8.7, 10.7, 14.6, 18, 22.3, 22.1, 17.3, 8.6, 7.9, 4.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1975, 1, [4.7, 5.1, 8.4, 11.4, 17.2, 18.6, 21.6, 20.3, 18.6, 11.5, 7.3, 4.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1976, 1, [2.4, 4.9, 6.2, 11, 15.6, 19.7, 21.8, 17.5, 15.6, 13.3, 9.8, 4.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1977, 1, [5.4, 6.8, 9.2, 10.2, 15.6, 19.8, 20.5, 19.9, 14.3, 12.6, 8, 3.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1978, 1, [4.2, 4.1, 8.1, 10.7, 13.3, 18.6, 20, 19.1, 15.4, 11.6, 5.8, 3.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1979, 1, [1.8, 5.4, 8.6, 9.9, 15.5, 21.2, 20.9, 19.1, 17, 12.4, 7, 4.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1980, 1, [2.3, 5.1, 7.2, 9.1, 13.8, 18.1, 19.7, 21.4, 16.5, 11.4, 5.9, 1.4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1981, 1, [0.1, 2.4, 8.1, 11.2, 14.4, 19.6, 20.3, 20.3, 17.6, 13.4, 4.5, 3.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1982, 1, [1.7, 1.7, 6.5, 10.5, 16.2, 20.4, 22.8, 21.5, 19.1, 13.1, 8.8, 3.3]); //za dec manjka podatek, nadomestil s povprečjem dec'81 in dec'83
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1983, 1, [1.7, 0.6, 6.8, 11.7, 15.5, 19, 22.5, 19.8, 16.6, 11.4, 4.8, 3.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1984, 1, [2, 3.3, 6.1, 10.4, 13.1, 17.5, 19.6, 19.2, 15.8, 13, 8.3, 4.6]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1985, 1, [-0.5, 0.4, 6.7, 10, 16, 17.9, 22, 20.2, 16.8, 12, 5.8, 5.3]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1986, 1, [2.4, 1.5, 6.6, 11.1, 18, 19.1, 21.2, 21.5, 16.1, 12, 7.9, 1.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1987, 1, [0.9, 3.9, 3, 11.3, 14.1, 18.1, 22.6, 20.3, 19.7, 13.7, 7.5, 4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1988, 1, [6, 5, 6, 11.4, 17.1, 18.6, 22.6, 21.6, 16.1, 13.6, 4.2, 2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1989, 1, [1.7, 5.1, 8.6, 11.9, 16.1, 17.9, 21.6, 20.3, 16.6, 10.4, 6, 4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1990, 1, [1.3, 5.8, 8.8, 10.4, 16.9, 18.7, 21.4, 20.6, 15.9, 13.2, 7.7, 3.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje51m, 1991, 1, [3.2, 1.8, 9.8]);
+//----
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1991, 4, [10.5, 12.8, 18.6, 23, 21.9, 19, 11.1, 7.3, 0.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1992, 1, [3.3, 3.6, 7.4, 11.9, 18, 19.3, 22, 23.6, 16.8, 12, 8.6, 4.6]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1993, 1, [2.8, 2.8, 6.2, 11.6, 18.2, 20.5, 21, 22.7, 16.6, 13.6, 6.6, 5.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1994, 1, [5.3, 4.3, 10.3, 11.6, 16.1, 20.3, 24.7, 23.4, 18.1, 11.7, 9.8, 4.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1995, 1, [3, 5.6, 6.8, 10.9, 15.9, 18.3, 24.1, 20.7, 15.6, 13, 6.9, 4.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1996, 1, [4, 2.5, 5.9, 11.9, 16.7, 20.7, 20.6, 20.9, 14.6, 12.7, 9.3, 3.7]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1997, 1, [5, 4.9, 9, 9.3, 17.1, 20.2, 20.8, 21.6, 18.1, 11.9, 8.4, 5.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1998, 1, [4.6, 6.1, 6.6, 11.5, 17.2, 20.8, 22.7, 23.4, 16.8, 12.4, 6.4, 1.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 1999, 1, [3.3, 2.5, 8.4, 12.2, 17.6, 20.3, 22.8, 22.2, 19.2, 13.7, 6.6, 3.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2000, 1, [0.6, 4.3, 7.8, 13.4, 17.4, 21.8, 20.3, 22.8, 17.6, 14.6, 10.5, 6.7]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2001, 1, [5.9, 5.8, 10.1, 11, 18.8, 19.3, 22.4, 23.8, 15.3, 15, 6.6, 1.6]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2002, 1, [1.5, 5.7, 10, 12.3, 17, 22, 22.7, 21.1, 16.4, 13.1, 11.2, 6.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2003, 1, [2.6, 1.8, 8, 11.1, 18.8, 24.5, 24.2, 25.7, 16.8, 11, 9.9, 4.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2004, 1, [2, 3.5, 7.4, 12.3, 14.7, 20.4, 22.5, 22, 18.1, 14.8, 7.8, 4.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2005, 1, [1.9, 2.3, 6.6, 11.3, 17.3, 21.3, 22.4, 20.1, 17.8, 13.3, 7.4, 2.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2006, 1, [1.7, 3.4, 6.4, 12.1, 16.2, 21.2, 25.4, 19.1, 18.9, 15, 9.1, 5.9]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2007, 1, [6.1, 6.9, 10.3, 15, 18.5, 21.8, 22.9, 21.6, 15.7, 12.1, 6.9, 3.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2008, 1, [5.3, 4.9, 7.7, 11.7, 17.6, 21.2, 22.5, 22.3, 16.5, 13.4, 8.5, 4.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2009, 1, [3.6, 3.8, 7.8, 14, 18.7, 20.5, 22.7, 23.8, 19.5, 12.5, 9.6, 4.4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2010, 1, [2, 4.5, 7.1, 12.4, 16, 20.7, 23.5, 21.1, 16.7, 11.9, 9.5, 2.5]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2011, 1, [3.1, 4.7, 8.2, 13.6, 18.3, 21.3, 21.9, 23.4, 20.7, 11.9, 7.6, 5.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2012, 1, [2, 1.4, 10.5, 12.1, 16.9, 22.1, 24.6, 24.5, 19.3, 13.5, 10.3, 2.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2013, 1, [4.1, 3.8, 6.7, 13.2, 15.6, 20.4, 24.8, 23.2, 18, 14.4, 9.8, 5.4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2014, 1, [7.8, 7.9, 10.7, 13.7, 15.9, 20.9, 21.2, 20.7, 17.4, 14.8, 11.4, 6.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2015, 1, [4.6, 5.1, 9.2, 11.8, 17.6, 21.5, 25.4, 23, 18.4, 13.1, 7.9, 4.7]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2016, 1, [3.1, 7.3, 9, 12.8, 15.8, 20.9, 23.9, 22.5, 19.8, 12, 9.2, 2.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2017, 1, [0.6, 6.3, 10.1, 12.6, 17.4, 22.4, 23.3, 24, 16.3, 12.4, 8.2, 3.4]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2018, 1, [5.7, 2.8, 7, 15.2, 19.1, 21.7, 23.3, 23.8, 19.1, 15.1, 10.7, 3.8]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2019, 1, [2, 5.9, 9.2, 12.7, 14.2, 24.3, 24, 24.3, 18.4, 14.1, 10.7, 6.3]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2020, 1, [3.7, 6.8, 8.5, 13.3, 17.1, 20.3, 23, 23.2, 19, 12.6, 8.1, 6.2]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2021, 1, [3.7, 6.6, 7, 10.4, 15, 22.8, 24.2, 22.6, 19, 11.7, 9.4, 4.1]);
+//addAvgTempYear(cv_placeNovaGoricaBilje55m, 2022, 1, [2.8, 5.5, 7, 11.5, 19.1, 24.2, 26.5, 24.4, 17.9, 15.6, 9.6, 6.9]);
 
+addAvgTempYear(cv_placeNovaGoricaBilje, 1962, 4, [11.4, 14.9, 18.4, 20.4, 23.8, 17.9, 13, 7.9, 1.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1963, 1, [-0.4, 0.9, 5.1, 11.1, 16.5, 19.3, 22.3, 21.2, 17.7, 12.4, 11.1, 2.3]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1964, 1, [0.8, 3.1, 6, 11.2, 16.4, 21.7, 22.2, 20.2, 16.4, 12.6, 8.2, 4.6]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1965, 1, [4.9, 2.2, 7.4, 10.1, 14.9, 19.4, 20.4, 19.4, 16.4, 11.1, 8.3, 5.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1966, 1, [1, 7, 7.1, 12.7, 16.9, 21, 20.8, 20.5, 17.3, 15.9, 7, 4.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1967, 1, [2.3, 4.2, 8.9, 10.6, 17, 18.5, 23.5, 21.6, 17.3, 13.2, 9.3, 3.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1968, 1, [2, 6.6, 8.2, 13.1, 16.2, 19.9, 21.5, 19.4, 16.8, 13.1, 9, 2.3]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1969, 1, [3.7, 3.6, 7.1, 10.8, 17.9, 18.8, 21.8, 20, 17, 12.6, 9.3, 2.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1970, 1, [4.2, 3, 6.7, 10.6, 14.2, 20.3, 21.1, 20.4, 17.4, 11.5, 8.9, 3.4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1971, 1, [4.8, 4.7, 4.8, 12.1, 16.9, 18.6, 22, 22.7, 14.4, 10.7, 7.8, 2.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1972, 1, [3.4, 6.4, 9.3, 11.4, 14.7, 20.2, 22.2, 20.2, 14.2, 11, 7.7, 4.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1973, 1, [4.3, 4.3, 6.9, 9.9, 16.4, 19.9, 21.5, 22, 18.4, 11.6, 6.1, 3.3]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1974, 1, [5.1, 7.1, 8.7, 10.7, 14.6, 18, 22.3, 22.1, 17.3, 8.6, 7.9, 4.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1975, 1, [4.7, 5.1, 8.4, 11.4, 17.2, 18.6, 21.6, 20.3, 18.6, 11.5, 7.3, 4.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1976, 1, [2.4, 4.9, 6.2, 11, 15.6, 19.7, 21.8, 17.5, 15.6, 13.3, 9.8, 4.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1977, 1, [5.4, 6.8, 9.2, 10.2, 15.6, 19.8, 20.5, 19.9, 14.3, 12.6, 8, 3.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1978, 1, [4.2, 4.1, 8.1, 10.7, 13.3, 18.6, 20, 19.1, 15.4, 11.6, 5.8, 3.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1979, 1, [1.8, 5.4, 8.6, 9.9, 15.5, 21.2, 20.9, 19.1, 17, 12.4, 7, 4.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1980, 1, [2.3, 5.1, 7.2, 9.1, 13.8, 18.1, 19.7, 21.4, 16.5, 11.4, 5.9, 1.4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1981, 1, [0.1, 2.4, 8.1, 11.2, 14.4, 19.6, 20.3, 20.3, 17.6, 13.4, 4.5, 3.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1982, 1, [1.7, 1.7, 6.5, 10.5, 16.2, 20.4, 22.8, 21.5, 19.1, 13.1, 8.8, 3.3]); //za dec manjka podatek, nadomestil s povprečjem dec'81 in dec'83
+addAvgTempYear(cv_placeNovaGoricaBilje, 1983, 1, [1.7, 0.6, 6.8, 11.7, 15.5, 19, 22.5, 19.8, 16.6, 11.4, 4.8, 3.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1984, 1, [2, 3.3, 6.1, 10.4, 13.1, 17.5, 19.6, 19.2, 15.8, 13, 8.3, 4.6]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1985, 1, [-0.5, 0.4, 6.7, 10, 16, 17.9, 22, 20.2, 16.8, 12, 5.8, 5.3]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1986, 1, [2.4, 1.5, 6.6, 11.1, 18, 19.1, 21.2, 21.5, 16.1, 12, 7.9, 1.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1987, 1, [0.9, 3.9, 3, 11.3, 14.1, 18.1, 22.6, 20.3, 19.7, 13.7, 7.5, 4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1988, 1, [6, 5, 6, 11.4, 17.1, 18.6, 22.6, 21.6, 16.1, 13.6, 4.2, 2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1989, 1, [1.7, 5.1, 8.6, 11.9, 16.1, 17.9, 21.6, 20.3, 16.6, 10.4, 6, 4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1990, 1, [1.3, 5.8, 8.8, 10.4, 16.9, 18.7, 21.4, 20.6, 15.9, 13.2, 7.7, 3.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1991, 1, [3.2, 1.8, 9.8, 10.5, 12.8, 18.6, 23, 21.9, 19, 11.1, 7.3, 0.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1992, 1, [3.3, 3.6, 7.4, 11.9, 18, 19.3, 22, 23.6, 16.8, 12, 8.6, 4.6]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1993, 1, [2.8, 2.8, 6.2, 11.6, 18.2, 20.5, 21, 22.7, 16.6, 13.6, 6.6, 5.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1994, 1, [5.3, 4.3, 10.3, 11.6, 16.1, 20.3, 24.7, 23.4, 18.1, 11.7, 9.8, 4.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1995, 1, [3, 5.6, 6.8, 10.9, 15.9, 18.3, 24.1, 20.7, 15.6, 13, 6.9, 4.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1996, 1, [4, 2.5, 5.9, 11.9, 16.7, 20.7, 20.6, 20.9, 14.6, 12.7, 9.3, 3.7]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1997, 1, [5, 4.9, 9, 9.3, 17.1, 20.2, 20.8, 21.6, 18.1, 11.9, 8.4, 5.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1998, 1, [4.6, 6.1, 6.6, 11.5, 17.2, 20.8, 22.7, 23.4, 16.8, 12.4, 6.4, 1.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 1999, 1, [3.3, 2.5, 8.4, 12.2, 17.6, 20.3, 22.8, 22.2, 19.2, 13.7, 6.6, 3.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2000, 1, [0.6, 4.3, 7.8, 13.4, 17.4, 21.8, 20.3, 22.8, 17.6, 14.6, 10.5, 6.7]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2001, 1, [5.9, 5.8, 10.1, 11, 18.8, 19.3, 22.4, 23.8, 15.3, 15, 6.6, 1.6]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2002, 1, [1.5, 5.7, 10, 12.3, 17, 22, 22.7, 21.1, 16.4, 13.1, 11.2, 6.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2003, 1, [2.6, 1.8, 8, 11.1, 18.8, 24.5, 24.2, 25.7, 16.8, 11, 9.9, 4.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2004, 1, [2, 3.5, 7.4, 12.3, 14.7, 20.4, 22.5, 22, 18.1, 14.8, 7.8, 4.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2005, 1, [1.9, 2.3, 6.6, 11.3, 17.3, 21.3, 22.4, 20.1, 17.8, 13.3, 7.4, 2.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2006, 1, [1.7, 3.4, 6.4, 12.1, 16.2, 21.2, 25.4, 19.1, 18.9, 15, 9.1, 5.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2007, 1, [6.1, 6.9, 10.3, 15, 18.5, 21.8, 22.9, 21.6, 15.7, 12.1, 6.9, 3.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2008, 1, [5.3, 4.9, 7.7, 11.7, 17.6, 21.2, 22.5, 22.3, 16.5, 13.4, 8.5, 4.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2009, 1, [3.6, 3.8, 7.8, 14, 18.7, 20.5, 22.7, 23.8, 19.5, 12.5, 9.6, 4.4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2010, 1, [2, 4.5, 7.1, 12.4, 16, 20.7, 23.5, 21.1, 16.7, 11.9, 9.5, 2.5]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2011, 1, [3.1, 4.7, 8.2, 13.6, 18.3, 21.3, 21.9, 23.4, 20.7, 11.9, 7.6, 5.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2012, 1, [2, 1.4, 10.5, 12.1, 16.9, 22.1, 24.6, 24.5, 19.3, 13.5, 10.3, 2.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2013, 1, [4.1, 3.8, 6.7, 13.2, 15.6, 20.4, 24.8, 23.2, 18, 14.4, 9.8, 5.4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2014, 1, [7.8, 7.9, 10.7, 13.7, 15.9, 20.9, 21.2, 20.7, 17.4, 14.8, 11.4, 6.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2015, 1, [4.6, 5.1, 9.2, 11.8, 17.6, 21.5, 25.4, 23, 18.4, 13.1, 7.9, 4.7]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2016, 1, [3.1, 7.3, 9, 12.8, 15.8, 20.9, 23.9, 22.5, 19.8, 12, 9.2, 2.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2017, 1, [0.6, 6.3, 10.1, 12.6, 17.4, 22.4, 23.3, 24, 16.3, 12.4, 8.2, 3.4]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2018, 1, [5.7, 2.8, 7, 15.2, 19.1, 21.7, 23.3, 23.8, 19.1, 15.1, 10.7, 3.8]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2019, 1, [2, 5.9, 9.2, 12.7, 14.2, 24.3, 24, 24.3, 18.4, 14.1, 10.7, 6.3]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2020, 1, [3.7, 6.8, 8.5, 13.3, 17.1, 20.3, 23, 23.2, 19, 12.6, 8.1, 6.2]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2021, 1, [3.7, 6.6, 7, 10.4, 15, 22.8, 24.2, 22.6, 19, 11.7, 9.4, 4.1]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2022, 1, [2.8, 5.5, 7, 11.5, 19.1, 24.2, 26.5, 24.4, 17.9, 15.6, 9.6, 6.9]);
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
@@ -520,11 +723,12 @@ function monthYearAfterMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
     if ((12 * vp_year + vp_month) > (12 * vp_yearRef + vp_monthRef)) { return true } else { return false };
 }
 
-const cv_mode_vaccExcessDeath = 1;
-const cv_mode_vaccExcessDeathMulti = 2;
-const cv_mode_timeAvgTempSingle = 3;
-const cv_mode_timeAvgTempMulti = 4;
-const cv_maxMode = 4;
+const cv_mode_timeAvgTempSingle = 1;
+const cv_mode_timeAvgTempMulti = 2;
+const cv_mode_vaccExcessDeath = 3;
+const cv_mode_vaccExcessDeathMulti = 4;
+
+const cv_maxMode = 2;
 var gl_mode = cv_mode_timeAvgTempSingle;
 var gl_sameScaleY = false; //24.10.2023
 var gl_showExactValuesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
@@ -3176,7 +3380,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
 
     //---- risanje koordinatnih osi
     gLine(cv_graphLeft, cv_graphBottom, cv_graphLeft, cv_graphTopAxis, 2, "gray", [])
-    gLine(cv_graphLeft, cv_graphY0, cv_graphRight, cv_graphY0, 2, "gray", [])
+    let yOsX = cv_graphY0; //7.12.2023 na tem Y bo risana X os in oznake na njej
+    if (yOsX > cv_graphBottom) { yOsX = cv_graphBottom };
+    gLine(cv_graphLeft, yOsX, cv_graphRight, yOsX, 2, "gray", [])
     
     //---- nastavitev globalnih spremenljivk za pozicije in dimenzije multi-place ter all-place grafov
     switch (vp_place) {
@@ -3310,7 +3516,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             for (tmpMonth = vl_monthStart; tmpMonth <= gl_monthEnd; tmpMonth++) {
                 x = cv_graphLeftData + kx * (tmpMonth - vl_monthStart);
                 if (x >= cv_graphLeftData && x <= cv_graphRightData) {
-                    gLine(x, cv_graphY0 - 2, x, cv_graphY0 + 2, 1, "darkSlateGray", []) //---- vertikalna črtica na X osi za vsak mesec
+                    gLine(x, yOsX - 2, x, yOsX + 2, 1, "darkSlateGray", []) //---- vertikalna črtica na X osi za vsak mesec
                     tmpStr = ""
                     if (kx < 4) { //---- pri najbolj zgoščenem izpisu skrajšana dvomestna letnica in pa vertikalna pregrada med leti pri prehodu v januar
                         if (lf_monthValue(tmpMonth) == 1 && tmpMonth != vl_monthStart) {
@@ -3335,7 +3541,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     else if (kx < 60) { tmpStr = lf_monthStrMMYY(tmpMonth); }  //---- pri še manj "11/23"
                     else { tmpStr = lf_monthStrMY(tmpMonth); }                 //---- sicer "nov/2023"
                     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    gText(tmpStr, font, "dimGray", x - tmpW / 2, cv_graphY0 + 13);
+                    gText(tmpStr, font, "dimGray", x - tmpW / 2, yOsX + 13);
                 }
                 vl_xOld = x;
             }
@@ -3346,13 +3552,13 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     tmpStr = "Time";
                     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                     x = cv_graphRight - tmpW + 10
-                    y = cv_graphY0 + 15;
+                    y = yOsX + 15;
                     break;
                 default:
                     tmpStr = "t";
                     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                     x = cv_graphRight - tmpW - 2;
-                    y = cv_graphY0 + 14;
+                    y = yOsX + 14;
                     break;
             }
             ctx.beginPath; ctx.rect(x - 1, y - tmpH - 1, tmpW + 2, tmpH + 2); ctx.closePath; ctx.fillStyle = bckgColor; ctx.fill();
@@ -3498,7 +3704,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             if (lo_nrMonthsAvg > 0 && gl_showExactLinesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
-                gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(64, placeColor[place]), []);
+                gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(80, placeColor[place]), []);
                 vl_xOldExact = x; vl_yOldExact = y;
             }
             //---- zdaj pa še osnovno zahtevano povezovanje vrednosti            
@@ -3540,7 +3746,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             if (lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
-                gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(64, placeColor[place]), 0, "");
+                gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
             }
             //---- zdaj pa še osnovno zahtevano označevanje vrednosti
             yValue = lf_getAvgValue(place, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
@@ -3829,12 +4035,12 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_left, vp_to
             if (maxWidth > 110) { frameWidth = maxWidth + 64 };
             break;
         default:
-            if (vp_place!=cv_placeSkofjaLoka) {
-                frameWidth = basicFrameWidth - 20;
-                if (vp_place!=cv_lie && vp_place!=cv_lux && vp_place!=cv_ned && vp_place!=cv_swi) {
-                    frameWidth = basicFrameWidth - 45;
-                };
-            };
+            //if (vp_place!=cv_placeSkofjaLoka) {
+            //    frameWidth = basicFrameWidth - 20;
+            //    if (vp_place!=cv_lie && vp_place!=cv_lux && vp_place!=cv_ned && vp_place!=cv_swi) {
+            //        frameWidth = basicFrameWidth - 45;
+            //    };
+            //};
             cv_heightBody = cv_heightSingle
             //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
             //if (lo_tipMonth <= offsetPlaceMonths) { cv_heightBody = 0 }
@@ -5184,5 +5390,11 @@ function cookie_set(cname, cvalue, exdays) {
     }
 }
   
-
+function genPlaceTemplate(name, start, end) {
+    //primer: addAvgTempYear(cv_placePostojna, 1950, 1, []);
+    let year
+    for (year = start; year <= end; year++) {
+        console.log("addAvgTempYear(" + name + ", " + year.toString() + ", 1, []);");
+    }
+}
 
