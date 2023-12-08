@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.3"
-const gl_versionDate = "7.12.2023"
+const gl_versionNr = "v0.4"
+const gl_versionDate = "8.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -73,7 +73,7 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 var avgTemp = [];
 
 const cv_placeSkofjaLoka = 1;
-addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "slateBlue");
+addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
 const cv_placeMariborVrbanskiPlato = 2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
 addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
 const cv_placeMariborTabor = 3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
@@ -94,10 +94,14 @@ addPlace("Postojna (533m)", "Postojna", "PO", "goldenrod");
 //addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
 const cv_placeNovaGoricaBilje = 9; // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
 addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+const cv_placeKredarica = 10; // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
+addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
+
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
 //genPlaceTemplate("cv_placeNovaGoricaBilje55m", 1991, 2022)
-genPlaceTemplate("cv_placeNovaGoricaBilje51m", 1962, 1991)
+//genPlaceTemplate("cv_placeNovaGoricaBilje51m", 1962, 1991)
+//genPlaceTemplate("cv_placeKredarica", 1955, 2022)
 
 //const cv_placeKoseze = 3
 //addPlace("Ljubljana Koseze", "Lj. Koseze", "LKS", "orchid");
@@ -607,6 +611,75 @@ addAvgTempYear(cv_placeNovaGoricaBilje, 2019, 1, [2, 5.9, 9.2, 12.7, 14.2, 24.3,
 addAvgTempYear(cv_placeNovaGoricaBilje, 2020, 1, [3.7, 6.8, 8.5, 13.3, 17.1, 20.3, 23, 23.2, 19, 12.6, 8.1, 6.2]);
 addAvgTempYear(cv_placeNovaGoricaBilje, 2021, 1, [3.7, 6.6, 7, 10.4, 15, 22.8, 24.2, 22.6, 19, 11.7, 9.4, 4.1]);
 addAvgTempYear(cv_placeNovaGoricaBilje, 2022, 1, [2.8, 5.5, 7, 11.5, 19.1, 24.2, 26.5, 24.4, 17.9, 15.6, 9.6, 6.9]);
+
+addAvgTempYear(cv_placeKredarica, 1955, 1, [-5.1, -9.8, -8, -5.5, -0.5, 2.9, 5.7, 4.1, 2.7, -1.3, -4.8, -5]);
+addAvgTempYear(cv_placeKredarica, 1956, 1, [-8.3, -17.2, -8.7, -5.5, 0.2, 1.7, 6.1, 6.2, 6, -0.3, -6.7, -5.8]);
+addAvgTempYear(cv_placeKredarica, 1957, 1, [-8.1, -6.3, -3.1, -4.4, -2.4, 4.9, 6, 4.8, 3, 1.6, -2.7, -7]);
+addAvgTempYear(cv_placeKredarica, 1958, 1, [-7.9, -5.5, -10.7, -6.7, 3.9, 2.9, 6.7, 7.3, 4.7, 0.5, -2.7, -6.3]);
+addAvgTempYear(cv_placeKredarica, 1959, 1, [-10.1, -5.3, -4.2, -3.6, -0.2, 3.3, 6.8, 4.8, 3.3, 0.1, -4.6, -6.2]);
+addAvgTempYear(cv_placeKredarica, 1960, 1, [-8.7, -7.6, -6.7, -4.5, 0.3, 4.1, 4.5, 6.1, 1.3, -1.2, -3.3, -6.1]);
+addAvgTempYear(cv_placeKredarica, 1961, 1, [-7.6, -5.7, -4.7, -0.8, -1.3, 4.8, 4.3, 6.5, 7.7, 1.4, -3.3, -7.4]);
+addAvgTempYear(cv_placeKredarica, 1962, 1, [-6.9, -10.4, -10.8, -4.5, -1.4, 1.5, 4.8, 7.9, 3, 0.8, -6.2, -10.2]);
+addAvgTempYear(cv_placeKredarica, 1963, 1, [-14.7, -12, -7.1, -3.2, -0.6, 4.3, 6.4, 5.8, 4.6, 0.3, -1.6, -7.3]);
+addAvgTempYear(cv_placeKredarica, 1964, 1, [-6.8, -7.9, -6.7, -3.4, 1, 5.1, 6.3, 5.6, 3.7, -1.8, -3, -6]);
+addAvgTempYear(cv_placeKredarica, 1965, 1, [-8.5, -14.4, -7.1, -5.6, -1.4, 3.9, 5.3, 4.2, 2.3, 2.6, -5.3, -7.1]);
+addAvgTempYear(cv_placeKredarica, 1966, 1, [-10.9, -3.8, -9.2, -2.4, 0, 4.6, 4.5, 4.8, 5.4, 1.3, -7, -8.5]);
+addAvgTempYear(cv_placeKredarica, 1967, 1, [-8.9, -8.3, -6.3, -5.5, 0.5, 2.9, 7.2, 6.4, 4.3, 3.8, -1.9, -9.1]);
+addAvgTempYear(cv_placeKredarica, 1968, 1, [-11.1, -7.6, -6.6, -2.3, -0.1, 3.2, 5, 3.9, 2.4, 2.6, -3.7, -9.6]);
+addAvgTempYear(cv_placeKredarica, 1969, 1, [-7.4, -11.8, -7.5, -4.9, 2.3, 1.9, 6.1, 4, 4.3, 2.4, -3.7, -11]);
+addAvgTempYear(cv_placeKredarica, 1970, 1, [-7.2, -11.5, -9.7, -6.1, -2.9, 4.5, 5.2, 6.3, 4.2, 0.1, -1.6, -7.4]);
+addAvgTempYear(cv_placeKredarica, 1971, 1, [-8.3, -9.6, -11.1, -2.7, 1.1, 1.9, 6.1, 8.1, 1.1, 1.3, -5.3, -3.1]);
+addAvgTempYear(cv_placeKredarica, 1972, 1, [-8.1, -6.1, -5, -4.1, -0.9, 3.4, 5.7, 5.2, -1.1, -2.2, -3.1, -4.9]);
+addAvgTempYear(cv_placeKredarica, 1973, 1, [-7.2, -9.9, -8.6, -7.4, 1.2, 4.3, 4.7, 7, 5.3, 0.2, -4.2, -7.4]);
+addAvgTempYear(cv_placeKredarica, 1974, 1, [-4.9, -8, -5.4, -5.8, -1.1, 1.5, 5.3, 7.4, 3.6, -6.8, -5.5, -5.2]);
+addAvgTempYear(cv_placeKredarica, 1975, 1, [-4.6, -8.3, -7.1, -4.6, 0.8, 2, 5.8, 5.2, 6, -0.7, -5.4, -4.1]);
+addAvgTempYear(cv_placeKredarica, 1976, 1, [-8.6, -6.3, -9.2, -4.6, 0.5, 3.8, 6.4, 2.5, 1.4, 1.3, -5.4, -9]);
+addAvgTempYear(cv_placeKredarica, 1977, 1, [-7.4, -7, -2.8, -4.5, -0.2, 3.1, 5.3, 4.8, 1.3, 2.7, -5.2, -5.5]);
+addAvgTempYear(cv_placeKredarica, 1978, 1, [-8.7, -8.7, -6.4, -5.7, -2, 2.3, 4.1, 4.5, 2.9, 0.7, -1.7, -5.7]);
+addAvgTempYear(cv_placeKredarica, 1979, 1, [-10.9, -8.6, -6, -6.2, -0.1, 4.8, 4.5, 4.4, 4.2, 0.5, -4.8, -5.3]);
+addAvgTempYear(cv_placeKredarica, 1980, 1, [-10.4, -7.7, -7.1, -7.4, -2.5, 2, 4.4, 7.2, 5.4, -0.6, -3.7, -8.3]);
+addAvgTempYear(cv_placeKredarica, 1981, 1, [-12, -10.3, -3.3, -3, 0.1, 4.5, 4.6, 6.1, 3.4, -0.4, -5.4, -9.8]);
+addAvgTempYear(cv_placeKredarica, 1982, 1, [-6, -8.5, -8.1, -6.3, 0.4, 4.9, 7.4, 6.2, 6.6, -0.4, -2, -6.5]);
+addAvgTempYear(cv_placeKredarica, 1983, 1, [-4.3, -11.5, -5.1, -3, 0.2, 4, 9.8, 5.8, 4.7, 0.8, -3.2, -6.3]);
+addAvgTempYear(cv_placeKredarica, 1984, 1, [-9, -11.5, -9.7, -5.9, -2, 2.4, 5.5, 5, 2.3, 1.2, -0.7, -6.1]);
+addAvgTempYear(cv_placeKredarica, 1985, 1, [-12.8, -8.9, -7.6, -4.7, 0.6, 1.7, 7.6, 6.8, 6.1, 1.2, -6.6, -3]);
+addAvgTempYear(cv_placeKredarica, 1986, 1, [-10.1, -12.4, -6.1, -4.2, 2.9, 3.2, 5.2, 6.6, 4.5, 2.4, -1.6, -6.4]);
+addAvgTempYear(cv_placeKredarica, 1987, 1, [-10.3, -6.8, -11.9, -3.2, -1.9, 2.8, 7.1, 6.1, 6.8, 2, -4.2, -3.7]);
+addAvgTempYear(cv_placeKredarica, 1988, 1, [-5.5, -9.3, -9.2, -3.2, 1, 2.9, 7.4, 7.4, 3.3, 2.6, -5.3, -6.4]);
+addAvgTempYear(cv_placeKredarica, 1989, 1, [-2.7, -4, -3.2, -3.8, -0.4, 1.7, 6.3, 5.9, 3.3, 1.6, -4.4, -4.3]);
+addAvgTempYear(cv_placeKredarica, 1990, 1, [-4.3, -2.9, -3.1, -5.1, 1.1, 3.6, 6.4, 6.7, 2.2, 2.5, -4.9, -9.7]);
+addAvgTempYear(cv_placeKredarica, 1991, 1, [-6.3, -10, -4, -6.1, -3.7, 3.3, 7.3, 7.1, 5.3, -1.1, -3.9, -7.5]);
+addAvgTempYear(cv_placeKredarica, 1992, 1, [-4.8, -6.7, -6.2, -3.9, 1.2, 3.2, 7.5, 10.3, 4.4, -1.2, -1.5, -5.1]);
+addAvgTempYear(cv_placeKredarica, 1993, 1, [-4.4, -7.4, -7.9, -3.3, 1.8, 4.3, 5.6, 7.1, 2.3, 0.5, -6, -5.6]);
+addAvgTempYear(cv_placeKredarica, 1994, 1, [-6.5, -8.9, -2.6, -5.1, 0.9, 4.7, 8, 8.6, 4.4, -0.2, -0.9, -4.1]);
+addAvgTempYear(cv_placeKredarica, 1995, 1, [-9.8, -4.6, -8.4, -3.4, 0.4, 2.5, 8.6, 5.2, 1, 4.6, -6, -7.3]);
+addAvgTempYear(cv_placeKredarica, 1996, 1, [-6, -10.3, -9.4, -2.9, 1.1, 5.1, 5.1, 5.3, -0.8, -0.6, -3.8, -6.1]);
+addAvgTempYear(cv_placeKredarica, 1997, 1, [-4, -5, -4.5, -6.5, 1, 4.1, 5.3, 6.3, 6.2, -0.3, -3.5, -6.5]);
+addAvgTempYear(cv_placeKredarica, 1998, 1, [-6.2, -2.5, -7.7, -3.7, 0.5, 5.6, 7.2, 7.9, 2.7, -0.1, -7.7, -7]);
+addAvgTempYear(cv_placeKredarica, 1999, 1, [-5.4, -10.6, -6, -3.2, 3, 3.8, 6.4, 6.9, 5.3, 0.8, -5, -7.5]);
+addAvgTempYear(cv_placeKredarica, 2000, 1, [-8, -6.7, -5.7, -1.6, 2.7, 6.5, 4.4, 8.5, 4.4, 1.8, -2.6, -4.2]);
+addAvgTempYear(cv_placeKredarica, 2001, 1, [-7.2, -7.8, -3.6, -4.8, 2.6, 3.3, 6.9, 8.6, 0.4, 4.7, -4.7, -10.8]);
+addAvgTempYear(cv_placeKredarica, 2002, 1, [-5.4, -4.6, -3.6, -4.1, 1.9, 6.8, 7, 6.1, 1.5, 0.4, -2.8, -5.5]);
+addAvgTempYear(cv_placeKredarica, 2003, 1, [-8.6, -11.2, -5, -4.9, 3.4, 8.9, 8, 10.2, 3.3, -2.6, -1.6, -5.8]);
+addAvgTempYear(cv_placeKredarica, 2004, 1, [-10.3, -7, -6.3, -3.7, -1.3, 4.1, 6.3, 7, 4, 2.3, -4.1, -4.6]);
+addAvgTempYear(cv_placeKredarica, 2005, 1, [-8.5, -13.1, -6.3, -3.3, 1.8, 4.9, 7, 4.7, 3.6, 2.7, -4.4, -9.9]);
+addAvgTempYear(cv_placeKredarica, 2006, 1, [-8.8, -9.6, -7.6, -2.7, 0.7, 5.1, 9.1, 3.5, 6.6, 3.8, -1.1, -3.1]);
+addAvgTempYear(cv_placeKredarica, 2007, 1, [-3.6, -5.5, -5.7, 0.4, 2.3, 5.6, 7.5, 6.8, 1.6, -0.1, -5.7, -7.2]);
+addAvgTempYear(cv_placeKredarica, 2008, 1, [-4.9, -5.1, -7.2, -4.4, 1.7, 5.7, 6.5, 7.5, 1.6, 1.9, -4, -7.2]);
+addAvgTempYear(cv_placeKredarica, 2009, 1, [-7.7, -10.5, -7.3, -1.5, 3.2, 3.7, 7.7, 8.8, 4.3, -0.4, -1.3, -8.5]);
+addAvgTempYear(cv_placeKredarica, 2010, 1, [-10.1, -8.7, -7.4, -3.2, -0.4, 5, 8.2, 6.5, 2.3, -0.6, -3.6, -10.1]);
+addAvgTempYear(cv_placeKredarica, 2011, 1, [-7.8, -6.5, -5.7, -1.3, 1.7, 5, 5.6, 9.2, 7.1, 0.5, 0.3, -6.3]);
+addAvgTempYear(cv_placeKredarica, 2012, 1, [-9, -12.6, -2.7, -3.2, 1.2, 6.8, 7.7, 9, 4.9, 2.7, -1.1, -8.3]);
+addAvgTempYear(cv_placeKredarica, 2013, 1, [-6.9, -11.2, -7.2, -1.6, -0.5, 4.1, 8.2, 7.9, 4.1, 2.5, -3.9, -3.3]);
+addAvgTempYear(cv_placeKredarica, 2014, 1, [-4.9, -6.1, -3.6, -1.7, 0, 4.7, 6.2, 5.6, 3.8, 1.9, -0.1, -5.8]);
+addAvgTempYear(cv_placeKredarica, 2015, 1, [-6.9, -8.1, -6.1, -3, 2.3, 5.2, 10.3, 9, 2.2, 0.1, 0.3, 0.7]);
+addAvgTempYear(cv_placeKredarica, 2016, 1, [-7.1, -5.8, -6.9, -1.8, 0.2, 4.7, 8.1, 7.2, 5.2, -1.3, -3.7, -3.3]);
+addAvgTempYear(cv_placeKredarica, 2017, 1, [-10.1, -5.1, -3, -3.4, 1.8, 7.4, 8.1, 9.7, 1.6, 2.5, -4.5, -7.8]);
+addAvgTempYear(cv_placeKredarica, 2018, 1, [-5.4, -12.2, -6.8, 0.7, 3.1, 5.3, 8, 8.7, 5.8, 1.8, -1.9, -6.2]);
+addAvgTempYear(cv_placeKredarica, 2019, 1, [-10.9, -4.3, -4.9, -2.6, -2, 8.9, 8.4, 9, 5.3, 4, -3.1, -5]);
+addAvgTempYear(cv_placeKredarica, 2020, 1, [-3.1, -4.5, -6.2, -1.2, 0.8, 4.6, 7.3, 8.5, 5.3, -0.4, 0.4, -5.5]);
+addAvgTempYear(cv_placeKredarica, 2021, 1, [-10.2, -4.4, -6.8, -5.5, -1.2, 7.3, 8, 6.5, 5.5, 0.2, -2.2, -5.6]);
+addAvgTempYear(cv_placeKredarica, 2022, 1, [-6.5, -6.5, -5.7, -3.9, 3.5, 8.4, 9, 8, 2.7, 5, -2.9, -3.6]);
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
@@ -2238,14 +2311,14 @@ function paint() {
             break;
         case cv_mode_vaccExcessDeathMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
-            paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
         case cv_mode_timeAvgTempSingle:
             paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeAvgTemp, cv_allPlace, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_timeAvgTempMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
-            paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeAvgTemp); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeAvgTemp); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
     }
     
@@ -2503,6 +2576,26 @@ function lf_setNrMonthsAvgText() {
     intChooserNrMonthsAvg.text = tmpStr;
 }
 
+function lf_setNrMonthsAvgTextShort() {
+
+    let tmpStr, tmpStr2;
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            break;
+        case cv_guiLayoutB:
+            //console.log("lo_nrMonthsAvg=" + lo_nrMonthsAvg.toString());
+            tmpStr = "Avg: "
+            tmpStr2 = lo_nrMonthsAvg.toString();
+            switch (lo_nrMonthsAvg) {
+                case 0: tmpStr2 = "none"; break;
+                default: tmpStr2 += "y"; break;
+            }
+            tmpStr += tmpStr2
+            break;
+    }
+    return tmpStr;
+}
+
 function lf_setTailMonthsText() {
 
     let tmpStr, tmpStr2;
@@ -2748,13 +2841,14 @@ function paint_GUI_layoutB() {
     if (guiPanelWidth < 300) { guiPanelWidth = 300 };
     lo_layout_marginTop = guiPanelTop + guiPanelHeight;
     if (!lo_showGUI) {
+        lo_currentMonthTextLeft = 15;
+        lo_currentMonthTextTop = 14;
         switch (gl_mode) {
             case cv_mode_vaccExcessDeathMulti: case cv_mode_timeAvgTempMulti:
                 guiPanelHeight = 0;
                 lo_layout_marginTop = guiPanelTop + guiPanelHeight;
-                lo_currentMonthTextLeft = 10;
-                lo_currentMonthTextTop = 11;
                 return;
+                break;     
         }
     }; //4.2.2023 v1.12
     //----
@@ -2799,7 +2893,7 @@ function paint_GUI_layoutB() {
             //----
             //lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
             lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 37; //zaradi buttonPlay
-            lo_currentMonthTextTop = 17;
+            lo_currentMonthTextTop = 21;
             break;
         case false:
             gap2 = 200; //prostor za izpis tekočega meseca
@@ -2808,8 +2902,8 @@ function paint_GUI_layoutB() {
             x2 = x1 + gap2 + 20;
             x3 = ctxW - xAuthor;
             //----
-            lo_currentMonthTextLeft = x1 + 50;
-            lo_currentMonthTextTop = 17;
+            lo_currentMonthTextLeft = x1 + 18;
+            lo_currentMonthTextTop = 21;
             //----
             sliderMonthEnd.left = x2;
             sliderMonthEnd.bodyMiddle = guiPanelTop + 22; //sliderTailMonths.bodyMiddle;
@@ -3209,7 +3303,7 @@ function lf_getnrSelectedPlaces() {
     }
 }
 
-function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
+function paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
 
     let rows, cols, row, col, x, y, itemWidth, itemHeight, place, ih, iw, k;
     let fx, fy, fiw, fih, haveFocusPlace;
@@ -3238,24 +3332,24 @@ function paint_graph_timeExcessDeath_multi(marginLeft, marginTop, marginRight, m
     haveFocusPlace = false;
     for (place = 1; place <= nrPlaces; place++) {
         if (!lo_enabledPlace[place]) { continue };
-        ;[x, y, iw, ih] = paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k)
+        ;[x, y, iw, ih] = paint_graph_timeAvgTemp_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k)
         //30.7.2023 lokacijo v fokusu preskočim in jo izrišem na koncu po zanki lokacij
         if (place == lo_focusPlace) {
             ;[fx, fy, fiw, fih] = [x, y, iw, ih];
             haveFocusPlace = true;
         } else {
-            paint_graph_timeExcessDeath_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
+            paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
         }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
     }
     //30.7.2023 po potrebi izrišem še lokacijo v fokusu
     if (haveFocusPlace) {
-        paint_graph_timeExcessDeath_multi_drawSinglePlace(lo_focusPlace, fx, fy, fiw, fih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
+        paint_graph_timeAvgTemp_multi_drawSinglePlace(lo_focusPlace, fx, fy, fiw, fih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
     }
 }
 
-function paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k) {
+function paint_graph_timeAvgTemp_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k) {
 
     let x, y, iw, ih, newY, yDiff, x0, y0;
  
@@ -3287,8 +3381,10 @@ function paint_graph_timeExcessDeath_multi_setPosition(marginLeft, marginTop, ma
     return [x, y, iw, ih]
 }
 
-function paint_graph_timeExcessDeath_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+function paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
     //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
+    
+    //---- risanje okvirja, kamor se bo potem notri narisal graf za tole konkretno lokacijo
     gLine(x + 1, y + 2, x + iw - 1, y + 2, 2, "white", []);
     gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
     gLine(x + 1, y + ih + 2, x + iw + 1, y + ih + 2, 2, "white", []);
@@ -3298,7 +3394,8 @@ function paint_graph_timeExcessDeath_multi_drawSinglePlace(place, x, y, iw, ih, 
     if (place == lo_focusPlace) { ctx.fillStyle = "floralWhite"; };
     ctx.fill();
     ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
-    //paint_graph_timeAvgTemp(x, y, iw, ih, cv_graphType_timeAvgTemp, place, 2);
+    
+    //---- končno zdaj risanje grafa za posamezno lokacijo
     paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
     
 }
@@ -3316,7 +3413,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             cv_graphGapLeft = 0; cv_graphGapRight = 5; cv_graphGapTop = 5; cv_graphGapBottom = 0;
             break;
         case cv_graphType_timeAvgTemp:
-            cv_graphMarginLeft = 20; cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
+            cv_graphMarginLeft = 25; cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
             cv_graphGapLeft = 14; cv_graphGapRight = 70; cv_graphGapTop = 5; cv_graphGapBottom = 0;
             if (vp_place != cv_allPlace) { cv_graphGapRight = 20 };
             break;
@@ -3351,6 +3448,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 default: kx = cv_graphRangeX / (vl_nrMonths - 1); break;
             }
     }
+    //console.log("kx=" + kx.toString());
+
     //---- pregled Y vrednosti povprečne temperature in določanje ky
     let vl_minY, vl_maxY, vl_dataRange;
     switch (vp_forceDataRangeY) { //24.10.2023 je Y range že vnaprej določen za vse lokacije enako?
@@ -3424,15 +3523,27 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let yMark10 = true; let yMark5 = true; let yMark1 = true;
     if (vl_dataRange > 27) { yMark1 = false }
     if (vl_dataRange > 100) { yMark5 = false }
-    font = "italic 10pt cambria";
+    let tmpShift; //8.12.2023
+    switch (vp_place) {
+        case cv_allPlace: {
+            font = "italic 11pt cambria"
+            tmpShift = 6;
+            break;
+        }
+        default: {
+            font = "italic 10pt cambria"
+            tmpShift = 4;
+            break;
+        }
+    }
     for (tmpTemp = -25; tmpTemp <= 30; tmpTemp++) {
         //---- izpis pri 0 stopinj
         if (tmpTemp == 0) {
             tmpStr = tmpTemp.toString();
             ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-            x = cv_graphLeft - tmpW - 4
+            x = cv_graphLeft - tmpW - tmpShift
             y = cv_graphY0
-            gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
+            gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
             continue
         }
         tmpTempAbs = Math.abs(tmpTemp)
@@ -3443,8 +3554,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "darkGray", [2, 2])
                 tmpStr = tmpTemp.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                x = cv_graphLeft - tmpW - 4
-                gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
+                x = cv_graphLeft - tmpW - tmpShift
+                gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
             }
             continue;
         }
@@ -3455,8 +3566,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "darkGray", [2, 4])
                 tmpStr = tmpTemp.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                x = cv_graphLeft - tmpW - 4
-                gText(tmpStr, font, "gray", x, y + tmpH / 2 - 1);
+                x = cv_graphLeft - tmpW - tmpShift
+                gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
             }
             continue;
         }
@@ -3467,14 +3578,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "silver", [2, 6])
                 tmpStr = tmpTemp.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                x = cv_graphLeft - tmpW - 4
-                gText(tmpStr, font, "darkGray", x, y + tmpH / 2 - 1);
+                x = cv_graphLeft - tmpW - tmpShift
+                gText(tmpStr, font, "gray", x, y + tmpH / 2 - 1);
             }
         }
     }
     
     //---- oznake na X osi
-    let tmpVacc, tmpMonth, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
+    let tmpVacc, tmpMonth, tmpMonthValue, tmpYear, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
     switch (vp_graphType) {
         case cv_graphType_vaccExcessDeath:
             switch (vp_place) {
@@ -3514,30 +3625,51 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             let singleYear = false;
             if (lf_yearValue(vl_monthStart) == lf_yearValue(gl_monthEnd)) { singleYear = true };
             for (tmpMonth = vl_monthStart; tmpMonth <= gl_monthEnd; tmpMonth++) {
+                tmpMonthValue = lf_monthValue(tmpMonth); //mesec od 1..12
+                tmpYear = lf_yearValue(tmpMonth);
                 x = cv_graphLeftData + kx * (tmpMonth - vl_monthStart);
                 if (x >= cv_graphLeftData && x <= cv_graphRightData) {
-                    gLine(x, yOsX - 2, x, yOsX + 2, 1, "darkSlateGray", []) //---- vertikalna črtica na X osi za vsak mesec
-                    tmpStr = ""
-                    if (kx < 4) { //---- pri najbolj zgoščenem izpisu skrajšana dvomestna letnica in pa vertikalna pregrada med leti pri prehodu v januar
-                        if (lf_monthValue(tmpMonth) == 1 && tmpMonth != vl_monthStart) {
-                            tmpStr = lf_yearStrShort(tmpMonth);
-                            x -= (x - vl_xOld) / 2;
-                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "darkGray", []);
-                            x += 8;
+                    tmpStr = "";
+                    //---- vertikalna kratka črtica na X osi za vsak mesec
+                    if (kx > 6) {
+                        //---- kratka črtica kot oznaka meseca na X osi
+                        gLine(x, yOsX - 2, x, yOsX + 2, 1, "darkSlateGray", []);
+                        //---- potencialna enočrkovna oznaka meseca na X osi
+                        if (valueBetween(kx, 23, 36.9)) {
+                            tmpStr = lf_monthStrM(tmpMonth);
+                        }
+                    }
+                     //---- vertikalna kratka črtica na X osi za vsako leto (pri najbolj zgoščenem prikazu)
+                     if (kx < 1.5 && tmpMonthValue == 1) {
+                        gLine(x - kx / 2, yOsX - 2, x, yOsX + 2, 1, "darkSlateGray", []);
+                    }
+                    if (kx < 1.5) { //---- pri najbolj zgoščenem izpisu samo skrajšana dvomestna letnica za vsako deseto leto
+                        if (tmpMonthValue == 1 && 10 * Math.trunc(tmpYear / 10) == tmpYear) {
+                            if (kx < 0.3) { tmpStr = lf_yearStrShort(tmpMonth) } else { tmpStr = tmpYear.toString() };
+                            gLine(x - kx /2, cv_graphTopData, x, cv_graphBottom, 1, "silver", []);                            
+                            //x += 8;
                         };
                     }
-                    else if (kx < 17) { //---- pri malo manj zgoščenem izpisu vertikalna pregrada med leti pri prehodu v januar, in pa letnica oziroma eventualno začetnica meseca
-                        if (lf_monthValue(tmpMonth) == 1 && tmpMonth != vl_monthStart) {
+                    else if (kx < 4) { //---- pri najbolj zgoščenem izpisu skrajšana dvomestna letnica in pa vertikalna pregrada med leti pri prehodu v januar
+                        if (tmpMonthValue == 1 && tmpMonth != vl_monthStart) {
+                            tmpStr = lf_yearStrShort(tmpMonth);
+                            x -= (x - vl_xOld) / 2;
+                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "silver", []);
+                            x += 8;
+                        };
+                    }                 
+                    else if (kx < 37) { //---- pri malo manj zgoščenem izpisu vertikalna pregrada med leti pri prehodu v januar, in pa letnica oziroma eventualno začetnica meseca
+                        if (tmpMonthValue == 1 && tmpMonth != vl_monthStart) {
                             tmpStr = lf_yearValue(tmpMonth);
                             x -= (x - vl_xOld) / 2;
-                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "darkGray", []);
+                            gLine(x, cv_graphTopData, x, cv_graphBottom, 1, "silver", []);
                             x += 15;
                         } else {
                             if (singleYear && kx > 6) { tmpStr = lf_monthStrM(tmpMonth); }
                         }
                     }
-                    else if (kx < 25) { tmpStr = tmpMonth.toString(); }        //---- pri še manj zgoščenem samo zaporedna številka meseca ("172")
-                    else if (kx < 37) { tmpStr = lf_monthStrMMM(tmpMonth); }   //---- pri še manj zgoščenem tromestna okrajšava meseca ("nov")
+                    //else if (kx < 25) { tmpStr = tmpMonth.toString(); }        //---- pri še manj zgoščenem samo zaporedna številka meseca ("172")
+                    //else if (kx < 37) { tmpStr = lf_monthStrMMM(tmpMonth); }   //---- pri še manj zgoščenem tromestna okrajšava meseca ("nov")
                     else if (kx < 60) { tmpStr = lf_monthStrMMYY(tmpMonth); }  //---- pri še manj "11/23"
                     else { tmpStr = lf_monthStrMY(tmpMonth); }                 //---- sicer "nov/2023"
                     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
@@ -3574,7 +3706,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     //}
 
     //---- risanje diagrama    
-    let xValue, xValue0, monthIndex;
+    let xValue, xValue0, monthIndex, kkk;
     let dataLineColor, dataLineColorFinal, dataPointColor, dataPointColorFinal, placeNameColor, dataLineWidth;
     switch (vp_graphType) {
         case cv_graphType_vaccExcessDeath: xValue0 = 0; break;
@@ -3612,6 +3744,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
     //----------------------------------------------
+    let tmpInt = 226; // =E2
+    let cv_colorHideData = "rgb("+tmpInt.toString()+", "+tmpInt.toString()+", "+tmpInt.toString()+")";
     for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
         
         place = placeLoopIndex;
@@ -3717,11 +3851,26 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
                     break;
             }
+            //---- pri prvi podatkovni točki še ne more biti linije od prejšnje do te
             if (monthIndex > 1 && placeMonth > 1) {
                 //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
                 dataLineColorFinal = dataLineColor;
-                if (placeMonth <= cv_nrMonthsAvgMult * lo_nrMonthsAvg) { dataLineColorFinal = "lightGray"; };
-                gLine(vl_xOld, vl_yOld, x, y, dataLineWidth, dataLineColorFinal, []);
+                if (placeMonth <= cv_nrMonthsAvgMult * lo_nrMonthsAvg) { dataLineColorFinal = cv_colorHideData; };
+                //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
+                if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
+                    //---- če sta obe krajišči znotraj, enostavno narišem linijo
+                    gLine(vl_xOld, vl_yOld, x, y, dataLineWidth, dataLineColorFinal, []);
+                } else if (vl_yOld >= cv_graphTopAxis) {
+                    //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
+                    kkk = (y - vl_yOld) / kx;
+                    tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
+                    gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth, dataLineColorFinal, []);
+                } else if (y >= cv_graphTopAxis) {
+                    //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
+                    kkk = (y - vl_yOld) / kx;
+                    tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
+                    gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth, dataLineColorFinal, []);
+                }
             }
             vl_xOld = x; vl_yOld = y;
         }
@@ -3746,7 +3895,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             if (lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
-                gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
+                if (y > cv_graphTopAxis) {
+                    gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
+                }
             }
             //---- zdaj pa še osnovno zahtevano označevanje vrednosti
             yValue = lf_getAvgValue(place, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
@@ -3758,14 +3909,17 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
                     break;
             }
-            //---- če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim (5.12.2023)
-            dataPointColorFinal = dataPointColor;
-            if (placeMonth < cv_nrMonthsAvgMult * lo_nrMonthsAvg) { dataPointColorFinal = "lightGray" };
-            //---- posebna obravnava zadnje podatkovne točke
-            if (vp_graphType == cv_graphType_vaccExcessDeath && month == gl_monthEnd) {
-                gEllipse(x, y, 5, 5, 0, placeNameColor, 1, "dimGray");
-            } else {
-                gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColorFinal, 0, "");
+            //---- za risanje ne smemo biti preko maxY
+            if (y >= cv_graphTopAxis) {
+                //---- če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim (5.12.2023)
+                dataPointColorFinal = dataPointColor;
+                if (placeMonth < cv_nrMonthsAvgMult * lo_nrMonthsAvg) { dataPointColorFinal = cv_colorHideData };
+                //---- posebna obravnava zadnje podatkovne točke
+                if (vp_graphType == cv_graphType_vaccExcessDeath && month == gl_monthEnd) {
+                    gEllipse(x, y, 5, 5, 0, placeNameColor, 1, "dimGray");
+                } else {
+                    gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColorFinal, 0, "");
+                }
             }
         }
     }
@@ -3815,20 +3969,21 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 xValue = month;
                 break;
         }
+
+        //---- 8.12.2023 izpis lokacije v kotu desno zgoraj v primeru MULTI grafov sem preselil sem, da se izpiše tudi za lokacije, ki so že definirane, nimajo pa še definiranih podatkov.
+        if (vp_place != cv_allPlace) {
+            tmpStr = placeName[place];
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+        }
+
         //---- če je mesec prikaza lokacije izven podatkovnega območja te lokacije
         if (month < firstMonth[place]) { continue };
 
         x = cv_graphLeftData + kx * (xValue - xValue0);
         yValue = lf_getAvgValue(place, lf_getPlaceMonth(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
         y = cv_graphY0 - ky * yValue
-        //switch (vp_graphType) {
-        //    case cv_graphType_vaccExcessDeath: x = x - kk * (vl_nrMonths / 2 - monthIndex + 1); break;
-        //}
-        
-        //
-        //if (place == cv_fin) {
-        //    place = place
-        //};
+
         placeNameColor = placeColor[place];
         //if (vl_focus) { dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; };
         //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray" };
@@ -3842,15 +3997,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     case cv_allPlace:
                         tmpStr = placeNameAbbr[place];
                         ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                        //gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeColor[place], tmpStr, "lightGray", 2, 2)
                         gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2)
-                        break;
-                    default:
-                        tmpStr = placeName[place];
-                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                        //gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeColor[place], tmpStr, "lightGray", 2, 2)
-                        //gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeColor[place], tmpStr, "lightGray", 2, 2);
-                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
                         break;
                 }
                 break;
@@ -3858,15 +4005,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 //tmpStr = placeNameAbbr[place];
                 tmpStr = placeName[place];
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                //gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "", 1, "lightGray", "bold 10pt verdana", placeColor[place], tmpStr, "lightGray", 2, 2)
                 switch (vp_place) {
                     case cv_allPlace:
-                        //gText(tmpStr, "normal 9pt verdana", placeColor[place], x + 8, y + 3);
                         gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
-                        break;
-                    default:
-                        //gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeColor[place], tmpStr, "lightGray", 2, 2);
-                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
                         break;
                 }
                 break;
@@ -3878,21 +4019,60 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     paint_graph_timeAvgTemp_tipAfterGraph(vp_place, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
 
     //Izpis tekočega meseca
-    tmpStr = lf_monthStrMY(gl_monthEnd);
-    font = "bold 14pt verdana";
-    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-    //let tmpLeft = 400; let tmpTop = 20;
-    //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
-    //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
-
-    lo_radialGradientFill = true;
-    rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
-    rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
-    rgfcs1 = 0; rgfc1 = "greenYellow";
-    rgfcs2 = 0.6; rgfc2 = "gold";
-    rgfcs3 = 1; rgfc3 = "azure";
-    gBannerRoundRectWithText(lo_currentMonthTextLeft, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 15, "azure", 1, "lightGray", "lightGray", 3, 3, false)
-
+    switch (lo_showGUI) {
+        case true: {
+            //---- tu je viden cel GUI - ta se je izrisal ločeno, med risanjem grafov pa se izriše še tale tabletek za izbrano obdobje
+            tmpStr = lf_monthStrMY(gl_monthStart) + ".." + lf_monthStrMY(gl_monthEnd);
+            font = "bold 10pt verdana";
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            //let tmpLeft = 400; let tmpTop = 20;
+            //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            lo_radialGradientFill = true;
+            rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
+            rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
+            rgfcs1 = 0; rgfc1 = "greenYellow";
+            rgfcs2 = 0.6; rgfc2 = "gold";
+            rgfcs3 = 1; rgfc3 = "azure";
+            gBannerRoundRectWithText(lo_currentMonthTextLeft, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)              
+            break;
+        }
+        default: {
+            //---- tu GUI ni viden - med risanjem grafov se posebej izriše še tale tabletek za izbrano obdobje ter tabletek za izbrano povprečenje
+            tmpStr = lf_monthStrMY(gl_monthStart) + ".." + lf_monthStrMY(gl_monthEnd);
+            font = "bold 10pt verdana";
+            x = 13;
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            //let tmpLeft = 400; let tmpTop = 20;
+            //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            lo_radialGradientFill = true;
+            rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
+            rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
+            rgfcs1 = 0; rgfc1 = "greenYellow";
+            rgfcs2 = 0.6; rgfc2 = "gold";
+            rgfcs3 = 1; rgfc3 = "azure";
+            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)       
+            x += tmpW + 23;
+            //----
+            tmpStr = lf_setNrMonthsAvgTextShort(); //8.12.2023
+            font = "bold 10pt verdana";
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            //let tmpLeft = 400; let tmpTop = 20;
+            //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            lo_radialGradientFill = true;
+            rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
+            rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
+            rgfcs1 = 0; rgfc1 = "aquamarine";
+            rgfcs2 = 0.6; rgfc2 = "deepSkyBlue";
+            rgfcs3 = 1; rgfc3 = "azure";
+            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH + 1, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)   
+            break;
+        }
+            
+    }
+    
     //oznake koordinat miške
     font = "italic 9pt cambria";
     let tmpValue;
@@ -4260,7 +4440,7 @@ function paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graph
 
 function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
     //----
-    //24.10.2023 ta funkcija se že nekaj mesecev ne uporablja več. Nadomeščata jo univerzalni funkciji paint_graph_timeAvgTemp() in paint_graph_timeExcessDeath_multi() !!
+    //24.10.2023 ta funkcija se že nekaj mesecev ne uporablja več. Nadomeščata jo univerzalni funkciji paint_graph_timeAvgTemp() in paint_graph_timeAvgTemp_multi() !!
     //----
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
     const cv_graphRight = vp_left + vp_width - 45 //X koordinata konca X osi
