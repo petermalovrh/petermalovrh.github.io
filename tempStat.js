@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.5"
+const gl_versionNr = "v0.6"
 const gl_versionDate = "9.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -757,129 +757,29 @@ addAvgTempYear(cv_placeSlovenjGradecSmartno, 2020, 1, [-0.9, 3.6, 4.6, 9.8, 13.1
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2021, 1, [-1.7, 1.9, 3.7, 6.8, 11.8, 20.3, 20.9, 17.9, 14.2, 8.4, 4.2, -1.4]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2022, 1, [-1.2, 2.2, 2.8, 8.2, 15.8, 20.1, 21.1, 20.2, 13.7, 12, 5.7, 0.1]);
 
-
-//---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
-for (place = 1; place <= nrPlaces; place++) {
-    offsetMonths[place] = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
-    firstMonth[place] = 1 + offsetMonths[place];              //prvi mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
-    lastMonth[place] = offsetMonths[place] + nrMonths[place]; //zadnji mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
-}
-
-//let tmpStr = "from: " + minMonthAll.toString() + "." + minYearAll.toString() + ", to: " + maxMonthAll.toString() + "." + maxYearAll.toString() + ", nrMonthsAll=" + nrMonthsAll.toString();
-//console.log(tmpStr)
-
-function addPlace(name, shortName, abbr, color) {
-    //---- 2.12.2023
-    nrPlaces += 1;
-    //----
-    placeName[nrPlaces] = name;
-    placeNameShort[nrPlaces] = shortName;
-    placeNameAbbr[nrPlaces] = abbr;
-    placeColor[nrPlaces] = color;
-    //----
-    minMonth[nrPlaces] = 0;
-    minYear[nrPlaces] = 0;
-    maxMonth[nrPlaces] = 0;
-    maxYear[nrPlaces] = 0;
-    nrMonths[nrPlaces] = 0;
-    //----
-    avgTemp[nrPlaces] = [];
-
-}
-
-function addAvgTemp(vp_place, vp_year, vp_month, vp_avgTemp) {
-    //---- 2.12.2023
-    
-    //let vl_month = (13 - minMonth[vp_place]) + 12 * (maxYear[vp_place] - minYear[vp_place] - 1) + maxMonth[vp_place];
-    
-    //---- začetni mesec podatkov za to lokacijo
-    if (minMonth[vp_place] == 0) {
-        minMonth[vp_place] = vp_month;
-        minYear[vp_place] = vp_year;
-    };
-    if (monthYearBeforeMonthYear(vp_month, vp_year, minMonthAll, minYearAll)) {
-        minMonthAll = vp_month;
-        minYearAll = vp_year;
-    }
-    
-    //---- končni mesec podatkov za to lokacijo
-    maxMonth[vp_place] = vp_month;
-    maxYear[vp_place] = vp_year;
-    if (monthYearAfterMonthYear(vp_month, vp_year, maxMonthAll, maxYearAll)) {
-        maxMonthAll = vp_month;
-        maxYearAll = vp_year;
-    }
-
-    //---- število mesecev s podatki za to lokacijo
-    let vl_month = nrMonths[vp_place] + 1;
-    nrMonths[nrPlaces] = vl_month;
-    nrMonthsAll = 12 * (maxYearAll - minYearAll) + (maxMonthAll - minMonthAll) + 1;
-
-    //---- vpis podatka o temperaturi
-    avgTemp[vp_place][vl_month] = vp_avgTemp;
-
-}
-
-function addAvgTempYear(vp_place, vp_year, vp_month, vp_arrTemp) {
-    //---- 4.12.2023 -----------------------------
-    // vp_place ... za katero lokacijo meritev
-    // vp_year,vp_month ... od katerega meseca/leta naprej so ti podatki
-    // vp_arrTemp       ... polje podatkov o temperaturah za podani mesec in naprej proti koncu leta (ni nujno, da čisto do konca!!)
-    //--------------------------------------------
-
-    //let vl_month = (13 - minMonth[vp_place]) + 12 * (maxYear[vp_place] - minYear[vp_place] - 1) + maxMonth[vp_place];
-    
-    //---- za koliko mesecev so prisotni podatki v vp_arrTemp[]
-    let nrData = vp_arrTemp.length;
-    if (nrData <= 0) { return };
-
-    //---- začetni mesec podatkov za to lokacijo
-    if (minMonth[vp_place] == 0) {
-        minMonth[vp_place] = vp_month;
-        minYear[vp_place] = vp_year;
-    };
-    if (monthYearBeforeMonthYear(vp_month, vp_year, minMonthAll, minYearAll)) {
-        minMonthAll = vp_month;
-        minYearAll = vp_year;
-    }
-      
-    //---- končni mesec podatkov za to lokacijo
-    let vl_monthEnd = vp_month + nrData - 1;
-    maxMonth[vp_place] = vl_monthEnd;
-    maxYear[vp_place] = vp_year;
-    if (monthYearAfterMonthYear(vl_monthEnd, vp_year, maxMonthAll, maxYearAll)) {
-        maxMonthAll = vl_monthEnd;
-        maxYearAll = vp_year;
-    }
-
-    //---- vpis podatkov o temperaturi
-    let vl_month, vl_monthIndex
-    for (vl_monthIndex = 1; vl_monthIndex <= nrData; vl_monthIndex++)    {
-        vl_month = nrMonths[vp_place] + vl_monthIndex;
-        avgTemp[vp_place][vl_month] = vp_arrTemp[vl_monthIndex - 1];
-    }
-        
-    //---- število mesecev s podatki za to lokacijo
-    nrMonths[vp_place] += nrData;
-    nrMonthsAll = 12 * (maxYearAll - minYearAll) + (maxMonthAll - minMonthAll) + 1;
-
-}
-
-function monthYearBeforeMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
-    if ((12 * vp_year + vp_month) < (12 * vp_yearRef + vp_monthRef)) { return true } else { return false };
-}
-
-function monthYearAfterMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
-    if ((12 * vp_year + vp_month) > (12 * vp_yearRef + vp_monthRef)) { return true } else { return false };
-}
-
+//---- mode aplikacije
 const cv_mode_timeAvgTempSingle = 1;
 const cv_mode_timeAvgTempMulti = 2;
 const cv_mode_vaccExcessDeath = 3;
 const cv_mode_vaccExcessDeathMulti = 4;
-
 const cv_maxMode = 2;
 var gl_mode = cv_mode_timeAvgTempSingle;
+
+//---- izbrana časovna enota poseznega podatka, lahko je vse, posamezen mesec, ali pa posamezen letni čas
+const cv_timeSliceAll = 0;
+const cv_timeSliceMonthMin = 1;
+const cv_timeSliceMonthMax = 12;
+const cv_timeSliceWinter = 13; // dec/jan/feb
+const cv_timeSliceSpring = 14; // mar/apr/maj
+const cv_timeSliceSummer = 15; // jun/jul/avg
+const cv_timeSliceAutumn = 16; // sep/okt/nov
+//----
+const cv_timeSliceMin = 0;
+const cv_timeSliceMax = 16;
+//----
+var gl_timeSlice = cv_timeSliceAll;
+
+
 var gl_sameScaleY = false; //24.10.2023
 var gl_showExactValuesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
 var gl_showExactLinesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
@@ -1880,6 +1780,7 @@ function main() {
     resizeCanvas();
     lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
     lf_changeTailMonths(gl_tailMonths, false);
+    lf_changeTimeSlice(gl_timeSlice, false); //10.12.2023
     lf_setMode(gl_mode, false);
     lf_changeMonthEnd(gl_monthEnd, false);
 
@@ -2147,12 +2048,16 @@ window.addEventListener("wheel", event => {
         return
     }
     else if (lo_keyDownT) {
-        if (sliderTailMonths.visible && sliderTailMonths.enabled) {
-            gl_tailMonths -= delta;
-            if (gl_tailMonths > (nrMonthsAll - 1)) { gl_tailMonths = (nrMonthsAll - 1) };
-            if (gl_tailMonths < 0) { gl_tailMonths = 0 };
-            lf_changeTailMonths(gl_tailMonths, true);
-        }
+        //if (sliderTailMonths.visible && sliderTailMonths.enabled) {
+        //    gl_tailMonths -= delta;
+        //    if (gl_tailMonths > (nrMonthsAll - 1)) { gl_tailMonths = (nrMonthsAll - 1) };
+        //    if (gl_tailMonths < 0) { gl_tailMonths = 0 };
+        //    lf_changeTailMonths(gl_tailMonths, true);
+        //}
+        gl_timeSlice -= delta;
+        if (gl_timeSlice > cv_timeSliceMax) { gl_timeSlice = cv_timeSliceMin };
+        if (gl_timeSlice < cv_timeSliceMin) { gl_timeSlice = cv_timeSliceMax };
+        lf_changeTailMonths(gl_timeSlice, true);
         return
     }
     else if (lo_keyDown0) {
@@ -2384,14 +2289,14 @@ function paint() {
     //
     switch (gl_mode) {
         case cv_mode_vaccExcessDeath:
-            paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allPlace, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_vaccExcessDeath, cv_allPlace, gl_timeSlice, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_vaccExcessDeathMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
             paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
         case cv_mode_timeAvgTempSingle:
-            paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeAvgTemp, cv_allPlace, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
+            paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeAvgTemp, cv_allPlace, gl_timeSlice, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_timeAvgTempMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
@@ -2672,6 +2577,31 @@ function lf_setNrMonthsAvgTextShort() {
             switch (lo_nrMonthsAvg) {
                 case 0: tmpStr2 = "none"; break;
                 default: tmpStr2 += "y"; break;
+            }
+            tmpStr += tmpStr2
+            break;
+    }
+    return tmpStr;
+}
+
+function lf_setTimeSliceText() {
+
+    let tmpStr, tmpStr2;
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            break;
+        case cv_guiLayoutB:
+            //console.log("gl_timeSlice=" + gl_timeSlice.toString());
+            tmpStr = "TS: "; tmpStr2 = "";
+            switch (gl_timeSlice) {
+                case cv_timeSliceAll:
+                    tmpStr2 = "all"; break;
+                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                    tmpStr2 = (gl_timeSlice - cv_timeSliceMonthMin + 1).toString(); break;
+                case cv_timeSliceWinter: tmpStr2 += "WN"; break;
+                case cv_timeSliceSpring: tmpStr2 += "SP"; break;
+                case cv_timeSliceSummer: tmpStr2 += "SM"; break;
+                case cv_timeSliceAutumn: tmpStr2 += "AT"; break;
             }
             tmpStr += tmpStr2
             break;
@@ -3262,6 +3192,23 @@ function lf_changeTailMonths(vp_newValue, vp_paint) {
     }
 }
 
+function lf_changeTimeSlice(vp_newValue, vp_paint) {
+
+    //console.log("lf_changeTimeSlice: newValue=" + vp_newValue)
+    
+    if (!valueBetween(vp_newValue, cv_timeSliceMin, cv_timeSliceMax)) { return };
+
+    gl_timeSlice = vp_newValue;
+
+    //lf_setTailMonthsText();
+    //sliderTailMonths.value = gl_tailMonths;
+    
+    if (vp_paint) {
+        //console.log("lf_changeTimeSlice: call Paint() now ...")
+        paint()
+    }
+}
+
 function lf_changeMonthEnd(vp_newValue, vp_paint) {
 
     //console.log("lf_changeMonthEnd: newValue=" + vp_newValue)
@@ -3406,7 +3353,7 @@ function paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, margi
     let vl_minY, vl_maxY, vl_dataRange;
     let vl_forceDataRangeY = false;
     if (gl_sameScaleY && vp_graphType==cv_graphType_timeAvgTemp) { //24.10.2023 normalizacija po Y v Mode=4       
-        ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(cv_allPlace, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+        ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(cv_allPlace, gl_timeSlice, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
         vl_forceDataRangeY = true;
     }
     //----
@@ -3479,14 +3426,15 @@ function paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_g
     ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
     
     //---- končno zdaj risanje grafa za posamezno lokacijo
-    paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
+    paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, gl_timeSlice, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
     
 }
 
-function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
     //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
     
     let place, yValue, placeMonth, offsetPlaceMonths;
+    let lastPlaceMarkerX = []; let lastPlaceMarkerY = [];
     //
     let cv_graphMarginLeft, cv_graphMarginRight, cv_graphMarginTop, cv_graphMarginBottom;
     let cv_graphGapLeft, cv_graphGapRight, cv_graphGapTop, cv_graphGapBottom;
@@ -3537,7 +3485,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_minY, vl_maxY, vl_dataRange;
     switch (vp_forceDataRangeY) { //24.10.2023 je Y range že vnaprej določen za vse lokacije enako?
         case false:
-            ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_place, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+            ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_place, vp_timeSlice, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
             break;
         default:
             vl_minY = vp_minY; vl_maxY = vp_maxY; vl_dataRange = vp_dataRange;
@@ -3668,7 +3616,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     }
     
     //---- oznake na X osi
-    let tmpVacc, tmpMonth, tmpMonthValue, tmpYear, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
+    let tmpVacc, tmpMonth, tmpMonthValue, tmpMonthValue2, tmpYear, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
     switch (vp_graphType) {
         case cv_graphType_vaccExcessDeath:
             switch (vp_place) {
@@ -3823,12 +3771,13 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             break;
     }
     let vl_focus, vl_disabled;
+    let vl_notFirstGraphDataPoint; //10.12.2023
 
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
     //----------------------------------------------
     let tmpInt = 226; // =E2
-    let cv_colorHideData = "rgb("+tmpInt.toString()+", "+tmpInt.toString()+", "+tmpInt.toString()+")";
+    let cv_colorHideData = "rgb(" + tmpInt.toString() + ", " + tmpInt.toString() + ", " + tmpInt.toString() + ")";
     for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
         
         place = placeLoopIndex;
@@ -3905,13 +3854,13 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //-----------------------------------------
         //---- GRAF: najprej linije med krogci točk
         //-----------------------------------------
-
+        vl_xOld = 0; vl_xOldExact = 0;
         offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
         for (month = vl_monthStart; month <= gl_monthEnd; month++) {
-            //if (month <= offsetPlaceMonths) { continue }; //4.12.2023
             if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
             placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
             monthIndex = month - vl_monthStart + 1       //na grafu je tole zaporedna številka meseca po X osi
+            tmpMonthValue = lf_monthValue(month);
             switch (vp_graphType) {
                 case cv_graphType_vaccExcessDeath: xValue = placeVaccByMonth[place][month - 1]; break;
                 case cv_graphType_timeAvgTemp: xValue = month; break;
@@ -3924,8 +3873,20 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(80, placeColor[place]), []);
                 vl_xOldExact = x; vl_yOldExact = y;
             }
+            //---- risanja markerja osnovne zahtevane krivulje ne bo, če timeSlice ni pravi (9.12.2023)
+            switch (vp_timeSlice) {
+                case cv_timeSliceAll: break; //risanje seveda je
+                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                    if (tmpMonthValue !== vp_timeSlice) { continue }; //risanja ni, če ni točno določeni mesec
+                    break;
+                case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                    tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                    if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
+                    if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                    break;                
+            }            
             //---- zdaj pa še osnovno zahtevano povezovanje vrednosti            
-            yValue = lf_getAvgValue(place, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
             y = cv_graphY0 - ky * yValue
             switch (vp_graphType) {
                 case cv_graphType_vaccExcessDeath:
@@ -3935,7 +3896,20 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     break;
             }
             //---- pri prvi podatkovni točki še ne more biti linije od prejšnje do te
-            if (monthIndex > 1 && placeMonth > 1) {
+            //---- pogoj za prvi data point pa je odvisen od vp_timeSlice (10.12.2023)
+            vl_notFirstGraphDataPoint = false;
+            switch (vp_timeSlice) {
+                case cv_timeSliceAll:
+                    if (monthIndex > 1 && placeMonth > 1) { vl_notFirstGraphDataPoint = true };
+                    break;
+                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                    if (monthIndex >= 13 && placeMonth >= 13) { vl_notFirstGraphDataPoint = true };
+                    break;
+                case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                    if (monthIndex >= 13 && placeMonth >= 13) { vl_notFirstGraphDataPoint = true };
+                    break;
+            }            
+            if (vl_notFirstGraphDataPoint && placeMonth > 1) {
                 //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
                 dataLineColorFinal = dataLineColor;
                 if (placeMonth <= cv_nrMonthsAvgMult * lo_nrMonthsAvg) { dataLineColorFinal = cv_colorHideData; };
@@ -3969,21 +3943,36 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
             placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
             monthIndex = month - vl_monthStart + 1;      //na grafu je tole zaporedna številka meseca po X osi
+            tmpMonthValue = lf_monthValue(month);
             switch (vp_graphType) {
                 case cv_graphType_vaccExcessDeath: xValue = placeVaccByMonth[place][month - 1]; break;
                 case cv_graphType_timeAvgTemp: xValue = month; break;
             }
             x = cv_graphLeftData + kx * (xValue - xValue0);
-            //---- če imamo povprečenje vrednosti, in se zahteva tudi izris točnih posameznih vrednosti, potem najprej posivljeno izrišem točno vrednost (6.12.2023)
+            //---- če imamo povprečenje vrednosti (lo_nrMonthsAvg>0), in se zahteva tudi izris točnih posameznih vrednosti (gl_showExactValuesToo), 
+            //     zraven pa moramo imeti ali samo eno selektirano lokacijo (nrSelectedPlaces==1), ali pa risanje lokacije v fokusu (place == lo_focusPlace),
+            //     potem najprej posivljeno izrišem točno vrednost (6.12.2023)
             if (lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
-                if (y > cv_graphTopAxis) {
+                if (y > cv_graphTopAxis) { //ne sme biti nad področjem predvidenim za graf
                     gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
                 }
             }
+            //---- risanja markerja osnovne zahtevane krivulje ne bo, če timeSlice ni pravi (9.12.2023)
+            switch (vp_timeSlice) {
+                case cv_timeSliceAll: break; //risanje seveda je
+                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                    if (tmpMonthValue !== vp_timeSlice) { continue }; //risanja ni, če ni točno določeni mesec
+                    break;
+                case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                    tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                    if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
+                    if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                    break;                
+            }
             //---- zdaj pa še osnovno zahtevano označevanje vrednosti
-            yValue = lf_getAvgValue(place, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
             y = cv_graphY0 - ky * yValue
             switch (vp_graphType) {
                 case cv_graphType_vaccExcessDeath:
@@ -4003,6 +3992,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 } else {
                     gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColorFinal, 0, "");
                 }
+                lastPlaceMarkerX[place] = x; //10.12.2023
+                lastPlaceMarkerY[place] = y;
             }
         }
     }
@@ -4064,7 +4055,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         if (month < firstMonth[place]) { continue };
 
         x = cv_graphLeftData + kx * (xValue - xValue0);
-        yValue = lf_getAvgValue(place, lf_getPlaceMonth(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+        yValue = lf_getAvgValue(place, vp_timeSlice, lf_getPlaceMonth(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
         y = cv_graphY0 - ky * yValue
 
         placeNameColor = placeColor[place];
@@ -4087,10 +4078,11 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             case cv_graphType_timeAvgTemp:
                 //tmpStr = placeNameAbbr[place];
                 tmpStr = placeName[place];
-                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                 switch (vp_place) {
                     case cv_allPlace:
-                        gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
+                        //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
+                        gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
                         break;
                 }
                 break;
@@ -4135,7 +4127,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             rgfcs1 = 0; rgfc1 = "greenYellow";
             rgfcs2 = 0.6; rgfc2 = "gold";
             rgfcs3 = 1; rgfc3 = "azure";
-            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)       
+            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)
             x += tmpW + 23;
             //----
             tmpStr = lf_setNrMonthsAvgTextShort(); //8.12.2023
@@ -4150,7 +4142,22 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             rgfcs1 = 0; rgfc1 = "aquamarine";
             rgfcs2 = 0.6; rgfc2 = "deepSkyBlue";
             rgfcs3 = 1; rgfc3 = "azure";
-            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH + 1, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)   
+            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH + 1, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)
+            x += tmpW + 23;
+            //----
+            tmpStr = lf_setTimeSliceText(); //10.12.2023
+            font = "bold 10pt verdana";
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            //let tmpLeft = 400; let tmpTop = 20;
+            //gBannerRectWithText(tmpLeft, tmpTop, tmpLeft + tmpW, tmpTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            //gBannerRectWithText(lo_currentMonthTextLeft+400, lo_currentMonthTextTop, lo_currentMonthTextLeft + tmpW, lo_currentMonthTextTop + tmpH, 6, 6, "azure", 1, "lightGray", font, "darkSlateGray", tmpStr, "lightGray", 2, 2)
+            lo_radialGradientFill = true;
+            rgfc1x = lo_currentMonthTextLeft + 0.7 * tmpW; rgfc1y = lo_currentMonthTextTop + 0.3 * tmpH; rgfc1r = 0.5 * tmpH;
+            rgfc2x = lo_currentMonthTextLeft + 0.3 * tmpW; rgfc2y = lo_currentMonthTextTop + 0.7 * tmpH; rgfc2r = Math.max(tmpW, tmpH);
+            rgfcs1 = 0; rgfc1 = "red";
+            rgfcs2 = 0.6; rgfc2 = "orange";
+            rgfcs3 = 1; rgfc3 = "azure";
+            gBannerRoundRectWithText(x, lo_currentMonthTextTop, tmpW, tmpH + 1, font, "darkSlateGray", tmpStr, 8, 9, 5, "azure", 1, "lightGray", "lightGray", 3, 3, false)
             break;
         }
             
@@ -4803,21 +4810,71 @@ function paint_graph_vaccExcessDeath_corelationLine(vp_month, vp_nrMonthsAvg, vp
     }
 }
 
-function lf_getAvgValue(vp_place, vp_month, vp_nrMonthsAvg) {
-
+function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
+    //--------------------------------------------------------------------------
+    // vp_place       ... lokacija meritev
+    // vp_timeSlice   ... vsi podatki / samo za dolečen mesec v vsakem letu / samo za dolečn letni čas v vsakem letu
+    // vp_month       ... zaporedna številka znotraj serije podatkov lokacije, ne pa globalno!!!
+    // vp_nrMonthsAvg ... čez koliko mesecev naj se povpreči, vključno z vp_month
+    //--------------------------------------------------------------------------
+    
     //---- če ni nič povprečenja podatkov, potem kar vrnem konkretno vrednost podatka (4.12.2023)
-    if (vp_nrMonthsAvg == 0) { return avgTemp[vp_place][vp_month] }
+    if (vp_nrMonthsAvg == 0) {
+        //---- tu je potrebno upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
+        switch (vp_timeSlice) {
+            case cv_timeSliceAll: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                //---- če delamo na vseh podatkih, ali pa na podatkih samo za določen mesec v letu, potem samo vrnemo pravi podatek
+                return avgTemp[vp_place][vp_month];
+                break;
+            case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                //---- če delamo za letni čas, je potrebno vrniti povprečje zadnjih treh mesecev
+                return (avgTemp[vp_place][vp_month - 2] + avgTemp[vp_place][vp_month - 1] + avgTemp[vp_place][vp_month]) / 3;
+                break;
+        }        
+    }
 
     //.... imamo povprečenje
-    let month1, nrMonths, tmpValue, tmpMonth
+    let month1, nrMonths, nrMonthsUsed, tmpValue, tmpMonth, tmpMonthValue, tmpMonthValue2
     month1 = vp_month - vp_nrMonthsAvg + 1
     if (month1 < 1) { month1 = 1 }
     nrMonths = vp_month - month1 + 1
-    tmpValue=0
+    nrMonthsUsed = 0;
+    tmpValue = 0
+    // zanka čez vse zahtevane mesece znotraj serije podatkov lokacije (ne globalno!!!)
     for (tmpMonth = month1; tmpMonth <= vp_month; tmpMonth++) {
-        tmpValue += avgTemp[vp_place][tmpMonth];
+        //---- tu je potrebno upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
+        switch (vp_timeSlice) {
+            case cv_timeSliceAll:
+                //---- mesec je tu sigurno pravi, ga uporabim
+                tmpValue += avgTemp[vp_place][tmpMonth];
+                break;
+            case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                //---- uporabimo samo mesec, ki je določen z vp_timeSlice
+                if (lf_monthValue(tmpMonth + offsetMonths[vp_place]) !== vp_timeSlice) { continue }; //če ni pravi mesec, ga preskočim
+                tmpValue += avgTemp[vp_place][tmpMonth];
+                nrMonthsUsed += 1;
+                break;
+            case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                //---- povprečju dodajamo le na zadnjem mesecu ustreznega letnega časa, dodamo mu pa povprečje zadnjih treh mesecev
+                tmpMonthValue = lf_monthValue(tmpMonth + offsetMonths[vp_place]);
+                tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                if (tmpMonthValue !== tmpMonthValue2) { continue };             //računam pri zadnjem mesecu letnega časa
+                if (!valueBetween(tmpMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                //---- očitno imam primerne podatke tega letnega časa
+                tmpValue += (avgTemp[vp_place][tmpMonth - 2] + avgTemp[vp_place][tmpMonth - 1] + avgTemp[vp_place][tmpMonth]) / 3;
+                nrMonthsUsed += 3;
+                break;
+        } 
     }
-    tmpValue/=nrMonths
+    //---- tu je spet potrebno upoštevati vp_timeSlice, število upoštevanih podatkov je namreč lahko različno glede na to, ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
+    switch (vp_timeSlice) {
+        case cv_timeSliceAll: //vsi meseci
+            tmpValue /= nrMonths; //uporabljeni so bili vsi meseci v razponu
+            break;
+        default: //določen mesec ali letni čas
+            tmpValue /= nrMonthsUsed; //uporabljenih je bilo samo del mesecev
+            break;
+    }
     return tmpValue
 }
 
@@ -4828,13 +4885,17 @@ function lf_getPlaceMonth(vp_place, vp_month) {
 
 }
 
-function lf_inspectDataValues(vp_place, vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
+function lf_inspectDataValues(vp_place, vp_timeSlice, vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
+    //----------------------------------------------
+    //
+    // ... 9.12.2023 dodal upoštevanje vp_timeSlice
+    //----------------------------------------------
 
     //console.log("------------------------")
 
-    let minY = 1000
-    let maxY = 0
-    let tmpValue, placeStart, placeEnd, offsetPlaceMonths, placeMonth;
+    let minY = 101
+    let maxY = -50
+    let tmpValue, tmpMonthValue, tmpMonthValue2, placeStart, placeEnd, offsetPlaceMonths, placeMonth;
     switch (vp_place) {
         case cv_allPlace: placeStart = 1; placeEnd = nrPlaces; break;
         default: placeStart = vp_place; placeEnd = vp_place; break;
@@ -4842,9 +4903,24 @@ function lf_inspectDataValues(vp_place, vp_monthStart, vp_monthEnd, vp_nrMonthsA
     for (place = placeStart; place <= placeEnd; place++) {
         offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll);
         for (month = vp_monthStart; month <= vp_monthEnd; month++) {
-            placeMonth = month - offsetPlaceMonths;
+            //placeMonth = month - offsetPlaceMonths;
+            placeMonth = month - offsetMonths[place];
             if (valueBetween(placeMonth, 1, nrMonths[place])) {  //zaporedna številka meseca mora biti znotraj razpona mesecev za to merilno lokacijo
-                tmpValue = lf_getAvgValue(place, placeMonth, cv_nrMonthsAvgMult * vp_nrMonthsAvg)
+                //---- smo znotraj razpona podatkov za trenutno lokacijo
+                //---- zdaj je potrebno upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
+                switch (vp_timeSlice) {
+                    case cv_timeSliceAll: break; //podatek v vsakem primeru upoštevamo
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                        if (lf_monthValue(month) !== vp_timeSlice) { continue };
+                        break;
+                    case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                        tmpMonthValue = lf_monthValue(month);
+                        tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                        if (tmpMonthValue !== tmpMonthValue2) { continue };             //računam pri zadnjem mesecu letnega časa
+                        if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                        break;
+                }
+                tmpValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * vp_nrMonthsAvg)
                 if (tmpValue < minY) {
                     minY = tmpValue
                     //console.log("place=" + place + " month=" + month + " minY=" + minY + " (maxY="+maxY+")")
@@ -5661,3 +5737,117 @@ function genPlaceTemplate(name, start, end) {
     }
 }
 
+//---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
+for (place = 1; place <= nrPlaces; place++) {
+    offsetMonths[place] = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
+    firstMonth[place] = 1 + offsetMonths[place];              //prvi mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
+    lastMonth[place] = offsetMonths[place] + nrMonths[place]; //zadnji mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
+}
+
+//let tmpStr = "from: " + minMonthAll.toString() + "." + minYearAll.toString() + ", to: " + maxMonthAll.toString() + "." + maxYearAll.toString() + ", nrMonthsAll=" + nrMonthsAll.toString();
+//console.log(tmpStr)
+
+function addPlace(name, shortName, abbr, color) {
+    //---- 2.12.2023
+    nrPlaces += 1;
+    //----
+    placeName[nrPlaces] = name;
+    placeNameShort[nrPlaces] = shortName;
+    placeNameAbbr[nrPlaces] = abbr;
+    placeColor[nrPlaces] = color;
+    //----
+    minMonth[nrPlaces] = 0;
+    minYear[nrPlaces] = 0;
+    maxMonth[nrPlaces] = 0;
+    maxYear[nrPlaces] = 0;
+    nrMonths[nrPlaces] = 0;
+    //----
+    avgTemp[nrPlaces] = [];
+
+}
+
+function addAvgTemp(vp_place, vp_year, vp_month, vp_avgTemp) {
+    //---- 2.12.2023
+    
+    //let vl_month = (13 - minMonth[vp_place]) + 12 * (maxYear[vp_place] - minYear[vp_place] - 1) + maxMonth[vp_place];
+    
+    //---- začetni mesec podatkov za to lokacijo
+    if (minMonth[vp_place] == 0) {
+        minMonth[vp_place] = vp_month;
+        minYear[vp_place] = vp_year;
+    };
+    if (monthYearBeforeMonthYear(vp_month, vp_year, minMonthAll, minYearAll)) {
+        minMonthAll = vp_month;
+        minYearAll = vp_year;
+    }
+    
+    //---- končni mesec podatkov za to lokacijo
+    maxMonth[vp_place] = vp_month;
+    maxYear[vp_place] = vp_year;
+    if (monthYearAfterMonthYear(vp_month, vp_year, maxMonthAll, maxYearAll)) {
+        maxMonthAll = vp_month;
+        maxYearAll = vp_year;
+    }
+
+    //---- število mesecev s podatki za to lokacijo
+    let vl_month = nrMonths[vp_place] + 1;
+    nrMonths[nrPlaces] = vl_month;
+    nrMonthsAll = 12 * (maxYearAll - minYearAll) + (maxMonthAll - minMonthAll) + 1;
+
+    //---- vpis podatka o temperaturi
+    avgTemp[vp_place][vl_month] = vp_avgTemp;
+
+}
+
+function addAvgTempYear(vp_place, vp_year, vp_month, vp_arrTemp) {
+    //---- 4.12.2023 -----------------------------
+    // vp_place ... za katero lokacijo meritev
+    // vp_year,vp_month ... od katerega meseca/leta naprej so ti podatki
+    // vp_arrTemp       ... polje podatkov o temperaturah za podani mesec in naprej proti koncu leta (ni nujno, da čisto do konca!!)
+    //--------------------------------------------
+
+    //let vl_month = (13 - minMonth[vp_place]) + 12 * (maxYear[vp_place] - minYear[vp_place] - 1) + maxMonth[vp_place];
+    
+    //---- za koliko mesecev so prisotni podatki v vp_arrTemp[]
+    let nrData = vp_arrTemp.length;
+    if (nrData <= 0) { return };
+
+    //---- začetni mesec podatkov za to lokacijo
+    if (minMonth[vp_place] == 0) {
+        minMonth[vp_place] = vp_month;
+        minYear[vp_place] = vp_year;
+    };
+    if (monthYearBeforeMonthYear(vp_month, vp_year, minMonthAll, minYearAll)) {
+        minMonthAll = vp_month;
+        minYearAll = vp_year;
+    }
+      
+    //---- končni mesec podatkov za to lokacijo
+    let vl_monthEnd = vp_month + nrData - 1;
+    maxMonth[vp_place] = vl_monthEnd;
+    maxYear[vp_place] = vp_year;
+    if (monthYearAfterMonthYear(vl_monthEnd, vp_year, maxMonthAll, maxYearAll)) {
+        maxMonthAll = vl_monthEnd;
+        maxYearAll = vp_year;
+    }
+
+    //---- vpis podatkov o temperaturi
+    let vl_month, vl_monthIndex
+    for (vl_monthIndex = 1; vl_monthIndex <= nrData; vl_monthIndex++)    {
+        vl_month = nrMonths[vp_place] + vl_monthIndex;
+        avgTemp[vp_place][vl_month] = vp_arrTemp[vl_monthIndex - 1];
+    }
+        
+    //---- število mesecev s podatki za to lokacijo
+    nrMonths[vp_place] += nrData;
+    nrMonthsAll = 12 * (maxYearAll - minYearAll) + (maxMonthAll - minMonthAll) + 1;
+
+}
+
+function monthYearBeforeMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
+    if ((12 * vp_year + vp_month) < (12 * vp_yearRef + vp_monthRef)) { return true } else { return false };
+}
+
+function monthYearAfterMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
+    if ((12 * vp_year + vp_month) > (12 * vp_yearRef + vp_monthRef)) { return true } else { return false };
+}
