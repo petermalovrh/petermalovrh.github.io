@@ -773,7 +773,7 @@ const cv_mode_timeAvgTempMultiPlace = 2;
 const cv_mode_timeAvgTempMultiTimeSlice = 3;
 const cv_mode_vaccExcessDeath = 4;
 const cv_mode_vaccExcessDeathMulti = 5;
-const cv_maxMode = 2;
+const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
 
 //---- izbrana časovna enota poseznega podatka, lahko je vse, posamezen mesec, ali pa posamezen letni čas
@@ -2028,6 +2028,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 //window.addEventListener("wheel", event, (passive = true) => {
 window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
+    let maxDiff;
     //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja dolžino "repa"
     if (lo_keyDownA) {
         if (lo_enabledIntChooserNrMonthsAvg) {
@@ -2061,17 +2062,19 @@ window.addEventListener("wheel", event => {
         return
     }
     else if (lo_keyDownU) {
+        maxDiff = 20;
         lo_addTempMarginUp -= delta;
-        if (lo_addTempMarginUp > 10) { lo_addTempMarginUp = 10 };
-        if (lo_addTempMarginUp < -10) { lo_addTempMarginUp = -10 };
+        if (lo_addTempMarginUp > maxDiff) { lo_addTempMarginUp = maxDiff };
+        if (lo_addTempMarginUp < -maxDiff) { lo_addTempMarginUp = -maxDiff };
         //console.log("lo_addTempMarginUp=" + lo_addTempMarginUp.toString())
         paint();
         return
     }
     else if (lo_keyDownD) {
+        maxDiff = 20;
         lo_addTempMarginDown -= delta;
-        if (lo_addTempMarginDown > 10) { lo_addTempMarginDown = 10 };
-        if (lo_addTempMarginDown < -10) { lo_addTempMarginDown = -10 };
+        if (lo_addTempMarginDown > maxDiff) { lo_addTempMarginDown = maxDiff };
+        if (lo_addTempMarginDown < -maxDiff) { lo_addTempMarginDown = -maxDiff };
         //console.log("lo_addTempMarginDown=" + lo_addTempMarginDown.toString())
         paint();
         return        
@@ -2284,14 +2287,18 @@ function paint() {
             break;
         case cv_mode_vaccExcessDeathMulti:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
-            paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            paint_graph_timeAvgTemp_multiPlace(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_vaccExcessDeath); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
         case cv_mode_timeAvgTempSingle:
             paint_graph_timeAvgTemp(marginLeft, marginTop, ctxW - marginLeft - marginRight, ctxH - marginTop - marginBottom, cv_graphType_timeAvgTemp, cv_allPlace, gl_timeSlice, 45, false, 0, 0, 0); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris
             break;
         case cv_mode_timeAvgTempMultiPlace:
             if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
-            paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeAvgTemp); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            paint_graph_timeAvgTemp_multiPlace(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeAvgTemp); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
+            break;
+        case cv_mode_timeAvgTempMultiTimeSlice:
+            if (lo_showGUI) { marginRight += 55; lo_graphMarginRight = marginRight; };
+            paint_graph_timeAvgTemp_multiTimeSlice(marginLeft, marginTop, marginRight, marginBottom, cv_graphType_timeAvgTemp); //spodaj pustim malo več, ker je recimo zdaj tam izpis porbljenega časa za izris, pa tudi vir podatkov
             break;
     }
     
@@ -2324,7 +2331,7 @@ function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
     
     //---- mora biti raztreseni diagram vacc-excDeaths
     switch (gl_mode) {
-        case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempSingle: { return false; }
+        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempMultiTimeSlice:  { return false; }
     }
     //---- miška mora biti znotraj področja grafa
     if (mouseX < lo_graphLeft || mouseX > lo_graphRight || mouseY < lo_graphTop || mouseY > lo_graphBottom) { return false };
@@ -2597,6 +2604,22 @@ function lf_setTimeSliceText() {
             }
             tmpStr += tmpStr2
             break;
+    }
+    return tmpStr;
+}
+
+function lf_setTimeSliceNameENG(vp_timeSlice) {
+
+    let tmpStr;
+
+    switch (vp_timeSlice) {
+        case cv_timeSliceAll: tmpStr = "All"; break;
+        case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+            tmpStr = lf_mesecNameLongENG((vp_timeSlice - cv_timeSliceMonthMin + 1)); break;
+        case cv_timeSliceWinter: tmpStr = "Winter"; break;
+        case cv_timeSliceSpring: tmpStr = "Spring"; break;
+        case cv_timeSliceSummer: tmpStr = "Summer"; break;
+        case cv_timeSliceAutumn: tmpStr = "Autumn"; break;
     }
     return tmpStr;
 }
@@ -3008,6 +3031,46 @@ function lf_yearStrShort(vp_month) {
     return ("'" + leto.toString().substring(2, 4));
 }
 
+function lf_mesecNameLongENG(vp_mesec) {
+
+    switch (vp_mesec) {
+        case 1: return "January"
+        case 2: return "February"
+        case 3: return "March"
+        case 4: return "April"
+        case 5: return "May"
+        case 6: return "June"
+        case 7: return "July"
+        case 8: return "August"
+        case 9: return "September"
+        case 10: return "October"
+        case 11: return "November"
+        case 12: return "December"
+    }
+    return "?"
+
+}
+
+function lf_mesecNameLongSLO(vp_mesec) {
+
+    switch (vp_mesec) {
+        case 1: return "Januar"
+        case 2: return "Februar"
+        case 3: return "Marec"
+        case 4: return "April"
+        case 5: return "Maj"
+        case 6: return "Junij"
+        case 7: return "Julij"
+        case 8: return "Avgust"
+        case 9: return "September"
+        case 10: return "Oktober"
+        case 11: return "November"
+        case 12: return "December"
+    }
+    return "?"
+
+}
+
 function lf_mesecName(vp_mesec) {
 
     switch (vp_mesec) {
@@ -3331,10 +3394,10 @@ function lf_getnrSelectedPlaces() {
     }
 }
 
-function paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
+function paint_graph_timeAvgTemp_multiPlace(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
 
     let rows, cols, row, col, x, y, itemWidth, itemHeight, place, ih, iw, k;
-    let fx, fy, fiw, fih, haveFocusPlace;
+    let fx, fy, fiw, fih, haveFocusGraph;
     let vGap = 10; let hGap = 10;
     //---- kakšna lokacija mora biti selektirana
     if (nrSelectedPlaces <= 0) { return };
@@ -3357,27 +3420,85 @@ function paint_graph_timeAvgTemp_multi(marginLeft, marginTop, marginRight, margi
     //----
     col = 1; row = 1;
     k = 0.15; //30.7.2023 v1.31
-    haveFocusPlace = false;
+    haveFocusGraph = false;
     for (place = 1; place <= nrPlaces; place++) {
         if (!lo_enabledPlace[place]) { continue };
-        ;[x, y, iw, ih] = paint_graph_timeAvgTemp_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k)
+        ;[x, y, iw, ih] = paint_graph_timeAvgTemp_multiPlace_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k)
         //30.7.2023 lokacijo v fokusu preskočim in jo izrišem na koncu po zanki lokacij
         if (place == lo_focusPlace) {
             ;[fx, fy, fiw, fih] = [x, y, iw, ih];
-            haveFocusPlace = true;
+            haveFocusGraph = true;
         } else {
-            paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
+            paint_graph_timeAvgTemp_multiPlace_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
         }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
     }
     //30.7.2023 po potrebi izrišem še lokacijo v fokusu
-    if (haveFocusPlace) {
-        paint_graph_timeAvgTemp_multi_drawSinglePlace(lo_focusPlace, fx, fy, fiw, fih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
+    if (haveFocusGraph) {
+        paint_graph_timeAvgTemp_multiPlace_drawSinglePlace(lo_focusPlace, fx, fy, fiw, fih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
     }
 }
 
-function paint_graph_timeAvgTemp_multi_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k) {
+function paint_graph_timeAvgTemp_multiTimeSlice(marginLeft, marginTop, marginRight, marginBottom, vp_graphType) {
+    //----------------------------------------
+    // 10.12.2023 nameče ali 12 grafov po mesecih, ali 4 grafe po letnih časih
+    //----------------------------------------
+    let rows, cols, row, col, x, y, itemWidth, itemHeight, place, ih, iw, k;
+    let fx, fy, fiw, fih, haveFocusGraph;
+    let vGap = 10; let hGap = 10;
+    //---- kakšna lokacija mora biti selektirana
+    if (nrSelectedPlaces <= 0) { return };
+    //---- za timeSlice more biti izbran ali nek mesec ali pa letni čas
+    let nrGraphs, timeSliceStart, timeSliceEnd;
+    switch (gl_timeSlice) {
+        case cv_timeSliceAll:
+            //return; //ne bom kar pustil praznega okna, ampak raje preklopim v multi prikaz po mesecih
+            gl_timeSlice = cv_timeSliceMonthMin;
+            nrGraphs = 12;
+            timeSliceStart = cv_timeSliceMonthMin;
+            timeSliceEnd = cv_timeSliceMonthMax;            
+            break;
+        case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+            nrGraphs = 12;
+            timeSliceStart = cv_timeSliceMonthMin;
+            timeSliceEnd = cv_timeSliceMonthMax;
+            break;
+        case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+            nrGraphs = 4;
+            timeSliceStart = cv_timeSliceWinter;
+            timeSliceEnd = cv_timeSliceAutumn;
+            break;
+    }
+    //---- dimenzije matrike
+    cols = Math.trunc(Math.sqrt(nrGraphs - 1)) + 1;
+    let ratio = ctxW / (ctxH + 1);
+    if (ratio > 1.7) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 };
+    if (cols > nrGraphs) { cols = nrGraphs };
+    rows = Math.trunc((nrGraphs - 1) / cols) + 1;
+    //----
+    itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
+    itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
+    //---- pregled Y vrednosti presežne smrtnosti in določanje ky
+    let vl_minY, vl_maxY, vl_dataRange;
+    let vl_forceDataRangeY = false;
+    if (gl_sameScaleY && vp_graphType==cv_graphType_timeAvgTemp) { //24.10.2023 normalizacija po Y      
+        ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(cv_allPlace, gl_timeSlice, gl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+        vl_forceDataRangeY = true;
+    }
+    //----
+    col = 1; row = 1;
+    k = 0.15; //30.7.2023 v1.31
+    let vl_timeSlice;
+    for (vl_timeSlice = timeSliceStart; vl_timeSlice <= timeSliceEnd; vl_timeSlice++) {
+        ;[x, y, iw, ih] = paint_graph_timeAvgTemp_multiTimeSlice_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, cv_allPlace, row, col, itemWidth, itemHeight, k)
+        paint_graph_timeAvgTemp_multiTimeSlice_drawSingleTimeSlice(cv_allPlace, vl_timeSlice, x, y, iw, ih, vp_graphType, vl_forceDataRangeY, vl_minY, vl_maxY, vl_dataRange)
+        col += 1;
+        if (col > cols) { col = 1; row += 1 };
+    }
+}
+
+function paint_graph_timeAvgTemp_multiPlace_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k) {
 
     let x, y, iw, ih, newY, yDiff, x0, y0;
  
@@ -3409,7 +3530,27 @@ function paint_graph_timeAvgTemp_multi_setPosition(marginLeft, marginTop, margin
     return [x, y, iw, ih]
 }
 
-function paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+function paint_graph_timeAvgTemp_multiTimeSlice_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, place, row, col, itemWidth, itemHeight, k) {
+
+    let x, y, iw, ih, newY, yDiff, x0, y0;
+ 
+    x = marginLeft + (col - 1) * (hGap + itemWidth);
+    y = marginTop + (row - 1) * (vGap + itemHeight);
+    iw = itemWidth; ih = itemHeight;
+        
+    if (col == 1 && row == 1 && !lo_showGUI) {
+        newY = 42; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+    }
+    if (col == cols && row == 1) {
+        newY = 59; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+    }
+        
+    return [x, y, iw, ih]
+}
+
+function paint_graph_timeAvgTemp_multiPlace_drawSinglePlace(place, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
     //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
     
     //---- risanje okvirja, kamor se bo potem notri narisal graf za tole konkretno lokacijo
@@ -3425,6 +3566,26 @@ function paint_graph_timeAvgTemp_multi_drawSinglePlace(place, x, y, iw, ih, vp_g
     
     //---- končno zdaj risanje grafa za posamezno lokacijo
     paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, gl_timeSlice, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
+    
+}
+
+function paint_graph_timeAvgTemp_multiTimeSlice_drawSingleTimeSlice(place, vp_timeSlice, x, y, iw, ih, vp_graphType, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
+    //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
+    //10.12.2023 prirejeno za risanje grafa za posamezen timeSlice
+
+    //---- risanje okvirja, kamor se bo potem notri narisal graf za tole konkretno lokacijo
+    gLine(x + 1, y + 2, x + iw - 1, y + 2, 2, "white", []);
+    gLine(x + 2, y + 1, x + 2, y + ih - 2, 2, "white", []);
+    gLine(x + 1, y + ih + 2, x + iw + 1, y + ih + 2, 2, "white", []);
+    gLine(x + iw + 2, y + 1, x + iw + 2, y + ih + 1, 2, "white", []);
+    ctx.beginPath(); ctx.rect(x, y, iw, ih); ctx.closePath();
+    ctx.fillStyle = "#FBFBFBFF";
+    if (place == lo_focusPlace) { ctx.fillStyle = "floralWhite"; };
+    ctx.fill();
+    ctx.setLineDash([]); ctx.strokeStyle = "lightGray"; ctx.strokeWidth = 1; ctx.stroke();
+    
+    //---- končno zdaj risanje grafa za posamezno lokacijo
+    paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, vp_timeSlice, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
     
 }
 
@@ -4047,10 +4208,29 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         }
 
         //---- 8.12.2023 izpis lokacije v kotu desno zgoraj v primeru MULTI grafov sem preselil sem, da se izpiše tudi za lokacije, ki so že definirane, nimajo pa še definiranih podatkov.
-        if (vp_place != cv_allPlace) {
-            tmpStr = placeName[place];
-            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-            gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+        //if (vp_place != cv_allPlace) {
+        //    tmpStr = placeName[place];
+        //    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+        //    gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+        //}
+        switch (vp_place) {
+            case cv_allPlace:
+                //---- risanje skupno za vse lokacije. Vprašanje je, ali delamo ločeno po mesecih ali letnih časih (multiTimeSlice), ali ne?
+                switch (gl_mode) {
+                    case cv_mode_timeAvgTempMultiTimeSlice:
+                        //---- multi mode - risanje skupno za vse lokacije in ločeno po mesecih ali pa letnih časih
+                        tmpStr = lf_setTimeSliceNameENG(vp_timeSlice);
+                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", "blue", tmpStr, "lightGray", 2, 2);
+                        break;
+                }
+                break;
+            default:
+                //---- risanje ločeno za eno lokacijo, se pravi da smo očitno v multiPlace mode
+                tmpStr = placeName[place];
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);                
+                break;
         }
 
         //---- če je mesec prikaza lokacije izven podatkovnega območja te lokacije
@@ -4615,7 +4795,7 @@ function paint_graph_timeExcessDeath_tipVerticalLine(vl_monthStart, kx, cv_graph
 
 function paint_graph_vaccExcessDeath(vp_left, vp_top, vp_width, vp_height) {
     //----
-    //24.10.2023 ta funkcija se že nekaj mesecev ne uporablja več. Nadomeščata jo univerzalni funkciji paint_graph_timeAvgTemp() in paint_graph_timeAvgTemp_multi() !!
+    //24.10.2023 ta funkcija se že nekaj mesecev ne uporablja več. Nadomeščata jo univerzalni funkciji paint_graph_timeAvgTemp() in paint_graph_timeAvgTemp_multiPlace() !!
     //----
     const cv_graphLeft = vp_left + 20 //X koordinata Y osi oziroma začetka X osi
     const cv_graphRight = vp_left + vp_width - 45 //X koordinata konca X osi
