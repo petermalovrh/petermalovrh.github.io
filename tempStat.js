@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.12"
+const gl_versionNr = "v0.13"
 const gl_versionDate = "12.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -111,6 +111,9 @@ addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
 const cv_placeJavorje = 14; // JAVORJE NAD POLJANAMI ... 12.12.2023
 //    dve postaji, obe sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
 addPlace("Javorje (695m)", "Javorje", "JAPO", "olive");
+const cv_placeCelje = 15; // CELJE ... 12.12.2023
+//    cel kup postaj, vse sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
+addPlace("Celje (245m)", "Celje", "CE", "blueViolet");
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -969,6 +972,105 @@ addAvgTempYear(cv_placeJavorje, 1988, 1, [2.6, 1.4, 2.9, 7.8, 12.5, 14.7, 19.1, 
 addAvgTempYear(cv_placeJavorje, 1989, 1, [0.7, 3.2, 6.8, 8, 12.8, 13.9, 17.6, 17, 13.7, 10.2, 3.1, 1.6]);
 addAvgTempYear(cv_placeJavorje, 1990, 1, [0.4, 5.1, 7.5, 6.6, 13.4, 14.8, 17.5, 18, 12.2, 10.2, 4.1, -1.3]);
 
+
+//id=1050  CELJE - MEDLOG (lon=15.2285, lat=46.2330, viš=241m)
+addAvgTempYear(cv_placeCelje, 1948, 1, [3.9, -1.7, 4.3, 10.8, 14.9, 16.1, 16.9, 18.5, 14.9, 10.5, 3.5, -1]);
+addAvgTempYear(cv_placeCelje, 1949, 1, [0.9, -0.1, 2.2, 11.1, 13.6, 15.9, 18.8, 17.5, 15.5, 10.5, 6, 2.1]);
+addAvgTempYear(cv_placeCelje, 1950, 1, [-3.7, 2.2, 5.9, 9.1, 16, 19.4, 21.5, 19.1, 15.1, 8.4, 5.5, 0.9]);
+addAvgTempYear(cv_placeCelje, 1951, 1, [1.9, 3.4, 4.8, 9.3, 14, 17.9, 18.7, 19.2, 16.6, 8.1, 8, 1.5]);
+addAvgTempYear(cv_placeCelje, 1952, 1, [-2.1, -2.5, 2.7, 12.2, 13.7, 18.7, 20.9, 19.9, 12.6, 9.9, 3.8, -0.8]);
+//addAvgTempYear(cv_placeCelje, 1953, 1, [-2.7, -0.8, 4.1, 10.2, 13.5, 17.5, 19.6, , , , , ]);
+//id=1060  CELJE - LEVEC - LETALIŠČE (lon=15.2452, lat=46.2330, viš=244m)
+//addAvgTempYear(cv_placeCelje, 1953, 1, [, , , , , , , 16.7, 15.2, 11.8, 3.2, 0.9]);
+addAvgTempYear(cv_placeCelje, 1953, 1, [-2.7, -0.8, 4.1, 10.2, 13.5, 17.5, 19.6, 16.7, 15.2, 11.8, 3.2, 0.9]);
+addAvgTempYear(cv_placeCelje, 1954, 1, [-6.1, -4.9, 5.4, 7.9, 13, 18.7, 17.5, 17.2, 15.4, 9, 3.7, 2.7]);
+addAvgTempYear(cv_placeCelje, 1955, 1, [0.2, 0.8, 0.8, 7.3, 12.6, 16.6, 19, 17.5, 13.6, 8.8, 3, 1.3]);
+addAvgTempYear(cv_placeCelje, 1956, 1, [1.8, -9.1, 1.8, 8.2, 14.1, 16.1, 19.4, 18.2, 14.5, 8.5, 1.8, -1.3]);
+addAvgTempYear(cv_placeCelje, 1957, 1, [-4.1, 4, 5.8, 8.9, 10.8, 18.9, 19.2, 16.8, 13.5, 8.7, 5.9, 1.3]);
+addAvgTempYear(cv_placeCelje, 1958, 1, [-3, 3.7, 1, 7.2, 17.6, 17.3, 19.4, 18.7, 14.2, 10.6, 6.2, 2.7]);
+//addAvgTempYear(cv_placeCelje, 1959, 1, [0.6, -1.6, 7.2, 10.1, 13.6, 17.1, 20.2, 17.8, 12.5, 7.1, 5, ]);
+//id=1063  CELJE - ŽALEC (lon=15.2452, lat=46.2497, viš=254m)
+//addAvgTempYear(cv_placeCelje, 1959, 1, [, , , , , , , , , , , 3.2]);
+addAvgTempYear(cv_placeCelje, 1959, 1, [0.6, -1.6, 7.2, 10.1, 13.6, 17.1, 20.2, 17.8, 12.5, 7.1, 5, 3.2]);
+addAvgTempYear(cv_placeCelje, 1960, 1, [-1, 1.6, 5.1, 9.8, 14.2, 18.7, 17.9, 18.8, 13.3, 11.9, 6.7, 3.1]);
+//addAvgTempYear(cv_placeCelje, 1961, 1, [-2.3, , , , , , , , , , , ]);
+//id=1064  CELJE - LOKROVEC (lon=15.2452, lat=46.2664, viš=255m)
+//addAvgTempYear(cv_placeCelje, 1961, 1, [, , 6.5, 12.3, 12.7, 18.2, 17.5, 17.3, 15.4, 11.2, 5.1, -1.9]);
+addAvgTempYear(cv_placeCelje, 1961, 1, [-2.3, 1, 6.5, 12.3, 12.7, 18.2, 17.5, 17.3, 15.4, 11.2, 5.1, -1.9]); //manjkajoči feb, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+//addAvgTempYear(cv_placeCelje, 1962, 1, [0.1, 0.5, 1.8, 8.6, 12.3, 14.9, 17.1, 18.9, 13, 8.8, , ]);
+//id=1075  CELJE - MEDLOG (lon=15.2285, lat=46.2497, viš=245m)
+//addAvgTempYear(cv_placeCelje, 1962, 1, [, , , , , , , , , , 3.9, -4.3]);
+addAvgTempYear(cv_placeCelje, 1962, 1, [0.1, 0.5, 1.8, 8.6, 12.3, 14.9, 17.1, 18.9, 13, 8.8, 3.9, -4.3]);
+addAvgTempYear(cv_placeCelje, 1963, 1, [-7.2, -4.2, 2.9, 10.4, 13.8, 18.3, 19.7, 18.9, 15.5, 9.3, 10.1, -4.1]);
+addAvgTempYear(cv_placeCelje, 1964, 1, [-7.5, -0.4, 3.4, 10, 14, 19.5, 19.2, 17.3, 14.8, 9.3, 6, 0.3]);
+//addAvgTempYear(cv_placeCelje, 1965, 1, [0, -2.7, 5.1, 7.9, 13, 17.7, 18.7, 16.4, 14.8, 8, , ]);
+//id=1081  CELJE - LEVEC - LETALIŠČE (lon=15.2452, lat=46.2330, viš=244m)
+//addAvgTempYear(cv_placeCelje, 1965, 1, [, , , , , , , , , , , 1.5]);
+addAvgTempYear(cv_placeCelje, 1965, 1, [0, -2.7, 5.1, 7.9, 13, 17.7, 18.7, 16.4, 14.8, 8, 4, 1.5]);  //manjkajoči nov, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeCelje, 1966, 1, [-4.4, 6.6, 3.7, 11.2, 13.5, 17.9, 17.5, 16.7, 14.6, 13.2, 2.1, 0.3]);
+addAvgTempYear(cv_placeCelje, 1967, 1, [-2.1, 1.1, 6.1, 8.2, 14.7, 17.1, 21, 19, 15.7, 10.6, 4.7, -1.6]);
+addAvgTempYear(cv_placeCelje, 1968, 1, [-4.8, 2.5, 4.7, 10.9, 14.3, 17.7, 18.7, 17.2, 14.1, 10.3, 5, -3.4]);
+addAvgTempYear(cv_placeCelje, 1969, 1, [-2.7, -2.2, 3.3, 8.7, 15.9, 16.7, 18.3, 16.9, 14.7, 8.4, 7.4, -4.1]);
+addAvgTempYear(cv_placeCelje, 1970, 1, [-1.1, 0.1, 2.7, 8, 12, 18.6, 18.5, 18.7, 14.7, 8.4, 6.6, -1.4]);
+addAvgTempYear(cv_placeCelje, 1971, 1, [-2.2, 1, 1.7, 10.1, 15.4, 16.7, 19, 19.4, 11.4, 7.3, 3.6, -0.8]);
+addAvgTempYear(cv_placeCelje, 1972, 1, [-3.2, 3, 6, 9.5, 13.4, 17.7, 19, 17.7, 11.5, 7.9, 4.2, 0]);
+addAvgTempYear(cv_placeCelje, 1973, 1, [-1.4, 0.6, 3.5, 7.3, 15.1, 17.9, 18.8, 18.2, 14.7, 7, 1.9, -0.7]);
+addAvgTempYear(cv_placeCelje, 1974, 1, [1.4, 5.3, 6.1, 8.1, 13.5, 15.8, 18.8, 19.7, 14.6, 6.1, 5.3, 2.2]);
+addAvgTempYear(cv_placeCelje, 1975, 1, [3.6, 0.3, 5.3, 8.9, 15.4, 16, 19.7, 17.7, 16.7, 8.6, 2.9, -0.8]);
+//addAvgTempYear(cv_placeCelje, 1976, 1, [-0.6, -0.5, 0.6, 9, 14.3, 17.9, 20.5, 15.4, 13.7, , , ]);
+//id=1901  CELJE (lon=15.2477, lat=46.2444, viš=244m)
+//addAvgTempYear(cv_placeCelje, 1976, 1, [, , , , , , , , , , 6.2, -0.2]);
+addAvgTempYear(cv_placeCelje, 1976, 1, [-0.6, -0.5, 0.6, 9, 14.3, 17.9, 20.5, 15.4, 13.7, 10.1, 6.2, -0.2]); //manjkajoči okt, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeCelje, 1977, 1, [2, 4.9, 8.1, 8.7, 14.8, 19.6, 19.6, 18.8, 12.9, 11.6, 5.7, -0.1]);
+addAvgTempYear(cv_placeCelje, 1978, 1, [-0.1, 0.9, 6.7, 7.9, 12.2, 17.2, 17.9, 16.9, 14, 8.9, 0.7, -0.4]);
+addAvgTempYear(cv_placeCelje, 1979, 1, [-2.8, 1.7, 6.9, 8.2, 14.7, 19.4, 18.3, 16.9, 14.6, 8.8, 4.8, 2.7]);
+addAvgTempYear(cv_placeCelje, 1980, 1, [-2.9, 2, 4.3, 7.6, 11.9, 16.7, 18.1, 18.8, 15, 9.3, 2.5, -2.3]);
+addAvgTempYear(cv_placeCelje, 1981, 1, [-4.3, -0.6, 7.1, 9.6, 13.9, 18.2, 18.6, 18, 15.7, 11.8, 3.7, -0.6]);
+addAvgTempYear(cv_placeCelje, 1982, 1, [-2.5, -1.6, 4.1, 7.5, 14.3, 18.5, 20.3, 18.8, 17, 10.6, 6, 3.5]);
+addAvgTempYear(cv_placeCelje, 1983, 1, [1.6, -2, 5.1, 11.7, 15, 17.9, 21.7, 18.9, 15.1, 9.4, 0.9, 0.2]);
+addAvgTempYear(cv_placeCelje, 1984, 1, [-1.3, -0.1, 3.7, 8.7, 13, 17.2, 18.2, 17.7, 14.5, 11.2, 5, 0.5]);
+addAvgTempYear(cv_placeCelje, 1985, 1, [-6.9, -4.4, 4, 9.4, 15, 16.5, 20.2, 19.1, 15.4, 8.9, 2.2, 4]);
+addAvgTempYear(cv_placeCelje, 1986, 1, [0.2, -4.1, 2.3, 9.9, 17.2, 16.8, 19, 19.6, 14, 9.5, 5, -2.2]);
+addAvgTempYear(cv_placeCelje, 1987, 1, [-4.1, -0.7, 0.1, 10.7, 13.2, 17.9, 20.8, 17.9, 17.7, 11, 4.4, 1.5]);
+addAvgTempYear(cv_placeCelje, 1988, 1, [3.1, 3.1, 4.8, 9.6, 15, 17.1, 21.1, 19.4, 14.8, 10.7, 0.9, -0.4]);
+addAvgTempYear(cv_placeCelje, 1989, 1, [-1, 3.7, 8, 10.6, 14, 16.5, 20, 18.9, 14.8, 9.2, 2.8, 2]);
+addAvgTempYear(cv_placeCelje, 1990, 1, [-1.2, 5.1, 7.1, 9.1, 15.6, 17.9, 19.1, 18.8, 13.3, 10.7, 4.5, -0.5]);
+addAvgTempYear(cv_placeCelje, 1991, 1, [0.2, -3.5, 7.4, 8.5, 11.6, 18.1, 21, 19.6, 16.4, 8.5, 5, -2.3]);
+addAvgTempYear(cv_placeCelje, 1992, 1, [0.6, 2.6, 5.4, 10.4, 15.3, 18.3, 20.5, 23.1, 15.5, 9.2, 6.3, 0.4]);
+addAvgTempYear(cv_placeCelje, 1993, 1, [1, -0.4, 4.4, 10.2, 16.6, 18.9, 19.7, 20, 14.8, 11.1, 1.8, 1.6]);
+addAvgTempYear(cv_placeCelje, 1994, 1, [3.4, 2.1, 9.6, 9.7, 15.1, 19, 21.4, 21.1, 16.9, 8.3, 7.3, 1.4]);
+addAvgTempYear(cv_placeCelje, 1995, 1, [0.2, 4.2, 4.4, 10.5, 14.8, 16.9, 21.7, 18.4, 14, 11.3, 3.9, 0.6]);
+addAvgTempYear(cv_placeCelje, 1996, 1, [-1, -1.8, 2.4, 9.8, 16.1, 19.2, 18.4, 18.8, 12.5, 10.6, 7.2, -1.6]);
+addAvgTempYear(cv_placeCelje, 1997, 1, [-1.3, 3, 5.6, 7.5, 15.8, 18.9, 19.3, 19.1, 15.2, 8.5, 4.8, 2.1]);
+addAvgTempYear(cv_placeCelje, 1998, 1, [2.7, 3.6, 4.6, 10.9, 14.8, 19.6, 20.6, 20.2, 15, 10.7, 2.6, -3.8]);
+addAvgTempYear(cv_placeCelje, 1999, 1, [0.8, -0.2, 7.4, 11, 15.9, 18.8, 20.2, 19.4, 16.8, 11.2, 2.3, 0]);
+addAvgTempYear(cv_placeCelje, 2000, 1, [-3.3, 3.3, 6.9, 13.1, 16.5, 20.3, 19.2, 21, 15.4, 12.3, 8.3, 4.4]);
+addAvgTempYear(cv_placeCelje, 2001, 1, [2.9, 3.8, 8.9, 9.2, 16.6, 17.7, 21, 21, 13.1, 13.3, 2.7, -3.1]);
+addAvgTempYear(cv_placeCelje, 2002, 1, [-0.1, 4.7, 7.4, 9.5, 16.9, 20.5, 20.9, 19.4, 13.9, 11, 8.6, 2.1]);
+addAvgTempYear(cv_placeCelje, 2003, 1, [-2, -2.7, 6.1, 9.2, 17.4, 23, 22, 23.8, 14.3, 8.3, 7.6, 1]);
+addAvgTempYear(cv_placeCelje, 2004, 1, [-1, 1.6, 4.2, 10, 13.3, 18.2, 19.9, 19.9, 14.7, 12.3, 5.4, 1.2]);
+addAvgTempYear(cv_placeCelje, 2005, 1, [-0.7, -2.2, 3.9, 10.4, 15.7, 19, 20.3, 17.9, 15.6, 10.9, 4.6, -0.2]);
+addAvgTempYear(cv_placeCelje, 2006, 1, [-3, -0.6, 3.9, 10.9, 14.7, 19.6, 22.4, 17.1, 16.3, 12.2, 7.5, 3.6]);
+addAvgTempYear(cv_placeCelje, 2007, 1, [4.1, 5.4, 7.2, 12.7, 16.8, 20.8, 21.5, 19.4, 13.5, 9.2, 4.1, -0.5]);
+//addAvgTempYear(cv_placeCelje, 2008, 1, [2.5, 3.3, , , , , , , , , , ]);
+//id=2482  CELJE - MEDLOG (lon=15.2259, lat=46.2366, viš=242m)
+//addAvgTempYear(cv_placeCelje, 2008, 1, [, , , 10, 15.9, 19.4, 20.1, 19.4, 13.9, 10.8, 5.6, 1.9]);
+addAvgTempYear(cv_placeCelje, 2008, 1, [2.5, 3.3, 6.5, 10, 15.9, 19.4, 20.1, 19.4, 13.9, 10.8, 5.6, 1.9]); //manjkajoči mar, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeCelje, 2009, 1, [-1.9, 1.5, 5.8, 12.3, 16.8, 17.9, 20.2, 20.2, 16.2, 10.1, 7.1, 1.6]);
+addAvgTempYear(cv_placeCelje, 2010, 1, [-2, 0.5, 5.4, 10.6, 15.4, 19.5, 22.1, 19.3, 13.6, 8.3, 7.3, -0.8]);
+addAvgTempYear(cv_placeCelje, 2011, 1, [1, 0.2, 5.6, 11.8, 15.1, 19, 19.6, 20.8, 17.6, 8.9, 3.4, 2.9]);
+addAvgTempYear(cv_placeCelje, 2012, 1, [0.7, -3.1, 7.8, 10.8, 15.2, 20.3, 21.4, 20.8, 16, 10.6, 8.1, 0.2]);
+addAvgTempYear(cv_placeCelje, 2013, 1, [0.8, -0.1, 2.7, 11.6, 14.5, 18.7, 21.7, 20.6, 14.8, 12.5, 6.7, 2.6]);
+addAvgTempYear(cv_placeCelje, 2014, 1, [4.2, 3.9, 8.3, 12.2, 15, 18.9, 20.1, 18.7, 15.3, 12.9, 8.7, 2.8]);
+addAvgTempYear(cv_placeCelje, 2015, 1, [2.1, 1.3, 6.2, 10.8, 15.9, 19.1, 22.5, 20.7, 15.5, 10.1, 5.6, 1.8]);
+addAvgTempYear(cv_placeCelje, 2016, 1, [-0.1, 5.3, 6.5, 11.4, 14.6, 18.7, 21.5, 18.8, 16.5, 9.4, 6, -0.9]);
+addAvgTempYear(cv_placeCelje, 2017, 1, [-5.1, 4, 8.4, 10.5, 15.8, 20.2, 21.7, 20.9, 13.4, 10.4, 5.6, 2]);
+addAvgTempYear(cv_placeCelje, 2018, 1, [4.2, -1.3, 3.6, 13.7, 17.1, 19.5, 20.3, 20.9, 16, 11.7, 7.3, 1.3]);
+addAvgTempYear(cv_placeCelje, 2019, 1, [-0.6, 3.3, 7.3, 10.3, 12.5, 21.7, 21.2, 21.1, 15.5, 12.3, 8.3, 3]);
+addAvgTempYear(cv_placeCelje, 2020, 1, [0.7, 5.7, 6.2, 10.7, 14.3, 18.3, 20.1, 20.8, 15.7, 11.2, 4.4, 2]);
+addAvgTempYear(cv_placeCelje, 2021, 1, [0.7, 4.3, 5.1, 8.4, 12.9, 21.1, 21.8, 19.1, 15.2, 8.8, 5, 1.1]);
+addAvgTempYear(cv_placeCelje, 2022, 1, [0.4, 3.7, 4.1, 9.4, 16.9, 21.5, 22.1, 21.5, 14.8, 13.3, 7, 3.2]);
+
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
     offsetMonths[place] = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
@@ -1009,7 +1111,7 @@ var gl_timeSlice = cv_timeSliceAll;
 var gl_sameScaleY = false; //24.10.2023
 var gl_showExactValuesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
 var gl_showExactLinesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
-var gl_showAvgFuzzyStartOscilations = true; //12.12.2023
+var gl_showAvgFuzzyStartOscilations = false; //12.12.2023
 
 const cv_graphType_vaccExcessDeath = 1;
 const cv_graphType_timeAvgTemp = 2;
