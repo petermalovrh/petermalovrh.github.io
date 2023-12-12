@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.9"
-const gl_versionDate = "11.12.2023"
+const gl_versionNr = "v0.10"
+const gl_versionDate = "12.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -79,7 +79,7 @@ addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGree
 const cv_placeMariborTabor = 3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
 addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
 const cv_placeLjubljanaBezigrad = 4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
-addPlace("Ljubljana Bezigrad (299m)", "LJ Bezigrad", "LJBE", "limeGreen");
+addPlace("Ljubljana Bezigrad (299m)", "LJ Bezigrad", "LJBE", "mediumSeaGreen");
 const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
 addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
 const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
@@ -101,6 +101,16 @@ const cv_placeSlovenjGradecSmartno = 11; // ŠMARTNO PRI SLOVENJ GRADCU (2513m) 
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
 addPlace("Slovenj Gradec " + scSch + "martno (445m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
+const cv_placeKrvavec = 12; // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
+//    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
+//    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
+addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
+const cv_placeMurskaSobota = 13; // MURSKA SOBOTA ... 12.12.2023
+//    cel kup prestavljanja postaje po Murski Soboti sem in tja, vse sem združil skupaj od 1949-2022, spodaj glej id-je in podatke konkretnih postaj
+addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
+const cv_placeJavorje = 14; // JAVORJE NAD POLJANAMI ... 12.12.2023
+//    dve postaji, obe sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
+addPlace("Javorje (695m)", "Javorje", "JANP", "olive");
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -756,6 +766,201 @@ addAvgTempYear(cv_placeSlovenjGradecSmartno, 2019, 1, [-1.6, 2.7, 6, 9.6, 11.1, 
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2020, 1, [-0.9, 3.6, 4.6, 9.8, 13.1, 17.4, 18.9, 19.6, 14.6, 9.7, 3.3, 0.8]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2021, 1, [-1.7, 1.9, 3.7, 6.8, 11.8, 20.3, 20.9, 17.9, 14.2, 8.4, 4.2, -1.4]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2022, 1, [-1.2, 2.2, 2.8, 8.2, 15.8, 20.1, 21.1, 20.2, 13.7, 12, 5.7, 0.1]);
+
+//myTool POZOR: id=14
+addAvgTempYear(cv_placeKrvavec, 1961, 1, [-5.8, -2.2, -3.3, 6, 6.1, 11.2, 11.2, 12.5, 12.4, 6.6, 1.3, -3.7]); //manjkajoči mar, nadomestim s povprečjem iz dveh naslednjih podatka
+addAvgTempYear(cv_placeKrvavec, 1962, 1, [-3.3, -5.3, -4.8, 3, 5.5, 8.9, 11.9, 14.2, 9.3, 5.1, -0.6, -6]);
+addAvgTempYear(cv_placeKrvavec, 1963, 1, [-9.7, -7.1, -1.9, 3.2, 7.1, 11.1, 13.5, 12.7, 10.5, 5.1, 2.7, -4.6]);
+addAvgTempYear(cv_placeKrvavec, 1964, 1, [-3.6, -3.9, -1.9, 3.6, 8.4, 12.7, 12.8, 11.2, 8.8, 3.8, 2.6, -2.1]);
+addAvgTempYear(cv_placeKrvavec, 1965, 1, [-3.6, -8.9, -2.6, 0.3, 5.1, 11.8, 12, 10.8, 8.4, 5.3, 0, -1.9]);
+addAvgTempYear(cv_placeKrvavec, 1966, 1, [-7.2, 1.1, -2.2, 4.7, 9.1, 12.5, 12.5, 11, 9.8, 8, -0.9, -4.7]);
+addAvgTempYear(cv_placeKrvavec, 1967, 1, [-5.3, -3.6, 0, 1.9, 7.5, 10.5, 14.8, 13.5, 10.8, 9.1, 2.7, -4.9]);
+addAvgTempYear(cv_placeKrvavec, 1968, 1, [-6, -2, -1.5, 5.1, 8.9, 11.4, 12.5, 10.2, 9, 7.1, 1.7, -5.7]);
+addAvgTempYear(cv_placeKrvavec, 1969, 1, [-3.5, -6, -2.9, 1.2, 10.2, 10.3, 13.4, 11.5, 9.8, 6.9, 1.5, -7]);
+addAvgTempYear(cv_placeKrvavec, 1970, 1, [-3.4, -6.6, -3.9, 0.4, 5, 12.3, 13.4, 13.9, 9.5, 4.6, 2.9, -3.3]);
+addAvgTempYear(cv_placeKrvavec, 1971, 1, [-4.2, -4.5, -5, 3.8, 9.4, 11.7, 13, 13, 7.6, 6, 0.1, 0.9]);  //manjkajoči jun-avg, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeKrvavec, 1972, 1, [-6.4, -4.2, -3.4, 2.7, 8, 11.2, 12.6, 12.2, 6.8, 2.9, 1.7, -1.8]);  //manjkajoči feb-maj, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+//addAvgTempYear(cv_placeKrvavec, 1973, 1, [-4.2, -4, -1.9, 1.6, , , , , , , , ]);
+//myTool POZOR: id=1614
+//addAvgTempYear(cv_placeKrvavec, 1973, 1, [, , , , , , , , 9.5, 3.8, -1.2, -4.3]);
+addAvgTempYear(cv_placeKrvavec, 1973, 1, [-4.2, -4, -1.9, 1.6, 6.7, 9, 11.4, 12.4, 9.5, 3.8, -1.2, -4.3]); //manjkajoči maj-avg, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeKrvavec, 1974, 1, [-1.4, -3.6, -0.7, -0.5, 4, 6.8, 10.2, 12.6, 7.8, -2.1, -1.7, -1.2]);
+addAvgTempYear(cv_placeKrvavec, 1975, 1, [-1.5, -4, -2.7, 0.3, 6.2, 7.7, 11.1, 10.6, 10.2, 3.7, -1.9, -1.4]);
+addAvgTempYear(cv_placeKrvavec, 1976, 1, [-4, -2.9, -5.1, 0.6, 5.8, 9.5, 11.7, 7.7, 5.7, 5.3, -0.9, -5]);
+addAvgTempYear(cv_placeKrvavec, 1977, 1, [-3.6, -2.7, 1.2, -0.2, 4.9, 8.4, 10.2, 9.7, 5.9, 6, -0.9, -2.5]);
+addAvgTempYear(cv_placeKrvavec, 1978, 1, [-4.6, -6, -1.9, -0.8, 2.8, 7.8, 9, 9.3, 7.5, 4.7, 2.1, -3.2]);
+addAvgTempYear(cv_placeKrvavec, 1979, 1, [-7.2, -5, -2.1, -1.2, 5.2, 10.6, 9.3, 9.4, 8.6, 3.7, -0.8, -1.4]);
+addAvgTempYear(cv_placeKrvavec, 1980, 1, [-6.7, -3.7, -3.6, -2.1, 2.4, 7.5, 9.2, 11.5, 8.7, 3.4, -1.6, -4.2]);
+addAvgTempYear(cv_placeKrvavec, 1981, 1, [-7.8, -6.8, 0.3, 1.6, 5.1, 9.6, 10.1, 11, 8, 3.8, -0.3, -5.7]);
+addAvgTempYear(cv_placeKrvavec, 1982, 1, [-3.2, -4.7, -3.5, -1.2, 6.1, 10.1, 12.2, 11.5, 11.1, 4, 1.6, -2.2]);
+addAvgTempYear(cv_placeKrvavec, 1983, 1, [0, -7.3, -0.4, 1.5, 5.9, 9.4, 15, 11.2, 9.3, 5.1, -0.2, -2.9]);
+addAvgTempYear(cv_placeKrvavec, 1984, 1, [-5.5, -7.2, -5, -0.2, 2.7, 7.5, 10.7, 9.8, 6.9, 5.3, 1.9, -2.3]);
+addAvgTempYear(cv_placeKrvavec, 1985, 1, [-8.5, -5.4, -3.3, 0.2, 6.2, 7, 12.2, 12, 10.7, 5.7, -3.4, 0.2]);
+addAvgTempYear(cv_placeKrvavec, 1986, 1, [-6.6, -9, -2.4, 0.7, 8.4, 8.7, 10.6, 11.6, 8.5, 6.1, 1.4, -2.9]);
+addAvgTempYear(cv_placeKrvavec, 1987, 1, [-7.3, -3.2, -7, 1.7, 3.8, 8.3, 12.3, 10.4, 11.8, 4.2, 0.4, -0.4]);
+addAvgTempYear(cv_placeKrvavec, 1988, 1, [-2.4, -4.8, -4.2, 1.3, 5.5, 8.4, 12.9, 12.7, 8, 6, -2.3, -2]);
+addAvgTempYear(cv_placeKrvavec, 1989, 1, [1, 0.4, 1.6, 1.1, 5.4, 7.5, 11.6, 11.2, 8, 6.1, -0.8, -1.6]);
+addAvgTempYear(cv_placeKrvavec, 1990, 1, [-0.4, 0.5, 2.3, -0.4, 7.1, 8.6, 11.4, 12, 6.5, 6.1, -0.7, -5.5]);
+addAvgTempYear(cv_placeKrvavec, 1991, 1, [-3.3, -6, 0.7, -0.1, 1.8, 8.5, 12.7, 12.1, 9.6, 2.1, -0.5, -3.4]);
+addAvgTempYear(cv_placeKrvavec, 1992, 1, [-0.9, -2.2, -1.8, 1.1, 6.8, 9.1, 12.3, 15.5, 8.7, 2.7, 1.6, -1.9]);
+addAvgTempYear(cv_placeKrvavec, 1993, 1, [-2.1, -2.8, -2.8, 2.3, 7.9, 9.5, 10.6, 12.3, 6.7, 4.4, -2.5, -2.6]);
+addAvgTempYear(cv_placeKrvavec, 1994, 1, [-2.5, -5.4, 1.6, 0.8, 5.7, 10.1, 13.6, 13.5, 8.7, 4, 3.1, -1]);
+addAvgTempYear(cv_placeKrvavec, 1995, 1, [-6.4, -1.5, -4.4, 1.5, 5.8, 7.7, 13.7, 10.3, 5.8, 8.3, -1.6, -3.8]);
+addAvgTempYear(cv_placeKrvavec, 1996, 1, [-3.4, -6.8, -5.2, 1.8, 6.2, 10.2, 9.7, 10.7, 4.5, 3.5, 0.1, -4]);
+addAvgTempYear(cv_placeKrvavec, 1997, 1, [-0.7, -1.9, 0.2, -1, 6.3, 9.3, 10.5, 11.5, 9.5, 3.2, 0.3, -2.9]);
+addAvgTempYear(cv_placeKrvavec, 1998, 1, [-3, 0.8, -3.7, 0.9, 5.8, 10.9, 12.1, 13.2, 6.9, 4, -3.4, -3.7]);
+addAvgTempYear(cv_placeKrvavec, 1999, 1, [-2.3, -6.1, -1.3, 1.8, 7.4, 9.1, 11.8, 11.2, 9.8, 4.7, -1.7, -4.6]);
+addAvgTempYear(cv_placeKrvavec, 2000, 1, [-4.8, -3.2, -1.8, 3.7, 8, 11.9, 9.6, 13.5, 8.5, 6.2, 1.2, -1]);
+addAvgTempYear(cv_placeKrvavec, 2001, 1, [-4, -3.6, -0.1, 0.5, 8.1, 8.5, 11.9, 13.6, 5.1, 8.4, -1.1, -6.7]);
+addAvgTempYear(cv_placeKrvavec, 2002, 1, [-2.1, -1.1, 0.4, 1, 7.6, 11.8, 12.3, 11.2, 6.7, 4.1, 1.5, -2.5]);
+addAvgTempYear(cv_placeKrvavec, 2003, 1, [-4.8, -7.8, -0.2, 0.2, 9.5, 14.3, 13, 15.9, 8, 0.9, 1.6, -2]);
+addAvgTempYear(cv_placeKrvavec, 2004, 1, [-6.9, -3.2, -3.1, 1.2, 4, 9.7, 12, 11.8, 8.3, 6.2, 0.3, -1.1]);
+addAvgTempYear(cv_placeKrvavec, 2005, 1, [-4.3, -8.3, -2.5, 1.3, 7.6, 10, 12.1, 9.7, 8.1, 5.6, -0.9, -5.9]);
+addAvgTempYear(cv_placeKrvavec, 2006, 1, [-5.4, -5.4, -3.8, 1.9, 6.1, 11, 14.8, 9, 10.7, 7.2, 2.2, 0.6]);
+addAvgTempYear(cv_placeKrvavec, 2007, 1, [-0.9, -1.8, -0.9, 5.9, 7.9, 11.1, 13, 12.1, 6.5, 4.1, -1.7, -3.3]);
+addAvgTempYear(cv_placeKrvavec, 2008, 1, [-1.4, -1.4, -2.9, 0.8, 7.2, 11.4, 12, 12.4, 6.4, 6.1, 0, -3.8]);
+addAvgTempYear(cv_placeKrvavec, 2009, 1, [-4.4, -6, -3, 4, 8.7, 9.3, 13, 13.6, 9.9, 3.5, 2, -4.7]);
+addAvgTempYear(cv_placeKrvavec, 2010, 1, [-6.5, -5.3, -3.3, 2, 5.3, 10.6, 14, 11.6, 7.3, 2.6, 0.3, -5.7]);
+addAvgTempYear(cv_placeKrvavec, 2011, 1, [-3.8, -1.7, -0.9, 4.6, 7.7, 10.4, 11.4, 14.4, 12.1, 4.6, 3.4, -2.3]);
+addAvgTempYear(cv_placeKrvavec, 2012, 1, [-5.1, -8.1, 2.8, 1.4, 7.2, 11.9, 13.2, 14.8, 10.2, 6.2, 2.3, -4.1]);
+addAvgTempYear(cv_placeKrvavec, 2013, 1, [-3.1, -6.5, -3.3, 2.5, 5, 9.9, 13.7, 13.8, 8.4, 5.5, 0, 0.3]);
+addAvgTempYear(cv_placeKrvavec, 2014, 1, [-1.3, -1.8, 1.1, 3.7, 5.5, 10.6, 11.9, 10.8, 8.5, 6, 4.2, -1.5]);
+addAvgTempYear(cv_placeKrvavec, 2015, 1, [-3.2, -3.7, -1.8, 1.9, 7.6, 10.6, 15.2, 14.3, 7.5, 4.5, 4.7, 3.7]);
+addAvgTempYear(cv_placeKrvavec, 2016, 1, [-3, -2.2, -2.3, 2.7, 5.4, 10.1, 13.2, 12.1, 10, 3.2, 0.1, 1]);
+addAvgTempYear(cv_placeKrvavec, 2017, 1, [-6.6, -1.7, 1.3, 1.9, 7.1, 12.3, 13.2, 14.8, 6.2, 6.3, -0.8, -3.7]);
+addAvgTempYear(cv_placeKrvavec, 2018, 1, [-2.2, -8.1, -3.3, 5.7, 8.9, 11.4, 13.2, 14.4, 10.6, 6.4, 1.7, -2.5]);
+addAvgTempYear(cv_placeKrvavec, 2019, 1, [-6.5, 0.1, -0.1, 2.5, 3.3, 14.5, 13.7, 13.8, 9, 6.7, 1.2, -1.1]);
+addAvgTempYear(cv_placeKrvavec, 2020, 1, [-0.1, -1.4, -1.8, 4, 6.1, 9.9, 12.4, 13.8, 9.6, 3.9, 3.6, -1.9]);
+addAvgTempYear(cv_placeKrvavec, 2021, 1, [-6.2, -1.2, -1.9, -0.8, 3.8, 13.3, 13.8, 11.8, 9.8, 4.3, 1.5, -2.2]);
+addAvgTempYear(cv_placeKrvavec, 2022, 1, [-2.1, -2.7, -1.7, 0.9, 9.1, 13.8, 14.9, 13.8, 7.8, 9.3, 1.6, -0.9]);
+
+//id=996  MURSKA SOBOTA - RAKIČAN I (lon=16.1950, lat=46.6497, viš=187m)
+addAvgTempYear(cv_placeMurskaSobota, 1949, 4, [10.9, 14.5, 15.8, 18.9, 17.3, 15.1, 10.5, 6.1, 1.5]);
+//addAvgTempYear(cv_placeMurskaSobota, 1950, 1, [-5.4, 1, 5.5, 9.5, 15.9, 19.1, , , , , , ]);
+//id=893  MURSKA SOBOTA (lon=16.1784, lat=46.6497, viš=187m)
+addAvgTempYear(cv_placeMurskaSobota, 1950, 1, [-5.4, 1, 5.5, 9.5, 15.8, 19.1, 21.7, 19.3, 15, 7.8, 5.4, 0.9]);
+addAvgTempYear(cv_placeMurskaSobota, 1951, 1, [1, 4, 4.9, 10.3, 14.1, 18.1, 19.2, 19.8, 16.8, 8.2, 8, 1.5]);
+//id=1052  MURSKA SOBOTA (lon=16.1284, lat=46.6663, viš=191m)
+addAvgTempYear(cv_placeMurskaSobota, 1952, 1, [-1.8, -2.1, 2.1, 12.7, 14.4, 18.8, 21.6, 21.2, 13.4, 9.2, 2.6, -0.3]);
+//id=1051  MURSKA SOBOTA (lon=16.1284, lat=46.6663, viš=191m)
+addAvgTempYear(cv_placeMurskaSobota, 1953, 1, [-2.4, 0.7, 3.9, 10.6, 14, 18.5, 20.3, 17.3, 15.8, 11.9, 2.5, -0.3]);
+addAvgTempYear(cv_placeMurskaSobota, 1954, 1, [-6.5, -6.5, 5.6, 8.2, 13.7, 19.2, 17.7, 18.3, 15.7, 9, 3.7, 3]);
+addAvgTempYear(cv_placeMurskaSobota, 1955, 1, [-1.1, 0.7, 1.2, 8, 13.1, 16.9, 19, 17.9, 14.5, 9.4, 3.7, 0.9]);
+//id=1078  MURSKA SOBOTA - RAKIČAN (lon=16.1284, lat=46.6663, viš=193m)
+addAvgTempYear(cv_placeMurskaSobota, 1956, 1, [1.3, -9, 1.9, 8.9, 14.4, 16.5, 19.6, 18.6, 14.7, 9.1, 1.4, -1.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1957, 1, [-4.9, 4, 6.7, 9.4, 11.6, 19.6, 19.9, 17.5, 14, 8.4, 6, 0.6]);
+addAvgTempYear(cv_placeMurskaSobota, 1958, 1, [-3.3, 2.9, 1.2, 7.8, 18.3, 17.2, 20, 19.4, 15, 10.8, 5.8, 2.8]);
+addAvgTempYear(cv_placeMurskaSobota, 1959, 1, [-0.3, -1.4, 8.1, 10.6, 14, 16.9, 20.1, 18.4, 13.2, 7.9, 4.9, 3.5]);
+addAvgTempYear(cv_placeMurskaSobota, 1960, 1, [-2.3, 0.7, 5.6, 9.9, 13.9, 18.1, 17.9, 19.1, 13.8, 12, 6.4, 3.3]);
+addAvgTempYear(cv_placeMurskaSobota, 1961, 1, [-2.7, 2.9, 7.4, 13.1, 13.3, 19, 18.1, 18.2, 16, 11.3, 5.2, -1.8]);
+addAvgTempYear(cv_placeMurskaSobota, 1962, 1, [-0.6, 0.5, 2.5, 10.1, 13.5, 15.6, 17.5, 19.3, 13.3, 9.3, 3.7, -4.9]);
+addAvgTempYear(cv_placeMurskaSobota, 1963, 1, [-7.7, -5.1, 2.5, 10.9, 14.5, 18.9, 20.3, 19.3, 15.8, 9, 9.5, -6.3]);
+addAvgTempYear(cv_placeMurskaSobota, 1964, 1, [-7.9, -0.4, 2.7, 10.7, 14.1, 19.6, 19.1, 17.7, 14.5, 9.1, 6.1, -0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1965, 1, [-0.6, -3, 5.2, 8.3, 13.2, 17.8, 18.8, 17, 15.6, 7.5, 2.5, 1.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1966, 1, [-4.3, 6, 4.7, 11.8, 14.2, 18, 18.1, 17.3, 15.3, 14.1, 2.9, 0.6]);
+addAvgTempYear(cv_placeMurskaSobota, 1967, 1, [-3.4, 1.6, 6.6, 9.3, 15.4, 17.6, 20.9, 18.6, 16, 10.8, 4.5, -1.4]);
+addAvgTempYear(cv_placeMurskaSobota, 1968, 1, [-5.6, 1.6, 5.3, 11.7, 14.9, 18.1, 19.2, 17.5, 14.5, 9.9, 5.3, -3.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1969, 1, [-3.2, -2.3, 3.1, 9.4, 16.4, 16.8, 19.4, 17.3, 15.1, 9.1, 6.9, -3.8]);
+addAvgTempYear(cv_placeMurskaSobota, 1970, 1, [-2.3, -0.3, 3.5, 8.7, 12.4, 18.4, 19, 19, 14.8, 8.5, 7.2, -1.1]);
+//addAvgTempYear(cv_placeMurskaSobota, 1971, 1, [-2.3, 1.6, 1.9, 10.5, 16.1, 17.2, , , , , , ]);
+//id=1082  MURSKA SOBOTA - RAKIČAN (lon=16.1784, lat=46.6330, viš=184m)
+//addAvgTempYear(cv_placeMurskaSobota, 1971, 1, [, , , , , , 20, 20.4, 12.7, 6.8, 3.3, -0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1971, 1, [-2.3, 1.6, 1.9, 10.5, 16.1, 17.2, 20, 20.4, 12.7, 6.8, 3.3, -0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1972, 1, [-3.1, 2.8, 6.5, 9.9, 13.9, 17.8, 19.4, 17.7, 11.6, 7.8, 3.9, -0.4]);
+addAvgTempYear(cv_placeMurskaSobota, 1973, 1, [-1.5, 1, 4.2, 7.8, 15.6, 17.7, 19.3, 18.4, 14.8, 7.3, 1.5, 0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1974, 1, [1.1, 4.9, 6.8, 9.2, 13.6, 16, 19, 20.1, 14.4, 6.1, 5.6, 2.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1975, 1, [2.7, 0.7, 6, 9.1, 15.6, 16.6, 19.3, 18.6, 16.8, 8.7, 3.4, -0.3]);
+addAvgTempYear(cv_placeMurskaSobota, 1976, 1, [0.1, -0.5, 1, 9.4, 14.1, 17.5, 19.8, 16, 13.9, 10.1, 6.1, -0.7]);
+addAvgTempYear(cv_placeMurskaSobota, 1977, 1, [0.6, 3.9, 7.5, 8, 14.2, 18.2, 18.9, 18, 12.1, 10.2, 5.1, -1.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1978, 1, [-0.6, 0, 6.3, 8.1, 12.8, 16.9, 17.1, 16.5, 13.5, 8.6, 0.6, -0.7]);
+addAvgTempYear(cv_placeMurskaSobota, 1979, 1, [-4, 0.9, 7.3, 8.5, 14.8, 19.4, 17.7, 17.1, 14.1, 8.2, 4.7, 2.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1980, 1, [-4, 1.6, 4.5, 7.7, 12, 17.1, 17.9, 18.4, 14, 9, 1.7, -1.9]);
+addAvgTempYear(cv_placeMurskaSobota, 1981, 1, [-3.4, 0.1, 7.4, 9.7, 14.2, 18.4, 18.9, 17.9, 16.3, 11.7, 3.7, -1]);
+addAvgTempYear(cv_placeMurskaSobota, 1982, 1, [-3.9, -1.7, 4.7, 8, 14.8, 18.3, 19.9, 18.6, 16.9, 10.2, 5.4, 3.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1983, 1, [0.9, -2.2, 5.8, 12.1, 16.1, 17.9, 21.8, 19.1, 14.6, 9.4, 0.5, -0.5]);
+addAvgTempYear(cv_placeMurskaSobota, 1984, 1, [-1.3, -0.5, 4.1, 9, 13.5, 16.8, 17.7, 17.6, 14.6, 10.6, 4.8, 0.1]);
+//addAvgTempYear(cv_placeMurskaSobota, 1985, 1, [-7.1, -5.1, 3.8, 9.7, 15.5, , , , , , , ]);
+//id=1894  MURSKA SOBOTA - RAKIČAN (lon=16.1913, lat=46.6521, viš=187m)
+//addAvgTempYear(cv_placeMurskaSobota, 1985, 1, [, , , , , , 19.9, 19, 15, 8.7, 2.5, 3.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1985, 1, [-7.1, -5.1, 3.8, 9.7, 15.5, 17.1, 19.9, 19, 15, 8.7, 2.5, 3.2]); //manjkajoči jun, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeMurskaSobota, 1986, 1, [-0.2, -5.1, 2.4, 11, 17.3, 17.4, 19.1, 19.6, 14, 8.8, 4.6, -2.2]);
+addAvgTempYear(cv_placeMurskaSobota, 1987, 1, [-5.7, -0.8, 0.3, 10.6, 13.2, 18.3, 21.1, 17.3, 17.4, 10.9, 4.7, 0.4]);
+addAvgTempYear(cv_placeMurskaSobota, 1988, 1, [2.4, 3, 4.5, 9.4, 15.4, 17.7, 21, 19.7, 15, 9.7, 0.2, 0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1989, 1, [-1.5, 3.6, 8.2, 11.1, 14.7, 16.7, 20.3, 19, 14.9, 9.6, 2.6, 2.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1990, 1, [-1.1, 5.2, 8.1, 9.7, 16, 18, 19.1, 19.1, 13.5, 9.9, 4.8, -0.4]);
+addAvgTempYear(cv_placeMurskaSobota, 1991, 1, [-0.1, -3.8, 7.1, 8.8, 12.1, 18.2, 21.4, 19.7, 16.1, 8.2, 5.1, -1.7]);
+addAvgTempYear(cv_placeMurskaSobota, 1992, 1, [0.3, 2.6, 5.6, 10.7, 15.4, 19, 21.5, 24.2, 16, 9.2, 5.4, 0.5]);
+addAvgTempYear(cv_placeMurskaSobota, 1993, 1, [0, -0.5, 4.5, 10.5, 17.5, 19.3, 20.1, 19.7, 14.9, 11.6, 1.4, 0.3]);
+addAvgTempYear(cv_placeMurskaSobota, 1994, 1, [3.1, 2, 9.2, 10.2, 15.3, 19, 21.9, 21, 17.4, 8.1, 6.7, 0.7]);
+addAvgTempYear(cv_placeMurskaSobota, 1995, 1, [0.2, 4.6, 5.1, 11, 15, 17.4, 21.8, 18.6, 14.1, 10.5, 3.2, -0.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1996, 1, [-2.1, -3.5, 2, 10.5, 16.2, 19.1, 18.4, 19, 12.4, 10.7, 7.2, -2.4]);
+addAvgTempYear(cv_placeMurskaSobota, 1997, 1, [-2.5, 2.5, 5.2, 7.6, 16.3, 19.1, 19.3, 19.4, 14.8, 7.5, 5.2, 1.6]);
+addAvgTempYear(cv_placeMurskaSobota, 1998, 1, [1.6, 4.2, 4.4, 11.3, 15.1, 19.5, 20.3, 20.1, 15, 11.2, 2.6, -4.1]);
+addAvgTempYear(cv_placeMurskaSobota, 1999, 1, [-1.2, 0.3, 7.5, 11.4, 16, 18.5, 20.7, 19, 17.3, 10.8, 2.5, -0.2]);
+addAvgTempYear(cv_placeMurskaSobota, 2000, 1, [-3.5, 3.8, 6.6, 13.7, 16.9, 20.3, 19.4, 22, 15.4, 12.3, 8.3, 2.5]);
+addAvgTempYear(cv_placeMurskaSobota, 2001, 1, [1.3, 3.6, 8.5, 9.5, 17.2, 17.7, 21.1, 21.5, 13.8, 13.2, 2.8, -4.2]);
+addAvgTempYear(cv_placeMurskaSobota, 2002, 1, [-0.6, 5, 7.2, 9.9, 17.6, 20.6, 21.5, 19.9, 14.4, 10.7, 8.4, 0.4]);
+addAvgTempYear(cv_placeMurskaSobota, 2003, 1, [-3.3, -3.1, 5.4, 9.6, 18, 23.1, 22.1, 24, 14.7, 8.1, 7.1, 0.2]);
+addAvgTempYear(cv_placeMurskaSobota, 2004, 1, [-1.6, 1.3, 4.3, 10.7, 13.6, 18, 19.9, 19.9, 14.5, 11.9, 4.6, 0.3]);
+addAvgTempYear(cv_placeMurskaSobota, 2005, 1, [-0.9, -3.3, 3.1, 10.9, 15.9, 19, 20.3, 18, 15.9, 10.7, 3.6, -0.3]);
+addAvgTempYear(cv_placeMurskaSobota, 2006, 1, [-5.1, -0.4, 4.2, 11.2, 14.9, 19.3, 22.3, 17.5, 16.3, 12.2, 6.8, 2.4]);
+addAvgTempYear(cv_placeMurskaSobota, 2007, 1, [3.6, 5, 7.4, 12.2, 17, 21.2, 22.2, 19.9, 13.4, 8.9, 3.9, -0.5]);
+addAvgTempYear(cv_placeMurskaSobota, 2008, 1, [1.8, 3.9, 6.2, 10.8, 16.7, 20.2, 20.8, 20.1, 14.7, 10.9, 6.2, 2.1]);
+addAvgTempYear(cv_placeMurskaSobota, 2009, 1, [-1.8, 1.8, 6.1, 13.3, 16.8, 18.2, 21.1, 20.7, 16.7, 10.1, 6.2, 1.5]);
+addAvgTempYear(cv_placeMurskaSobota, 2010, 1, [-2, 1, 5.8, 11, 15.6, 19.7, 22.2, 19.6, 13.9, 8.1, 7.6, -0.2]);
+addAvgTempYear(cv_placeMurskaSobota, 2011, 1, [0.8, -0.2, 5.7, 12.4, 15.7, 19.9, 20.1, 21.2, 18, 9.3, 2.6, 2.6]);
+addAvgTempYear(cv_placeMurskaSobota, 2012, 1, [1, -2.8, 8.3, 11.7, 15.9, 21.1, 21.9, 21.8, 16.8, 10.5, 7.8, 0.6]);
+addAvgTempYear(cv_placeMurskaSobota, 2013, 1, [0.1, 0.6, 3.5, 12.2, 15.7, 19.3, 23, 21.4, 15.2, 12.2, 6.5, 2.1]);
+addAvgTempYear(cv_placeMurskaSobota, 2014, 1, [3.4, 4.5, 9.1, 12.6, 15.1, 19.6, 21.2, 18.8, 15.5, 12.9, 8.5, 2.4]);
+addAvgTempYear(cv_placeMurskaSobota, 2015, 1, [2.4, 2, 6.4, 11.3, 16, 19.9, 23, 22.1, 16.4, 10.1, 6.4, 1.8]);
+addAvgTempYear(cv_placeMurskaSobota, 2016, 1, [-0.2, 5.9, 6.9, 12.2, 15.6, 19.8, 22, 19.5, 17.4, 9.6, 5.6, -0.8]);
+addAvgTempYear(cv_placeMurskaSobota, 2017, 1, [-5.1, 3.7, 8.7, 10.7, 16.4, 21, 22.2, 21.6, 14.2, 10.5, 5.2, 2.2]);
+addAvgTempYear(cv_placeMurskaSobota, 2018, 1, [3.4, -0.8, 3.8, 15.3, 18.1, 20.1, 21.5, 22.3, 16.4, 12.3, 7, 1]);
+addAvgTempYear(cv_placeMurskaSobota, 2019, 1, [-0.1, 3.7, 7.8, 11.5, 13, 22.7, 21.6, 21.8, 16.1, 12.1, 8.4, 3.5]);
+addAvgTempYear(cv_placeMurskaSobota, 2020, 1, [0, 6, 6.9, 11.7, 14.7, 19.2, 20.5, 21.6, 16, 11.1, 5, 2.3]);
+addAvgTempYear(cv_placeMurskaSobota, 2021, 1, [1.8, 3.1, 5.5, 8.6, 13.5, 21.6, 22.8, 19.3, 15.7, 9.2, 5.3, 1.8]);
+addAvgTempYear(cv_placeMurskaSobota, 2022, 1, [0.8, 4.2, 4.7, 9.7, 17.4, 21.7, 21.9, 21.5, 15.2, 12.4, 6.5, 2.1]);
+
+//id=40  JAVORJE NAD POLJANAMI (lon=14.1786, lat=46.1663, viš=700m)
+addAvgTempYear(cv_placeJavorje, 1955, 1, [-0.4, 0.7, 0.2, 7.1, 10.7, 14.7, 17.4, 16.5, 14, 8.7, 2.8, 2.3]);
+addAvgTempYear(cv_placeJavorje, 1956, 1, [0.4, -8, 1.2, 5.9, 13, 14.4, 17.8, 17.1, 15.2, 9.2, 1.2, -0.5]);
+addAvgTempYear(cv_placeJavorje, 1957, 1, [-0.6, 3.7, 5.9, 8, 9.7, 17.5, 18.1, 16.5, 13.1, 9.6, 5, 1.4]);
+addAvgTempYear(cv_placeJavorje, 1958, 1, [-0.8, 3.2, 0.4, 5.5, 15.6, 15.1, 18.4, 18.2, 14.6, 9.8, 4.3, 2.8]);
+addAvgTempYear(cv_placeJavorje, 1959, 1, [0.1, -0.8, 6, 8.5, 12.2, 15.7, 18.9, 16.8, 13.2, 8.5, 4.6, 2.7]);
+addAvgTempYear(cv_placeJavorje, 1960, 1, [-0.7, -0.2, 3.6, 8.1, 12.2, 15.9, 15.9, 16.5, 12.4, 10.1, 6, 2]);
+addAvgTempYear(cv_placeJavorje, 1961, 1, [-2.5, 3.5, 6.9, 10.9, 11.4, 16.5, 16.1, 17.5, 16.6, 10.5, 5.1, -1.1]);
+addAvgTempYear(cv_placeJavorje, 1962, 1, [0.5, -0.7, 0.2, 8.3, 10.8, 13.8, 16.3, 19.1, 13.3, 10, 2.6, -2.5]);
+addAvgTempYear(cv_placeJavorje, 1963, 1, [-6.3, -4.5, 2.2, 8.8, 12.4, 15.6, 18.8, 17.3, 14.7, 9.3, 8.3, -3.2]);
+addAvgTempYear(cv_placeJavorje, 1964, 1, [-4.4, 0.4, 1.3, 8.8, 12.7, 17.7, 18.2, 16.5, 13.9, 8.5, 4.9, -0.1]);
+addAvgTempYear(cv_placeJavorje, 1965, 1, [-0.1, -3.2, 3.4, 6.2, 11, 15.5, 16.5, 15.5, 13.3, 9.2, 2.5, 1]);
+addAvgTempYear(cv_placeJavorje, 1966, 1, [-3, 5.5, 3.1, 9.9, 12.9, 16.7, 16, 15.8, 14.6, 12.3, 1.9, 1]);
+addAvgTempYear(cv_placeJavorje, 1967, 1, [-1.3, 0.3, 5.5, 7.2, 13.2, 15.1, 19.5, 17.5, 14.6, 11.3, 5, -0.5]);
+addAvgTempYear(cv_placeJavorje, 1968, 1, [-2, 1.7, 5, 10, 12.4, 15.6, 17.3, 15.6, 13.4, 10.5, 4.3, -3]);
+addAvgTempYear(cv_placeJavorje, 1969, 1, [-1.4, -1.3, 1.8, 7.5, 14.1, 14.7, 18.2, 16.1, 14.6, 10.8, 5.9, -3.6]);
+addAvgTempYear(cv_placeJavorje, 1970, 1, [-0.7, -0.5, 1.4, 6, 10.3, 16.6, 17.5, 17.4, 14.3, 8.6, 6.2, -0.6]);
+addAvgTempYear(cv_placeJavorje, 1971, 1, [-0.7, 1.1, 0.3, 9, 13.2, 14, 18.5, 18.9, 12.3, 9, 4, 2.5]);
+addAvgTempYear(cv_placeJavorje, 1972, 1, [-3.3, 2.2, 6.1, 7.5, 11.5, 15.9, 17.9, 16.9, 10.8, 7.6, 4.8, -0.8]);
+addAvgTempYear(cv_placeJavorje, 1973, 1, [-1.2, 0.3, 3.8, 5.5, 13.1, 15.8, 17.1, 17.6, 14.8, 7.7, 3.3, -0.1]);
+addAvgTempYear(cv_placeJavorje, 1974, 1, [1.3, 3.6, 5.5, 7.3, 11.1, 13.5, 17.1, 18.8, 13.7, 4.6, 4.4, 3.1]);
+//addAvgTempYear(cv_placeJavorje, 1975, 1, [3.2, 0.9, 3.6, 7.8, , , , , , , , ]);
+//id=40  JAVORJE NAD POLJANAMI (lon=14.1775, lat=46.1569, viš=690m)
+//addAvgTempYear(cv_placeJavorje, 1975, 1, [, , , , , 14.3, 17.9, 17.1, 16.2, 9.2, 3.2, 0.6]);
+addAvgTempYear(cv_placeJavorje, 1975, 1, [3.2, 0.9, 3.6, 7.8, 12.1, 14.3, 17.9, 17.1, 16.2, 9.2, 3.2, 0.6]); //manjkajoči maj, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeJavorje, 1976, 1, [0.3, -0.8, 1.3, 7.8, 13.1, 16.3, 18.4, 14.3, 12.3, 9.8, 5.4, 0]);
+addAvgTempYear(cv_placeJavorje, 1977, 1, [1.1, 3.3, 7.1, 6.6, 12.1, 15.9, 16.8, 16.2, 11.9, 10.9, 5.1, -0.8]);
+addAvgTempYear(cv_placeJavorje, 1978, 1, [-0.2, -0.6, 5.1, 6.5, 10.1, 14.9, 16.2, 15.6, 13.4, 9.4, 2.5, 0.3]);
+addAvgTempYear(cv_placeJavorje, 1979, 1, [-2, 0.2, 4.7, 6.6, 13.3, 17.9, 16.3, 16.1, 14, 8.2, 4.4, 2.8]);
+addAvgTempYear(cv_placeJavorje, 1980, 1, [-2.6, 2.3, 3.4, 5.4, 9.8, 14.5, 16.1, 17.9, 14.3, 9, 2.4, -0.7]);
+addAvgTempYear(cv_placeJavorje, 1981, 1, [-1.8, -0.5, 6, 8.4, 11.9, 15.8, 17, 17.7, 15.3, 10.3, 3.9, -0.8]); //manjkajoči avg-sep, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeJavorje, 1982, 1, [-2, -1.9, 2.9, 6.1, 12.6, 16.3, 18.5, 17.5, 16.3, 9.4, 5.2, 2.2]);
+addAvgTempYear(cv_placeJavorje, 1983, 1, [2.5, -2.4, 4.7, 8.6, 12.3, 15.8, 20.5, 17.6, 14.3, 9.2, 1.7, 0.2]);
+addAvgTempYear(cv_placeJavorje, 1984, 1, [-1.1, -1.5, 1.8, 7, 9.6, 14, 16.2, 16.1, 12.7, 10.2, 4.1, 0]);
+addAvgTempYear(cv_placeJavorje, 1985, 1, [-5.7, -2.7, 2.3, 7, 12.7, 13.8, 18.6, 18.1, 15.4, 9.3, 1.1, 3.5]);
+addAvgTempYear(cv_placeJavorje, 1986, 1, [-1.1, -5, 1.4, 7.7, 15.2, 15.3, 17.4, 18, 13.4, 9.9, 5.1, -0.4]);
+addAvgTempYear(cv_placeJavorje, 1987, 1, [-4.4, -0.1, -1.1, 8.5, 10.6, 14.9, 18.7, 16.3, 16.7, 9.4, 4.1, 1.4]);
+addAvgTempYear(cv_placeJavorje, 1988, 1, [2.6, 1.4, 2.9, 7.8, 12.5, 14.7, 19.1, 18.2, 13.8, 9.9, 0.9, 1.1]);
+addAvgTempYear(cv_placeJavorje, 1989, 1, [0.7, 3.2, 6.8, 8, 12.8, 13.9, 17.6, 17, 13.7, 10.2, 3.1, 1.6]);
+addAvgTempYear(cv_placeJavorje, 1990, 1, [0.4, 5.1, 7.5, 6.6, 13.4, 14.8, 17.5, 18, 12.2, 10.2, 4.1, -1.3]);
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
