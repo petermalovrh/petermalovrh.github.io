@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.10"
+const gl_versionNr = "v0.11"
 const gl_versionDate = "12.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1008,6 +1008,7 @@ const cv_graphType_timeAvgTemp = 2;
 
 const cv_nrMonthsAvgMin = 0;   //3.12.2023
 const cv_nrMonthsAvgMax = 9;   //3.12.2023
+const cv_nrMonthsAvgMaxExceed = 19;   //3.12.2023
 const cv_nrMonthsAvgMult = 12; //3.12.2023
 var lo_nrMonthsAvg = 5
 var lo_nrMonthsAvgOld = 5                   // 25.1.2023 v1.1
@@ -1458,12 +1459,12 @@ class slider2 {
 }
 
 class intChooser {
-    constructor(left, top, width, items, value, minItemValue, step, color, fillColor, crossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
+    constructor(left, top, width, items, value, minItemValue, step, allowExceedValues, color, fillColor, crossColor, exceedCrossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
         this.left = left; this.top = top; this.width = width; // top: zgornji rob krogcev
-        this.items = items; this.value = value; this.minItemValue = minItemValue; this.step = step;
+        this.items = items; this.value = value; this.minItemValue = minItemValue; this.step = step; this.allowExceedValues = allowExceedValues;
         this.color = color;
         this.fillColor = fillColor;
-        this.crossColor = crossColor;
+        this.crossColor = crossColor; this.exceedCrossColor = exceedCrossColor;
         this.outRadij = outRadij;
         this.inRadij = inRadij;
         this.selRadij = selRadij;
@@ -1479,10 +1480,12 @@ class intChooser {
     }
     paint() {
         if (!this.visible) { return };
-        let myColor = this.color; let myCrossColor = this.crossColor;
-        if (!this.enabled) { myColor = this.disabledColor; myCrossColor = this.disabledColor }
+        let myColor = this.color; let myCrossColor = this.crossColor; let myExceedCrossColor = this.exceedCrossColor;
+        if (!this.enabled) { myColor = this.disabledColor; myCrossColor = this.disabledColor, myExceedCrossColor = this.disabledColor }
         let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
-        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        let maxRegularValue = this.minItemValue + (this.items - 1) * this.step;
+        let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1; //začnejo se z 1
+        if (this.allowExceedValues && valueItem > this.items) { valueItem = this.items }; //12.12.2023
         const cv_bodyWidthHalf = Math.trunc(this.bodyWidth / 2);
         let yBodyMiddle = this.top + this.outRadij; 
         if (focused) {
@@ -1496,13 +1499,17 @@ class intChooser {
         let font = "italic Cambria 20pt";
         for (step = 1; step <= this.items; step++) {
             x = this.left + this.outRadij + (step - 1) * xStep
+            //---- prazen krogec za vsako opcijo
             gEllipse(x, yBodyMiddle, this.outRadij, this.outRadij, 0, myColor, 0, "")        
             gEllipse(x, yBodyMiddle, this.inRadij, this.inRadij, 0, this.fillColor, 0, "") 
+            //---- poln krogec za vsako opcijo
             if (step == valueItem) {
-                gEllipse(x, yBodyMiddle, this.selRadij, this.selRadij, 0, myCrossColor, 0, "") 
-                //tmpStr = this.value.toString();
-                //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                //gText(this.value.toString(), font, "darkSlateGray", x - tmpW/2, yBodyMiddle - this.outRadij - 2)
+                //gEllipse(x, yBodyMiddle, this.selRadij, this.selRadij, 0, myCrossColor, 0, "")
+                if (this.allowExceedValues && this.value > maxRegularValue) {
+                    gEllipse(x + 1, yBodyMiddle, this.selRadij, this.selRadij, 0, myExceedCrossColor, 0, "")
+                } else {
+                    gEllipse(x, yBodyMiddle, this.selRadij, this.selRadij, 0, myCrossColor, 0, "")
+                }
             }
         }
         //---- izpis teksta
@@ -1539,6 +1546,7 @@ class intChooser {
             if (returnItem) { return (this.minItemValue - 1) } else { return false };            
         };
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1
+        if (this.allowExceedValues && valueItem > this.items) { valueItem = this.items }; //12.12.2023
         let yBodyMiddle = this.top + this.outRadij;
         let xStep = (this.width - 2 * this.outRadij) / (this.items - 1)
         let step, x, dx, dy, dist
@@ -1899,7 +1907,7 @@ switch (lo_GUI_layout) {
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
         var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, "burlyWood", "white", "orangeRed", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, nrMonthsAll, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
@@ -2244,7 +2252,8 @@ window.addEventListener("wheel", event => {
     if (lo_keyDownA) {
         if (lo_enabledIntChooserNrMonthsAvg) {
             lo_nrMonthsAvg -= delta;
-            if (lo_nrMonthsAvg > cv_nrMonthsAvgMax) { lo_nrMonthsAvg = cv_nrMonthsAvgMax };
+            //if (lo_nrMonthsAvg > cv_nrMonthsAvgMax) { lo_nrMonthsAvg = cv_nrMonthsAvgMax };
+            if (lo_nrMonthsAvg > cv_nrMonthsAvgMaxExceed) { lo_nrMonthsAvg = cv_nrMonthsAvgMaxExceed }; //12.12.2023
             if (lo_nrMonthsAvg < cv_nrMonthsAvgMin) { lo_nrMonthsAvg = cv_nrMonthsAvgMin };
             lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
         }
