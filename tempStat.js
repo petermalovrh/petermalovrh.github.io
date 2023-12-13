@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.13"
-const gl_versionDate = "12.12.2023"
+const gl_versionNr = "v0.14"
+const gl_versionDate = "13.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -72,48 +72,52 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 
 var avgTemp = [];
 
-const cv_placeSkofjaLoka = 1;
+let stationID = 0;
+stationID += 1; const cv_placeSkofjaLoka = stationID;  //1;
 addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
-const cv_placeMariborVrbanskiPlato = 2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
+stationID += 1; const cv_placeMariborVrbanskiPlato = stationID;  //2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
 addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
-const cv_placeMariborTabor = 3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
+stationID += 1; const cv_placeMariborTabor = stationID;  //3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
 addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
-const cv_placeLjubljanaBezigrad = 4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
+stationID += 1; const cv_placeLjubljanaBezigrad = stationID;  //4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
 addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen");
-const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
-addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
-const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
-addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
-const cv_placeNovoMesto = 7; // NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
+//const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
+//addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
+//const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
+//addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
+stationID += 1; const cv_placeNovoMesto = stationID;  //5; // NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
 addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
-const cv_placePostojna = 8; // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
+stationID += 1; const cv_placePostojna = stationID;  //6; // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
 addPlace("Postojna (533m)", "Postojna", "PO", "goldenrod");
 //const cv_placeNovaGoricaBilje51m = 9; // NOVA GORICA BILJE (51m) (lon=13.6315, lat=45.8911, viš=51m) ... 8.12.2023
 //addPlace("Nova Gorica Bilje (51m)", "NG Bilje", "NGBI51", "darkSalmon");
 //const cv_placeNovaGoricaBilje55m = 10; // NOVA GORICA BILJE (55m) (lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
 //addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
-const cv_placeNovaGoricaBilje = 9; // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
+stationID += 1; const cv_placeNovaGoricaBilje = stationID;  //7; // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
 addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
-const cv_placeKredarica = 10; // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
+stationID += 1; const cv_placeKredarica = stationID;  //8; // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
 addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
-const cv_placeSlovenjGradecSmartno = 11; // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
+stationID += 1; const cv_placeSlovenjGradecSmartno = stationID;  //9; // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
 //    jan'54-mar'57: (lon=15.1118, lat=46.4997, viš=440m)
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
 addPlace("Slovenj Gradec " + scSch + "martno (445m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
-const cv_placeKrvavec = 12; // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
+stationID += 1; const cv_placeKrvavec = stationID;  //10; // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
 //    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
 //    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
 addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
-const cv_placeMurskaSobota = 13; // MURSKA SOBOTA ... 12.12.2023
+stationID += 1; const cv_placeMurskaSobota = stationID;  //11; // MURSKA SOBOTA ... 12.12.2023
 //    cel kup prestavljanja postaje po Murski Soboti sem in tja, vse sem združil skupaj od 1949-2022, spodaj glej id-je in podatke konkretnih postaj
 addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
-const cv_placeJavorje = 14; // JAVORJE NAD POLJANAMI ... 12.12.2023
+stationID += 1; const cv_placeJavorje = stationID;  //12; // JAVORJE NAD POLJANAMI ... 12.12.2023
 //    dve postaji, obe sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
 addPlace("Javorje (695m)", "Javorje", "JAPO", "olive");
-const cv_placeCelje = 15; // CELJE ... 12.12.2023
+stationID += 1; const cv_placeCelje = stationID;  //13; // CELJE ... 12.12.2023
 //    cel kup postaj, vse sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
 addPlace("Celje (245m)", "Celje", "CE", "blueViolet");
+stationID += 1; const cv_placeBabnoPolje = stationID;  //14; // BABNO POLJE ... 13.12.2023
+//    podatki postaje so v treh delih, ki sem jih združil spodaj, spodaj glej id-je in podatke konkretnih postaj
+addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod");
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -358,34 +362,65 @@ addAvgTempYear(cv_placeLjubljanaBezigrad, 2020, 1, [1.9, 6.8, 7.2, 13, 15.3, 19.
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2021, 1, [1.2, 5.9, 6.7, 9.1, 13.5, 23.1, 23.3, 21, 17.5, 9.8, 5.9, 1.3]);
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2022, 1, [0.8, 5.1, 6.6, 10.4, 18.1, 23.4, 24.5, 23, 16, 14.4, 7.9, 4.4]);
 
-addAvgTempYear(cv_placeNovoMestoKandija, 1948, 1, [4, 0, 5.7, 11.4, 16, 16.9, 17.2, 18.9, 15.3, 11.1, 4.4, -1.4]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1949, 1, [1.5, 1.2, 2.5, 12, 14.1, 16.4, 19.1, 18, 16.1, 11.1, 6.8, 2.3]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1950, 1, [-3.2, 2.9, 6.4, 10, 16.7, 20.3, 21.7, 20, 15.7, 8.4, 5.3, 1.2]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1951, 1, [2.3, 4.1, 5.3, 9.7, 14.5, 18.1, 19, 19.4, 17.2, 8.8, 8.1, 1.7]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1952, 1, [-1.1, -1.1, 4.1, 12.5, 14, 19, 21.3, 20.8, 13.3, 10.3, 4, -0.3]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1953, 1, [-2.1, -0.6, 4.3, 10.6, 14, 17.9, 20.2, 17.6, 15.6, 12.3, 3.2, 0.8]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1954, 1, [-5.5, -4.4, 6.2, 8.3, 13.4, 19.2, 17.9, 18, 16, 9.6, 4.8, 3.1]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1955, 1, [1, 2.2, 1.6, 8.1, 13, 17.2, 19.5, 17.8, 14.3, 9.5, 3.8, 2.4]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1956, 1, [2.3, -8, 2.3, 9.3, 14.8, 16.4, 20, 19, 15.7, 9.1, 1.7, -0.4]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1957, 1, [-3.4, 4.8, 7, 9.6, 11.6, 19.8, 20.1, 17.6, 14.3, 9.8, 6.4, 1.4]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1958, 1, [-1.8, 4.6, 2.1, 7.8, 17.9, 17.6, 20.4, 19.5, 14.8, 10.8, 6.5, 3.2]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1959, 1, [0.2, -1.1, 8.1, 10.7, 13.9, 17.4, 20.8, 18.2, 13, 8, 5.6, 3.5]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1960, 1, [-0.7, 2, 5.6, 9.4, 14, 18.1, 17.9, 18.7, 13.3, 11.5, 6.6, 3.6]);
-addAvgTempYear(cv_placeNovoMestoKandija, 1961, 1, [-1.4, 3.1]);
+//id=  Novo Mesto Kandija
+//addAvgTempYear(cv_placeNovoMestoKandija, 1948, 1, [4, 0, 5.7, 11.4, 16, 16.9, 17.2, 18.9, 15.3, 11.1, 4.4, -1.4]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1949, 1, [1.5, 1.2, 2.5, 12, 14.1, 16.4, 19.1, 18, 16.1, 11.1, 6.8, 2.3]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1950, 1, [-3.2, 2.9, 6.4, 10, 16.7, 20.3, 21.7, 20, 15.7, 8.4, 5.3, 1.2]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1951, 1, [2.3, 4.1, 5.3, 9.7, 14.5, 18.1, 19, 19.4, 17.2, 8.8, 8.1, 1.7]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1952, 1, [-1.1, -1.1, 4.1, 12.5, 14, 19, 21.3, 20.8, 13.3, 10.3, 4, -0.3]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1953, 1, [-2.1, -0.6, 4.3, 10.6, 14, 17.9, 20.2, 17.6, 15.6, 12.3, 3.2, 0.8]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1954, 1, [-5.5, -4.4, 6.2, 8.3, 13.4, 19.2, 17.9, 18, 16, 9.6, 4.8, 3.1]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1955, 1, [1, 2.2, 1.6, 8.1, 13, 17.2, 19.5, 17.8, 14.3, 9.5, 3.8, 2.4]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1956, 1, [2.3, -8, 2.3, 9.3, 14.8, 16.4, 20, 19, 15.7, 9.1, 1.7, -0.4]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1957, 1, [-3.4, 4.8, 7, 9.6, 11.6, 19.8, 20.1, 17.6, 14.3, 9.8, 6.4, 1.4]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1958, 1, [-1.8, 4.6, 2.1, 7.8, 17.9, 17.6, 20.4, 19.5, 14.8, 10.8, 6.5, 3.2]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1959, 1, [0.2, -1.1, 8.1, 10.7, 13.9, 17.4, 20.8, 18.2, 13, 8, 5.6, 3.5]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1960, 1, [-0.7, 2, 5.6, 9.4, 14, 18.1, 17.9, 18.7, 13.3, 11.5, 6.6, 3.6]);
+//addAvgTempYear(cv_placeNovoMestoKandija, 1961, 1, [-1.4, 3.1]);
+//id=  Novo Mesto Gotna Vas
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1961, 4, [12.6, 13, 18.1, 17.8, 18, 16, 11.4, 5.3, -1.5]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1962, 1, [-0.3, 0.1, 2.1, 9, 13.2, 15.5, 17.7, 19.5, 14, 9.7, 3.7, -4]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1963, 1, [-6.8, -4.1, 3.3, 10.6, 13.7, 18.2, 20.2, 19.3, 15.6, 9.3, 10, -3.4]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1964, 1, [-5.8, -0.2, 2.8, 10.1, 14.1, 19.3, 19.1, 17.3, 14.2, 9.5, 6, 0.1]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1965, 1, [-0.5, -3.3, 4.9, 8, 12.9, 17.4, 18.9, 16.3, 14.9, 8.4, 3.5, 1.6]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1966, 1, [-4, 7.3, 4.4, 11.5, 14.2, 18.6, 18.1, 17.3, 15.1, 13.3, 2.6, 0.3]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1967, 1, [-2.9, 1.2, 6.6, 8.6, 15.3, 17, 20.6, 18.7, 15.5, 11, 5.1, -1.2]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1968, 1, [-3.7, 3, 5.7, 11.8, 14.4, 17.2, 19, 17.4, 14.8, 10.7, 5.3, -2.6]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1969, 1, [-2.6, -1.7, 3.2, 9.1, 16.1, 16.6, 19, 17.2, 15.2, 8.8, 7.5, -3.4]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1970, 1, [-0.5, 0.2, 3, 8.4, 12, 18, 18.7, 18.7, 14.8, 8.8, 7.2, -0.9]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1971, 1, [-1.4, 1.7, 2.3, 10.7, 15.2, 16.7, 19.6, 19.6, 11.7, 7.9, 4, -0.2]);
+//addAvgTempYear(cv_placeNovoMestoGotnaVas, 1972, 1, [-1.9, 2.5, 6.9, 9.7, 13.5, 17.9, 19.3, 17.9, 11.7, 8.4, 4.1]);
 
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1961, 4, [12.6, 13, 18.1, 17.8, 18, 16, 11.4, 5.3, -1.5]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1962, 1, [-0.3, 0.1, 2.1, 9, 13.2, 15.5, 17.7, 19.5, 14, 9.7, 3.7, -4]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1963, 1, [-6.8, -4.1, 3.3, 10.6, 13.7, 18.2, 20.2, 19.3, 15.6, 9.3, 10, -3.4]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1964, 1, [-5.8, -0.2, 2.8, 10.1, 14.1, 19.3, 19.1, 17.3, 14.2, 9.5, 6, 0.1]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1965, 1, [-0.5, -3.3, 4.9, 8, 12.9, 17.4, 18.9, 16.3, 14.9, 8.4, 3.5, 1.6]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1966, 1, [-4, 7.3, 4.4, 11.5, 14.2, 18.6, 18.1, 17.3, 15.1, 13.3, 2.6, 0.3]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1967, 1, [-2.9, 1.2, 6.6, 8.6, 15.3, 17, 20.6, 18.7, 15.5, 11, 5.1, -1.2]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1968, 1, [-3.7, 3, 5.7, 11.8, 14.4, 17.2, 19, 17.4, 14.8, 10.7, 5.3, -2.6]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1969, 1, [-2.6, -1.7, 3.2, 9.1, 16.1, 16.6, 19, 17.2, 15.2, 8.8, 7.5, -3.4]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1970, 1, [-0.5, 0.2, 3, 8.4, 12, 18, 18.7, 18.7, 14.8, 8.8, 7.2, -0.9]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1971, 1, [-1.4, 1.7, 2.3, 10.7, 15.2, 16.7, 19.6, 19.6, 11.7, 7.9, 4, -0.2]);
-addAvgTempYear(cv_placeNovoMestoGotnaVas, 1972, 1, [-1.9, 2.5, 6.9, 9.7, 13.5, 17.9, 19.3, 17.9, 11.7, 8.4, 4.1]);
-
+//id=  Novo Mesto Kandija
+addAvgTempYear(cv_placeNovoMesto, 1948, 1, [4, 0, 5.7, 11.4, 16, 16.9, 17.2, 18.9, 15.3, 11.1, 4.4, -1.4]);
+addAvgTempYear(cv_placeNovoMesto, 1949, 1, [1.5, 1.2, 2.5, 12, 14.1, 16.4, 19.1, 18, 16.1, 11.1, 6.8, 2.3]);
+addAvgTempYear(cv_placeNovoMesto, 1950, 1, [-3.2, 2.9, 6.4, 10, 16.7, 20.3, 21.7, 20, 15.7, 8.4, 5.3, 1.2]);
+addAvgTempYear(cv_placeNovoMesto, 1951, 1, [2.3, 4.1, 5.3, 9.7, 14.5, 18.1, 19, 19.4, 17.2, 8.8, 8.1, 1.7]);
+addAvgTempYear(cv_placeNovoMesto, 1952, 1, [-1.1, -1.1, 4.1, 12.5, 14, 19, 21.3, 20.8, 13.3, 10.3, 4, -0.3]);
+addAvgTempYear(cv_placeNovoMesto, 1953, 1, [-2.1, -0.6, 4.3, 10.6, 14, 17.9, 20.2, 17.6, 15.6, 12.3, 3.2, 0.8]);
+addAvgTempYear(cv_placeNovoMesto, 1954, 1, [-5.5, -4.4, 6.2, 8.3, 13.4, 19.2, 17.9, 18, 16, 9.6, 4.8, 3.1]);
+addAvgTempYear(cv_placeNovoMesto, 1955, 1, [1, 2.2, 1.6, 8.1, 13, 17.2, 19.5, 17.8, 14.3, 9.5, 3.8, 2.4]);
+addAvgTempYear(cv_placeNovoMesto, 1956, 1, [2.3, -8, 2.3, 9.3, 14.8, 16.4, 20, 19, 15.7, 9.1, 1.7, -0.4]);
+addAvgTempYear(cv_placeNovoMesto, 1957, 1, [-3.4, 4.8, 7, 9.6, 11.6, 19.8, 20.1, 17.6, 14.3, 9.8, 6.4, 1.4]);
+addAvgTempYear(cv_placeNovoMesto, 1958, 1, [-1.8, 4.6, 2.1, 7.8, 17.9, 17.6, 20.4, 19.5, 14.8, 10.8, 6.5, 3.2]);
+addAvgTempYear(cv_placeNovoMesto, 1959, 1, [0.2, -1.1, 8.1, 10.7, 13.9, 17.4, 20.8, 18.2, 13, 8, 5.6, 3.5]);
+addAvgTempYear(cv_placeNovoMesto, 1960, 1, [-0.7, 2, 5.6, 9.4, 14, 18.1, 17.9, 18.7, 13.3, 11.5, 6.6, 3.6]);
+//addAvgTempYear(cv_placeNovoMesto, 1961, 1, [-1.4, 3.1]);
+//id=  Novo Mesto Gotna Vas
+//addAvgTempYear(cv_placeNovoMesto, 1961, 4, [12.6, 13, 18.1, 17.8, 18, 16, 11.4, 5.3, -1.5]);
+addAvgTempYear(cv_placeNovoMesto, 1961, 1, [-1.4, 3.1, 3.8, 12.6, 13, 18.1, 17.8, 18, 16, 11.4, 5.3, -1.5]); //manjkajoči mar, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeNovoMesto, 1962, 1, [-0.3, 0.1, 2.1, 9, 13.2, 15.5, 17.7, 19.5, 14, 9.7, 3.7, -4]);
+addAvgTempYear(cv_placeNovoMesto, 1963, 1, [-6.8, -4.1, 3.3, 10.6, 13.7, 18.2, 20.2, 19.3, 15.6, 9.3, 10, -3.4]);
+addAvgTempYear(cv_placeNovoMesto, 1964, 1, [-5.8, -0.2, 2.8, 10.1, 14.1, 19.3, 19.1, 17.3, 14.2, 9.5, 6, 0.1]);
+addAvgTempYear(cv_placeNovoMesto, 1965, 1, [-0.5, -3.3, 4.9, 8, 12.9, 17.4, 18.9, 16.3, 14.9, 8.4, 3.5, 1.6]);
+addAvgTempYear(cv_placeNovoMesto, 1966, 1, [-4, 7.3, 4.4, 11.5, 14.2, 18.6, 18.1, 17.3, 15.1, 13.3, 2.6, 0.3]);
+addAvgTempYear(cv_placeNovoMesto, 1967, 1, [-2.9, 1.2, 6.6, 8.6, 15.3, 17, 20.6, 18.7, 15.5, 11, 5.1, -1.2]);
+addAvgTempYear(cv_placeNovoMesto, 1968, 1, [-3.7, 3, 5.7, 11.8, 14.4, 17.2, 19, 17.4, 14.8, 10.7, 5.3, -2.6]);
+addAvgTempYear(cv_placeNovoMesto, 1969, 1, [-2.6, -1.7, 3.2, 9.1, 16.1, 16.6, 19, 17.2, 15.2, 8.8, 7.5, -3.4]);
+addAvgTempYear(cv_placeNovoMesto, 1970, 1, [-0.5, 0.2, 3, 8.4, 12, 18, 18.7, 18.7, 14.8, 8.8, 7.2, -0.9]);
+addAvgTempYear(cv_placeNovoMesto, 1971, 1, [-1.4, 1.7, 2.3, 10.7, 15.2, 16.7, 19.6, 19.6, 11.7, 7.9, 4, -0.2]);
+addAvgTempYear(cv_placeNovoMesto, 1972, 1, [-1.9, 2.5, 6.9, 9.7, 13.5, 17.9, 19.3, 17.9, 11.7, 8.4, 4.1, 0]); //manjkajoči dec, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+//id=  Novo Mesto
 addAvgTempYear(cv_placeNovoMesto, 1973, 1, [-1, 1.1, 4.6, 7.7, 15.6, 18, 19.2, 18.7, 15.4, 8, 2.8, 0.2]);
 addAvgTempYear(cv_placeNovoMesto, 1974, 1, [0.8, 5.6, 6.8, 8.9, 13.5, 16.1, 19.3, 20.1, 14.9, 5.9, 5.6, 2.1]);
 addAvgTempYear(cv_placeNovoMesto, 1975, 1, [3.9, 1.1, 6, 9.8, 15.5, 16.3, 19.3, 17.9, 17.1, 9.2, 3.6, 0.4]);
@@ -1071,6 +1106,92 @@ addAvgTempYear(cv_placeCelje, 2020, 1, [0.7, 5.7, 6.2, 10.7, 14.3, 18.3, 20.1, 2
 addAvgTempYear(cv_placeCelje, 2021, 1, [0.7, 4.3, 5.1, 8.4, 12.9, 21.1, 21.8, 19.1, 15.2, 8.8, 5, 1.1]);
 addAvgTempYear(cv_placeCelje, 2022, 1, [0.4, 3.7, 4.1, 9.4, 16.9, 21.5, 22.1, 21.5, 14.8, 13.3, 7, 3.2]);
 
+
+//id=389 BABNO POLJE (lon=14.5359, lat=45.6467, viš=753m)
+addAvgTempYear(cv_placeBabnoPolje, 1949, 11, [2.8, 0]);
+addAvgTempYear(cv_placeBabnoPolje, 1950, 1, [-4.9, 0.9, 2.1, 5.7, 11.9, 16.1, 18.6, 16.1, 11.9, 5.5, 2.8, -1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1951, 1, [0.4, 1.5, 1.1, 5.5, 10.6, 14.3, 15.5, 16.1, 13.1, 6, 5.1, -0.2]);
+addAvgTempYear(cv_placeBabnoPolje, 1952, 1, [-5, -5.5, 0, 8.1, 10.7, 15.7, 17.9, 16.6, 10.7, 7.5, 2, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1953, 1, [-5, -4.1, -0.2, 7.3, 10.6, 14.3, 16.6, 14.4, 12.8, 10.1, 1.1, -0.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1954, 1, [-7.2, -5.9, 2.8, 4.6, 9.7, 15.5, 14.6, 14.3, 12.7, 6.8, 2.8, 0.6]);
+addAvgTempYear(cv_placeBabnoPolje, 1955, 1, [-0.7, -0.7, -2, 3.8, 9.2, 13.6, 15.6, 13.5, 10.4, 6.9, 1.3, 1]);
+addAvgTempYear(cv_placeBabnoPolje, 1956, 1, [-0.6, -11.7, -1.1, 4.8, 11.1, 12.7, 16.2, 15.8, 11.6, 5.1, -0.7, -2.5]);
+addAvgTempYear(cv_placeBabnoPolje, 1957, 1, [-4.9, 1.8, 2.3, 5.1, 6.9, 15.9, 15.8, 14.6, 10.7, 6.9, 3.3, 0.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1958, 1, [-4.9, 1.6, -3, 3.3, 13.4, 13.5, 16.2, 15.4, 11, 7.3, 3.5, 1.4]);
+addAvgTempYear(cv_placeBabnoPolje, 1959, 1, [-3, -4.9, 4, 6.8, 10, 13.6, 16.9, 14.2, 9.2, 4.3, 3, 1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1960, 1, [-2.9, -1.1, 1.9, 5.4, 10.6, 14, 14.1, 14.4, 10.2, 8.8, 5, 1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1961, 1, [-4.4, -0.5, 2.1, 8.8, 9.4, 14.4, 14.3, 13.9, 12.1, 8.1, 3.1, -2.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1962, 1, [-2.3, -3.8, -2.1, 4.8, 9.2, 11.6, 14.4, 15.8, 10.9, 6.7, 1.2, -5.5]);
+addAvgTempYear(cv_placeBabnoPolje, 1963, 1, [-7.9, -6.7, -0.4, 6.2, 9.5, 14.3, 16.1, 15.2, 12.3, 6, 7.8, -5.2]);
+addAvgTempYear(cv_placeBabnoPolje, 1964, 1, [-7.3, -2.6, 0, 5.5, 10.5, 15.5, 15.5, 14, 10.8, 7.2, 2.9, -2.8]);
+//addAvgTempYear(cv_placeBabnoPolje, 1965, 1, [-2.4, -6.4, 1.5, 3.6, 9.1, 13.8, 15, 12.7, 11.2, , , ]);
+//id=1141  BABNO POLJE (lon=14.5449, lat=45.6452, viš=755m)
+//addAvgTempYear(cv_placeBabnoPolje, 1965, 1, [, , , , , , , , , , 2.1, 0.4]);
+addAvgTempYear(cv_placeBabnoPolje, 1965, 1, [-2.4, -6.4, 1.5, 3.6, 9.1, 13.8, 15, 12.7, 11.2, 8.6, 2.1, 0.4]); //manjkajoči okt, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
+addAvgTempYear(cv_placeBabnoPolje, 1966, 1, [-5.3, 4, -0.1, 7.2, 10.1, 14.7, 14.3, 14, 11.5, 10.1, -0.2, -1.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1967, 1, [-5.7, -1.7, 3, 4.4, 11.3, 12.7, 16.5, 14.6, 12, 7.7, 3.5, -3.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1968, 1, [-6.8, 0.9, 1.9, 7.8, 10.8, 13.5, 15.4, 13.7, 11.2, 7.8, 2.7, -5]);
+addAvgTempYear(cv_placeBabnoPolje, 1969, 1, [-2.9, -3.1, -0.1, 4.4, 12.3, 12.8, 15.4, 14.1, 11.9, 5.5, 5.1, -5.7]);
+addAvgTempYear(cv_placeBabnoPolje, 1970, 1, [-1.3, -2.3, -1, 3.9, 8.1, 14.7, 15, 15.3, 11.8, 5.9, 4.4, -3.2]);
+addAvgTempYear(cv_placeBabnoPolje, 1971, 1, [-1.6, -1.5, -1.6, 6.5, 11.2, 13.2, 15.9, 16.3, 8.4, 4.3, 1.6, -3.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1972, 1, [-4.1, 0.1, 3.2, 5.7, 9.7, 14.1, 15.8, 14.2, 8.1, 5.7, 1.9, -2.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1973, 1, [-2.6, -3.1, -0.3, 3.4, 11.2, 14.1, 15.4, 14.7, 12.1, 6.2, 1, -1.7]);
+addAvgTempYear(cv_placeBabnoPolje, 1974, 1, [-0.7, 2, 2.8, 4.8, 9.6, 12.1, 15.3, 16.1, 11.4, 2.5, 2.6, -0.7]);
+addAvgTempYear(cv_placeBabnoPolje, 1975, 1, [0.9, -2.3, 1.9, 5.8, 11.2, 13, 15.7, 14.6, 13.3, 5.3, 1.2, -1.8]);
+addAvgTempYear(cv_placeBabnoPolje, 1976, 1, [-2.9, -3.1, -2.8, 4.1, 10.5, 13.7, 15.6, 11.7, 10.1, 7.7, 3.5, -2.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1977, 1, [0.6, 1.4, 3.9, 4.3, 10.1, 13.7, 15, 14, 8.3, 8, 2.7, -3.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1978, 1, [-2.3, -2.4, 1.8, 4, 8.8, 12.7, 14.2, 13.2, 9.9, 6.4, -1.5, -1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1979, 1, [-4.9, -1, 3, 4.3, 11, 15.1, 14.8, 13.6, 10.9, 6.5, 2.1, 0.2]);
+addAvgTempYear(cv_placeBabnoPolje, 1980, 1, [-5.3, -0.7, 1.4, 3.3, 8.2, 13, 14.5, 15.4, 11.4, 7.3, 0.4, -5.8]);
+addAvgTempYear(cv_placeBabnoPolje, 1981, 1, [-6.9, -4.9, 3, 5.6, 9.9, 14.1, 14.9, 14.2, 12.2, 9.5, -0.6, -2.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1982, 1, [-3.3, -4.1, 0.3, 2.9, 10.8, 14.9, 16.9, 14.9, 13.6, 8.1, 3.8, 0.3]);
+addAvgTempYear(cv_placeBabnoPolje, 1983, 1, [-2.2, -5.4, 1.9, 7.5, 11.3, 13.8, 17.8, 15, 11.3, 6.5, -0.1, -1.7]);
+addAvgTempYear(cv_placeBabnoPolje, 1984, 1, [-3.2, -2.8, -0.1, 4.1, 9, 13, 14.8, 13.7, 10.9, 8.7, 3.1, -1.1]);
+addAvgTempYear(cv_placeBabnoPolje, 1985, 1, [-7.9, -5, 1, 5.3, 11.4, 13.1, 17.2, 15.7, 11.8, 5.8, -0.1, 0.6]);
+addAvgTempYear(cv_placeBabnoPolje, 1986, 1, [-3.7, -6, -0.1, 6, 13.4, 13.4, 15.3, 15.9, 10.2, 6.4, 2.8, -4]);
+addAvgTempYear(cv_placeBabnoPolje, 1987, 1, [-5.8, -2.5, -3.5, 6.5, 9.5, 14.2, 17.1, 14.6, 14.1, 8.7, 2.6, -1.5]);
+addAvgTempYear(cv_placeBabnoPolje, 1988, 1, [1.9, -0.7, 0.3, 5.8, 11.4, 13.2, 17.3, 15.9, 10.9, 8.2, -0.9, -1.5]);
+addAvgTempYear(cv_placeBabnoPolje, 1989, 1, [-2.3, 0.5, 4, 7.3, 10.5, 12.8, 16.2, 15.2, 11.1, 5.5, 0.5, 0.2]);
+addAvgTempYear(cv_placeBabnoPolje, 1990, 1, [-2.6, 1.8, 3.5, 4.9, 11.2, 14.1, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+//addAvgTempYear(cv_placeBabnoPolje, 1991, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, , , , , ,]);
+// podatke jul'91-dec'91 skopiram iz leta 1990
+//podatke za leta 1991-2002 skopiram iz leta 1991, ker postaja v teh letih na tej lokaciji ni delala, nočem pa zato imeti dveh ločenih postaj!!!
+// podatke jan'2003-okt'2003 skopiram iz izmišljenih podatkov leta 2002 !!!
+addAvgTempYear(cv_placeBabnoPolje, 1991, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1992, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1993, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1994, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1995, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1996, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1997, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1998, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 1999, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 2000, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 2001, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+addAvgTempYear(cv_placeBabnoPolje, 2002, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 2.4, -1.9]);
+//id=2214  BABNO POLJE (lon=14.5449, lat=45.6452, viš=755m)
+//addAvgTempYear(cv_placeBabnoPolje, 2003, 1, [, , , , , , , , , , 4.2, -1.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2003, 1, [-2.2, -5, 4.3, 4.3, 7.5, 14.2, 15.5, 14.5, 10.3, 8.8, 4.2, -1.1]); //jan-okt vzamem podatke oz izmišljenega leta 2002
+addAvgTempYear(cv_placeBabnoPolje, 2004, 1, [-5.1, -2.4, -0.4, 5.6, 9.2, 14.1, 16.4, 16, 11.3, 9.9, 2.5, -1.5]);
+addAvgTempYear(cv_placeBabnoPolje, 2005, 1, [-4.3, -5.6, -1, 5.8, 11.6, 14.9, 16, 14, 11.8, 8.1, 1.8, -3.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2006, 1, [-4.9, -3.8, -0.3, 6.4, 10.9, 15.1, 18.7, 13.6, 12.4, 9, 4.4, 1.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2007, 1, [0.5, 1.9, 3.7, 8.2, 12.5, 16.6, 16.8, 15.6, 9.4, 5.6, 1.2, -3.6]);
+addAvgTempYear(cv_placeBabnoPolje, 2008, 1, [0.2, -0.1, 1.7, 5.9, 11.9, 15.7, 16.7, 16, 10.5, 7.7, 3.3, -1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 2009, 1, [-4, -1.7, 1.5, 7.8, 13, 14.7, 16.9, 16.8, 12.4, 7, 4.8, -0.6]);
+addAvgTempYear(cv_placeBabnoPolje, 2010, 1, [-5.2, -2.2, 0.3, 6.3, 10.8, 15.5, 17.7, 15.5, 10.4, 6.1, 4.7, -4.4]);
+addAvgTempYear(cv_placeBabnoPolje, 2011, 1, [-2.3, -2.5, 1.6, 7.5, 11.5, 15.7, 16.5, 17.6, 14.1, 5.9, 0.6, -0.3]);
+addAvgTempYear(cv_placeBabnoPolje, 2012, 1, [-3.3, -6.3, 4, 7.2, 10.8, 17.1, 18.7, 18.1, 12.5, 7.6, 6.1, -3.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2013, 1, [-1.4, -2.7, -0.4, 7.2, 10.7, 14.8, 18.1, 16.8, 11.8, 9.3, 3.9, -0.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2014, 1, [2.5, 1.8, 4.6, 8.4, 10.9, 15.3, 16.6, 15.8, 11.8, 9.6, 6.3, -0.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2015, 1, [0.2, -1.8, 2.8, 6.1, 12.8, 15.8, 19.4, 17.1, 12.3, 7.7, 1.8, -0.8]);
+addAvgTempYear(cv_placeBabnoPolje, 2016, 1, [-1.8, 1.8, 2.8, 7.7, 10.8, 15.5, 18.3, 15.9, 12.6, 6.7, 3.9, -3.1]);
+addAvgTempYear(cv_placeBabnoPolje, 2017, 1, [-6.7, 1, 4.2, 6.7, 11.7, 17.4, 18.4, 17.9, 10.2, 6.3, 2.7, -2.2]);
+addAvgTempYear(cv_placeBabnoPolje, 2018, 1, [1.5, -4.6, 0.4, 9.8, 13.1, 15.9, 17.4, 17.2, 12.3, 9.1, 4.5, -1.3]);
+addAvgTempYear(cv_placeBabnoPolje, 2019, 1, [-2.9, 0.3, 3.2, 6.5, 8.3, 18.6, 17.8, 17.9, 11.9, 8.6, 5.7, 0.8]);
+addAvgTempYear(cv_placeBabnoPolje, 2020, 1, [-0.8, 2.6, 2.3, 6.8, 10.6, 14.8, 16.2, 16.8, 11.7, 7.4, 2.2, 0.7]);
+addAvgTempYear(cv_placeBabnoPolje, 2021, 1, [-2.5, 2.3, 1.2, 3.6, 9.9, 17.5, 18.5, 16, 11.8, 5.9, 3.2, -0.6]);
+addAvgTempYear(cv_placeBabnoPolje, 2022, 1, [-2.5, 0.8, 0.5, 5.7, 13.2, 18.4, 18.6, 17.3, 11.6, 9.7, 4.3, 2.5]);
+
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
     offsetMonths[place] = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
@@ -1135,8 +1256,13 @@ var lo_keyDown0 = false; //2.2.2023 v1.11
 //---- spreminjanje zgornje in spodnje meje grafa po Y (6.12.2023)
 var lo_keyDownU = false;      //6.12.2023
 var lo_keyDownD = false;      //6.12.2023
+var lo_keyDownW = false;      //13.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
+
+const cv_addMarkWidthMin = 0; //13.12.2023
+const cv_addMarkWidthMax = 3; //13.12.2023
+var lo_addMarkWidth = 0; //13.12.2023
 
 var lo_graphMarginLeft, lo_graphMarginTop, lo_graphMarginRight, lo_graphMarginBottom;
 
@@ -2416,6 +2542,14 @@ window.addEventListener("wheel", event => {
         paint();
         return        
     }
+    else if (lo_keyDownW) {
+        lo_addMarkWidth -= delta;
+        if (lo_addMarkWidth > cv_addMarkWidthMax) { lo_addMarkWidth = cv_addMarkWidthMax };
+        if (lo_addMarkWidth < cv_addMarkWidthMin) { lo_addMarkWidth = cv_addMarkWidthMin };
+        //console.log("lo_addMarkWidth=" + lo_addMarkWidth.toString())
+        paint();
+        return        
+    }    
     //---- ... sicer spreminja (končni) mesec prikaza
     gl_monthEnd -= delta;
     if (gl_monthEnd > nrMonthsAll) { gl_monthEnd = nrMonthsAll };
@@ -2441,6 +2575,8 @@ window.addEventListener("keydown", (event) => {
             lo_keyDownU = true; break;
         case 'KeyD':
             lo_keyDownD = true; break;
+        case 'KeyW':
+            lo_keyDownW = true; break;        
         case 'ArrowRight':
             lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
             break;
@@ -2473,7 +2609,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyY': case 'KeyZ': //24.10.2023
             //console.log("Y pressed");
             lf_changeSameScaleY(!gl_sameScaleY, true); break;
-        case 'KeyW': //18.11.2023
+        case 'KeyQ': //18.11.2023
             //console.log("W pressed");
             lf_resizeWindowToFullHD(true); break;
         case 'KeyV': //6.12.2023
@@ -2498,6 +2634,8 @@ window.addEventListener("keyup", (event) => {
             lo_keyDownU = false; break;
         case 'KeyD':
             lo_keyDownD = false; break;
+        case 'KeyW':
+            lo_keyDownW = false; break;
         //case 'KeyP':
         //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
     }
@@ -3120,7 +3258,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 16;
+            let nrTipRows = 17;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -3188,6 +3326,12 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("V", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... show exact values/lines too", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //   
+            y += vStep;
+            gBannerRectWithText2("W", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... change marker size", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //            
             y += vStep;
             gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4446,17 +4590,17 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
                 if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
                     //---- če sta obe krajišči znotraj, enostavno narišem linijo
-                    gLine(vl_xOld, vl_yOld, x, y, dataLineWidth, dataLineColorFinal, []);
+                    gLine(vl_xOld, vl_yOld, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
                 } else if (vl_yOld >= cv_graphTopAxis) {
                     //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
                     kkk = (y - vl_yOld) / kx;
                     tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
-                    gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth, dataLineColorFinal, []);
+                    gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
                 } else if (y >= cv_graphTopAxis) {
                     //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
                     kkk = (y - vl_yOld) / kx;
                     tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
-                    gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth, dataLineColorFinal, []);
+                    gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
                 }
             }
             vl_xOld = x; vl_yOld = y;
@@ -4517,7 +4661,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 };
                 //---- risanje točke
                 if (vl_showPoint) {
-                    gEllipse(x, y, dataPointRadij, dataPointRadij, 0, dataPointColorFinal, 0, "");
+                    gEllipse(x, y, dataPointRadij + lo_addMarkWidth, dataPointRadij + lo_addMarkWidth, 0, dataPointColorFinal, 0, "");
                 }
                 //---- beleženje zadnjih koordinat (10.12.2023)
                 lastPlaceMarkerX[place] = x; 
