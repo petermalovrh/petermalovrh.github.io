@@ -1,9 +1,11 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.16"
+const gl_versionNr = "v0.17"
 const gl_versionDate = "13.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
+
+console.clear;
 
 // https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Excess_mortality_-_statistics
 // https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Excess_mortality_-_statistics#Excess_mortality_in_the_EU_between_January_2020_and_November_2022
@@ -1899,6 +1901,8 @@ class slider2 {
         this.valueFont = valueFont; this.valueColor = valueColor; this.valueGap = valueGap;
         this.addZoneUp = addZoneUp; this.addZoneDown = addZoneDown;
         this.visible = visible;
+        //---- additional object properties
+        this.itemWidth = width / items; //13.12.2023
     }
     paint() {
         if (!this.visible) { return };
@@ -1958,10 +1962,12 @@ class slider2 {
         }
     }
     paint_selector(xx, chooserWidthHalf, bodyBottom, myColor, selStrokeColor) {
+        //console.log("      slider2.paint_selector(): xx=" + xx.toString() + " chooserWidthHalf=" + chooserWidthHalf.toString() + " bodyBottom=" + bodyBottom.toString());
         let x1, x2, y1
         x1 = xx - chooserWidthHalf;
         x2 = xx + chooserWidthHalf;
         y1 = bodyBottom + this.selHeight
+        //console.log("        x1=" + x1.toString() + " x2=" + x2.toString() + " y1=" + y1.toString());
         ctx.beginPath()
         ctx.moveTo(x1, y1)
         ctx.lineTo(x2, y1)
@@ -2018,7 +2024,13 @@ class slider2 {
         const bodyTop = this.bodyMiddle - bodyHeightHalf
         let x0, x1, y0, y1;
         x0 = this.left; x1 = x0 + this.width;
+        //---- če je trikotnik selektorja širši od razmika med dvema vrednostima (itemWidth), potem je območje detekcije potrebno razširiti še za polovico te razlike
+        if (this.selWidth > this.itemWidth) {
+            x0 -= (this.selWidth - this.itemWidth) / 2;
+            x1 += (this.selWidth - this.itemWidth) / 2;
+        }
         y0 = bodyTop - 8; y1 = bodyBottom + this.selHeight;
+        //console.log("      slider2.eventMouseWithin(): x0=" + x0.toString() + " x1=" + x1.toString() + " y0=" + y0.toString() + " y1=" + y1.toString());
         if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) {
             return true;
         } else { return false; };
@@ -2650,6 +2662,7 @@ function tmHideTips_tick() {
 // event.offsetX, event.offsetY gives the (x,y) offset from the edge of the canvas.
 // Add the event listeners for mousedown, mousemove, and mouseup
 elMyCanvas.addEventListener('mousedown', (e) => {
+    //console.log("event mouseDown(): x=" + e.offsetX.toString() + " y=" + e.offsetY.toString());
     lo_mouseDownX = e.offsetX;
     lo_mouseDownY = e.offsetY;
     lo_mouseDown = true
@@ -2657,7 +2670,7 @@ elMyCanvas.addEventListener('mousedown', (e) => {
     lo_dragMonthEndActive = sliderMonthEnd.eventMouseWithin(e.offsetX, e.offsetY); //lo_mouseAboveSliderMonthEnd
     lo_dragTailMonthsActive = sliderTailMonths.eventMouseWithin(e.offsetX, e.offsetY); 
     //console.log("---------------------------------------------------------")
-    //console.log("mousedown(): dragMonthEndActive=" + lo_dragMonthEndActive)
+    //console.log("      mousedown(): dragMonthEndActive=" + lo_dragMonthEndActive)
 
 });
 elMyCanvas.addEventListener('mouseup', (e) => {
@@ -2760,6 +2773,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //console.log("mouse_move() enter")
     //console.log("mouseMove:mouseIn x=" + e.offsetX.toString() + " y=" + e.offsetY.toString())
+    //console.log("event mouseMove(): x=" + e.offsetX.toString() + " y=" + e.offsetY.toString());
     
     //if (lo_mouseOut) { console.log("mouseMove:mouseIn x=" + e.offsetX.) }
     lo_mouseOut = false; //29.7.2023
@@ -2772,11 +2786,11 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     //Vlečenje okna / GUI elementov
     if (lo_mouseDown) {
         if (lo_dragMonthEndActive) {
-            //console.log("mousemove(): drag interval:")
+            //console.log("      mousemove(): drag the monthStart or monthEnd slider")
             sliderMonthEnd.setAddZone(100, 100)
             let rslt = sliderMonthEnd.eventMouseOverValue(e.offsetX, e.offsetY)
             sliderMonthEnd.setAddZone(0, 0)
-            //console.log("  mousemove(): drag interval: overValue=" + rslt)
+            //console.log("      mousemove(): slider overValue=" + rslt)
             if (rslt >= 0) { lf_dragInterval(rslt); }
             return;
         }
