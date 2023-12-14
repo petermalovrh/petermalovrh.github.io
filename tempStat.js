@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.19"
+const gl_versionNr = "v0.20"
 const gl_versionDate = "14.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2977,7 +2977,7 @@ window.addEventListener("wheel", event => {
     }
     else if (lo_keyDownU) {
         maxDiff = 20;
-        lo_addTempMarginUp -= delta;
+        lo_addTempMarginUp += delta;
         if (lo_addTempMarginUp > maxDiff) { lo_addTempMarginUp = maxDiff };
         if (lo_addTempMarginUp < -maxDiff) { lo_addTempMarginUp = -maxDiff };
         //console.log("lo_addTempMarginUp=" + lo_addTempMarginUp.toString())
@@ -2986,7 +2986,7 @@ window.addEventListener("wheel", event => {
     }
     else if (lo_keyDownD) {
         maxDiff = 20;
-        lo_addTempMarginDown -= delta;
+        lo_addTempMarginDown += delta;
         if (lo_addTempMarginDown > maxDiff) { lo_addTempMarginDown = maxDiff };
         if (lo_addTempMarginDown < -maxDiff) { lo_addTempMarginDown = -maxDiff };
         //console.log("lo_addTempMarginDown=" + lo_addTempMarginDown.toString())
@@ -4528,7 +4528,7 @@ function paint_graph_timeAvgTemp_multiTimeSlice_drawSingleTimeSlice(place, vp_ti
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
     //24.10.2023 uvedeni vhodni parametri vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange
     
-    let place, yValue, placeMonth, offsetPlaceMonths;
+    let place, yValue, placeMonth, offsetPlaceMonths, stepMonths, vl_drawLines;
     let lastPlaceMarkerX = []; let lastPlaceMarkerY = [];
     //
     let cv_graphMarginLeft, cv_graphMarginRight, cv_graphMarginTop, cv_graphMarginBottom;
@@ -4977,96 +4977,103 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
         vl_firstGraphDataPoint = true;
         vl_haveValidDataPoints = false; vl_currentPointValid = false; vl_previousPointValid = false; //12.12.2023
-        //---- zanka čez vse mesece
-        for (month = vl_monthStart; month <= gl_monthEnd; month++) {
-            if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
-            placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
-            if (gf_withinUndefPeriod(place, month)) { vl_pointUndefData = true; continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
-            //if (vl_pointUndefData) { vl_pointUndefData = false; continue }; // če je bila prejšnja točka še v nedefiniranem področju, potem linije ne rišem, za naprej si pa popravim, da zdaj nismo več v nedefiniranem področju
-            monthIndex = month - vl_monthStart + 1       //na grafu je tole zaporedna številka meseca po X osi
-            tmpMonthValue = lf_monthValue(month);
-            switch (vp_graphType) {
-                case cv_graphType_timeAvgTemp: xValue = month; break;
-            }
-            x = cv_graphLeftData + kx * (xValue - xValue0);
-            //---- če imamo povprečenje vrednosti (lo_nrMonthsAvg>0), in se zahteva tudi izris točnih posameznih vrednosti (gl_showExactValuesToo), 
-            //     zraven pa moramo imeti ali samo eno selektirano lokacijo (nrSelectedPlaces==1), ali pa risanje lokacije v fokusu (place == lo_focusPlace),
-            //     potem najprej posivljeno izrišem točno vrednost (6.12.2023)            
-            if (lo_nrMonthsAvg > 0 && gl_showExactLinesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
-                yValue = avgTemp[place][placeMonth];
-                y = cv_graphY0 - ky * yValue
-                gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(80, placeColor[place]), []);
-                vl_xOldExact = x; vl_yOldExact = y;
-            }
-            //---- risanja linije osnovne zahtevane krivulje ne bo, če timeSlice ni pravi (9.12.2023)
-            switch (vp_timeSlice) {
-                case cv_timeSliceAll: break; //risanje seveda je
-                case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
-                    if (tmpMonthValue !== vp_timeSlice) { continue }; //risanja ni, če ni točno določeni mesec
-                    break;
-                case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
-                    tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
-                    if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
-                    if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
-                    break;                
-            }    
-            //---- glede timeSlice smo na pravi točki (mesecu). Je ta v redu z vidika povprečenja?
-            if (vl_previousPointValid) {
-                //---- ker je prejšnja valid, je tudi ta sigurno valid
-                vl_currentPointValid = true; 
-            } else {
-                //---- prejšnja ni bila valid, ali pa je sploh še ni bilo. Za tole je potrebno preveriti, ali se za zadnjo sploh da izračunati ustrezno povprečje ...
-                vl_currentPointValid = paint_graph_timeAvgTemp_enoughDataForAveraging(placeMonth, vp_timeSlice);
-            }
-            //---- zdaj pa še osnovno zahtevano povezovanje vrednosti            
-            yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
-            y = cv_graphY0 - ky * yValue
-            //---- pri prvi podatkovni točki še ne more biti linije od prejšnje do te
-            //---- pogoj za prvi data point pa je odvisen od vp_timeSlice (10.12.2023)
-            if (vl_firstGraphDataPoint) {
+        //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
+        vl_drawLines = true; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { vl_drawLines = false }; console.log("vl_drawLines=" + vl_drawLines.toString()); //14.12.2023
+        //---- zanka čez vse mesece v izbranem razponu
+        if (vl_drawLines) {
+            for (month = vl_monthStart; month <= gl_monthEnd; month++) {
+                if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
+                placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
+                if (gf_withinUndefPeriod(place, month)) { vl_pointUndefData = true; continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+                //if (vl_pointUndefData) { vl_pointUndefData = false; continue }; // če je bila prejšnja točka še v nedefiniranem področju, potem linije ne rišem, za naprej si pa popravim, da zdaj nismo več v nedefiniranem področju
+                monthIndex = month - vl_monthStart + 1       //na grafu je tole zaporedna številka meseca po X osi
+                tmpMonthValue = lf_monthValue(month);
+                switch (vp_graphType) {
+                    case cv_graphType_timeAvgTemp: xValue = month; break;
+                }
+                x = cv_graphLeftData + kx * (xValue - xValue0);
+                //---- če imamo povprečenje vrednosti (lo_nrMonthsAvg>0), in se zahteva tudi izris točnih posameznih vrednosti (gl_showExactValuesToo), 
+                //     zraven pa moramo imeti ali samo eno selektirano lokacijo (nrSelectedPlaces==1), ali pa risanje lokacije v fokusu (place == lo_focusPlace),
+                //     potem najprej posivljeno izrišem točno vrednost (6.12.2023)            
+                if (lo_nrMonthsAvg > 0 && gl_showExactLinesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
+                    yValue = avgTemp[place][placeMonth];
+                    y = cv_graphY0 - ky * yValue
+                    gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(80, placeColor[place]), []);
+                    vl_xOldExact = x; vl_yOldExact = y;
+                }
+                //---- risanja linije osnovne zahtevane krivulje ne bo, če timeSlice ni pravi (9.12.2023)
                 switch (vp_timeSlice) {
-                    case cv_timeSliceAll:
-                        if (monthIndex > 1 && placeMonth > 1) { vl_firstGraphDataPoint = false };
-                        break;
+                    case cv_timeSliceAll: break; //risanje seveda je
                     case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
-                        if (monthIndex >= 13 && placeMonth >= 13) { vl_firstGraphDataPoint = false };
+                        if (tmpMonthValue !== vp_timeSlice) { continue }; //risanja ni, če ni točno določeni mesec
                         break;
                     case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
-                        if (monthIndex >= 15 && placeMonth >= 15) { vl_firstGraphDataPoint = false };
+                        tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                        if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
+                        if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
                         break;
-                }              
-            }
-            //---- linijo rišem od prejšnje do trenutne točke, zato v primeru prve točke na grafu ni risanja
-            if (!vl_firstGraphDataPoint && placeMonth > 1 && !vl_pointUndefData) {
-                //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
-                dataLineColorFinal = dataLineColor;
-                if (!vl_currentPointValid || !vl_previousPointValid) { dataLineColorFinal = cv_colorHideData };
-                //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
-                if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
-                    //---- če sta obe krajišči znotraj, enostavno narišem linijo
-                    gLine(vl_xOld, vl_yOld, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
-                } else if (vl_yOld >= cv_graphTopAxis) {
-                    //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
-                    kkk = (y - vl_yOld) / kx;
-                    tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
-                    gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
-                } else if (y >= cv_graphTopAxis) {
-                    //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
-                    kkk = (y - vl_yOld) / kx;
-                    tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
-                    gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
                 }
+                //---- glede timeSlice smo na pravi točki (mesecu). Je ta v redu z vidika povprečenja?
+                if (vl_previousPointValid) {
+                    //---- ker je prejšnja valid, je tudi ta sigurno valid
+                    vl_currentPointValid = true;
+                } else {
+                    //---- prejšnja ni bila valid, ali pa je sploh še ni bilo. Za tole je potrebno preveriti, ali se za zadnjo sploh da izračunati ustrezno povprečje ...
+                    vl_currentPointValid = paint_graph_timeAvgTemp_enoughDataForAveraging(placeMonth, vp_timeSlice);
+                }
+                //---- zdaj pa še osnovno zahtevano povezovanje vrednosti            
+                yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+                y = cv_graphY0 - ky * yValue
+                //---- pri prvi podatkovni točki še ne more biti linije od prejšnje do te
+                //---- pogoj za prvi data point pa je odvisen od vp_timeSlice (10.12.2023)
+                if (vl_firstGraphDataPoint) {
+                    switch (vp_timeSlice) {
+                        case cv_timeSliceAll:
+                            if (monthIndex > 1 && placeMonth > 1) { vl_firstGraphDataPoint = false };
+                            break;
+                        case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                            if (monthIndex >= 13 && placeMonth >= 13) { vl_firstGraphDataPoint = false };
+                            break;
+                        case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                            if (monthIndex >= 15 && placeMonth >= 15) { vl_firstGraphDataPoint = false };
+                            break;
+                    }
+                }
+                //---- linijo rišem od prejšnje do trenutne točke, zato v primeru prve točke na grafu ni risanja
+                if (!vl_firstGraphDataPoint && placeMonth > 1 && !vl_pointUndefData) {
+                    //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
+                    dataLineColorFinal = dataLineColor;
+                    if (!vl_currentPointValid || !vl_previousPointValid) { dataLineColorFinal = cv_colorHideData };
+                    //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
+                    if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
+                        //---- če sta obe krajišči znotraj, enostavno narišem linijo
+                        gLine(vl_xOld, vl_yOld, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                    } else if (vl_yOld >= cv_graphTopAxis) {
+                        //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
+                        kkk = (y - vl_yOld) / kx;
+                        tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
+                        gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                    } else if (y >= cv_graphTopAxis) {
+                        //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
+                        kkk = (y - vl_yOld) / kx;
+                        tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
+                        gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                    }
+                }
+                vl_xOld = x; vl_yOld = y;
+                vl_previousPointValid = vl_currentPointValid; //12.12.2023
+                vl_pointUndefData = false; //14.12.2023
             }
-            vl_xOld = x; vl_yOld = y;
-            vl_previousPointValid = vl_currentPointValid; //12.12.2023
-            vl_pointUndefData = false; //14.12.2023
         }
 
         //----------------------------------------------------------------
         //---- GRAF: zdaj pa še za krogce točk, zato da so ti risani preko linij
         //----------------------------------------------------------------
         ctx.setLineDash([]);
-        for (month = vl_monthStart; month <= gl_monthEnd; month++) {
+        //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
+        stepMonths = 1; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { stepMonths = 2 }; console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
+        //---- zanka čez vse mesece v izbranem razponu
+        for (month = vl_monthStart; month <= gl_monthEnd; month+=stepMonths) {
             //if (month == 901) { //debug
             //    month = month;
             //}
@@ -5128,6 +5135,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     //---------------------------------------------------------------------------
     //---- zdaj pa še za oznake lokacij, zato da so te v vsakem primeru preko krogcev točk in linij med krogci (ta problem je sicer le pri VACC-ExcessDeath diagramu)
     //---------------------------------------------------------------------------
+    //---- zanka čez vse mesece v izbranem razponu
     for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
         place = placeLoopIndex;
         //13.2.2023 v1.14
@@ -5194,7 +5202,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 //---- risanje ločeno za eno lokacijo, se pravi da smo očitno v multiPlace mode
                 tmpStr = placeName[place];
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);                
+                gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
                 break;
         }
 
@@ -5234,7 +5242,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 }
                 break;
         }
-        vl_xOld = x; vl_yOld = y 
+        vl_xOld = x; vl_yOld = y
     }
 
     //---- foreground toolTip krogci
@@ -7214,4 +7222,12 @@ function gf_withinUndefPeriod(vp_place, vp_month) {
 
     return false;
     
+}
+
+function cLogVarStr(myVar) {
+    //return Object.keys({ myVar })[0] + "=" + myVar.toString();
+
+    //a = window[myVar];
+    return myVar + '=' + window[myVar]; //tole deluje, ampak samo za globalne spremenljivke!!! 14.12.2023
+
 }
