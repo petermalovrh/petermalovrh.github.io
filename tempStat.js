@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.20"
-const gl_versionDate = "14.12.2023"
+const gl_versionNr = "v0.21"
+const gl_versionDate = "15.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -1696,12 +1696,18 @@ var lo_keyDown0 = false; //2.2.2023 v1.11
 var lo_keyDownU = false;      //6.12.2023
 var lo_keyDownD = false;      //6.12.2023
 var lo_keyDownW = false;      //13.12.2023
+var lo_keyDownE = false;      //15.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 
 const cv_addMarkWidthMin = 0; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
 var lo_addMarkWidth = 0; //13.12.2023
+
+const cv_addRightMarginMin = -200;   //15.12.2023
+const cv_addRightMarginMax = 100;   //15.12.2023
+const cv_addRightMarginMult = 10; //15.12.2023
+var lo_addRightMargin = 0;        //15.12.2023
 
 var lo_graphMarginLeft, lo_graphMarginTop, lo_graphMarginRight, lo_graphMarginBottom;
 
@@ -3000,7 +3006,15 @@ window.addEventListener("wheel", event => {
         //console.log("lo_addMarkWidth=" + lo_addMarkWidth.toString())
         paint();
         return        
-    }    
+    }  
+    else if (lo_keyDownE) {
+        lo_addRightMargin -= delta * cv_addRightMarginMult;
+        if (lo_addRightMargin > cv_addRightMarginMax) { lo_addRightMargin = cv_addRightMarginMax };
+        if (lo_addRightMargin < cv_addRightMarginMin) { lo_addRightMargin = cv_addRightMarginMin };
+        //console.log("lo_addRightMargin=" + lo_addRightMargin.toString())
+        paint();
+        return        
+    }      
     //---- ... sicer spreminja (končni) mesec prikaza
     gl_monthEnd -= delta;
     if (gl_monthEnd > nrMonthsAll) { gl_monthEnd = nrMonthsAll };
@@ -3028,6 +3042,8 @@ window.addEventListener("keydown", (event) => {
             lo_keyDownD = true; break;
         case 'KeyW':
             lo_keyDownW = true; break;        
+        case 'KeyE':
+            lo_keyDownE = true; break;  
         case 'ArrowRight':
             lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
             break;
@@ -3087,6 +3103,8 @@ window.addEventListener("keyup", (event) => {
             lo_keyDownD = false; break;
         case 'KeyW':
             lo_keyDownW = false; break;
+        case 'KeyE':
+            lo_keyDownE = false; break;
         //case 'KeyP':
         //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
     }
@@ -4547,7 +4565,10 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     const cv_graphLeft = vp_left + cv_graphMarginLeft //X koordinata Y osi oziroma začetka X osi
     const cv_graphRight = vp_left + vp_width - vp_marginRight //X koordinata konca X osi
     const cv_graphLeftData = cv_graphLeft + cv_graphGapLeft //X koordinata začetka področja podatkov
-    const cv_graphRightData = cv_graphRight - cv_graphGapRight //X koordinata konca področja podatkov
+    //const cv_graphRightData = cv_graphRight - cv_graphGapRight //X koordinata konca področja podatkov
+    let cv_graphRightData = cv_graphRight - cv_graphGapRight + lo_addRightMargin; //X koordinata konca področja podatkov
+    if (cv_graphRightData < cv_graphLeftData + 50) { cv_graphRightData = cv_graphLeftData + 50 };
+    if (cv_graphRightData > cv_graphRight) { cv_graphRightData = cv_graphRight };
     const cv_graphRangeX = cv_graphRightData - cv_graphLeftData //X koordinata konca področja podatkov
     //----
     const cv_graphTopAxis = vp_top + cv_graphMarginTop //Y koordinata vrha Y osi
@@ -4978,7 +4999,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         vl_firstGraphDataPoint = true;
         vl_haveValidDataPoints = false; vl_currentPointValid = false; vl_previousPointValid = false; //12.12.2023
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
-        vl_drawLines = true; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { vl_drawLines = false }; console.log("vl_drawLines=" + vl_drawLines.toString()); //14.12.2023
+        vl_drawLines = true; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { vl_drawLines = false }; //console.log("vl_drawLines=" + vl_drawLines.toString()); //14.12.2023
         //---- zanka čez vse mesece v izbranem razponu
         if (vl_drawLines) {
             for (month = vl_monthStart; month <= gl_monthEnd; month++) {
@@ -5071,7 +5092,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //----------------------------------------------------------------
         ctx.setLineDash([]);
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
-        stepMonths = 1; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { stepMonths = 2 }; console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
+        stepMonths = 1; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { stepMonths = 2 }; //console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
         //---- zanka čez vse mesece v izbranem razponu
         for (month = vl_monthStart; month <= gl_monthEnd; month+=stepMonths) {
             //if (month == 901) { //debug
