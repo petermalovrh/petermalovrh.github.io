@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.17"
+const gl_versionNr = "v0.18"
 const gl_versionDate = "13.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -54,6 +54,19 @@ const placeNameShort = []; // new Array(nrPlaces)
 const placeNameAbbr = [];  // new Array(nrPlaces)
 const placeColor = [];     // new Array(nrPlaces)
 
+//---- to se fila pri nalaganju podatkov o lokacijah meritev (14.12.2023)
+var nrStations = 0
+const stationPlaceId = []; // id lokacije
+const stationArsoId = [];  // ARSO id konkretne postaje na lokaciji
+const stationName = [];    // ime konkretne postaje na lokaciji
+const stationLon = [];     // longitude postaje
+const stationLat = [];     // latitude postaje
+const stationHeight = [];  // nadmorska višina postaje
+const stationMonthStart = []; // new Array(nrStations)
+const stationYearStart = [];  // new Array(nrStations)
+const stationMonthEnd = [];   // new Array(nrStations)
+const stationYearEnd = [];    // new Array(nrStations)
+
 //---- to se fila sproti med nalaganjem izmerjenih podatkov
 const minMonth = [];     // new Array(nrPlaces);
 const minYear = [];      // new Array(nrPlaces);
@@ -74,62 +87,105 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 
 var avgTemp = [];
 
-let stationID = 0;
-stationID += 1; const cv_placeSkofjaLoka = stationID;  //1;
-addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
-stationID += 1; const cv_placeMariborVrbanskiPlato = stationID;  //2; // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
-addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
-stationID += 1; const cv_placeMariborTabor = stationID;  //3; // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
-addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
-stationID += 1; const cv_placeLjubljanaBezigrad = stationID;  //4; // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
-addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen");
-//const cv_placeNovoMestoKandija = 5; // NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
-//addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
-//const cv_placeNovoMestoGotnaVas = 6; // NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
-//addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
-stationID += 1; const cv_placeNovoMesto = stationID;  //5; // NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
-addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
-stationID += 1; const cv_placePostojna = stationID;  //6; // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
-addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod");
-//const cv_placeNovaGoricaBilje51m = 9; // NOVA GORICA BILJE (51m) (lon=13.6315, lat=45.8911, viš=51m) ... 8.12.2023
-//addPlace("Nova Gorica Bilje (51m)", "NG Bilje", "NGBI51", "darkSalmon");
-//const cv_placeNovaGoricaBilje55m = 10; // NOVA GORICA BILJE (55m) (lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
-//addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
-stationID += 1; const cv_placeNovaGoricaBilje = stationID;  //7; // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
-addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
-stationID += 1; const cv_placeKredarica = stationID;  //8; // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
-addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
-stationID += 1; const cv_placeSlovenjGradecSmartno = stationID;  //9; // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
+const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
+
+// MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
+const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
+// MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
+const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
+// LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
+const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen");
+//NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
+//const cv_placeNovoMestoKandija = addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
+// NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
+//const cv_placeNovoMestoGotnaVas = addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
+// NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
+const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
+// POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
+const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod");
+// NOVA GORICA BILJE (51m) (lon=13.6315, lat=45.8911, viš=51m) ... 8.12.2023
+//cv_placeNovaGoricaBilje51m = addPlace("Nova Gorica Bilje (51m)", "NG Bilje", "NGBI51", "darkSalmon");
+//NOVA GORICA BILJE (55m) (lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
+//const cv_placeNovaGoricaBilje55m = addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
+// NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
+const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+// KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
+const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
+// ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
 //    jan'54-mar'57: (lon=15.1118, lat=46.4997, viš=440m)
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
-addPlace("Slovenj Gradec " + scSch + "martno (445m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
-stationID += 1; const cv_placeKrvavec = stationID;  //10; // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
+const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (445m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
+
+// KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
 //    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
 //    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
-addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
-stationID += 1; const cv_placeMurskaSobota = stationID;  //11; // MURSKA SOBOTA ... 12.12.2023
-//    cel kup prestavljanja postaje po Murski Soboti sem in tja, vse sem združil skupaj od 1949-2022, spodaj glej id-je in podatke konkretnih postaj
-addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
-stationID += 1; const cv_placeJavorje = stationID;  //12; // JAVORJE NAD POLJANAMI ... 12.12.2023
-//    dve postaji, obe sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
-addPlace("Javorje (695m)", "Javorje", "JAPO", "olive");
-stationID += 1; const cv_placeCelje = stationID;  //13; // CELJE ... 12.12.2023
+const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
+addStation(cv_placeKrvavec, 14, "KRVAVEC", "14.5201", "46.2964", 1478, 1, 1961, 4, 1973);
+addStation(cv_placeKrvavec, 1614, "KRVAVEC", "14.5333", "46.2973", 1742, 9, 1973, 0, 0); // !!! POZOR: višina spremenjena za 300m !!! Razdeli lokacijo na 2 lokaciji !!!
+
+// MURSKA SOBOTA ... 12.12.2023, vse postaje združil skupaj
+const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
+addStation(cv_placeMurskaSobota, 996, "MURSKA SOBOTA - RAKIČAN I", "16.1950", "46.6497", 187, 4, 1949, 6, 1950);
+addStation(cv_placeMurskaSobota, 893, "MURSKA SOBOTA", "16.1784", "46.6497", 187, 1, 1950, 12, 1951);
+addStation(cv_placeMurskaSobota, 1052, "MURSKA SOBOTA", "16.1284", "46.6663", 191, 1, 1952, 12, 1952);
+addStation(cv_placeMurskaSobota, 1051, "MURSKA SOBOTA", "16.1284", "46.6663", 191, 1, 1953, 12, 1955);
+addStation(cv_placeMurskaSobota, 1078, "MURSKA SOBOTA - RAKIČAN", "16.1284", "46.6663", 193, 1, 1956, 6, 1971);
+addStation(cv_placeMurskaSobota, 1082, "MURSKA SOBOTA - RAKIČAN", "16.1784", "46.6330", 184, 7, 1971, 5, 1985);
+addStation(cv_placeMurskaSobota, 1894, "MURSKA SOBOTA - RAKIČAN", "16.1913", "46.6521", 187, 7, 1985, 0, 0);
+
+// JAVORJE NAD POLJANAMI ... 12.12.2023, združil dve postaji
+const cv_placeJavorje = addPlace("Javorje (695m)", "Javorje", "JAPO", "olive");
+addStation(cv_placeJavorje, 40, "JAVORJE NAD POLJANAMI", "14.1786", "46.1663", 700, 1, 1955, 4, 1975);
+addStation(cv_placeJavorje, 41, "JAVORJE NAD POLJANAMI", "14.1775", "46.1569", 690, 6, 1975, 12, 1990);
+
+// CELJE ... 12.12.2023
 //    cel kup postaj, vse sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
-addPlace("Celje (245m)", "Celje", "CE", "blueViolet");
-stationID += 1; const cv_placeBabnoPolje = stationID;  //14; // BABNO POLJE ... 13.12.2023
+const cv_placeCelje = addPlace("Celje (245m)", "Celje", "CE", "blueViolet");
+addStation(cv_placeCelje, 1050, "CELJE - MEDLOG", "15.2285", "46.2330", 241, 1, 1948, 7, 1953);
+addStation(cv_placeCelje, 1060, "CELJE - LEVEC - LETALIŠČE", "15.2452", "46.2330", 244, 8, 1953, 11, 1959);
+addStation(cv_placeCelje, 1063, "CELJE - ŽALEC", "15.2452", "46.2497", 254, 12, 1959, 1, 1961);
+addStation(cv_placeCelje, 1064, "CELJE - LOKROVEC", "15.2452", "46.2664", 255, 3, 1961, 10, 1962);
+addStation(cv_placeCelje, 1075, "CELJE - MEDLOG", "15.2285", "46.2497", 245, 11, 1962, 10, 1965);
+addStation(cv_placeCelje, 1081, "CELJE - LEVEC - LETALIŠČE", "15.2452", "46.2330", 244, 12, 1965, 9, 1976);
+addStation(cv_placeCelje, 1901, "CELJE", "15.2477", "46.2444", 244, 11, 1976, 2, 2008);
+addStation(cv_placeCelje, 2482, "CELJE - MEDLOG", "15.2259", "46.2366", 242, 4, 2008, 0, 0);
+
+// BABNO POLJE ... 13.12.2023 
 //    podatki postaje so v treh delih, ki sem jih združil spodaj, spodaj glej id-je in podatke konkretnih postaj
-addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod");
-stationID += 1; const cv_placePortorozLetalisce = stationID;  //15; // PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m) ... 13.12.2023  id=1896
-addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue");
-stationID += 1; const cv_placeKocevje = stationID;  //16; // KOČEVJE  ... 13.12.2023  id=1896
-addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "indianRed");
-stationID += 1; const cv_placeRatece = stationID;  //17; // RATEČE (lon=13.7129, lat=46.4971, viš=864m)  ... 13.12.2023  id=1086 (za 1948) in 1899 (za 1949-zdaj)
-addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "slateBlue");
-stationID += 1; const cv_placeVojsko = stationID;  //18; // VOJSKO lokacije postaj glej spodaj med podatki  ... 13.12.2023  id=192 (za 1958-1993) in 1654 (za 1993-zdaj)
-addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "mediumOrchid");
-stationID += 1; const cv_placeBrnikLetalisce = stationID;  //19; // BRNIK LETALIŠČE lokacije in ARSO-Id postaj glej spodaj med podatki  ... 13.12.2023  
-addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "oliveDrab");
+const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod");
+addStation(cv_placeBabnoPolje, 389, "BABNO POLJE", "14.5359", "45.6467", 753, 11, 1949, 9, 1965);
+addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "lat=45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
+addStation(cv_placeBabnoPolje, 2214, "BABNO POLJE", "14.5449", "45.6452", 755, 11, 2003, 0, 0);
+
+// PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m) ... 13.12.2023  id=1896
+const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue");
+addStation(cv_placePortorozLetalisce, 1896, "PORTOROŽ - LETALIŠČE", "13.6160", "45.4753", 2, 6, 1988, 0, 0);
+
+// KOČEVJE  ... 13.12.2023  id=1896
+const cv_placeKocevje = addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "indianRed");
+addStation(cv_placeKocevje, 2512, "KOČEVJE", "14.8589", "45.6375", 464, 1, 1950, 5, 1951);
+addStation(cv_placeKocevje, 409, "KOČEVJE", "14.8603", "45.6362", 463, 7, 1951, 7, 1989);
+addStation(cv_placeKocevje, 410, "KOČEVJE", "14.8640", "45.6374", 467, 9, 1989, 10, 1993);
+addStation(cv_placeKocevje, 1694, "KOČEVJE", "14.8501", "45.6460", 467, 12, 1993, 0, 0);
+
+// RATEČE (lon=13.7129, lat=46.4971, viš=864m)  ... 13.12.2023  id=1086 (za 1948) in 1899 (za 1949-zdaj)
+const cv_placeRatece = addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "slateBlue");
+addStation(cv_placeRatece, 1086, "RATEČE", "13.7129", "46.4971", 864, 1, 1948, 12, 1948);
+addStation(cv_placeRatece, 1899, "RATEČE", "13.7129", "46.4971", 864, 1, 1949, 0, 0);
+
+// VOJSKO lokacije postaj glej spodaj med podatki  ... 13.12.2023  id=192 (za 1958-1993) in 1654 (za 1993-zdaj)
+const cv_placeVojsko = addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "mediumOrchid");
+addStation(cv_placeVojsko, 192, "VOJSKO", "13.9031", "46.0250", 1070, 11, 1958, 11, 1993);
+addStation(cv_placeVojsko, 1654, "VOJSKO", "13.9021", "46.0254", 1065, 12, 1993, 0, 0);
+
+// BRNIK LETALIŠČE lokacije in ARSO-Id postaj glej spodaj med podatki  ... 13.12.2023  
+const cv_placeBrnikLetalisce = addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "oliveDrab");
+addStation(cv_placeBrnikLetalisce, 1076, "BRNIK - LETALIŠČE", "14.4574", "46.2288", 380, 1, 1964, 4, 1966);
+addStation(cv_placeBrnikLetalisce, 1079, "BRNIK - LETALIŠČE", "14.4747", "46.2169", 363, 6, 1966, 10, 1978);
+addStation(cv_placeBrnikLetalisce, 1085, "BRNIK - LETALIŠČE", "14.4542", "46.2311", 384, 12, 1978, 4, 1994);
+addStation(cv_placeBrnikLetalisce, 1898, "LETALIŠČE JOŽETA PUČNIKA LJUBLJANA", "14.4728", "46.2175", 364, 6, 1994, 9, 2017);
+addStation(cv_placeBrnikLetalisce, 3049, "LETALIŠČE JOŽETA PUČNIKA LJUBLJANA", "14.4784", "46.2114", 362, 8, 2017, 0, 0);
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -1000,7 +1056,7 @@ addAvgTempYear(cv_placeJavorje, 1972, 1, [-3.3, 2.2, 6.1, 7.5, 11.5, 15.9, 17.9,
 addAvgTempYear(cv_placeJavorje, 1973, 1, [-1.2, 0.3, 3.8, 5.5, 13.1, 15.8, 17.1, 17.6, 14.8, 7.7, 3.3, -0.1]);
 addAvgTempYear(cv_placeJavorje, 1974, 1, [1.3, 3.6, 5.5, 7.3, 11.1, 13.5, 17.1, 18.8, 13.7, 4.6, 4.4, 3.1]);
 //addAvgTempYear(cv_placeJavorje, 1975, 1, [3.2, 0.9, 3.6, 7.8, , , , , , , , ]);
-//id=40  JAVORJE NAD POLJANAMI (lon=14.1775, lat=46.1569, viš=690m)
+//id=41  JAVORJE NAD POLJANAMI (lon=14.1775, lat=46.1569, viš=690m)
 //addAvgTempYear(cv_placeJavorje, 1975, 1, [, , , , , 14.3, 17.9, 17.1, 16.2, 9.2, 3.2, 0.6]);
 addAvgTempYear(cv_placeJavorje, 1975, 1, [3.2, 0.9, 3.6, 7.8, 12.1, 14.3, 17.9, 17.1, 16.2, 9.2, 3.2, 0.6]); //manjkajoči maj, nadomestim s povprečjem iz prejšnjega in naslednjega podatka
 addAvgTempYear(cv_placeJavorje, 1976, 1, [0.3, -0.8, 1.3, 7.8, 13.1, 16.3, 18.4, 14.3, 12.3, 9.8, 5.4, 0]);
@@ -6973,7 +7029,27 @@ function addPlace(name, shortName, abbr, color) {
     nrMonths[nrPlaces] = 0;
     //----
     avgTemp[nrPlaces] = [];
+    //----
+    return nrPlaces; //14.12.2023
+}
 
+function addStation(placeId, arsoId, name, lon, lat, height, monthStart, yearStart, monthEnd, yearEnd) {
+    //-------------------------------------------------
+    // 14.12.2023
+    // addStation(cv_placeBrnikLetalisce, 1076, "BRNIK - LETALIŠČE", "14.4574", "46.2288", 380, 1, 1964, 4, 1966);
+    //-------------------------------------------------
+    nrStations += 1;
+    //----
+    stationPlaceId[nrStations] = placeId;
+    stationArsoId[nrStations] = arsoId;
+    stationName[nrStations] = name;
+    stationLon[nrStations] = lon;
+    stationLat[nrStations] = lat;
+    stationHeight[nrStations] = height;
+    stationMonthStart[nrStations] = monthStart;
+    stationYearStart[nrStations] = yearStart;
+    stationMonthEnd[nrStations] = monthEnd;
+    stationYearEnd[nrStations] = yearEnd;
 }
 
 function addAvgTemp(vp_place, vp_year, vp_month, vp_avgTemp) {
