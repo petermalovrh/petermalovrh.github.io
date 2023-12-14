@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.18"
-const gl_versionDate = "13.12.2023"
+const gl_versionNr = "v0.19"
+const gl_versionDate = "14.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -53,6 +53,7 @@ const placeName = [];      // new Array(nrPlaces)
 const placeNameShort = []; // new Array(nrPlaces)
 const placeNameAbbr = [];  // new Array(nrPlaces)
 const placeColor = [];     // new Array(nrPlaces)
+const placeHaveUndefPeriods = []; // new Array(nrPlaces)
 
 //---- to se fila pri nalaganju podatkov o lokacijah meritev (14.12.2023)
 var nrStations = 0
@@ -66,6 +67,18 @@ const stationMonthStart = []; // new Array(nrStations)
 const stationYearStart = [];  // new Array(nrStations)
 const stationMonthEnd = [];   // new Array(nrStations)
 const stationYearEnd = [];    // new Array(nrStations)
+
+//---- nedefinirani intervali podatkov določenih lokacij (14.12.2023)
+var nrUndefDataPeriods = 0;
+const undefDataPeriodPlace = [];
+const undefDataPeriodMonthStart = [];
+const undefDataPeriodYearStart = [];
+const undefDataPeriodMonthEnd = [];
+const undefDataPeriodYearEnd = [];
+const undefDataPeriodMonthIndexStart = [];      // od katerega podatka v globalnem razponu podatkov podatki niso definirani
+const undefDataPeriodMonthIndexEnd = [];        // do katerega podatka v globalnem razponu podatkov podatki niso definirani
+const undefDataPeriodPlaceMonthIndexStart = []; // od katerega podatka v nizu podatkov za to lokacijo podatki niso definirani
+const undefDataPeriodPlaceMonthIndexEnd = [];   // do katerega podatka v nizu podatkov za to lokacijo podatki niso definirani
 
 //---- to se fila sproti med nalaganjem izmerjenih podatkov
 const minMonth = [];     // new Array(nrPlaces);
@@ -157,6 +170,7 @@ const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP",
 addStation(cv_placeBabnoPolje, 389, "BABNO POLJE", "14.5359", "45.6467", 753, 11, 1949, 9, 1965);
 addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "lat=45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
 addStation(cv_placeBabnoPolje, 2214, "BABNO POLJE", "14.5449", "45.6452", 755, 11, 2003, 0, 0);
+addUndefPlaceDataPeriod(cv_placeBabnoPolje, 7, 1991, 10, 2003); //tu vmes ni podatkov, vseeno pa ohranim eno lokacijo, le graf se tu vmes ne bo prikazoval
 
 // PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m) ... 13.12.2023  id=1896
 const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue");
@@ -1611,6 +1625,17 @@ for (place = 1; place <= nrPlaces; place++) {
     offsetMonths[place] = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
     firstMonth[place] = 1 + offsetMonths[place];              //prvi mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
     lastMonth[place] = offsetMonths[place] + nrMonths[place]; //zadnji mesec podatkov te lokacije, zaporedno relativno glede na splošno prvi mesec vseh podatkov
+}
+
+//---- med intervali nedefiniranih podatkov je potrebno nastaviti pravilne indekse mesecev
+let undefDataPeriodIndex;
+for (undefDataPeriodIndex = 1; undefDataPeriodIndex <= nrUndefDataPeriods; undefDataPeriodIndex++) {
+    // zaporedna številka meseca v globalu
+    undefDataPeriodMonthIndexStart[undefDataPeriodIndex] = lf_getMonthDataIndex(undefDataPeriodMonthStart[undefDataPeriodIndex], undefDataPeriodYearStart[undefDataPeriodIndex]);
+    undefDataPeriodMonthIndexEnd[undefDataPeriodIndex] = lf_getMonthDataIndex(undefDataPeriodMonthEnd[undefDataPeriodIndex], undefDataPeriodYearEnd[undefDataPeriodIndex]);
+    // zaporedna številka meseca znotraj niza podatkov lokacije
+    undefDataPeriodPlaceMonthIndexStart[undefDataPeriodIndex] = undefDataPeriodMonthIndexStart[undefDataPeriodIndex] - offsetMonths[undefDataPeriodPlace[undefDataPeriodIndex]];
+    undefDataPeriodPlaceMonthIndexEnd[undefDataPeriodIndex] = undefDataPeriodMonthIndexEnd[undefDataPeriodIndex] - offsetMonths[undefDataPeriodPlace[undefDataPeriodIndex]];
 }
 
 //let tmpStr = "from: " + minMonthAll.toString() + "." + minYearAll.toString() + ", to: " + maxMonthAll.toString() + "." + maxYearAll.toString() + ", nrMonthsAll=" + nrMonthsAll.toString();
@@ -4863,6 +4888,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_focus, vl_disabled;
     let vl_firstGraphDataPoint; //10.12.2023
     let vl_haveValidDataPoints, vl_currentPointValid, vl_previousPointValid, vl_showPoint; //12.12.2023
+    let vl_pointUndefData; //14.12.2023
 
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
@@ -4947,7 +4973,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //-----------------------------------------
         //---- GRAF: najprej linije med krogci točk
         //-----------------------------------------
-        vl_xOld = 0; vl_xOldExact = 0;
+        vl_xOld = 0; vl_xOldExact = 0; vl_pointUndefData = false;
         offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
         vl_firstGraphDataPoint = true;
         vl_haveValidDataPoints = false; vl_currentPointValid = false; vl_previousPointValid = false; //12.12.2023
@@ -4955,6 +4981,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         for (month = vl_monthStart; month <= gl_monthEnd; month++) {
             if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
             placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
+            if (gf_withinUndefPeriod(place, month)) { vl_pointUndefData = true; continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+            //if (vl_pointUndefData) { vl_pointUndefData = false; continue }; // če je bila prejšnja točka še v nedefiniranem področju, potem linije ne rišem, za naprej si pa popravim, da zdaj nismo več v nedefiniranem področju
             monthIndex = month - vl_monthStart + 1       //na grafu je tole zaporedna številka meseca po X osi
             tmpMonthValue = lf_monthValue(month);
             switch (vp_graphType) {
@@ -5009,7 +5037,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 }              
             }
             //---- linijo rišem od prejšnje do trenutne točke, zato v primeru prve točke na grafu ni risanja
-            if (!vl_firstGraphDataPoint && placeMonth > 1) {
+            if (!vl_firstGraphDataPoint && placeMonth > 1 && !vl_pointUndefData) {
                 //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
                 dataLineColorFinal = dataLineColor;
                 if (!vl_currentPointValid || !vl_previousPointValid) { dataLineColorFinal = cv_colorHideData };
@@ -5031,6 +5059,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             }
             vl_xOld = x; vl_yOld = y;
             vl_previousPointValid = vl_currentPointValid; //12.12.2023
+            vl_pointUndefData = false; //14.12.2023
         }
 
         //----------------------------------------------------------------
@@ -5043,6 +5072,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             //}
             if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
             placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
+            if (gf_withinUndefPeriod(place, month)) { continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
             monthIndex = month - vl_monthStart + 1;      //na grafu je tole zaporedna številka meseca po X osi
             tmpMonthValue = lf_monthValue(month);
             switch (vp_graphType) {
@@ -5172,7 +5202,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         if (month < firstMonth[place]) { continue };
 
         x = cv_graphLeftData + kx * (xValue - xValue0);
-        yValue = lf_getAvgValue(place, vp_timeSlice, lf_getPlaceMonth(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+        yValue = lf_getAvgValue(place, vp_timeSlice, lf_getPlaceMonthDataIndex(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
         y = cv_graphY0 - ky * yValue
 
         placeNameColor = placeColor[place];
@@ -6149,10 +6179,16 @@ function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
     return tmpValue
 }
 
-function lf_getPlaceMonth(vp_place, vp_month) {
+function lf_getPlaceMonthDataIndex(vp_place, vp_month) {
 
     let offsetPlaceMonths = (12 * minYear[vp_place] + minMonth[vp_place]) - (12 * minYearAll + minMonthAll);
     return (month - offsetPlaceMonths);
+
+}
+
+function lf_getMonthDataIndex(vp_month, vp_year) {
+
+    return 1 + (12 * vp_year + vp_month) - (12 * minYearAll + minMonthAll);
 
 }
 
@@ -7021,6 +7057,7 @@ function addPlace(name, shortName, abbr, color) {
     placeNameShort[nrPlaces] = shortName;
     placeNameAbbr[nrPlaces] = abbr;
     placeColor[nrPlaces] = color;
+    placeHaveUndefPeriods[nrPlaces] = false; //14.12.2023 po default dam na false, kasneje pri dodajanju undefPeriods pa se tudi tu vpiše true
     //----
     minMonth[nrPlaces] = 0;
     minYear[nrPlaces] = 0;
@@ -7031,6 +7068,26 @@ function addPlace(name, shortName, abbr, color) {
     avgTemp[nrPlaces] = [];
     //----
     return nrPlaces; //14.12.2023
+}
+
+function addUndefPlaceDataPeriod(place, monthStart, yearStart, monthEnd, yearEnd) {
+    //---- 14.12.2023
+    
+    nrUndefDataPeriods += 1;
+
+    undefDataPeriodPlace[nrUndefDataPeriods] = place;
+    undefDataPeriodMonthStart[nrUndefDataPeriods] = monthStart;
+    undefDataPeriodYearStart[nrUndefDataPeriods] = yearStart;
+    undefDataPeriodMonthEnd[nrUndefDataPeriods] = monthEnd;
+    undefDataPeriodYearEnd[nrUndefDataPeriods] = yearEnd;
+    //----
+    undefDataPeriodMonthIndexStart[nrUndefDataPeriods] = 0;
+    undefDataPeriodMonthIndexEnd[nrUndefDataPeriods] = 0;
+    undefDataPeriodPlaceMonthIndexStart[nrUndefDataPeriods] = 0;
+    undefDataPeriodPlaceMonthIndexEnd[nrUndefDataPeriods] = 0;
+    //----
+    placeHaveUndefPeriods[place] = true;
+
 }
 
 function addStation(placeId, arsoId, name, lon, lat, height, monthStart, yearStart, monthEnd, yearEnd) {
@@ -7140,4 +7197,21 @@ function monthYearAfterMonthYear(vp_month, vp_year, vp_monthRef, vp_yearRef) {
 
 function mouseInsideRect(vp_mouseX, vp_mouseY, x0, y0, x1, y1) {
     if (valueBetween(vp_mouseX, x0, x1) && valueBetween(vp_mouseY, y0, y1)) { return true } else { return false };
+}
+
+function gf_withinUndefPeriod(vp_place, vp_month) {
+
+    //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+    if (placeHaveUndefPeriods[vp_place]) {
+        for (undefDataPeriodIndex = 1; undefDataPeriodIndex <= nrUndefDataPeriods; undefDataPeriodIndex++) {
+            if (undefDataPeriodPlace[undefDataPeriodIndex] == vp_place) {
+                if (valueBetween(vp_month, undefDataPeriodMonthIndexStart[undefDataPeriodIndex], undefDataPeriodMonthIndexEnd[undefDataPeriodIndex])) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+    
 }
