@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.22"
+const gl_versionNr = "v0.23"
 const gl_versionDate = "15.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -122,20 +122,27 @@ const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "golden
 //const cv_placeNovaGoricaBilje55m = addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
 // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
 const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+
 // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
 const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
+addStation(cv_placeKredarica, 1890, "KREDARICA", "13.8489", "46.3787", 2513, 1, 1955, 0, 0);
+
 // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
 //    jan'54-mar'57: (lon=15.1118, lat=46.4997, viš=440m)
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
-const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (445m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
+const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (444m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
+addStation(cv_placeSlovenjGradecSmartno, 1054, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 7, 1949, 12, 1952);
+addStation(cv_placeSlovenjGradecSmartno, 1053, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 1, 1953, 3, 1957);
+addStation(cv_placeSlovenjGradecSmartno, 1080, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1119", "46.4830", 452, 4, 1957, 12, 1993);
+addStation(cv_placeSlovenjGradecSmartno, 1897, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1112", "46.4896", 444, 1, 1994, 0, 0);
 
 // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
 //    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
 //    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
 const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
 addStation(cv_placeKrvavec, 14, "KRVAVEC", "14.5201", "46.2964", 1478, 1, 1961, 4, 1973);
-addStation(cv_placeKrvavec, 1614, "KRVAVEC", "14.5333", "46.2973", 1742, 9, 1973, 0, 0); // !!! POZOR: višina spremenjena za 300m !!! Razdeli lokacijo na 2 lokaciji !!!
+addStation(cv_placeKrvavec, 1614, "KRVAVEC", "14.5333", "46.2973", 1742, 9, 1973, 0, 0); // !!! POZOR: višina dvignjena za 264m, v nižje T !!! Razdeli lokacijo na 2 lokaciji ali nekako normaliziraj !!!
 
 // MURSKA SOBOTA ... 12.12.2023, vse postaje združil skupaj
 const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
@@ -755,6 +762,7 @@ addAvgTempYear(cv_placeNovaGoricaBilje, 2020, 1, [3.7, 6.8, 8.5, 13.3, 17.1, 20.
 addAvgTempYear(cv_placeNovaGoricaBilje, 2021, 1, [3.7, 6.6, 7, 10.4, 15, 22.8, 24.2, 22.6, 19, 11.7, 9.4, 4.1]);
 addAvgTempYear(cv_placeNovaGoricaBilje, 2022, 1, [2.8, 5.5, 7, 11.5, 19.1, 24.2, 26.5, 24.4, 17.9, 15.6, 9.6, 6.9]);
 
+//id=1890
 addAvgTempYear(cv_placeKredarica, 1955, 1, [-5.1, -9.8, -8, -5.5, -0.5, 2.9, 5.7, 4.1, 2.7, -1.3, -4.8, -5]);
 addAvgTempYear(cv_placeKredarica, 1956, 1, [-8.3, -17.2, -8.7, -5.5, 0.2, 1.7, 6.1, 6.2, 6, -0.3, -6.7, -5.8]);
 addAvgTempYear(cv_placeKredarica, 1957, 1, [-8.1, -6.3, -3.1, -4.4, -2.4, 4.9, 6, 4.8, 3, 1.6, -2.7, -7]);
@@ -824,6 +832,12 @@ addAvgTempYear(cv_placeKredarica, 2020, 1, [-3.1, -4.5, -6.2, -1.2, 0.8, 4.6, 7.
 addAvgTempYear(cv_placeKredarica, 2021, 1, [-10.2, -4.4, -6.8, -5.5, -1.2, 7.3, 8, 6.5, 5.5, 0.2, -2.2, -5.6]);
 addAvgTempYear(cv_placeKredarica, 2022, 1, [-6.5, -6.5, -5.7, -3.9, 3.5, 8.4, 9, 8, 2.7, 5, -2.9, -3.6]);
 
+//id=1054 1053  1897
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1949, 7, [, , , , , , 17.3, 16.5, 14.4, 9.7, 4.4, -1.1]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1950, 1, [-5.8, 1.2, 4.9, 7.8, 14.7, 18, 20.2, 18.3, 14.1, 7.1, 3.1, -0.4]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1951, 1, [-0.3, 2.4, 3, 8, 12.4, 16.6, 17.6, 18.1, 15.2, 7.1, 5.9, -0.6]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1952, 1, [-5.3, -3.6, 0.9, 10.3, 12.6, 17.1, 19.2, 18.3, 11.3, 8, 0.8, -2.3]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1953, 1, [-4.9, -2.3, 2.4, 8.9, 12.1, 16.3, 18.3, 15.5, 14, 11.1, 1.1, -0.8]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1954, 1, [-6.8, -5, 4.5, 6.7, 11.7, 17.3, 16, 16.3, 14.2, 7.9, 2.6, 2.1]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1955, 1, [-1.4, -0.1, 0.1, 6.2, 11.2, 15.6, 17.5, 15.9, 12.8, 7.6, 1.7, -0.1]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1956, 1, [-0.8, -8.5, 1.2, 6.6, 12.8, 15, 18.2, 17, 13.3, 7.6, 0.9, -2.5]);
@@ -1638,6 +1652,9 @@ for (undefDataPeriodIndex = 1; undefDataPeriodIndex <= nrUndefDataPeriods; undef
     undefDataPeriodPlaceMonthIndexEnd[undefDataPeriodIndex] = undefDataPeriodMonthIndexEnd[undefDataPeriodIndex] - offsetMonths[undefDataPeriodPlace[undefDataPeriodIndex]];
 }
 
+//---- normalizacija/korekcija določenih podatkov
+normalizePlaceDataPeriod(cv_placeKrvavec, 1, 1961, 4, 1973, -1.2); //višina dvignjena za 264m, v nižje T !!! Zato normalizacija z -1.2 stopinje, to pa pride iz razlike Kredarica:Krvavec 2513:1790 diff=4.5 stopinje, se pravi okoli 0.6 stopinje na 100m višine
+
 //let tmpStr = "from: " + minMonthAll.toString() + "." + minYearAll.toString() + ", to: " + maxMonthAll.toString() + "." + maxYearAll.toString() + ", nrMonthsAll=" + nrMonthsAll.toString();
 //console.log(tmpStr)
 
@@ -1709,7 +1726,7 @@ var lo_keyDownE = false;      //15.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 
-const cv_addMarkWidthMin = 0; //13.12.2023
+const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
 var lo_addMarkWidth = 0; //13.12.2023
 
@@ -4149,7 +4166,7 @@ function lf_changeShowPlaceNameLevel(vp_paint) {
     if (gl_showPlaceNameLevel < cv_showPlaceNameLevelMin) { gl_showPlaceNameLevel = cv_showPlaceNameLevelMax };
     if (gl_showPlaceNameLevel > cv_showPlaceNameLevelMax) { gl_showPlaceNameLevel = cv_showPlaceNameLevelMin };
     //lf_setShowPlaceNameLevel(gl_showPlaceNameLevel, vp_paint);
-    console.log("gl_showPlaceNameLevel=" + gl_showPlaceNameLevel.toString());
+    //console.log("gl_showPlaceNameLevel=" + gl_showPlaceNameLevel.toString());
     if (vp_paint) { paint() }
 
 }
@@ -4604,12 +4621,12 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let cv_graphRightData = cv_graphRight - cv_graphGapRight + lo_addRightMargin; //X koordinata konca področja podatkov
     if (cv_graphRightData < cv_graphLeftData + 50) { cv_graphRightData = cv_graphLeftData + 50 };
     if (cv_graphRightData > cv_graphRight) { cv_graphRightData = cv_graphRight };
-    const cv_graphRangeX = cv_graphRightData - cv_graphLeftData //X koordinata konca področja podatkov
+    const cv_graphRangeX = cv_graphRightData - cv_graphLeftData //razpon X koordinat področja podatkov
     //----
     const cv_graphTopAxis = vp_top + cv_graphMarginTop //Y koordinata vrha Y osi
     const cv_graphTopData = cv_graphTopAxis + cv_graphGapTop //Y koordinata vrha območja podatkov
     const cv_graphBottom = vp_top + vp_height - cv_graphMarginBottom //Y koordinata dna grafa
-    const cv_graphRangeY = cv_graphBottom - cv_graphTopData //X koordinata konca področja podatkov
+    const cv_graphRangeY = cv_graphBottom - cv_graphTopData //razpon Y koordinat področja podatkov
     
     //---- določanje začetnega meseca
     let vl_monthStart
@@ -4728,7 +4745,12 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let tmpShift; //8.12.2023
     switch (vp_place) {
         case cv_allPlace: {
-            font = "italic 11pt cambria"
+            switch (gl_timeSlice) { //15.12.2023
+                case cv_timeSliceMonth: case cv_timeSliceSeason:
+                    font = "italic 10pt cambria"; break;
+                default:
+                    font = "italic 11pt cambria"; break;
+            }
             tmpShift = 6;
             break;
         }
@@ -4741,12 +4763,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     for (tmpTemp = -25; tmpTemp <= 30; tmpTemp++) {
         //---- izpis pri 0 stopinj
         if (tmpTemp == 0) {
-            tmpStr = tmpTemp.toString();
-            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-            x = cv_graphLeft - tmpW - tmpShift
-            y = cv_graphY0
-            gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
-            continue
+            y = cv_graphY0;
+            if (y <= cv_graphBottom) {
+                tmpStr = tmpTemp.toString();
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                x = cv_graphLeft - tmpW - tmpShift
+                gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
+            }
+            continue;
         }
         tmpTempAbs = Math.abs(tmpTemp)
         //---- gosta temnejša linija na vsakih 10 stopinj in številčna oznaka na Y osi
@@ -5022,6 +5046,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         if (vl_focus) {
             dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; dataLineWidth = 2;
         };
+        //---- 15.12.2023
+        dataLineWidth += lo_addMarkWidth;
+        if (dataLineWidth < 1) { dataLineWidth = 1 };
         //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray"; };
         if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(25, placeColor[place]); placeNameColor = "lightGray";};
         //console.log("placeNameColor=" + placeNameColor);
@@ -5034,7 +5061,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         vl_firstGraphDataPoint = true;
         vl_haveValidDataPoints = false; vl_currentPointValid = false; vl_previousPointValid = false; //12.12.2023
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
-        vl_drawLines = true; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { vl_drawLines = false }; //console.log("vl_drawLines=" + vl_drawLines.toString()); //14.12.2023
+        vl_drawLines = true; //if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3  && cv_graphRangeY / ky > 27) { vl_drawLines = false }; //console.log("vl_drawLines=" + vl_drawLines.toString()); //14.12.2023
         //---- zanka čez vse mesece v izbranem razponu
         if (vl_drawLines) {
             for (month = vl_monthStart; month <= gl_monthEnd; month++) {
@@ -5103,17 +5130,17 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
                     if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
                         //---- če sta obe krajišči znotraj, enostavno narišem linijo
-                        gLine(vl_xOld, vl_yOld, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                        gLine(vl_xOld, vl_yOld, x, y, dataLineWidth, dataLineColorFinal, []);
                     } else if (vl_yOld >= cv_graphTopAxis) {
                         //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
                         kkk = (y - vl_yOld) / kx;
                         tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
-                        gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                        gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth, dataLineColorFinal, []);
                     } else if (y >= cv_graphTopAxis) {
                         //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
                         kkk = (y - vl_yOld) / kx;
                         tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
-                        gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth + lo_addMarkWidth, dataLineColorFinal, []);
+                        gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth, dataLineColorFinal, []);
                     }
                 }
                 vl_xOld = x; vl_yOld = y;
@@ -5127,7 +5154,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //----------------------------------------------------------------
         ctx.setLineDash([]);
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
-        stepMonths = 1; if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3) { stepMonths = 2 }; //console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
+        stepMonths = 1; //if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3 && cv_graphRangeY / ky > 27) { stepMonths = 2 }; //console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
         //---- zanka čez vse mesece v izbranem razponu
         for (month = vl_monthStart; month <= gl_monthEnd; month+=stepMonths) {
             //if (month == 901) { //debug
@@ -6252,8 +6279,9 @@ function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
 
 function lf_getPlaceMonthDataIndex(vp_place, vp_month) {
 
-    let offsetPlaceMonths = (12 * minYear[vp_place] + minMonth[vp_place]) - (12 * minYearAll + minMonthAll);
-    return (month - offsetPlaceMonths);
+    //let offsetPlaceMonths = (12 * minYear[vp_place] + minMonth[vp_place]) - (12 * minYearAll + minMonthAll);
+    //return (vp_month - offsetPlaceMonths);
+    return vp_month - offsetMonths[vp_place]; //15.12.2023
 
 }
 
@@ -7158,6 +7186,20 @@ function addUndefPlaceDataPeriod(place, monthStart, yearStart, monthEnd, yearEnd
     undefDataPeriodPlaceMonthIndexEnd[nrUndefDataPeriods] = 0;
     //----
     placeHaveUndefPeriods[place] = true;
+
+}
+
+function normalizePlaceDataPeriod(place, monthStart, yearStart, monthEnd, yearEnd, valueCorrection) {
+    //---- 15.12.2023
+    
+    let placeMonthIndexStart = lf_getPlaceMonthDataIndex(place, lf_getMonthDataIndex(monthStart, yearStart));
+    let placeMonthIndexEnd = lf_getPlaceMonthDataIndex(place, lf_getMonthDataIndex(monthEnd, yearEnd));
+
+    //---- na vseh zahtevanih podatkih lokacije naredim korekcijo temperature
+    let placeMonthIndex;
+    for (placeMonthIndex = placeMonthIndexStart; placeMonthIndex <= placeMonthIndexEnd; placeMonthIndex++) {
+        avgTemp[place][placeMonthIndex] += valueCorrection;
+    }
 
 }
 
