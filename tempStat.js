@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.23"
+const gl_versionNr = "v0.24"
 const gl_versionDate = "15.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -101,27 +101,41 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 var avgTemp = [];
 
 const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
+addStation(cv_placeSkofjaLoka, 0, "TRNJE", "14.2938", "46.1776", 391, 8, 2009, 12, 2020);
+addStation(cv_placeSkofjaLoka, 0, "STRAŽIŠČE", "14.342", "46.232", 395, 1, 2021, 0, 0);
 
 // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
 const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
+addStation(cv_placeMariborVrbanskiPlato, 3308, "MARIBOR - VRBANSKI PLATO", "15.6260", "46.5678", 279, 1, 2020, 0, 0);
+
 // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
 const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
+addStation(cv_placeMariborTabor, 1892, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 7, 1962, 12, 2004);
+addStation(cv_placeMariborTabor, 2295, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 1, 2005, 1, 2020);
+
 // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
 const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen");
-//NOVO MESTO KANDIJA (193m) (lon=15.1785, lat=45.7997, viš=193m) ... 6.12.2023
-//const cv_placeNovoMestoKandija = addPlace("Novo Mesto Kandija (193m)", "NM Kandija", "NMKA", "crimson");
-// NOVO MESTO GOTNA VAS (208m) (lon=15.1785, lat=45.7997, viš=208m) ... 6.12.2023
-//const cv_placeNovoMestoGotnaVas = addPlace("Novo Mesto Gotna vas (208m)", "NM Gotna vas", "NMGV", "crimson");
-// NOVO MESTO (220m) (lon=15.1773, lat=45.8018, viš=220m) ... 6.12.2023
+addStation(cv_placeLjubljanaBezigrad, 1895, "LJUBLJANA - BEŽIGRAD", "14.5124", "46.0655", 299, 1, 1948, 0, 0);
+
+// NOVO MESTO 6.12.2023
 const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
+addStation(cv_placeNovoMesto, 988, "NOVO MESTO - KANDIJA", "15.1619", "45.7997", 193, 1, 1948, 12, 1950);
+addStation(cv_placeNovoMesto, 1058, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1951, 12, 1951);
+addStation(cv_placeNovoMesto, 1057, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1952, 2, 1961);
+addStation(cv_placeNovoMesto, 1077, "NOVO MESTO - GOTNA VAS", "15.1785", "45.7997", 208, 4, 1961, 11, 1972);
+addStation(cv_placeNovoMesto, 1893, "NOVO MESTO", "15.1773", "45.8018", 220, 1, 1973, 0, 0);
+
 // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
 const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod");
-// NOVA GORICA BILJE (51m) (lon=13.6315, lat=45.8911, viš=51m) ... 8.12.2023
-//cv_placeNovaGoricaBilje51m = addPlace("Nova Gorica Bilje (51m)", "NG Bilje", "NGBI51", "darkSalmon");
-//NOVA GORICA BILJE (55m) (lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
-//const cv_placeNovaGoricaBilje55m = addPlace("Nova Gorica Bilje (55m)", "NG Bilje", "NGBI55", "darkSalmon");
+addStation(cv_placePostojna, 1133, "POSTOJNA", "14.1932", "45.7661", 533, 1, 1950, 9, 1953);
+addStation(cv_placePostojna, 1134, "POSTOJNA", "14.1932", "45.7661", 533, 11, 1953, 2, 1961);
+addStation(cv_placePostojna, 1922, "POSTOJNA", "14.1932", "45.7661", 533, 4, 1961, 0, 0);
+
 // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
 const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+addStation(cv_placeNovaGoricaBilje, 232, "BILJE", "13.6315", "45.8911", 51, 4, 1962, 11, 1982);
+addStation(cv_placeNovaGoricaBilje, 2249, "BILJE", "13.6446", "45.8989", 51, 1, 1983, 3, 1991);
+addStation(cv_placeNovaGoricaBilje, 1923, "BILJE", "13.6240", "45.8956", 55, 4, 1991, 0, 0);
 
 // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
 const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
