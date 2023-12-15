@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.24"
+const gl_versionNr = "v0.25"
 const gl_versionDate = "15.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -53,6 +53,7 @@ const placeName = [];      // new Array(nrPlaces)
 const placeNameShort = []; // new Array(nrPlaces)
 const placeNameAbbr = [];  // new Array(nrPlaces)
 const placeColor = [];     // new Array(nrPlaces)
+const placeColorAnti = []; // 15.12.2023 barva, ki je primerna za pisanje, če bi bilo ozadje placeColor[]
 const placeHaveUndefPeriods = []; // new Array(nrPlaces)
 
 //---- to se fila pri nalaganju podatkov o lokacijah meritev (14.12.2023)
@@ -100,25 +101,25 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 
 var avgTemp = [];
 
-const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue");
+const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue", "white");
 addStation(cv_placeSkofjaLoka, 0, "TRNJE", "14.2938", "46.1776", 391, 8, 2009, 12, 2020);
-addStation(cv_placeSkofjaLoka, 0, "STRAŽIŠČE", "14.342", "46.232", 395, 1, 2021, 0, 0);
+addStation(cv_placeSkofjaLoka, 0, "STRA" + scZh + "I" + scSch + scTch + "E", "14.342", "46.232", 395, 1, 2021, 0, 0);
 
 // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
-const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen");
+const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen", "white");
 addStation(cv_placeMariborVrbanskiPlato, 3308, "MARIBOR - VRBANSKI PLATO", "15.6260", "46.5678", 279, 1, 2020, 0, 0);
 
 // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
-const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green");
+const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green", "white");
 addStation(cv_placeMariborTabor, 1892, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 7, 1962, 12, 2004);
 addStation(cv_placeMariborTabor, 2295, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 1, 2005, 1, 2020);
 
 // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
-const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen");
-addStation(cv_placeLjubljanaBezigrad, 1895, "LJUBLJANA - BEŽIGRAD", "14.5124", "46.0655", 299, 1, 1948, 0, 0);
+const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen", "white");
+addStation(cv_placeLjubljanaBezigrad, 1895, "LJUBLJANA - BE" + scZh + "IGRAD", "14.5124", "46.0655", 299, 1, 1948, 0, 0);
 
 // NOVO MESTO 6.12.2023
-const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson");
+const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson", "white");
 addStation(cv_placeNovoMesto, 988, "NOVO MESTO - KANDIJA", "15.1619", "45.7997", 193, 1, 1948, 12, 1950);
 addStation(cv_placeNovoMesto, 1058, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1951, 12, 1951);
 addStation(cv_placeNovoMesto, 1057, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1952, 2, 1961);
@@ -126,101 +127,101 @@ addStation(cv_placeNovoMesto, 1077, "NOVO MESTO - GOTNA VAS", "15.1785", "45.799
 addStation(cv_placeNovoMesto, 1893, "NOVO MESTO", "15.1773", "45.8018", 220, 1, 1973, 0, 0);
 
 // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
-const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod");
+const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod", "white");
 addStation(cv_placePostojna, 1133, "POSTOJNA", "14.1932", "45.7661", 533, 1, 1950, 9, 1953);
 addStation(cv_placePostojna, 1134, "POSTOJNA", "14.1932", "45.7661", 533, 11, 1953, 2, 1961);
 addStation(cv_placePostojna, 1922, "POSTOJNA", "14.1932", "45.7661", 533, 4, 1961, 0, 0);
 
 // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
-const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon");
+const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon", "white");
 addStation(cv_placeNovaGoricaBilje, 232, "BILJE", "13.6315", "45.8911", 51, 4, 1962, 11, 1982);
 addStation(cv_placeNovaGoricaBilje, 2249, "BILJE", "13.6446", "45.8989", 51, 1, 1983, 3, 1991);
 addStation(cv_placeNovaGoricaBilje, 1923, "BILJE", "13.6240", "45.8956", 55, 4, 1991, 0, 0);
 
 // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
-const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal");
+const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal", "white");
 addStation(cv_placeKredarica, 1890, "KREDARICA", "13.8489", "46.3787", 2513, 1, 1955, 0, 0);
 
 // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
 //    jan'54-mar'57: (lon=15.1118, lat=46.4997, viš=440m)
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
-const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (444m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple");
-addStation(cv_placeSlovenjGradecSmartno, 1054, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 7, 1949, 12, 1952);
-addStation(cv_placeSlovenjGradecSmartno, 1053, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 1, 1953, 3, 1957);
-addStation(cv_placeSlovenjGradecSmartno, 1080, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1119", "46.4830", 452, 4, 1957, 12, 1993);
-addStation(cv_placeSlovenjGradecSmartno, 1897, "ŠMARTNO PRI SLOVENJ GRADCU", "15.1112", "46.4896", 444, 1, 1994, 0, 0);
+const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (444m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple", "white");
+addStation(cv_placeSlovenjGradecSmartno, 1054, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 7, 1949, 12, 1952);
+addStation(cv_placeSlovenjGradecSmartno, 1053, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 1, 1953, 3, 1957);
+addStation(cv_placeSlovenjGradecSmartno, 1080, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1119", "46.4830", 452, 4, 1957, 12, 1993);
+addStation(cv_placeSlovenjGradecSmartno, 1897, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1112", "46.4896", 444, 1, 1994, 0, 0);
 
 // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
 //    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
 //    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
-const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna");
+const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna", "white");
 addStation(cv_placeKrvavec, 14, "KRVAVEC", "14.5201", "46.2964", 1478, 1, 1961, 4, 1973);
 addStation(cv_placeKrvavec, 1614, "KRVAVEC", "14.5333", "46.2973", 1742, 9, 1973, 0, 0); // !!! POZOR: višina dvignjena za 264m, v nižje T !!! Razdeli lokacijo na 2 lokaciji ali nekako normaliziraj !!!
 
 // MURSKA SOBOTA ... 12.12.2023, vse postaje združil skupaj
-const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed");
-addStation(cv_placeMurskaSobota, 996, "MURSKA SOBOTA - RAKIČAN I", "16.1950", "46.6497", 187, 4, 1949, 6, 1950);
+const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed", "white");
+addStation(cv_placeMurskaSobota, 996, "MURSKA SOBOTA - RAKI" + scTch + "AN I", "16.1950", "46.6497", 187, 4, 1949, 6, 1950);
 addStation(cv_placeMurskaSobota, 893, "MURSKA SOBOTA", "16.1784", "46.6497", 187, 1, 1950, 12, 1951);
 addStation(cv_placeMurskaSobota, 1052, "MURSKA SOBOTA", "16.1284", "46.6663", 191, 1, 1952, 12, 1952);
 addStation(cv_placeMurskaSobota, 1051, "MURSKA SOBOTA", "16.1284", "46.6663", 191, 1, 1953, 12, 1955);
-addStation(cv_placeMurskaSobota, 1078, "MURSKA SOBOTA - RAKIČAN", "16.1284", "46.6663", 193, 1, 1956, 6, 1971);
-addStation(cv_placeMurskaSobota, 1082, "MURSKA SOBOTA - RAKIČAN", "16.1784", "46.6330", 184, 7, 1971, 5, 1985);
-addStation(cv_placeMurskaSobota, 1894, "MURSKA SOBOTA - RAKIČAN", "16.1913", "46.6521", 187, 7, 1985, 0, 0);
+addStation(cv_placeMurskaSobota, 1078, "MURSKA SOBOTA - RAKI" + scTch + "AN", "16.1284", "46.6663", 193, 1, 1956, 6, 1971);
+addStation(cv_placeMurskaSobota, 1082, "MURSKA SOBOTA - RAKI" + scTch + "AN", "16.1784", "46.6330", 184, 7, 1971, 5, 1985);
+addStation(cv_placeMurskaSobota, 1894, "MURSKA SOBOTA - RAKI" + scTch + "AN", "16.1913", "46.6521", 187, 7, 1985, 0, 0);
 
 // JAVORJE NAD POLJANAMI ... 12.12.2023, združil dve postaji
-const cv_placeJavorje = addPlace("Javorje (695m)", "Javorje", "JAPO", "olive");
+const cv_placeJavorje = addPlace("Javorje (695m)", "Javorje", "JAPO", "olive", "white");
 addStation(cv_placeJavorje, 40, "JAVORJE NAD POLJANAMI", "14.1786", "46.1663", 700, 1, 1955, 4, 1975);
 addStation(cv_placeJavorje, 41, "JAVORJE NAD POLJANAMI", "14.1775", "46.1569", 690, 6, 1975, 12, 1990);
 
 // CELJE ... 12.12.2023
 //    cel kup postaj, vse sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
-const cv_placeCelje = addPlace("Celje (245m)", "Celje", "CE", "blueViolet");
+const cv_placeCelje = addPlace("Celje (245m)", "Celje", "CE", "blueViolet", "white");
 addStation(cv_placeCelje, 1050, "CELJE - MEDLOG", "15.2285", "46.2330", 241, 1, 1948, 7, 1953);
-addStation(cv_placeCelje, 1060, "CELJE - LEVEC - LETALIŠČE", "15.2452", "46.2330", 244, 8, 1953, 11, 1959);
-addStation(cv_placeCelje, 1063, "CELJE - ŽALEC", "15.2452", "46.2497", 254, 12, 1959, 1, 1961);
+addStation(cv_placeCelje, 1060, "CELJE - LEVEC - LETALI" + scSch + scTch + "E", "15.2452", "46.2330", 244, 8, 1953, 11, 1959);
+addStation(cv_placeCelje, 1063, "CELJE - " + scZh + "ALEC", "15.2452", "46.2497", 254, 12, 1959, 1, 1961);
 addStation(cv_placeCelje, 1064, "CELJE - LOKROVEC", "15.2452", "46.2664", 255, 3, 1961, 10, 1962);
 addStation(cv_placeCelje, 1075, "CELJE - MEDLOG", "15.2285", "46.2497", 245, 11, 1962, 10, 1965);
-addStation(cv_placeCelje, 1081, "CELJE - LEVEC - LETALIŠČE", "15.2452", "46.2330", 244, 12, 1965, 9, 1976);
+addStation(cv_placeCelje, 1081, "CELJE - LEVEC - LETALI" + scSch + scTch + "E", "15.2452", "46.2330", 244, 12, 1965, 9, 1976);
 addStation(cv_placeCelje, 1901, "CELJE", "15.2477", "46.2444", 244, 11, 1976, 2, 2008);
 addStation(cv_placeCelje, 2482, "CELJE - MEDLOG", "15.2259", "46.2366", 242, 4, 2008, 0, 0);
 
 // BABNO POLJE ... 13.12.2023 
 //    podatki postaje so v treh delih, ki sem jih združil spodaj, spodaj glej id-je in podatke konkretnih postaj
-const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod");
+const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod", "white");
 addStation(cv_placeBabnoPolje, 389, "BABNO POLJE", "14.5359", "45.6467", 753, 11, 1949, 9, 1965);
 addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "lat=45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
 addStation(cv_placeBabnoPolje, 2214, "BABNO POLJE", "14.5449", "45.6452", 755, 11, 2003, 0, 0);
 addUndefPlaceDataPeriod(cv_placeBabnoPolje, 7, 1991, 10, 2003); //tu vmes ni podatkov, vseeno pa ohranim eno lokacijo, le graf se tu vmes ne bo prikazoval
 
 // PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m) ... 13.12.2023  id=1896
-const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue");
-addStation(cv_placePortorozLetalisce, 1896, "PORTOROŽ - LETALIŠČE", "13.6160", "45.4753", 2, 6, 1988, 0, 0);
+const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue", "white");
+addStation(cv_placePortorozLetalisce, 1896, "PORTORO" + scZh + " - LETALI" + scSch + scTch + "E", "13.6160", "45.4753", 2, 6, 1988, 0, 0);
 
 // KOČEVJE  ... 13.12.2023  id=1896
-const cv_placeKocevje = addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "indianRed");
-addStation(cv_placeKocevje, 2512, "KOČEVJE", "14.8589", "45.6375", 464, 1, 1950, 5, 1951);
-addStation(cv_placeKocevje, 409, "KOČEVJE", "14.8603", "45.6362", 463, 7, 1951, 7, 1989);
-addStation(cv_placeKocevje, 410, "KOČEVJE", "14.8640", "45.6374", 467, 9, 1989, 10, 1993);
-addStation(cv_placeKocevje, 1694, "KOČEVJE", "14.8501", "45.6460", 467, 12, 1993, 0, 0);
+const cv_placeKocevje = addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "indianRed", "white");
+addStation(cv_placeKocevje, 2512, "KO" + scTch + "EVJE", "14.8589", "45.6375", 464, 1, 1950, 5, 1951);
+addStation(cv_placeKocevje, 409, "KO" + scTch + "EVJE", "14.8603", "45.6362", 463, 7, 1951, 7, 1989);
+addStation(cv_placeKocevje, 410, "KO" + scTch + "EVJE", "14.8640", "45.6374", 467, 9, 1989, 10, 1993);
+addStation(cv_placeKocevje, 1694, "KO" + scTch + "EVJE", "14.8501", "45.6460", 467, 12, 1993, 0, 0);
 
 // RATEČE (lon=13.7129, lat=46.4971, viš=864m)  ... 13.12.2023  id=1086 (za 1948) in 1899 (za 1949-zdaj)
-const cv_placeRatece = addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "slateBlue");
-addStation(cv_placeRatece, 1086, "RATEČE", "13.7129", "46.4971", 864, 1, 1948, 12, 1948);
-addStation(cv_placeRatece, 1899, "RATEČE", "13.7129", "46.4971", 864, 1, 1949, 0, 0);
+const cv_placeRatece = addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "slateBlue", "white");
+addStation(cv_placeRatece, 1086, "RATE" + scTch + "E", "13.7129", "46.4971", 864, 1, 1948, 12, 1948);
+addStation(cv_placeRatece, 1899, "RATE" + scTch + "E", "13.7129", "46.4971", 864, 1, 1949, 0, 0);
 
 // VOJSKO lokacije postaj glej spodaj med podatki  ... 13.12.2023  id=192 (za 1958-1993) in 1654 (za 1993-zdaj)
-const cv_placeVojsko = addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "mediumOrchid");
+const cv_placeVojsko = addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "mediumOrchid", "white");
 addStation(cv_placeVojsko, 192, "VOJSKO", "13.9031", "46.0250", 1070, 11, 1958, 11, 1993);
 addStation(cv_placeVojsko, 1654, "VOJSKO", "13.9021", "46.0254", 1065, 12, 1993, 0, 0);
 
 // BRNIK LETALIŠČE lokacije in ARSO-Id postaj glej spodaj med podatki  ... 13.12.2023  
-const cv_placeBrnikLetalisce = addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "oliveDrab");
-addStation(cv_placeBrnikLetalisce, 1076, "BRNIK - LETALIŠČE", "14.4574", "46.2288", 380, 1, 1964, 4, 1966);
-addStation(cv_placeBrnikLetalisce, 1079, "BRNIK - LETALIŠČE", "14.4747", "46.2169", 363, 6, 1966, 10, 1978);
-addStation(cv_placeBrnikLetalisce, 1085, "BRNIK - LETALIŠČE", "14.4542", "46.2311", 384, 12, 1978, 4, 1994);
-addStation(cv_placeBrnikLetalisce, 1898, "LETALIŠČE JOŽETA PUČNIKA LJUBLJANA", "14.4728", "46.2175", 364, 6, 1994, 9, 2017);
-addStation(cv_placeBrnikLetalisce, 3049, "LETALIŠČE JOŽETA PUČNIKA LJUBLJANA", "14.4784", "46.2114", 362, 8, 2017, 0, 0);
+const cv_placeBrnikLetalisce = addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "oliveDrab", "white");
+addStation(cv_placeBrnikLetalisce, 1076, "BRNIK - LETALI" + scSch + scTch + "E", "14.4574", "46.2288", 380, 1, 1964, 4, 1966);
+addStation(cv_placeBrnikLetalisce, 1079, "BRNIK - LETALI" + scSch + scTch + "E", "14.4747", "46.2169", 363, 6, 1966, 10, 1978);
+addStation(cv_placeBrnikLetalisce, 1085, "BRNIK - LETALI" + scSch + scTch + "E", "14.4542", "46.2311", 384, 12, 1978, 4, 1994);
+addStation(cv_placeBrnikLetalisce, 1898, "LETALI" + scSch + scTch + "E JO" + scZh + "ETA PU" + scTch + "NIKA LJUBLJANA", "14.4728", "46.2175", 364, 6, 1994, 9, 2017);
+addStation(cv_placeBrnikLetalisce, 3049, "LETALI" + scSch + scTch + "E JO" + scZh + "ETA PU" + scTch + "NIKA LJUBLJANA", "14.4784", "46.2114", 362, 8, 2017, 0, 0);
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -1753,6 +1754,7 @@ var lo_graphMarginLeft, lo_graphMarginTop, lo_graphMarginRight, lo_graphMarginBo
 
 var lo_showGUI = true
 var lo_showHelpTips = true
+var lo_showStations = false
 
 var lo_showToolTips = true
 
@@ -3130,6 +3132,8 @@ window.addEventListener("keydown", (event) => {
             // if (event.shiftKey) { } //... takole bi preverjal SHIFT tipko
             // if (event.ctrlKey) { } //... takole bi preverjal CTRL tipko
             lf_changeShowPlaceNameLevel(true); break;
+        case 'F9':
+            lf_changeShowStations(!lo_showStations, true); break;
     }
 });
 
@@ -3714,6 +3718,7 @@ function paint_GUI() {
     if (!lo_showGUI) {
         //---- on-screen namigi/pomoč
         if (lo_showHelpTips) { paint_tips() };
+        if (lo_showStations) { paint_stations() };
         return
     };
 
@@ -3745,7 +3750,85 @@ function paint_GUI() {
     
     //---- on-screen namigi/pomoč
     if (lo_showHelpTips) { paint_tips() };
+    if (lo_showStations) { paint_stations() };
 
+}
+
+function paint_stations() {
+    //---------------------------------------------
+    // 15.12.2023
+    //---------------------------------------------
+    let fontStation = "normal 11pt serif";
+    let fontPlace = "bold 12pt serif";
+    //----    
+    let place, place2, station, station2;
+    let xPlace = 20; let xStation = 50;
+    //----
+    let wArsoId = 45; let wHeight = 55; let wLon = 63; let wLat = 63; let wDateStart = 70; let wDateEnd = 70; let wName = 285;
+    //----
+    let xArsoId = xStation;
+    let xHeight = xArsoId + wArsoId;
+    let xLon = xHeight + wHeight;
+    let xLat = xLon + wLon;
+    let xDateStart = xLat + wLat;
+    let xDateEnd = xDateStart + wDateStart;
+    let xName = xDateEnd + wDateEnd;
+    //----
+    let y0 = 65; let y;
+    let vStepStation = 16; let vStepPlace = 19;
+    let backHeight = nrPlaces * vStepPlace + nrStations * vStepStation + 15;
+    let tmpStr, tmpW, tmpH;
+    //----
+    let wCol = xName + wName - xPlace; //širina celotnega izpisa za en stolpec lokacij in postaj
+    let xCol = 0; let wColGap = 40;
+    let tmpNrPlaces, tmpNrStations, newCol;
+    //----
+    const cv_placeVDiff = 6;            // se vsaki pred place odvzame, razen na vrhu vsakega stolpca podatkov
+    const cv_avgPlaceTextHeight = 11.4; // povprečna višina teksta za place
+    
+    place = 0; y = y0;
+    for (station = 1; station <= nrStations; station++) {
+        //---- smo na prehodu na novo lokacijo z njenimi postajami?
+        if (place !== stationPlaceId[station]) {
+            //---- po 12 lokacij s postajami v enem stolpcu izpisa
+            newCol = false;
+            switch (place) {
+                case 0: newCol = true; break;
+                case 12: case 24: case 36: xCol += wColGap + wCol; y = y0; newCol = true
+            }
+            //---- lokacija se je spremenila, treba jo je izpisati
+            place = stationPlaceId[station];            
+            //---- koliko je postaj v trenutnem ducati lokacij?
+            if (newCol) {
+                tmpNrPlaces = 0; tmpNrStations = 0;
+                for (station2 = station; station2 <= nrStations; station2++) {
+                    place2 = stationPlaceId[station2];
+                    if (place2 - place >= 12) { place2 -= 1; break; }
+                    tmpNrStations += 1;
+                }
+                tmpNrPlaces = place2 - place + 1;
+                console.log("tmpNrPlaces=" + tmpNrPlaces.toString() + " tmpNrStations=" + tmpNrStations.toString());
+                //---- za ta stolpec imamo torej tmpNrPlaces+tmpNrStations
+                backHeight = tmpNrPlaces * (vStepPlace + cv_avgPlaceTextHeight - cv_placeVDiff) + cv_placeVDiff + tmpNrStations * vStepStation + 10; 
+                gBannerRoundRect(xPlace - 15 + xCol, y0 - 10, wCol + 30, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
+            }
+            //---- 
+            if (!newCol) { y -= cv_placeVDiff };
+            ;[tmpW, tmpH] = gMeasureText(placeName[place], fontPlace);
+            gBannerRectWithText2(placeName[place], xCol + xPlace, y, fontPlace, 3, 2, 1, 1, placeColor[place], 1, "gray", placeColorAnti[place], "lightGray", 2, 2);
+            y += tmpH + vStepPlace;
+        }
+        gText(stationArsoId[station].toString(), fontStation, "darkSlateGray", xCol + xArsoId, y);
+        gText(stationHeight[station].toString() + "m", fontStation, "darkSlateGray", xCol + xHeight, y);
+        gText(stationLon[station].toString(), fontStation, "darkSlateGray", xCol + xLon, y);
+        gText(stationLat[station].toString(), fontStation, "darkSlateGray", xCol + xLat, y);
+        tmpStr = lf_dateStrMMMsepYY(stationMonthStart[station], stationYearStart[station], ":", 0, 0, "live");
+        gText(tmpStr, fontStation, "darkSlateGray", xCol + xDateStart, y);
+        tmpStr = lf_dateStrMMMsepYY(stationMonthEnd[station], stationYearEnd[station], ":", 0, 0, "live");
+        gText(tmpStr, fontStation, "darkSlateGray", xCol + xDateEnd, y);
+        gText(stationName[station].toString(), fontStation, "darkSlateGray", xCol + xName, y);
+        y += vStepStation;
+    }
 }
 
 function paint_tips() {
@@ -3772,7 +3855,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 19;
+            let nrTipRows = 20;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -3866,6 +3949,10 @@ function paint_tips() {
             gBannerRectWithText2("/", x0 + 21, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("dblClick", x0 + 35, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... select/unselect all places", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("F9", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... list of weather stations", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4007,11 +4094,24 @@ function lf_monthStrMMMYYYY(vp_month) {
     return (lf_mesecName(mesec) + "/" + leto.toString());
 }
 
+function lf_dateStrMMMsepYY(vp_month, vp_year, vp_sep, vp_monthSpec, vp_yearSpec, vp_strSpec) {
+    // format: "sep/21"
+    
+    //---- če je specialen primer, potem vrnem za to definiran rezultat
+    if (vp_month == vp_monthSpec && vp_year == vp_yearSpec) {
+        return vp_strSpec
+    };
+
+    //---- sicer pa pač sestavim skupaj mesec in leto
+    return lf_mesecName(vp_month) + vp_sep + vp_year.toString();
+
+}
+
 function lf_monthStrMMM(vp_month) {
     // format: "sep"
     let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
     let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
-    return (lf_mesecName(mesec))
+    return lf_mesecName(mesec);
 }
 
 function lf_monthStrM(vp_month) {
@@ -4156,6 +4256,12 @@ function lf_changeEnablePlaceAll(vp_newValue, vp_paint) {
 function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 
     lo_showHelpTips = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
+function lf_changeShowStations(vp_newValue, vp_paint) {
+
+    lo_showStations = vp_newValue;
     if (vp_paint) { paint() }
 }
 
@@ -6697,7 +6803,8 @@ function gBannerRectWithText2(text, xiLeft, yiTop, font, xGap, yGap, ddx, ddy, f
     let xiRight = xiLeft + w; let yiBottom = yiTop + h;
     let top = yiTop - yGap;
     let left = xiLeft - xGap;
-    let bottom = yiBottom + yGap;
+    //let bottom = yiBottom + yGap;
+    let bottom = yiBottom + yGap + 1; // tole 1 na koncu dodal 15.12.2023, ker se mi je zdelo, da je zgoraj nad tekstom do okvirja bannerja nekaj več lufta kot spodaj / vpliva na HELP in listo postaj
     let right = xiRight + xGap;
     let x1, x2, x3, x4, y1, y2, y3, y4;
     x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
@@ -7162,7 +7269,7 @@ function genPlaceTemplate(name, start, end) {
     }
 }
 
-function addPlace(name, shortName, abbr, color) {
+function addPlace(name, shortName, abbr, color, colorAnti) {
     //---- 2.12.2023
     nrPlaces += 1;
     //----
@@ -7170,6 +7277,7 @@ function addPlace(name, shortName, abbr, color) {
     placeNameShort[nrPlaces] = shortName;
     placeNameAbbr[nrPlaces] = abbr;
     placeColor[nrPlaces] = color;
+    placeColorAnti[nrPlaces] = colorAnti;
     placeHaveUndefPeriods[nrPlaces] = false; //14.12.2023 po default dam na false, kasneje pri dodajanju undefPeriods pa se tudi tu vpiše true
     //----
     minMonth[nrPlaces] = 0;
