@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.21"
+const gl_versionNr = "v0.22"
 const gl_versionDate = "15.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1650,6 +1650,15 @@ const cv_mode_vaccExcessDeathMulti = 5;
 const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
 
+//---- nivo prikaza imena lokacije (15.12.2023)
+const cv_showPlaceNameLevel_none = 0;
+const cv_showPlaceNameLevel_abbr = 1;
+const cv_showPlaceNameLevel_short = 2;
+const cv_showPlaceNameLevel_full = 3;
+const cv_showPlaceNameLevelMin = 0;
+const cv_showPlaceNameLevelMax = 3;
+var gl_showPlaceNameLevel = cv_showPlaceNameLevel_short;
+
 //---- izbrana časovna enota poseznega podatka, lahko je vse, posamezen mesec, ali pa posamezen letni čas
 const cv_timeSliceAll = 0;
 const cv_timeSliceMonthMin = 1;
@@ -3041,9 +3050,9 @@ window.addEventListener("keydown", (event) => {
         case 'KeyD':
             lo_keyDownD = true; break;
         case 'KeyW':
-            lo_keyDownW = true; break;        
+            lo_keyDownW = true; break;
         case 'KeyE':
-            lo_keyDownE = true; break;  
+            lo_keyDownE = true; break;
         case 'ArrowRight':
             lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
             break;
@@ -3085,6 +3094,11 @@ window.addEventListener("keydown", (event) => {
         case 'KeyX': //6.12.2023
             //console.log("V pressed");
             gl_showAvgFuzzyStartOscilations = !gl_showAvgFuzzyStartOscilations; paint(); break;
+        case 'KeyB': //15.12.2023
+            //console.log("B pressed"); 
+            // if (event.shiftKey) { } //... takole bi preverjal SHIFT tipko
+            // if (event.ctrlKey) { } //... takole bi preverjal CTRL tipko
+            lf_changeShowPlaceNameLevel(true); break;
     }
 });
 
@@ -3727,7 +3741,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 17;
+            let nrTipRows = 19;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -3750,8 +3764,8 @@ function paint_tips() {
             //
             y += vStep;
             gBannerRectWithText2("0", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 15, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 32, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... select start month", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
@@ -3795,11 +3809,21 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("V", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... show exact values/lines too", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //   
+            //
+            y += vStep;
+            gBannerRectWithText2("B", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... change station name length", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("E", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 17, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 34, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... move the end of data region", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //            
             y += vStep;
             gBannerRectWithText2("W", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 22, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 39, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... change marker size", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //            
             y += vStep;
@@ -4117,6 +4141,17 @@ function lf_changeMode(vp_paint) {
     gl_mode += 1;
     if (gl_mode > cv_maxMode) { gl_mode = 1 };
     lf_setMode(gl_mode, vp_paint);
+}
+
+function lf_changeShowPlaceNameLevel(vp_paint) {
+    // 15.12.2023
+    gl_showPlaceNameLevel -= 1;
+    if (gl_showPlaceNameLevel < cv_showPlaceNameLevelMin) { gl_showPlaceNameLevel = cv_showPlaceNameLevelMax };
+    if (gl_showPlaceNameLevel > cv_showPlaceNameLevelMax) { gl_showPlaceNameLevel = cv_showPlaceNameLevelMin };
+    //lf_setShowPlaceNameLevel(gl_showPlaceNameLevel, vp_paint);
+    console.log("gl_showPlaceNameLevel=" + gl_showPlaceNameLevel.toString());
+    if (vp_paint) { paint() }
+
 }
 
 function lf_changeSameScaleY(vp_newValue, vp_paint) {
@@ -5253,13 +5288,20 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 break;
             case cv_graphType_timeAvgTemp:
                 //tmpStr = placeNameAbbr[place];
-                tmpStr = placeName[place];
-                //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                switch (vp_place) {
-                    case cv_allPlace:
-                        //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
-                        gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
-                        break;
+                //tmpStr = placeName[place];
+                if (gl_showPlaceNameLevel !== cv_showPlaceNameLevel_none) { //15.12.2023
+                    switch (gl_showPlaceNameLevel) {
+                        case cv_showPlaceNameLevel_abbr: tmpStr = placeNameAbbr[place]; break;
+                        case cv_showPlaceNameLevel_short: tmpStr = placeNameShort[place]; break;
+                        case cv_showPlaceNameLevel_full: tmpStr = placeName[place]; break;
+                    }
+                    //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    switch (vp_place) {
+                        case cv_allPlace:
+                            //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
+                            gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                            break;
+                    }
                 }
                 break;
         }
