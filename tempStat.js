@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.26"
+const gl_versionNr = "v0.27"
 const gl_versionDate = "16.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -52,6 +52,7 @@ var nrPlaces = 0
 const placeName = [];      // new Array(nrPlaces)
 const placeNameShort = []; // new Array(nrPlaces)
 const placeNameAbbr = [];  // new Array(nrPlaces)
+const placeLocation = [];  // 16.12.2023
 const placeColor = [];     // new Array(nrPlaces)
 const placeColorAnti = []; // 15.12.2023 barva, ki je primerna za pisanje, če bi bilo ozadje placeColor[]
 const placeHaveUndefPeriods = []; // new Array(nrPlaces)
@@ -101,25 +102,26 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 
 var avgTemp = [];
 
-const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "k.Loka", scSch + "KL", "royalBlue", "white");
+// ŠKOFJA LOKA
+const cv_placeSkofjaLoka = addPlace(scSch + "kofja Loka (355m)", scSch + "kofja Loka", scSch + "KL", scSch + "kofja Loka", "royalBlue", "white");
 addStation(cv_placeSkofjaLoka, 0, "TRNJE", "14.2938", "46.1776", 391, 8, 2009, 12, 2020);
 addStation(cv_placeSkofjaLoka, 0, "STRA" + scZh + "I" + scSch + scTch + "E", "14.342", "46.232", 395, 1, 2021, 0, 0);
 
 // MARIBOR VRBANSKI PLATO (lon=15.6260, lat=46.5678, viš=279m)
-const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "darkGreen", "white");
+const cv_placeMariborVrbanskiPlato = addPlace("Maribor Vrbanski Plato (279m)", "MB Vrbanski Plato", "MBVP", "Maribor", "darkGreen", "white");
 addStation(cv_placeMariborVrbanskiPlato, 3308, "MARIBOR - VRBANSKI PLATO", "15.6260", "46.5678", 279, 1, 2020, 0, 0);
 
 // MARIBOR TABOR (lon=15.6450, lat=46.5394, viš=275m)
-const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "green", "white");
+const cv_placeMariborTabor = addPlace("Maribor Tabor (275m)", "MB Tabor", "MBTB", "Maribor", "green", "white");
 addStation(cv_placeMariborTabor, 1892, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 7, 1962, 12, 2004);
 addStation(cv_placeMariborTabor, 2295, "MARIBOR - TABOR", "15.6450", "46.5394", 275, 1, 2005, 1, 2020);
 
 // LJUBLJANA BEŽIGRAD (lon=14.5124, lat=46.0655, viš=299m) ... 5.12.2023
-const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "mediumSeaGreen", "white");
+const cv_placeLjubljanaBezigrad = addPlace("Ljubljana Be"+scZhLow+"igrad (299m)", "LJ Be"+scZhLow+"igrad", "LJBE", "Ljubljana", "mediumSeaGreen", "white");
 addStation(cv_placeLjubljanaBezigrad, 1895, "LJUBLJANA - BE" + scZh + "IGRAD", "14.5124", "46.0655", 299, 1, 1948, 0, 0);
 
 // NOVO MESTO 6.12.2023
-const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "crimson", "white");
+const cv_placeNovoMesto = addPlace("Novo Mesto (220m)", "Novo Mesto", "NM", "Novo Mesto", "crimson", "white");
 addStation(cv_placeNovoMesto, 988, "NOVO MESTO - KANDIJA", "15.1619", "45.7997", 193, 1, 1948, 12, 1950);
 addStation(cv_placeNovoMesto, 1058, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1951, 12, 1951);
 addStation(cv_placeNovoMesto, 1057, "NOVO MESTO - KANDIJA", "15.1785", "45.7997", 193, 1, 1952, 2, 1961);
@@ -127,26 +129,26 @@ addStation(cv_placeNovoMesto, 1077, "NOVO MESTO - GOTNA VAS", "15.1785", "45.799
 addStation(cv_placeNovoMesto, 1893, "NOVO MESTO", "15.1773", "45.8018", 220, 1, 1973, 0, 0);
 
 // POSTOJNA (533m) (lon=14.1932, lat=45.7661, viš=533m) ... 7.12.2023
-const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "goldenrod", "white");
+const cv_placePostojna = addPlace("Postojna (533m)", "Postojna", "POST", "Postojna", "goldenrod", "white");
 addStation(cv_placePostojna, 1133, "POSTOJNA", "14.1932", "45.7661", 533, 1, 1950, 9, 1953);
 addStation(cv_placePostojna, 1134, "POSTOJNA", "14.1932", "45.7661", 533, 11, 1953, 2, 1961);
 addStation(cv_placePostojna, 1922, "POSTOJNA", "14.1932", "45.7661", 533, 4, 1961, 0, 0);
 
 // NOVA GORICA BILJE (51/55m) (združeno, ker je lepo zvezno! 1962-1991:lon=13.6240, lat=45.8956, viš=55m      1991-2022:lon=13.6240, lat=45.8956, viš=55m) ... 8.12.2023
-const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "darkSalmon", "white");
+const cv_placeNovaGoricaBilje = addPlace("Nova Gorica Bilje (51/55m)", "NG Bilje", "NGBI", "Nova Gorica", "darkSalmon", "white");
 addStation(cv_placeNovaGoricaBilje, 232, "BILJE", "13.6315", "45.8911", 51, 4, 1962, 11, 1982);
 addStation(cv_placeNovaGoricaBilje, 2249, "BILJE", "13.6446", "45.8989", 51, 1, 1983, 3, 1991);
 addStation(cv_placeNovaGoricaBilje, 1923, "BILJE", "13.6240", "45.8956", 55, 4, 1991, 0, 0);
 
 // KREDARICA (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 8.12.2023
-const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "teal", "white");
+const cv_placeKredarica = addPlace("Kredarica (2513m)", "Kredarica", "KRED", "Kredarica", "teal", "white");
 addStation(cv_placeKredarica, 1890, "KREDARICA", "13.8489", "46.3787", 2513, 1, 1955, 0, 0);
 
 // ŠMARTNO PRI SLOVENJ GRADCU (2513m) (lon=13.8489, lat=46.3787, viš=2513m) ... 9.12.2023
 //    jan'54-mar'57: (lon=15.1118, lat=46.4997, viš=440m)
 //    apr'57-dec'93: (lon=15.1119, lat=46.4830, viš=452m)
 //    jan'94-      : (lon=15.1112, lat=46.4896, viš=444m)
-const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (444m)", "SG " + scSch + "martno", "SG" + scSch + "M", "purple", "white");
+const cv_placeSlovenjGradecSmartno = addPlace("Slovenj Gradec " + scSch + "martno (444m)", "SG " + scSch + "martno", "SG" + scSch + "M", "Slovenj Gradec", "purple", "white");
 addStation(cv_placeSlovenjGradecSmartno, 1054, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 7, 1949, 12, 1952);
 addStation(cv_placeSlovenjGradecSmartno, 1053, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1118", "46.4997", 440, 1, 1953, 3, 1957);
 addStation(cv_placeSlovenjGradecSmartno, 1080, scSch + "MARTNO PRI SLOVENJ GRADCU", "15.1119", "46.4830", 452, 4, 1957, 12, 1993);
@@ -155,12 +157,12 @@ addStation(cv_placeSlovenjGradecSmartno, 1897, scSch + "MARTNO PRI SLOVENJ GRADC
 // KRVAVEC (1742m) (lon=14.5333, lat=46.2973, viš=1742m) ... 12.12.2023
 //    1961-1973 id=14, 1973-2022 id=1614 !!! id postaje v http req, ki ga uporabljam tudi v mojem vb-net orodju avgTemp
 //    pred 1961 je že tudi bila postaja, a 300m višje in je zato tu ne gledam
-const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec ", "KRVA", "sienna", "white");
+const cv_placeKrvavec = addPlace("Krvavec (1742m)", "Krvavec", "KRVA", "Krvavec", "sienna", "white");
 addStation(cv_placeKrvavec, 14, "KRVAVEC", "14.5201", "46.2964", 1478, 1, 1961, 4, 1973);
 addStation(cv_placeKrvavec, 1614, "KRVAVEC", "14.5333", "46.2973", 1742, 9, 1973, 0, 0); // !!! POZOR: višina dvignjena za 264m, v nižje T !!! Razdeli lokacijo na 2 lokaciji ali nekako normaliziraj !!!
 
 // MURSKA SOBOTA ... 12.12.2023, vse postaje združil skupaj
-const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "mediumVioletRed", "white");
+const cv_placeMurskaSobota = addPlace("Murska Sobota (190m)", "Murska Sobota", "MS", "Murska Sobota", "mediumVioletRed", "white");
 addStation(cv_placeMurskaSobota, 996, "MURSKA SOBOTA - RAKI" + scTch + "AN I", "16.1950", "46.6497", 187, 4, 1949, 6, 1950);
 addStation(cv_placeMurskaSobota, 893, "MURSKA SOBOTA", "16.1784", "46.6497", 187, 1, 1950, 12, 1951);
 addStation(cv_placeMurskaSobota, 1052, "MURSKA SOBOTA", "16.1284", "46.6663", 191, 1, 1952, 12, 1952);
@@ -170,13 +172,13 @@ addStation(cv_placeMurskaSobota, 1082, "MURSKA SOBOTA - RAKI" + scTch + "AN", "1
 addStation(cv_placeMurskaSobota, 1894, "MURSKA SOBOTA - RAKI" + scTch + "AN", "16.1913", "46.6521", 187, 7, 1985, 0, 0);
 
 // JAVORJE NAD POLJANAMI ... 12.12.2023, združil dve postaji
-const cv_placeJavorje = addPlace("Javorje (695m)", "Javorje", "JAPO", "olive", "white");
+const cv_placeJavorje = addPlace("Javorje (695m)", "Javorje", "JAPO", "Javorje nad Poljanami", "olive", "white");
 addStation(cv_placeJavorje, 40, "JAVORJE NAD POLJANAMI", "14.1786", "46.1663", 700, 1, 1955, 4, 1975);
 addStation(cv_placeJavorje, 41, "JAVORJE NAD POLJANAMI", "14.1775", "46.1569", 690, 6, 1975, 12, 1990);
 
 // CELJE ... 12.12.2023
 //    cel kup postaj, vse sem združil skupaj, spodaj glej id-je in podatke konkretnih postaj
-const cv_placeCelje = addPlace("Celje (245m)", "Celje", "CE", "blueViolet", "white");
+const cv_placeCelje = addPlace("Celje (245m)", "Celje", "CE", "Celje", "blueViolet", "white");
 addStation(cv_placeCelje, 1050, "CELJE - MEDLOG", "15.2285", "46.2330", 241, 1, 1948, 7, 1953);
 addStation(cv_placeCelje, 1060, "CELJE - LEVEC - LETALI" + scSch + scTch + "E", "15.2452", "46.2330", 244, 8, 1953, 11, 1959);
 addStation(cv_placeCelje, 1063, "CELJE - " + scZh + "ALEC", "15.2452", "46.2497", 254, 12, 1959, 1, 1961);
@@ -188,35 +190,35 @@ addStation(cv_placeCelje, 2482, "CELJE - MEDLOG", "15.2259", "46.2366", 242, 4, 
 
 // BABNO POLJE ... 13.12.2023 
 //    podatki postaje so v treh delih, ki sem jih združil spodaj, spodaj glej id-je in podatke konkretnih postaj
-const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "darkGoldenrod", "white");
+const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "Babno Polje", "darkGoldenrod", "white");
 addStation(cv_placeBabnoPolje, 389, "BABNO POLJE", "14.5359", "45.6467", 753, 11, 1949, 9, 1965);
 addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "lat=45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
 addStation(cv_placeBabnoPolje, 2214, "BABNO POLJE", "14.5449", "45.6452", 755, 11, 2003, 0, 0);
 addUndefPlaceDataPeriod(cv_placeBabnoPolje, 7, 1991, 10, 2003); //tu vmes ni podatkov, vseeno pa ohranim eno lokacijo, le graf se tu vmes ne bo prikazoval
 
 // PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m) ... 13.12.2023  id=1896
-const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "deepSkyBlue", "white");
+const cv_placePortorozLetalisce = addPlace("Portoro" + scZhLow + " Letali" + scSchLow + scTchLow + "e (2m)", "Portoro" + scZhLow, "PRT" + scZh, "Portoro" + scZhLow, "deepSkyBlue", "white");
 addStation(cv_placePortorozLetalisce, 1896, "PORTORO" + scZh + " - LETALI" + scSch + scTch + "E", "13.6160", "45.4753", 2, 6, 1988, 0, 0);
 
 // KOČEVJE  ... 13.12.2023  id=1896
-const cv_placeKocevje = addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "indianRed", "white");
+const cv_placeKocevje = addPlace("Ko" + scTchLow + "evje (467m)", "Ko" + scTchLow + "evje", "KO" + scTch + "E", "Ko" + scTchLow + "evje", "indianRed", "white");
 addStation(cv_placeKocevje, 2512, "KO" + scTch + "EVJE", "14.8589", "45.6375", 464, 1, 1950, 5, 1951);
 addStation(cv_placeKocevje, 409, "KO" + scTch + "EVJE", "14.8603", "45.6362", 463, 7, 1951, 7, 1989);
 addStation(cv_placeKocevje, 410, "KO" + scTch + "EVJE", "14.8640", "45.6374", 467, 9, 1989, 10, 1993);
 addStation(cv_placeKocevje, 1694, "KO" + scTch + "EVJE", "14.8501", "45.6460", 467, 12, 1993, 0, 0);
 
 // RATEČE (lon=13.7129, lat=46.4971, viš=864m)  ... 13.12.2023  id=1086 (za 1948) in 1899 (za 1949-zdaj)
-const cv_placeRatece = addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "slateBlue", "white");
+const cv_placeRatece = addPlace("Rate" + scTchLow + "e (864m)", "Rate" + scTchLow + "e", "RATE", "Rate" + scTchLow + "e", "slateBlue", "white");
 addStation(cv_placeRatece, 1086, "RATE" + scTch + "E", "13.7129", "46.4971", 864, 1, 1948, 12, 1948);
 addStation(cv_placeRatece, 1899, "RATE" + scTch + "E", "13.7129", "46.4971", 864, 1, 1949, 0, 0);
 
 // VOJSKO lokacije postaj glej spodaj med podatki  ... 13.12.2023  id=192 (za 1958-1993) in 1654 (za 1993-zdaj)
-const cv_placeVojsko = addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "mediumOrchid", "white");
+const cv_placeVojsko = addPlace("Vojsko (1065m)", "Vojsko", "VOJS", "Vojsko", "mediumOrchid", "white");
 addStation(cv_placeVojsko, 192, "VOJSKO", "13.9031", "46.0250", 1070, 11, 1958, 11, 1993);
 addStation(cv_placeVojsko, 1654, "VOJSKO", "13.9021", "46.0254", 1065, 12, 1993, 0, 0);
 
 // BRNIK LETALIŠČE lokacije in ARSO-Id postaj glej spodaj med podatki  ... 13.12.2023  
-const cv_placeBrnikLetalisce = addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "oliveDrab", "white");
+const cv_placeBrnikLetalisce = addPlace("Brnik Letali" + scSchLow + scTchLow + "e (362m)", "Brnik", "BRLE", "Brnik", "oliveDrab", "white");
 addStation(cv_placeBrnikLetalisce, 1076, "BRNIK - LETALI" + scSch + scTch + "E", "14.4574", "46.2288", 380, 1, 1964, 4, 1966);
 addStation(cv_placeBrnikLetalisce, 1079, "BRNIK - LETALI" + scSch + scTch + "E", "14.4747", "46.2169", 363, 6, 1966, 10, 1978);
 addStation(cv_placeBrnikLetalisce, 1085, "BRNIK - LETALI" + scSch + scTch + "E", "14.4542", "46.2311", 384, 12, 1978, 4, 1994);
@@ -3786,11 +3788,16 @@ function paint_stations() {
     const cv_placeVDiff = 6;            // se vsaki pred place odvzame, razen na vrhu vsakega stolpca podatkov
     const cv_avgPlaceTextHeight = 11.4; // povprečna višina teksta za place
     const colStations = 12; // toliko lokacij znotaj enega stolpca. Preizkušeno deluje tudi za 8 ali poljubno drugo številko!
-
+    let yGapTop;
+    //gText("Javorje", fontPlace, "black", 0, 0);
+    //console.log("--------------------");
     place = 0; y = y0;
     for (station = 1; station <= nrStations; station++) {
         //---- smo na prehodu na novo lokacijo z njenimi postajami?
         if (place !== stationPlaceId[station]) {
+            //if (stationPlaceId[station] == 12) { // debug purposes
+            //    y = y;
+            //}
             //---- po 12 lokacij s postajami v enem stolpcu izpisa
             newCol = false;
             switch (place) {
@@ -3799,8 +3806,9 @@ function paint_stations() {
             }
             //---- lokacija se je spremenila, treba jo je izpisati
             place = stationPlaceId[station];            
-            //---- koliko je postaj v trenutnem ducati lokacij?
+            //---- če je nov stolpec podatkov, potem izračunati, koliko je lokacij in pripadajočih postaj v tem stolpcu, in potem izris background okvirja?
             if (newCol) {
+                //---- koliko je lokacij in pripadajočih postaj v trenutnem stolpcu za izpis?
                 tmpNrPlaces = 0; tmpNrStations = 0;
                 for (station2 = station; station2 <= nrStations; station2++) {
                     place2 = stationPlaceId[station2];
@@ -3808,15 +3816,17 @@ function paint_stations() {
                     tmpNrStations += 1;
                 }
                 tmpNrPlaces = place2 - place + 1;
-                console.log("tmpNrPlaces=" + tmpNrPlaces.toString() + " tmpNrStations=" + tmpNrStations.toString());
-                //---- za ta stolpec imamo torej tmpNrPlaces+tmpNrStations
+                //console.log("tmpNrPlaces=" + tmpNrPlaces.toString() + " tmpNrStations=" + tmpNrStations.toString());
+                //---- za ta stolpec imamo torej tmpNrPlaces+tmpNrStations, sledi izris background okvirja
                 backHeight = tmpNrPlaces * (vStepPlace + cv_avgPlaceTextHeight - cv_placeVDiff) + cv_placeVDiff + tmpNrStations * vStepStation + 10; 
                 gBannerRoundRect(xPlace - 15 + xCol, y0 - 10, wCol + 30, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             }
             //---- 
             if (!newCol) { y -= cv_placeVDiff };
-            ;[tmpW, tmpH] = gMeasureText(placeName[place], fontPlace);
-            gBannerRectWithText2(placeName[place], xCol + xPlace, y, fontPlace, 3, 2, 1, 1, placeColor[place], 1, "gray", placeColorAnti[place], "lightGray", 2, 2);
+            ;[tmpW, tmpH] = gMeasureText(placeLocation[place], fontPlace);
+            //console.log("tmpH=" + tmpH.toString());
+            yGapTop = 3; if (placeLocation[place].includes(scSch)) { yGapTop = 2 }; // če je v imenu lokacije "Š", potem na vrhu malo manj spacinga
+            gBannerRectWithText3(placeLocation[place], xCol + xPlace, y, fontPlace, 3, yGapTop, 4, 1, 1, placeColor[place], 1, "gray", placeColorAnti[place], "lightGray", 2, 2);
             y += tmpH + vStepPlace;
         }
         gText(stationArsoId[station].toString(), fontStation, "darkSlateGray", xCol + xArsoId, y);
@@ -6724,12 +6734,23 @@ function gText(text, font, color, x, y) {
 }
 
 function gMeasureText(text, font) {
+    
+    //----------------------------------------
+    // https://stackoverflow.com/questions/46949891/html5-canvas-fontboundingboxascent-vs-actualboundingboxascent
+    // fontBoundingBoxAscent ... The distance from the horizontal line indicated by the textBaseline attribute to the top of the highest bounding rectangle of all the fonts used to render the text, in CSS pixels; positive numbers indicating a distance going up from the given baseline.'
+    // fontBoundingBoxDescent ... The distance from the horizontal line indicated by the textBaseline attribute to the bottom of the lowest bounding rectangle of all the fonts used to render the text, in CSS pixels; positive numbers indicating a distance going down from the given baseline.
+    // actualBoundingBoxAscent ... The distance from the horizontal line indicated by the textBaseline attribute to the top of the bounding rectangle of the given text, in CSS pixels; positive numbers indicating a distance going up from the given baseline.
+    // actualBoundingBoxDescent ... The distance from the horizontal line indicated by the textBaseline attribute to the bottom of the bounding rectangle of the given text, in CSS pixels; positive numbers indicating a distance going down from the given baseline.
+    // To calculate the text height you can do the following:
+    //     fontHeight = fontBoundingBoxAscent + fontBoundingBoxDescent;
+    //     actualHeight = actualBoundingBoxAscent + actualBoundingBoxDescent;
+    // fontHeight is the bounding box height regardless of the string being rendered. actualHeight is specific to the string being rendered.    
+    //----------------------------------------
+    
     ctx.font = font
     let msrText = ctx.measureText(text);
     //if (text == gl_versionDate) { console.log("msrText.width=" + msrText.width) }
-    //let tmpWidth = msrText.width;
-    //let tmpHeight = msrText.actualBoundingBoxAscent;
-    return [msrText.width, msrText.actualBoundingBoxAscent]
+    return [msrText.width, msrText.actualBoundingBoxAscent]; // The distance from the horizontal line indicated by the textBaseline attribute to the top of the bounding rectangle of the given text, in CSS pixels; positive numbers indicating a distance going up from the given baseline.
 }
 
 function gBannerRectWithText(x0, y0, x1, y1, ddx, ddy, fillColor, strokeWidth, strokeColor, font, fontColor, tmpStr, shaddowColor, xShaddow, yShaddow) {
@@ -6806,7 +6827,75 @@ function gBannerRectWithText2(text, xiLeft, yiTop, font, xGap, yGap, ddx, ddy, f
     let top = yiTop - yGap;
     let left = xiLeft - xGap;
     //let bottom = yiBottom + yGap;
-    let bottom = yiBottom + yGap + 1; // tole 1 na koncu dodal 15.12.2023, ker se mi je zdelo, da je zgoraj nad tekstom do okvirja bannerja nekaj več lufta kot spodaj / vpliva na HELP in listo postaj
+    let bottom = yiBottom + yGap + 0; // tole 1 na koncu dodal 15.12.2023, ker se mi je zdelo, da je zgoraj nad tekstom do okvirja bannerja nekaj več lufta kot spodaj / vpliva na HELP in listo postaj
+    let right = xiRight + xGap;
+    let x1, x2, x3, x4, y1, y2, y3, y4;
+    x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
+    y1 = top; y2 = top + ddy; y3 = bottom - ddy; y4 = bottom;
+    //----
+    if (shaddowColor != "") {
+        ctx.beginPath()
+        ctx.moveTo(x2 + xShaddow, y1 + yShaddow)
+        ctx.lineTo(x3 + xShaddow, y1 + yShaddow)
+        ctx.lineTo(x4 + xShaddow, y2 + yShaddow)
+        ctx.lineTo(x4 + xShaddow, y3 + yShaddow)
+        ctx.lineTo(x3 + xShaddow, y4 + yShaddow)
+        ctx.lineTo(x2 + xShaddow, y4 + yShaddow)
+        ctx.lineTo(x1 + xShaddow, y3 + yShaddow)
+        ctx.lineTo(x1 + xShaddow, y2 + yShaddow)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = shaddowColor
+        ctx.fill()
+    }
+    //----
+    if (fillColor != "" || strokeWidth > 0) {
+        ctx.beginPath()
+        ctx.moveTo(x2, y1)
+        ctx.lineTo(x3, y1)
+        ctx.lineTo(x4, y2)
+        ctx.lineTo(x4, y3)
+        ctx.lineTo(x3, y4)
+        ctx.lineTo(x2, y4)
+        ctx.lineTo(x1, y3)
+        ctx.lineTo(x1, y2)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+    }
+    //----
+    if (fillColor != "") {
+        ctx.fillStyle = fillColor
+        ctx.fill()
+    }
+    //----
+    if (strokeWidth > 0) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = strokeColor
+        ctx.lineWidth = strokeWidth
+        ctx.stroke();
+    }
+    //gText(text, font, "lightYellow", xiLeft + 2, y1 +2)
+    if (text != "") {
+        gText(text, font, fontColor, xiLeft, yiBottom)
+    }
+}
+
+function gBannerRectWithText3(text, xiLeft, yiTop, font, xGap, yGapTop, yGapBottom, ddx, ddy, fillColor, strokeWidth, strokeColor, fontColor, shaddowColor, xShaddow, yShaddow) {
+    //-------------------------------
+    // xiLeft,yiTop,x1,y1 ... notranji nevidni okvir, tudi tekst se spodaj izpisuje na y1 (nad y1)
+    // dd          ... toliko od notranjega okvirja od zunanjega izrisanega okvirja
+    // x(y)Shaddow ... kako daleč pade senca desno in navzdol
+    //-------------------------------
+    let w, h;
+
+    //;[w, h] = gMeasureText("jgP", font); console.log("jgP-" + h); // 11
+    //;[w, h] = gMeasureText("PP", font); console.log("PP-" + h);   // 10
+    //;[w, h] = gMeasureText("jg", font); console.log("jg-" + h);   // 11
+    //;[w, h] = gMeasureText("aa", font); console.log("aa-" + h);   //  7
+
+    ;[w, h] = gMeasureText(text, font);
+    let xiRight = xiLeft + w; let yiBottom = yiTop + h - 1;
+    let top = yiTop - yGapTop;
+    let left = xiLeft - xGap;
+    let bottom = yiBottom + yGapBottom; 
     let right = xiRight + xGap;
     let x1, x2, x3, x4, y1, y2, y3, y4;
     x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
@@ -7271,13 +7360,14 @@ function genPlaceTemplate(name, start, end) {
     }
 }
 
-function addPlace(name, shortName, abbr, color, colorAnti) {
+function addPlace(name, shortName, abbr, location, color, colorAnti) {
     //---- 2.12.2023
     nrPlaces += 1;
     //----
     placeName[nrPlaces] = name;
     placeNameShort[nrPlaces] = shortName;
     placeNameAbbr[nrPlaces] = abbr;
+    placeLocation[nrPlaces] = location; // 16.12.2023
     placeColor[nrPlaces] = color;
     placeColorAnti[nrPlaces] = colorAnti;
     placeHaveUndefPeriods[nrPlaces] = false; //14.12.2023 po default dam na false, kasneje pri dodajanju undefPeriods pa se tudi tu vpiše true
