@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.27"
+const gl_versionNr = "v0.28"
 const gl_versionDate = "16.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -850,7 +850,7 @@ addAvgTempYear(cv_placeKredarica, 2021, 1, [-10.2, -4.4, -6.8, -5.5, -1.2, 7.3, 
 addAvgTempYear(cv_placeKredarica, 2022, 1, [-6.5, -6.5, -5.7, -3.9, 3.5, 8.4, 9, 8, 2.7, 5, -2.9, -3.6]);
 
 //id=1054 1053  1897
-addAvgTempYear(cv_placeSlovenjGradecSmartno, 1949, 7, [, , , , , , 17.3, 16.5, 14.4, 9.7, 4.4, -1.1]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 1949, 7, [17.3, 16.5, 14.4, 9.7, 4.4, -1.1]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1950, 1, [-5.8, 1.2, 4.9, 7.8, 14.7, 18, 20.2, 18.3, 14.1, 7.1, 3.1, -0.4]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1951, 1, [-0.3, 2.4, 3, 8, 12.4, 16.6, 17.6, 18.1, 15.2, 7.1, 5.9, -0.6]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1952, 1, [-5.3, -3.6, 0.9, 10.3, 12.6, 17.1, 19.2, 18.3, 11.3, 8, 0.8, -2.3]);
