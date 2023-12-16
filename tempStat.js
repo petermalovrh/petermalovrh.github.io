@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.29"
-const gl_versionDate = "16.12.2023"
+const gl_versionNr = "v1.0"
+const gl_versionDate = "17.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -204,7 +204,7 @@ station = addStation(cv_placeCelje, 2482, "CELJE - MEDLOG", "15.2259", "46.2366"
 //    podatki postaje so v treh delih, ki sem jih združil spodaj, spodaj glej id-je in podatke konkretnih postaj
 const cv_placeBabnoPolje = addPlace("Babno Polje (755m)", "Babno Polje", "BABP", "Babno Polje", "darkGoldenrod", "white");
 station = addStation(cv_placeBabnoPolje, 389, "BABNO POLJE", "14.5359", "45.6467", 753, 11, 1949, 9, 1965);
-station = addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "lat=45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
+station = addStation(cv_placeBabnoPolje, 1141, "BABNO POLJE", "14.5449", "45.6452", 755, 10, 1965, 6, 1991); // !!!POZOR: vmes manjka 12 let podatkov!!! umetno sem to nafilal, da obdržim eno lokacijo
 station = addStation(cv_placeBabnoPolje, 2214, "BABNO POLJE", "14.5449", "45.6452", 755, 11, 2003, 0, 0);
 addUndefPlaceDataPeriod(cv_placeBabnoPolje, 7, 1991, 10, 2003); //tu vmes ni podatkov, vseeno pa ohranim eno lokacijo, le graf se tu vmes ne bo prikazoval
 
@@ -1730,7 +1730,7 @@ var gl_timeSlice = cv_timeSliceAll;
 var gl_sameScaleY = false; //24.10.2023
 var gl_showExactValuesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
 var gl_showExactLinesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
-var gl_showAvgFuzzyStartOscilations = false; //12.12.2023
+var gl_showAvgFuzzyStartOscilations = true;  //false; //12.12.2023
 
 const cv_graphType_vaccExcessDeath = 1;
 const cv_graphType_timeAvgTemp = 2;
@@ -3804,8 +3804,9 @@ function paint_stations() {
     const cv_placeVDiff = 6;            // se vsaki pred place odvzame, razen na vrhu vsakega stolpca podatkov
     const cv_avgPlaceTextHeight = 11.4; // povprečna višina teksta za place
     const colStations = 12; // toliko lokacij znotaj enega stolpca. Preizkušeno deluje tudi za 8 ali poljubno drugo številko!
-    let yGapTop;
+    let yGapTop, tmpMaxWidth;
     let valueCorrection; //16.12.2023
+    let wColShorten = 0; //17.12.2023
     //gText("Javorje", fontPlace, "black", 0, 0);
     //console.log("--------------------");
     place = 0; y = y0;
@@ -3819,24 +3820,29 @@ function paint_stations() {
             newCol = false;
             switch (place) {
                 case 0: newCol = true; break;
-                case colStations: case 2 * colStations: case 3 * colStations: xCol += wColGap + wCol; y = y0; newCol = true; break;
+                case colStations: case 2 * colStations: case 3 * colStations: xCol += wColGap + wCol - wColShorten; y = y0; newCol = true; break;
             }
             //---- lokacija se je spremenila, treba jo je izpisati
             place = stationPlace[station];            
             //---- če je nov stolpec podatkov, potem izračunati, koliko je lokacij in pripadajočih postaj v tem stolpcu, in potem izris background okvirja?
             if (newCol) {
                 //---- koliko je lokacij in pripadajočih postaj v trenutnem stolpcu za izpis?
-                tmpNrPlaces = 0; tmpNrStations = 0;
+                tmpNrPlaces = 0; tmpNrStations = 0; tmpMaxWidth = 0;
                 for (station2 = station; station2 <= nrStations; station2++) {
                     place2 = stationPlace[station2];
                     if (place2 - place >= colStations) { place2 -= 1; break; }
                     tmpNrStations += 1;
+                    // iščem tudi station z najdaljšim imenom, da bom lahko izrisal background banner ustrezne širine!
+                    ;[tmpW, tmpH] = gMeasureText(stationName[station2], fontPlace); 
+                    if (tmpW > tmpMaxWidth) { tmpMaxWidth = tmpW };
                 }
                 tmpNrPlaces = place2 - place + 1;
                 //console.log("tmpNrPlaces=" + tmpNrPlaces.toString() + " tmpNrStations=" + tmpNrStations.toString());
                 //---- za ta stolpec imamo torej tmpNrPlaces+tmpNrStations, sledi izris background okvirja
+                wColShorten = 0;
+                if (tmpMaxWidth < 320) { wColShorten = 320 - tmpMaxWidth };
                 backHeight = tmpNrPlaces * (vStepPlace + cv_avgPlaceTextHeight - cv_placeVDiff) + cv_placeVDiff + tmpNrStations * vStepStation + 10; 
-                gBannerRoundRect(xPlace - 15 + xCol, y0 - 10, wCol + 30, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
+                gBannerRoundRect(xPlace - 15 + xCol, y0 - 10, wCol + 30 - wColShorten, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             }
             //---- 
             if (!newCol) { y -= cv_placeVDiff };
@@ -6387,8 +6393,21 @@ function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
 
     //.... imamo povprečenje
     let month1, nrMonths, nrMonthsUsed, tmpValue, tmpMonth, tmpMonthValue, tmpMonthValue2
-    month1 = vp_month - vp_nrMonthsAvg + 1
-    if (month1 < 1) { month1 = 1 }
+    //month1 = vp_month - vp_nrMonthsAvg + 1
+    //if (month1 < 1) { month1 = 1 }
+    if (vp_nrMonthsAvg <= vp_month) {
+        month1 = vp_month - vp_nrMonthsAvg + 1
+    } else {
+        //if (vp_month >= 12) {
+        //    month1 = vp_month - 12 * Math.trunc(vp_month / 12) + 1;
+        //} else {
+        //    month1 = 1;
+        //}
+        //17.12.2023 rajši kar vedno takole. Če je mesec<12, dobim neregularen interval povprečenja in na grafu se ne izriše nič, kar je bolje, 
+        //           kot pa da bi imel tisti velik nihaj od začetnih vrednosti proti povprečju.
+        //           tudi tiste začetne oscilacija lahko potem mirno po default-u prikazujem! (gl_showAvgFuzzyStartOscilations = true;)
+        month1 = vp_month - 12 * Math.trunc(vp_month / 12) + 1; 
+    }
     nrMonths = vp_month - month1 + 1
     nrMonthsUsed = 0;
     tmpValue = 0
