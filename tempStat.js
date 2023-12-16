@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v0.25"
-const gl_versionDate = "15.12.2023"
+const gl_versionNr = "v0.26"
+const gl_versionDate = "16.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -3764,7 +3764,7 @@ function paint_stations() {
     let place, place2, station, station2;
     let xPlace = 20; let xStation = 50;
     //----
-    let wArsoId = 45; let wHeight = 55; let wLon = 63; let wLat = 63; let wDateStart = 70; let wDateEnd = 70; let wName = 285;
+    let wArsoId = 45; let wHeight = 55; let wLon = 63; let wLat = 63; let wDateStart = 65; let wDateEnd = 70; let wName = 285;
     //----
     let xArsoId = xStation;
     let xHeight = xArsoId + wArsoId;
@@ -3785,7 +3785,8 @@ function paint_stations() {
     //----
     const cv_placeVDiff = 6;            // se vsaki pred place odvzame, razen na vrhu vsakega stolpca podatkov
     const cv_avgPlaceTextHeight = 11.4; // povprečna višina teksta za place
-    
+    const colStations = 12; // toliko lokacij znotaj enega stolpca. Preizkušeno deluje tudi za 8 ali poljubno drugo številko!
+
     place = 0; y = y0;
     for (station = 1; station <= nrStations; station++) {
         //---- smo na prehodu na novo lokacijo z njenimi postajami?
@@ -3794,7 +3795,7 @@ function paint_stations() {
             newCol = false;
             switch (place) {
                 case 0: newCol = true; break;
-                case 12: case 24: case 36: xCol += wColGap + wCol; y = y0; newCol = true
+                case colStations: case 2 * colStations: case 3 * colStations: xCol += wColGap + wCol; y = y0; newCol = true; break;
             }
             //---- lokacija se je spremenila, treba jo je izpisati
             place = stationPlaceId[station];            
@@ -3803,7 +3804,7 @@ function paint_stations() {
                 tmpNrPlaces = 0; tmpNrStations = 0;
                 for (station2 = station; station2 <= nrStations; station2++) {
                     place2 = stationPlaceId[station2];
-                    if (place2 - place >= 12) { place2 -= 1; break; }
+                    if (place2 - place >= colStations) { place2 -= 1; break; }
                     tmpNrStations += 1;
                 }
                 tmpNrPlaces = place2 - place + 1;
@@ -3824,6 +3825,7 @@ function paint_stations() {
         gText(stationLat[station].toString(), fontStation, "darkSlateGray", xCol + xLat, y);
         tmpStr = lf_dateStrMMMsepYY(stationMonthStart[station], stationYearStart[station], ":", 0, 0, "live");
         gText(tmpStr, fontStation, "darkSlateGray", xCol + xDateStart, y);
+        gText("..", fontStation, "darkSlateGray", xCol + xDateEnd - 12, y);
         tmpStr = lf_dateStrMMMsepYY(stationMonthEnd[station], stationYearEnd[station], ":", 0, 0, "live");
         gText(tmpStr, fontStation, "darkSlateGray", xCol + xDateEnd, y);
         gText(stationName[station].toString(), fontStation, "darkSlateGray", xCol + xName, y);
