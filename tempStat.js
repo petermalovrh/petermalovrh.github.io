@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.3"
-const gl_versionDate = "20.12.2023"
+const gl_versionNr = "v1.4"
+const gl_versionDate = "21.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -1969,6 +1969,7 @@ const cv_mode_timeAvgTempMultiPlace = 2;
 const cv_mode_timeAvgTempMultiTimeSlice = 3;
 const cv_mode_vaccExcessDeath = 4;
 const cv_mode_vaccExcessDeathMulti = 5;
+const cv_minMode = 1;
 const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
 var gl_modeLast = gl_mode; // 19.12.2023
@@ -2035,7 +2036,10 @@ var lo_keyDownW = false;      //13.12.2023
 var lo_keyDownE = false;      //15.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
-
+//----
+var gl_changeByMouseWheel_nrMonthsAvg = false; //21.12.2023
+var gl_changeByMouseWheel_timeSlice = false;   //21.12.2023
+//----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
 var lo_addMarkWidth = 0; //13.12.2023
@@ -3024,7 +3028,6 @@ function main() {
    
     resizeCanvas();
     lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
-    lf_changeTailMonths(gl_tailMonths, false);
     lf_changeTimeSlice(gl_timeSlice, false); //10.12.2023
     lf_setMode(gl_mode, false);
     lf_changeMonthEnd(gl_monthEnd, false);
@@ -3132,7 +3135,7 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI) {
         boolRslt = buttonMode.eventClick(e.offsetX, e.offsetY);
         if (boolRslt) {
-            lf_changeMode(true)
+            lf_changeMode(e.shiftKey, true)
             vl_end = true
         }
     }
@@ -3148,13 +3151,6 @@ elMyCanvas.addEventListener('click', (e) => {
         boolRslt = checkBoxNrMonthsAvgAll.eventClick(e.offsetX, e.offsetY);
         if (boolRslt != lo_nrMonthsAvgAll) {
             lf_changeNrMonthsAvgAll(boolRslt, true)
-            vl_end = true
-        }
-    }
-    if (!vl_end && lo_showGUI) {
-        rslt = sliderTailMonths.eventClick(e.offsetX, e.offsetY);
-        if (rslt >= 0 && rslt != gl_tailMonths) {
-            lf_changeTailMonths(rslt, true);
             vl_end = true
         }
     }
@@ -3228,13 +3224,6 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             if (rslt >= 0) { lf_dragInterval(rslt); }
             return;
         }
-        else if (lo_dragTailMonthsActive) {
-            sliderTailMonths.setAddZone(100, 100)
-            let rslt = sliderTailMonths.eventClick(e.offsetX, e.offsetY)
-            sliderTailMonths.setAddZone(0, 0)
-            if (rslt >= 0) { lf_changeTailMonths(rslt, true); }
-            return;
-        }
         else {
             //Me.Location = New Point((Me.Location.X - lo_lastMouseLocation.X) + e.X, (Me.Location.Y - lo_lastMouseLocation.Y) + e.Y)
             //Me.Update()
@@ -3291,32 +3280,17 @@ window.addEventListener("wheel", event => {
     //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja dolžino "repa"
     if (lo_keyDownA) {
         if (lo_enabledIntChooserNrMonthsAvg) {
-            lo_nrMonthsAvg -= delta;
-            //if (lo_nrMonthsAvg > cv_nrMonthsAvgMax) { lo_nrMonthsAvg = cv_nrMonthsAvgMax };
-            if (lo_nrMonthsAvg > cv_nrMonthsAvgMaxExceed) { lo_nrMonthsAvg = cv_nrMonthsAvgMaxExceed }; //12.12.2023
-            if (lo_nrMonthsAvg < cv_nrMonthsAvgMin) { lo_nrMonthsAvg = cv_nrMonthsAvgMin };
+            lf_changeValueNrMonthsAvg(delta);
+            gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
             lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
         }
         return
     }
     else if (lo_keyDownT) {
-        //if (sliderTailMonths.visible && sliderTailMonths.enabled) {
-        //    gl_tailMonths -= delta;
-        //    if (gl_tailMonths > (nrMonthsAll - 1)) { gl_tailMonths = (nrMonthsAll - 1) };
-        //    if (gl_tailMonths < 0) { gl_tailMonths = 0 };
-        //    lf_changeTailMonths(gl_tailMonths, true);
-        //}
-        switch (gl_mode) {
-            case cv_mode_timeAvgTempMultiTimeSlice:
-                if (gl_timeSlice == cv_timeSliceMonth) { gl_timeSlice = cv_timeSliceSeason } else { gl_timeSlice = cv_timeSliceMonth };
-                break;
-            default:
-                gl_timeSlice -= delta;
-                if (gl_timeSlice > cv_timeSliceMax) { gl_timeSlice = cv_timeSliceMin };
-                if (gl_timeSlice < cv_timeSliceMin) { gl_timeSlice = cv_timeSliceMax };                
-                break;
-        }
-        lf_changeTailMonths(gl_timeSlice, true);
+        lf_changeValueTimeSlice(delta);
+        gl_changeByMouseWheel_timeSlice = true; // 21.12.2023
+        //console.log("WHEEL: true");
+        lf_changeTimeSlice(gl_timeSlice, true);
         return
     }
     else if (lo_keyDown0) {
@@ -3380,7 +3354,10 @@ window.addEventListener("keydown", (event) => {
         case 'KeyA':
             lo_keyDownA = true; break;
         case 'KeyT':
-            lo_keyDownT = true; break;
+            lo_keyDownT = true;
+            //gl_changeByMouseWheel_timeSlice = false; //sem pogruntal, da zaradi multiple keyDown eventov tegale ne smem imeti tu. Na FALSE se itak postavi po obdelavi keyUp eventa
+            //console.log("DOWN: false");
+            break;
         case 'Digit0':
             lo_keyDown0 = true; break;
         case 'KeyU':
@@ -3419,7 +3396,7 @@ window.addEventListener("keydown", (event) => {
             lf_changeAutoPlay(!lo_autoPlay); break;
         case 'KeyM':
             //console.log("M pressed"); 
-            lf_changeMode(true); break;
+            lf_changeMode(event.shiftKey, true); break;
         case 'KeyY': case 'KeyZ': //24.10.2023
             //console.log("Y pressed");
             lf_changeSameScaleY(!gl_sameScaleY, true); break;
@@ -3446,9 +3423,29 @@ window.addEventListener("keyup", (event) => {
     
     switch (event.code) {
         case 'KeyA':
-            lo_keyDownA = false; break;
+            lo_keyDownA = false;
+            // 21.12.2023 Ali spreminja vrednost gl_timeSlice samo s pomočjo tipke T brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_nrMonthsAvg) {
+                // 21.12.2023 tole je primer spreminjanja spremenljivke samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost spremenljivke
+                //console.log("UP: process keyPress(T)");
+                if (event.shiftKey) { lf_changeValueNrMonthsAvg(1) } else { lf_changeValueNrMonthsAvg(-1) };
+                lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
+            }
+            gl_changeByMouseWheel_nrMonthsAvg = false;
+            break;
         case 'KeyT':
-            lo_keyDownT = false; break;
+            lo_keyDownT = false;
+            // 21.12.2023 Ali spreminja vrednost gl_timeSlice samo s pomočjo tipke T brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_timeSlice) {
+                // 21.12.2023 tole je primer spreminjanja gl_timeSlice samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost gl_timeSlice
+                //console.log("UP: process keyPress(T)");
+                if (event.shiftKey) { lf_changeValueTimeSlice(1) } else { lf_changeValueTimeSlice(-1) };
+                lf_changeTimeSlice(gl_timeSlice, true);
+            }
+            gl_changeByMouseWheel_timeSlice = false; 
+            //console.log("UP: false");
+            //console.log("----");
+            break;
         case 'Digit0':
             lo_keyDown0 = false; break;
         case 'KeyU':
@@ -4635,14 +4632,15 @@ function lf_changeShowToolTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
-function lf_changeMode(vp_paint) {
+function lf_changeMode(vp_shift, vp_paint) {
 
     if (gl_mode == cv_mode_timeAvgTempMultiTimeSlice) {
         gl_timeSlice = cv_timeSliceAll
     }; //11.12.2023
     //----
-    gl_mode += 1;
-    if (gl_mode > cv_maxMode) { gl_mode = 1 };
+    if (vp_shift) { gl_mode -= 1 } else { gl_mode += 1 };
+    if (gl_mode < cv_minMode) { gl_mode = cv_maxMode };
+    if (gl_mode > cv_maxMode) { gl_mode = cv_minMode };
     lf_setMode(gl_mode, vp_paint);
 }
 
@@ -4732,21 +4730,16 @@ function lf_changeNrMonthsAvg(vp_newValue, vp_paint) {
     }
 }
 
-function lf_changeTailMonths(vp_newValue, vp_paint) {
+function lf_changeValueNrMonthsAvg(vp_changeValue) {
 
-    //console.log("lf_changeTailMonths: newValue=" + vp_newValue)
+    //console.log("lf_changeValueNrMonthsAvg: changeValue=" + vp_changeValue)
     
-    if (vp_newValue < 0 || vp_newValue >= nrMonthsAll) { return };
-
-    gl_tailMonths = vp_newValue;
-
-    lf_setTailMonthsText();
-    sliderTailMonths.value = gl_tailMonths;
+    lo_nrMonthsAvg -= vp_changeValue;
+    //if (lo_nrMonthsAvg > cv_nrMonthsAvgMax) { lo_nrMonthsAvg = cv_nrMonthsAvgMax };
+    if (lo_nrMonthsAvg > cv_nrMonthsAvgMaxExceed) { lo_nrMonthsAvg = cv_nrMonthsAvgMaxExceed }; //12.12.2023
+    if (lo_nrMonthsAvg < cv_nrMonthsAvgMin) { lo_nrMonthsAvg = cv_nrMonthsAvgMin };
     
-    if (vp_paint) {
-        //console.log("lf_changeTailMonths: call Paint() now ...")
-        paint()
-    }
+    //console.log("lf_changeValueNrMonthsAvg: call Paint() now ...")
 }
 
 function lf_changeTimeSlice(vp_newValue, vp_paint) {
@@ -4764,6 +4757,24 @@ function lf_changeTimeSlice(vp_newValue, vp_paint) {
         //console.log("lf_changeTimeSlice: call Paint() now ...")
         paint()
     }
+}
+
+function lf_changeValueTimeSlice(vp_changeValue) {
+
+    //console.log("lf_changeValueTimeSlice: changeValue=" + vp_changeValue)
+    
+    switch (gl_mode) {
+        case cv_mode_timeAvgTempMultiTimeSlice:
+            if (gl_timeSlice == cv_timeSliceMonth) { gl_timeSlice = cv_timeSliceSeason } else { gl_timeSlice = cv_timeSliceMonth };
+            break;
+        default:
+            gl_timeSlice -= vp_changeValue;
+            if (gl_timeSlice > cv_timeSliceMax) { gl_timeSlice = cv_timeSliceMin };
+            if (gl_timeSlice < cv_timeSliceMin) { gl_timeSlice = cv_timeSliceMax };                
+            break;
+    }
+    
+    //console.log("lf_changeValueTimeSlice: call Paint() now ...")
 }
 
 function lf_changeMonthEnd(vp_newValue, vp_paint) {
@@ -5123,9 +5134,7 @@ function paint_graph_timeAvgTemp_cache() {
     }
     //---- izpis potrebnega časa za izris
     let myTime2 = Date.now()
-    console.log("cach fill: " + (myTime2 - myTime1).toString() + "ms");
-    //tmpStr = "izris: " + (myTime2 - myTime1).toString() + " ms"
-    //gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 3)
+    //console.log("cach fill: " + (myTime2 - myTime1).toString() + "ms");
 }
 
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
