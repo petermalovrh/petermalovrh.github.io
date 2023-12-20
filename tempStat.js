@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.2"
-const gl_versionDate = "19.12.2023"
+const gl_versionNr = "v1.3"
+const gl_versionDate = "20.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -39,7 +39,6 @@ const scSingleQuote = String.fromCharCode(0x27)
 //---------------------------------------------------------------------
 //------------ PODATKI O KRAJIH Z MERITVAMI ---------------------------
 //---------------------------------------------------------------------
-
 
 //----
 const cv_minPlace = 1
@@ -112,6 +111,7 @@ var maxYearAll = 0;    // leto zadnjega podatka generalno od vseh lokacij (recim
 var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od vseh lokacij (če so podatki med avg'2009 in nov'2023, je to 172 =5+14*12-1)
 
 var avgTemp = [];
+var avgTempCache = []; // 19.12.2023
 let station, station2;
 
 // ŠKOFJA LOKA
@@ -263,6 +263,15 @@ const cv_placeVelenje = addPlace("Velenje - TE" + scSch + " (388m)", "Velenje - 
 station = addStation(cv_placeVelenje, 1837, "VELENJE - TE" + scSch, "15.1119", "46.3603", "A", 388, 8, 1990, 0, 0);
 addUndefPlaceDataPeriod(cv_placeVelenje, 4, 1999, 12, 2004); //tu vmes ni podatkov, vseeno pa ohranim eno lokacijo, le graf se tu vmes ne bo prikazoval
 
+// PTUJ - TERME  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 19.12.2023  
+const cv_placePtuj = addPlace("Ptuj - Terme (222m)", "Ptuj - Terme", "PTUJ", "Ptuj", "darkOrange", "white");
+station = addStation(cv_placePtuj, 1266, "PTUJ - TERME", "15.8543", "46.4219", "A", 223, 12, 1995, 2, 2006);
+station = addStation(cv_placePtuj, 1859, "PTUJ - TERME", "15.8512", "46.4213", "A", 222, 4, 2006, 11, 2016);
+station = addStation(cv_placePtuj, 2701, "PTUJ", "15.8492", "46.4197", "A", 222, 12, 2016, 0, 0);
+
+// id=1266 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8543 lat = 46.4219 viš = 223m)
+// id=1859 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8512 lat = 46.4213 viš = 222m)
+
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
 //genPlaceTemplate("cv_placePostojna", 1950, 2022)
@@ -283,7 +292,8 @@ addUndefPlaceDataPeriod(cv_placeVelenje, 4, 1999, 12, 2004); //tu vmes ni podatk
 // dobiš JS source kodo za zahtevane podatke postaje v zahtevanem obdobju, ki jo prekopiraš v VSCode JS projekt tempStat
 //----
 
-
+var gl_configChanged = true; // 19.12.2023
+var gl_appStart = true;      // 19.12.2023
 
 var lo_focusPlace = cv_placeNone;
 var lo_focusMonth = 0;
@@ -1882,6 +1892,48 @@ addAvgTempYear(cv_placeVelenje, 2020, 1, [1.8, 5.7, 6.7, 12.0, 14.4, 18.7, 20.8,
 addAvgTempYear(cv_placeVelenje, 2021, 1, [0.4, 3.9, 5.2, 7.8, 12.4, 21.1, 21.7, 19.4, 16.1, 9.2, 4.7, 0.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeVelenje, 2022, 1, [0.7, 3.6, 4.6, 8.9, 16.5, 21.2, 22.3, 21.5, 14.6, 13.4, 6.7, 1.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 
+// id=1266 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8543 lat = 46.4219 viš = 223m)
+//addAvgTempYear(cv_placePtuj, 1995, 1, [?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 3.0 ?, 0.9]); // 48 48 48 48 48 48 48 48 48 48 96 1488
+addAvgTempYear(cv_placePtuj, 1995, 12, [0.9]); // 1488
+addAvgTempYear(cv_placePtuj, 1996, 1, [-1.6, -3.2, 2.8, 10.0, 16.2, 19.1, 18.3, 18.8, 12.5, 10.7, 7.5, 0.7]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 1997, 1, [-1.5, 3.6, 5.4, 7.6, 16.2, 18.9, 19.2, 19.2, 15.4, 8.5, 5.3, 2.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 1998, 1, [3.0, 4.5, 4.7, 11.4, 14.9, 18.8, 20.1, 21.2, 16.8, 10.9, 2.7, -3.6]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 1999, 1, [?, 2.5, 7.7, 11.1, 15.7, 18.9, 21.0, 18.9, 16.9, 11.1, 2.2, -0.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 1999, 1, [-0.2, 2.5, 7.7, 11.1, 15.7, 18.9, 21.0, 18.9, 16.9, 11.1, 2.2, -0.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2000, 1, [-3.5, 3.8, 6.6, 13.0, 16.1, 19.6, 19.1, 21.5, 15.5, 12.0, 8.4, 3.2]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2001, 1, [2.1, 3.8, 9.1, 9.1, 17.6, 16.5, 20.7, 20.4, 13.2, 13.3, 3.1, -1.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2002, 1, [1.6, 5.6, 7.7, 9.9, 17.1, 20.0, 21.4, 20.3, 11.1, 10.9, 8.9, 1.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2003, 1, [-2.4, -2.9, 6.3, 9.9, 18.2, 23.4, 20.2, ?, ?, 4.9, 7.4, 0.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2003, 1, [-2.4, -2.9, 6.3, 9.9, 18.2, 23.4, 20.2, 19.1, 13.1, 4.9, 7.4, 0.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2004, 1, [-1.2, 1.9, 4.6, 10.5, 13.7, 18.2, 19.9, 17.9, 15.1, 12.1, 5.5, 0.7]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2005, 1, [-0.6, -2.7, 3.6, 10.8, 16.3, 19.5, 20.6, 18.7, 15.5, 11.8, 3.4, 0.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2006, 1, [-3.1, 0.5, 1.7 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?]); // 1488 1344 960 48 48 48 48 48 48 48 48 48
+// id=1859 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8512 lat = 46.4213 viš = 222m)
+//addAvgTempYear(cv_placePtuj, 2006, 1, [?, ?, 10.4 ?, 11.7, 15.2, 18.2, 22.5, 17.3, 16.8, 12.4, 7.7, 2.6]); // 48 48 576 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2006, 1, [-3.1, 0.5, 5.4, 11.7, 15.2, 18.2, 22.5, 17.3, 16.8, 12.4, 7.7, 2.6]); // 
+addAvgTempYear(cv_placePtuj, 2007, 1, [4.5, 5.2, 7.2, 12.1, 16.3, 20.3, 20.9, 18.4, 13.6, 7.9, 4.1, -0.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2008, 1, [2.5, 3.9, 6.2, 10.6, 16.0, 18.8, 20.3, 19.9, 14.5, 10.9, 6.3, 1.8]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2009, 1, [-2.0, 1.8, 6.0, 12.8, 16.5, 17.7, 20.3, 20.3, 16.3, 10.3, 6.9, 2.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2010, 1, [-1.7, 1.1, 6.0, 10.4, 15.3, 19.2, 21.6, 19.7, 13.8, 8.5, 8.0, 0.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2011, 1, [1.2, 0.3, 6.1, 12.1, 15.1, 19.1, 19.5, 20.7, 17.9, 9.3, 3.0, 3.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2012, 1, [1.3, -2.9, 8.2, 11.4, 15.4, 20.4, 21.7, 21.4, 16.5, 10.8, 8.0, 1.0]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2013, 1, [0.6, 0.8, 3.3, 11.7, 15.1, 18.8, 21.7, 20.6, 14.9, 12.8, 6.7, 2.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2014, 1, [4.0, 4.5, 9.0, 12.5, 14.7, 18.7, 20.3, 18.6, 15.4, 13.1, 8.5, 3.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placePtuj, 2015, 1, [2.9, 2.0, 6.5, 11.1, 15.8, 19.4, 22.4, 21.2, 16.0, 10.0, 6.7, 2.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2016, 1, [0.3, 6.2, 6.8, 11.9, 14.9, 19.3, 21.7, 19.2, 17.2, 9.7, 6.5, -0.7]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2017, 1, [-4.8, 3.9, 9.1, 10.7, 16.2, 20.7, 21.5, 21.2, 13.9, 10.9, 6.2, 2.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2018, 1, [4.6, -0.9, 3.9, 14.5, 17.5, 19.8, 21.1, 21.5, 16.4, 12.1, 7.4, 1.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placePtuj, 2019, 1, [0.1, 3.8, 8.2, 11.0, 12.7, 22.1, 21.5, 21.6, 16.0, ?, ?, ?]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 49 48 48
+// id=2701 AVTOMATSKA !!  PTUJ (lon = 15.8492 lat = 46.4197 viš = 222m)
+//addAvgTempYear(cv_placePtuj, 2016, 1, [?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.1 ?, -0.9]); // 48 48 48 48 48 48 48 48 48 48 479 4464
+addAvgTempYear(cv_placePtuj, 2016, 1, [0.3, 6.2, 6.8, 11.9, 14.9, 19.3, 21.7, 19.2, 17.2, 9.7, 6.5, -0.9]); // kombiniram
+addAvgTempYear(cv_placePtuj, 2017, 1, [-5.1, 3.7, 9.0, 10.6, 16.2, 20.8, 21.7, 21.3, 13.9, 10.8, 6.0, 2.5]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2018, 1, [4.3, -1.2, 3.7, 14.4, 17.6, 19.8, 21.1, 21.6, 16.5, 12.0, 7.2, 1.4]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2019, 1, [-0.2, 3.5, 8.0, 10.9, 12.8, 22.2, 21.5, 21.7, 16.2, 12.7, 8.3, 3.6]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2020, 1, [0.1, 6.4, 6.9, 11.2, 14.6, 18.6, 20.3, 21.3, 16.1, 11.5, 4.6, 2.2]); // 4464 4176 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2021, 1, [1.8, 4.1, 5.8, 8.5, 13.5, 21.5, 22.0, 19.2, 15.7, 9.2, 5.2, 1.5]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2022, 1, [0.9, 4.6, 4.8, 9.7, 17.0, 21.3, 22.0, 21.6, 15.2, 13.0, 6.5, 2.7]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
@@ -1919,6 +1971,7 @@ const cv_mode_vaccExcessDeath = 4;
 const cv_mode_vaccExcessDeathMulti = 5;
 const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
+var gl_modeLast = gl_mode; // 19.12.2023
 
 //---- nivo prikaza imena lokacije (15.12.2023)
 const cv_showPlaceNameLevel_none = 0;
@@ -1945,12 +1998,13 @@ const cv_timeSliceMax = 16;
 const cv_timeSliceMaxAll = 18; //11.12.2023
 //----
 var gl_timeSlice = cv_timeSliceAll;
+var gl_timeSliceLast = gl_timeSlice; // 19.12.2023
 
 
 var gl_sameScaleY = false; //24.10.2023
 var gl_showExactValuesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
 var gl_showExactLinesToo = false; //6.12.2023 ali naj se v primeru povprečenja poleg povprečja izrišejo še točne vrednosti
-var gl_showAvgFuzzyStartOscilations = true;  //false; //12.12.2023
+var gl_showAvgFuzzyStartOscilations = false; //12.12.2023
 
 const cv_graphType_vaccExcessDeath = 1;
 const cv_graphType_timeAvgTemp = 2;
@@ -1960,12 +2014,15 @@ const cv_nrMonthsAvgMax = 9;   //3.12.2023
 const cv_nrMonthsAvgMaxExceed = 19;   //3.12.2023
 const cv_nrMonthsAvgMult = 12; //3.12.2023
 var lo_nrMonthsAvg = 5
+var lo_nrMonthsAvgLast = lo_nrMonthsAvg; // 19.12.2023
 var lo_nrMonthsAvgOld = 5                   // 25.1.2023 v1.1
 var lo_nrMonthsAvgAll = false;
 var lo_enabledIntChooserNrMonthsAvg = true; // 25.1.2023 v1.1
 var gl_monthEnd = nrMonthsAll;
+//var gl_monthEndLast = gl_monthEnd; // 19.12.2023
 var gl_tailMonths = 5  //za koliko mesecev nazaj se še riše od trenutno izbranega meseca gl_monthEnd
 var gl_monthStart = 1; //gl_monthEnd - gl_tailMonths  //28=apr2022 30=jun2022 35=nov2022 36=dec2022
+//var gl_monthStartLast = gl_monthStart; // 19.12.2023
 var lo_tipMonth = 0;
 
 var lo_keyDownA = false
@@ -2419,12 +2476,22 @@ class slider2 {
         y0 = bodyTop - 8 - this.addZoneUp; y1 = bodyBottom + 10 + this.addZoneDown
         if (mouseY < y0 || mouseY > y1) { return (this.minItemValue - 1); }
         //---- če je po X izven obsega, potem lahko takoj zaključimo
-        x0 = this.left; x1 = this.left + this.width;
-        if (mouseX < x0 || mouseX > x1) { return (this.minItemValue - 1); }
-        //---- miška je znotraj območja možnega klika
-        vl_value = Math.round(this.minItemValue + (mouseX - this.left - itemWidthHalf) / itemWidth);
-        vl_value = fixForRange(vl_value, this.minItemValue, this.minItemValue + (this.items - 1) * this.step);
-        //console.log("  mouse over value=" + vl_value);
+        //x0 = this.left; x1 = this.left + this.width;
+        x0 = this.left - this.addZoneUp; x1 = this.left + this.width + this.addZoneDown; // 20.12.2023 pri velikem razponu vrednosti na sliderju je težko zadeti zadnjo ali prvo vrdnost. Zato še po X razširim tako, kot je bilo že prej po Y, in če je izven, postavim na zadnjo/prvo vrednost
+        if (mouseX < x0 || mouseX > x1) {
+            return (this.minItemValue - 1);
+        }
+        if (valueBetween(mouseX), x0, x1) {
+            if (mouseX < x0) { mouseX = x0 }; // 20.12.2023 postavim na prvo vrednost, če je vlekel še nekoliko bolj levo od prve
+            if (mouseX > x1) { mouseX = x1 }; // 20.12.2023 postavim na zadnjo vrednost, če je vlekel še nekoliko bolj desno od prve
+            //---- miška je znotraj območja možnega klika
+            vl_value = Math.round(this.minItemValue + (mouseX - this.left - itemWidthHalf) / itemWidth);
+            vl_value = fixForRange(vl_value, this.minItemValue, this.minItemValue + (this.items - 1) * this.step);
+            //console.log("  mouse over value=" + vl_value);
+        } else {
+            return (this.minItemValue - 1)
+        };
+ 
         return vl_value;
     }
 }
@@ -3464,6 +3531,39 @@ function paint() {
 
     let myTime1 = Date.now()
 
+    // 19.12.2023 nastavitev boolean podatka o spremenjeni konfiguraciji glede na zadnje risanje pred tem risanjem
+    let noChangeCond1;
+    switch (gl_appStart) {
+        case true:
+            //---- prvič se riše! zato nastavim, kot da je konfiguracija spremenjena, da bo šel podatke računati iz original tabel, ne pa iz cache-a
+            gl_configChanged = true;
+            gl_appStart = false;
+            break;
+        case false:
+            //---- ne riše se prvič ... preverim, ali se je konfiguracija spremenila
+            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast);
+            //let noChangeCond2 = (valueBetween(gl_monthStart, gl_monthStartLast, gl_monthEndLast) && valueBetween(gl_monthEnd, gl_monthStartLast, gl_monthEndLast));
+            //if (noChangeCond1 && noChangeCond2) {
+            //    gl_configChanged = false;
+            //} else {
+            //    gl_configChanged = true;
+            //}
+            //gl_configChanged = !(noChangeCond1 && noChangeCond2);
+            gl_configChanged = !noChangeCond1;
+            break;
+    }
+    if (gl_configChanged) {
+        //console.log("change")
+        paint_graph_timeAvgTemp_cache();
+        gl_configChanged = false;
+    };
+    //----
+    gl_modeLast = gl_mode;
+    lo_nrMonthsAvgLast = lo_nrMonthsAvg;
+    gl_timeSliceLast = gl_timeSlice;
+    //gl_monthStartLast = gl_monthStart;
+    //gl_monthEndLast = gl_monthEnd;
+    
     //console.log("paint()")
     //elMyCanvas = document.getElementById("myCanvas");
     //ctx = elMyCanvas.getContext("2d");
@@ -4060,7 +4160,7 @@ function paint_stations() {
                 //console.log("tmpNrPlaces=" + tmpNrPlaces.toString() + " tmpNrStations=" + tmpNrStations.toString());
                 //---- za ta stolpec imamo torej tmpNrPlaces+tmpNrStations, sledi izris background okvirja
                 wColShorten = 0;
-                if (tmpMaxWidth < 320) { wColShorten = 320 - tmpMaxWidth };
+                if (tmpMaxWidth < 310) { wColShorten = 310 - tmpMaxWidth };
                 backHeight = tmpNrPlaces * (vStepPlace + cv_avgPlaceTextHeight - cv_placeVDiff) + cv_placeVDiff + tmpNrStations * vStepStation + 10; 
                 gBannerRoundRect(xPlace - 15 + xCol, y0 - 10, wCol + 30 - wColShorten, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             }
@@ -4537,7 +4637,9 @@ function lf_changeShowToolTips(vp_newValue, vp_paint) {
 
 function lf_changeMode(vp_paint) {
 
-    if (gl_mode == cv_mode_timeAvgTempMultiTimeSlice) { gl_timeSlice = cv_timeSliceAll }; //11.12.2023
+    if (gl_mode == cv_mode_timeAvgTempMultiTimeSlice) {
+        gl_timeSlice = cv_timeSliceAll
+    }; //11.12.2023
     //----
     gl_mode += 1;
     if (gl_mode > cv_maxMode) { gl_mode = 1 };
@@ -4977,6 +5079,53 @@ function paint_graph_timeAvgTemp_multiTimeSlice_drawSingleTimeSlice(place, vp_ti
     //---- končno zdaj risanje grafa za posamezno lokacijo
     paint_graph_timeAvgTemp(x, y, iw, ih, vp_graphType, place, vp_timeSlice, 2, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange);
     
+}
+
+function paint_graph_timeAvgTemp_cache() {
+    //-------------------------
+    // 19.12.2023 pred novim risanjem zaradi spremembe konfiguracije (avg, time interval, mode, time slice) najprej napolnim cache, da lahko potem delam samo z njim brez vsakega izračunavanja povprečij itd.
+    //-------------------------
+
+    let myTime1 = Date.now()
+
+    gl_configChanged = true; // zato da bo pri klicih izračuna vrednosti nafilal to vrednosti tudi v cache
+
+    let place, tmpValue, placeMonth, monthValue, timeSlice;
+    let actualMonthsAvg = cv_nrMonthsAvgMult * lo_nrMonthsAvg;
+    for (place = 1; place <= nrPlaces; place++) {
+        for (placeMonth = 1; placeMonth <= nrMonths[place]; placeMonth++) {
+            //---- tu je potrebno upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
+            switch (gl_timeSlice) {
+                case cv_timeSliceAll:
+                    //---- če delamo na vseh podatkih, samo izračunaj podatek
+                    tmpValue = lf_getAvgValue(place, gl_timeSlice, placeMonth, actualMonthsAvg)
+                    break;
+                case cv_timeSliceMonth: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                    //---- če delamo ločeno po mesecih, je treba pogruntati tekoči mesec, in izračunati s timeSlice nastavljenim na tisti mesec
+                    monthValue = lf_monthValue(placeMonth + offsetMonths[place]); //mesec od 1..12
+                    timeSlice = cv_timeSliceMonthMin + monthValue - 1;
+                    tmpValue = lf_getAvgValue(place, timeSlice, placeMonth, actualMonthsAvg)
+                    break;
+                case cv_timeSliceSeason: case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                    //---- če delamo za letni čas, je potrebno izračunati podatek samo v primeru feb/may/aug/nov, in to s timeSlice nastavljenim na ustrezen letni čas
+                    monthValue = lf_monthValue(placeMonth + offsetMonths[place]); //mesec od 1..12
+                    switch (monthValue) {
+                        case 2: timeSlice = cv_timeSliceWinter; break;
+                        case 5: timeSlice = cv_timeSliceSpring; break;
+                        case 8: timeSlice = cv_timeSliceSummer; break;
+                        case 11: timeSlice = cv_timeSliceAutumn; break;
+                        default: continue; // na ostalih 8 mesecih ne računam nič, ker ne rabim. Če bo kasneje spremenil gl_timeSlice, bom itak ponovno prišel sem in vse naredil na novo
+                    }
+                    tmpValue = lf_getAvgValue(place, timeSlice, placeMonth, actualMonthsAvg)
+                    break;
+            }
+        }
+    }
+    //---- izpis potrebnega časa za izris
+    let myTime2 = Date.now()
+    console.log("cach fill: " + (myTime2 - myTime1).toString() + "ms");
+    //tmpStr = "izris: " + (myTime2 - myTime1).toString() + " ms"
+    //gText(tmpStr, "italic 10pt sans serif", "gray", ctxW - 65, ctxH - 3)
 }
 
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
@@ -6601,23 +6750,34 @@ function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
     // vp_nrMonthsAvg ... čez koliko mesecev naj se povpreči, vključno z vp_month
     //--------------------------------------------------------------------------
     
+    //---- če je eenaka konfiguracija, kot je bila pri prejšnjem risanju, potem že izračunane podatke enostavno vzamem iz pomožne tabele, in s tem prihranim na času (19.12.2023)
+    if (!gl_configChanged) {
+        return avgTempCache[vp_place][vp_month]; // 20.12.2023 če je cache že napolnjen, samo vnem vrednost direktno iz njega. Cache se vedno napolni takoj ob vsaki spremembi konfiguracije (mode, nrMonthsAvg, timeSlice)
+    }
+
+    let tmpValue;
+
     //---- če ni nič povprečenja podatkov, potem kar vrnem konkretno vrednost podatka (4.12.2023)
     if (vp_nrMonthsAvg == 0) {
         //---- tu je potrebno upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas (9.12.2023)
         switch (vp_timeSlice) {
             case cv_timeSliceAll: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
                 //---- če delamo na vseh podatkih, ali pa na podatkih samo za določen mesec v letu, potem samo vrnemo pravi podatek
-                return avgTemp[vp_place][vp_month];
+                tmpValue = avgTemp[vp_place][vp_month];      //19.12.2023
+                avgTempCache[vp_place][vp_month] = tmpValue; //19.12.2023 sem pridem samo ob spremembi konfiguracije in to med polnenjem cache-a
+                return tmpValue;
                 break;
             case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
                 //---- če delamo za letni čas, je potrebno vrniti povprečje zadnjih treh mesecev
-                return (avgTemp[vp_place][vp_month - 2] + avgTemp[vp_place][vp_month - 1] + avgTemp[vp_place][vp_month]) / 3;
+                tmpValue = (avgTemp[vp_place][vp_month - 2] + avgTemp[vp_place][vp_month - 1] + avgTemp[vp_place][vp_month]) / 3; //19.12.2023
+                avgTempCache[vp_place][vp_month] = tmpValue; //19.12.2023 sem pridem samo ob spremembi konfiguracije in to med polnenjem cache-a
+                return tmpValue;
                 break;
         }        
     }
 
     //.... imamo povprečenje
-    let month1, nrMonths, nrMonthsUsed, tmpValue, tmpMonth, tmpMonthValue, tmpMonthValue2
+    let month1, nrMonths, nrMonthsUsed, tmpMonth, tmpMonthValue, tmpMonthValue2
     //month1 = vp_month - vp_nrMonthsAvg + 1
     //if (month1 < 1) { month1 = 1 }
     if (vp_nrMonthsAvg <= vp_month) {
@@ -6671,7 +6831,8 @@ function lf_getAvgValue(vp_place, vp_timeSlice, vp_month, vp_nrMonthsAvg) {
             tmpValue /= nrMonthsUsed; //uporabljenih je bilo samo del mesecev
             break;
     }
-    return tmpValue
+    avgTempCache[vp_place][vp_month] = tmpValue; //19.12.2023 sem pridem samo ob spremembi konfiguracije in to med polnenjem cache-a
+    return tmpValue;
 }
 
 function lf_getPlaceMonthDataIndex(vp_place, vp_month) {
@@ -7644,6 +7805,7 @@ function addPlace(name, shortName, abbr, location, color, colorAnti) {
     nrMonths[nrPlaces] = 0;
     //----
     avgTemp[nrPlaces] = [];
+    avgTempCache[nrPlaces] = [];
     //----
     return nrPlaces; //14.12.2023
 }
@@ -7766,7 +7928,7 @@ function addAvgTemp(vp_place, vp_year, vp_month, vp_avgTemp) {
 
     //---- vpis podatka o temperaturi
     avgTemp[vp_place][vl_month] = vp_avgTemp;
-
+    avgTempCache[vp_place][vl_month] = vp_avgTemp; // 19.12.2023
 }
 
 function addAvgTempYear(vp_place, vp_year, vp_month, vp_arrTemp) {
@@ -7806,6 +7968,7 @@ function addAvgTempYear(vp_place, vp_year, vp_month, vp_arrTemp) {
     for (vl_monthIndex = 1; vl_monthIndex <= nrData; vl_monthIndex++)    {
         vl_month = nrMonths[vp_place] + vl_monthIndex;
         avgTemp[vp_place][vl_month] = vp_arrTemp[vl_monthIndex - 1];
+        avgTempCache[vp_place][vl_month] = avgTemp[vp_place][vl_month]; // 19.12.2023
     }
         
     //---- število mesecev s podatki za to lokacijo
