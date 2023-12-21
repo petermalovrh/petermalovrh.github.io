@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.4"
+const gl_versionNr = "v1.5"
 const gl_versionDate = "21.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1996,6 +1996,8 @@ const cv_timeSliceSeason = 18; // by season
 //----
 const cv_timeSliceMin = 0;
 const cv_timeSliceMax = 16;
+const cv_timeSliceSeasonMin = 13;
+const cv_timeSliceSeasonMax = 16;
 const cv_timeSliceMaxAll = 18; //11.12.2023
 //----
 var gl_timeSlice = cv_timeSliceAll;
@@ -4425,34 +4427,61 @@ function valueBetween(value, minValue, maxValue) {
 
 function lf_monthStrMY(vp_month) {
     // format: "sep/2021"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let leto = minYearAll + nrLet
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let leto = minYearAll + nrLet
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    let mesec, leto;
+    ;[mesec, leto] = lf_monthYearValue(vp_month);
     return (lf_mesecName(mesec) + "/" + leto.toString())
 }
 
 function lf_monthStrMMYY(vp_month) {
     // format: "9/21"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let leto = minYearAll + nrLet
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let leto = minYearAll + nrLet
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    let mesec, leto;
+    ;[mesec, leto] = lf_monthYearValue(vp_month);
     return (mesec.toString() + "/" + leto.toString().substring(2, 4))
 }
 
 function lf_monthStrMMMYY(vp_month) {
     // format: "sep/21"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let leto = minYearAll + nrLet
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let leto = minYearAll + nrLet
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    let mesec, leto;
+    ;[mesec, leto] = lf_monthYearValue(vp_month);
     return (lf_mesecName(mesec) + "/" + leto.toString().substring(2, 4))
 }
 
 function lf_monthStrMMMYYYY(vp_month) {
     // format: "sep/21"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let leto = minYearAll + nrLet
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let leto = minYearAll + nrLet
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    let mesec, leto;
+    ;[mesec, leto] = lf_monthYearValue(vp_month);
     return (lf_mesecName(mesec) + "/" + leto.toString());
+}
+
+function lf_seasonStrSmall(vp_monthValue) {
+    // format: "winter"
+    switch (vp_monthValue) {
+        case 12: case 1: case 2: return "winter"; break;
+        case 3: case 4: case 5: return "spring"; break;
+        case 6: case 7: case 8: return "summer"; break;
+        case 9: case 10: case 11: return "autumn"; break;
+    }
+}
+
+function lf_seasonStrSmallYYYY(vp_month) {
+    // format: "winter/1987"
+    let mesec, leto, tmpStr;
+    ;[mesec, leto] = lf_monthYearValue(vp_month);
+    tmpStr = lf_seasonStrSmall(mesec);
+    tmpStr += "/" + leto.toString();
+    return tmpStr;
 }
 
 function lf_dateStrMMMsepYY(vp_month, vp_year, vp_sep, vp_monthSpec, vp_yearSpec, vp_strSpec) {
@@ -4470,16 +4499,20 @@ function lf_dateStrMMMsepYY(vp_month, vp_year, vp_sep, vp_monthSpec, vp_yearSpec
 
 function lf_monthStrMMM(vp_month) {
     // format: "sep"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
-    return lf_mesecName(mesec);
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let mesec = lf_monthValue(vp_month); // 21.12.2023
+    //return lf_mesecName(mesec);
+    return lf_mesecName(lf_monthValue(vp_month)); // 21.12.2023
 }
 
 function lf_monthStrM(vp_month) {
     // format: "S"
-    let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
-    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
-    return (lf_mesecNameM(mesec))
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    //let mesec = lf_monthValue(vp_month); // 21.12.2023
+    //return (lf_mesecNameM(mesec))
+    return (lf_mesecNameM(lf_monthValue(vp_month)))
 }
 
 function lf_monthValue(vp_month) {
@@ -4496,11 +4529,20 @@ function lf_yearValue(vp_month) {
     return (leto)
 }
 
-function lf_yearStrShort(vp_month) {
+function lf_monthYearValue(vp_month) {
 
     let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
     let leto = minYearAll + nrLet
-    return ("'" + leto.toString().substring(2, 4));
+    let mesec = vp_month + minMonthAll - 1 - 12 * nrLet
+    return [mesec, leto];
+}
+
+function lf_yearStrShort(vp_month) {
+
+    //let nrLet = Math.trunc((vp_month - 1 + minMonthAll - 1) / 12)
+    //let leto = minYearAll + nrLet
+    //return ("'" + leto.toString().substring(2, 4));
+    return ("'" + lf_yearValue(vp_month).toString().substring(2, 4));
 }
 
 function lf_mesecNameLongENG(vp_mesec) {
@@ -6193,9 +6235,17 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
     //---- background toolTip okvir
     gBannerRoundRect(frameLeft, frameTop, frameWidth, frameHeight, 4, gf_alphaColor(224, "mintCream"), 1, "gray", "#C0C0C080", 3, 3, false);
 
-    //---- izpis meseca na vrhu
+    //---- izpis meseca/letnega časa na vrhu
     font = "bold 13px verdana";
-    tmpStr = lf_monthStrMMMYYYY(lo_tipMonth) + "  (#" + lo_tipMonth.toString() + ")";
+    switch (vp_timeSlice) {
+        case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn: case cv_timeSliceSeason:
+            tmpStr = lf_seasonStrSmallYYYY(lo_tipMonth);
+            break;
+        default:
+            tmpStr = lf_monthStrMMMYYYY(lo_tipMonth);
+            break;
+    }    
+    tmpStr += "  (#" + lo_tipMonth.toString() + ")";
     ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
     x = frameLeft + frameWidth / 2 - tmpW / 2;
     y = frameTop + 4 + tmpH;
