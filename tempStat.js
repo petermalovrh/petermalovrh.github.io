@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.6"
+const gl_versionNr = "v1.7"
 const gl_versionDate = "21.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -268,6 +268,10 @@ const cv_placePtuj = addPlace("Ptuj - Terme (222m)", "Ptuj - Terme", "PTUJ", "Pt
 station = addStation(cv_placePtuj, 1266, "PTUJ - TERME", "15.8543", "46.4219", "A", 223, 12, 1995, 2, 2006);
 station = addStation(cv_placePtuj, 1859, "PTUJ - TERME", "15.8512", "46.4213", "A", 222, 4, 2006, 11, 2016);
 station = addStation(cv_placePtuj, 2701, "PTUJ", "15.8492", "46.4197", "A", 222, 12, 2016, 0, 0);
+
+// AJDOVŠČINA  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 21.12.2023  
+const cv_placeAjdovscina = addPlace("Ajdov" + scSchLow + scTchLow + "ina (86m)", "Ajdov" + scSchLow + scTchLow + "ina", "AJDV", "Ajdov" + scSchLow + scTchLow + "ina", "seaGreen", "white");
+station = addStation(cv_placeAjdovscina, 1857, "AJDOV" + scSch + scTch + "INA - DOLENJE", "13.9013", "45.8662", "A", 86, 2, 1993, 0, 0);
 
 // id=1266 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8543 lat = 46.4219 viš = 223m)
 // id=1859 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8512 lat = 46.4213 viš = 222m)
@@ -1934,6 +1938,41 @@ addAvgTempYear(cv_placePtuj, 2020, 1, [0.1, 6.4, 6.9, 11.2, 14.6, 18.6, 20.3, 21
 addAvgTempYear(cv_placePtuj, 2021, 1, [1.8, 4.1, 5.8, 8.5, 13.5, 21.5, 22.0, 19.2, 15.7, 9.2, 5.2, 1.5]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placePtuj, 2022, 1, [0.9, 4.6, 4.8, 9.7, 17.0, 21.3, 22.0, 21.6, 15.2, 13.0, 6.5, 2.7]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 
+// id=1859 AVTOMATSKA !!  AJDOVŠČINA - DOLENJE (lon = 13.9013 lat = 45.8662 viš = 86m)
+//addAvgTempYear(cv_placeAjdovscina, 1993, 1, [3.8 ?, 4.0, 6.2, 11.5, 18.0, 20.5, 20.7, 23.2, 16.4, 13.5, 6.3, 5.1]); // 288 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1993, 2, [4.0, 6.2, 11.5, 18.0, 20.5, 20.7, 23.2, 16.4, 13.5, 6.3, 5.1]); // 288 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1994, 1, [5.4, 4.6, 10.6, 11.6, 15.7, 19.5, 25.0, 22.8, 18.1, 12.5, 10.3, 4.6]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1995, 1, [3.6, 5.9, 6.8, 10.5, 15.3, 17.4, 23.8, 21.3, 15.7, 14.6, 7.3, 4.9]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1996, 1, [3.9, 2.1, 6.8, 11.8, 16.5, 20.5, 20.5, 21.1, 14.9, 12.9, 9.3, 4.0]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placeAjdovscina, 1997, 1, [4.2, 5.7, 9.9, 9.4, ?, 19.8, 20.8, 21.7, 19.3, 12.1, 8.7, 5.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1997, 1, [4.2, 5.7, 9.9, 9.4, 16.8, 19.8, 20.8, 21.7, 19.3, 12.1, 8.7, 5.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1998, 1, [5.3, 7.0, 7.7, 12.3, 17.1, 21.8, 23.1, 24.2, 17.8, 13.0, 7.9, 2.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 1999, 1, [4.1, 3.0, 8.7, 12.0, 17.7, 20.9, 23.2, 22.9, 19.8, 14.0, 6.8, 4.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2000, 1, [1.5, 5.4, 8.4, 13.8, 18.2, 22.5, 20.4, 22.9, 18.5, 15.4, 10.3, 6.8]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2001, 1, [6.0, 6.4, 10.1, 11.2, 19.0, 19.5, 22.7, 24.6, 15.4, 16.1, 7.1, 2.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2002, 1, [3.2, 6.1, 10.6, 12.5, 17.5, 22.6, 23.1, 21.8, 17.3, 13.9, 11.1, 5.9]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2003, 1, [3.1, 2.6, 8.6, 11.4, 19.1, 24.8, 24.4, 25.9, 17.9, 11.3, 10.3, 5.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2004, 1, [2.3, 3.7, 7.4, 12.9, 14.8, 20.2, 23.3, 22.2, 18.9, 14.2, 8.5, 5.6]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placeAjdovscina, 2005, 1, [2.6, 2.8, 6.8, 11.5, 17.5, 20.9, 22.9, 20.5, 19.0, 14.1, 12.6, ?]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2005, 1, [2.6, 2.8, 6.8, 11.5, 17.5, 20.9, 22.9, 20.5, 19.0, 14.1, 12.6, 6]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placeAjdovscina, 2006, 1, [?, ?, ?, 14.9, 16.4, 21.3, 26.1, 19.3, 19.4, 16.3, 9.6, 6.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2006, 1, [4.2, 5.1, 8.9, 14.9, 16.4, 21.3, 26.1, 19.3, 19.4, 16.3, 9.6, 6.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2007, 1, [5.8, 7.4, 11.0, 15.8, 18.8, 21.9, 22.5, 21.6, 16.8, 13.0, 7.4, 4.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2008, 1, [5.8, 5.1, 8.1, 11.6, 17.6, 21.4, 22.5, 22.9, 17.3, 13.6, 8.8, 4.9]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2009, 1, [4.1, 4.4, 7.8, 14.2, 18.8, 20.0, 22.5, 24.0, 20.4, 13.5, 9.7, 4.6]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2010, 1, [1.9, 4.3, 7.3, 12.9, 15.7, 20.7, 23.6, 21.6, 17.3, 12.4, 9.7, 2.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2011, 1, [3.0, 5.0, 8.3, 13.9, 18.3, 21.3, 21.6, 23.9, 21.9, 12.6, 7.7, 5.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2012, 1, [2.1, 1.0, 11.5, 12.1, 16.4, 21.9, 24.2, 25.0, 19.9, 14.6, 11.0, 3.9]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2013, 1, [4.3, 4.1, 6.9, 13.0, 15.6, 20.0, 24.6, 23.5, 18.2, 14.3, 9.9, 5.6]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2014, 1, [7.7, 8.1, 10.9, 14.0, 15.7, 20.7, 20.7, 21.0, 17.9, 15.6, 11.6, 6.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2015, 1, [5.0, 5.6, 9.9, 11.8, 17.9, 21.5, 25.0, 23.5, 18.6, 13.9, 8.0, 5.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2016, 1, [3.3, 7.4, 8.8, 13.1, 15.8, 20.7, 23.8, 22.8, 20.3, 13.0, 9.2, 4.2]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2017, 1, [0.9, 6.9, 11.2, 12.7, 17.0, 22.1, 22.8, 24.2, 16.3, 13.0, 8.4, 3.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2018, 1, [6.1, 3.1, 6.9, 15.3, 19.7, 21.5, 22.8, 24.4, 19.7, 16.4, 11.0, 4.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2019, 1, [2.8, 6.8, 10.0, 12.9, 13.8, 24.1, 23.5, 24.0, 18.8, 14.4, 11.1, 6.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2020, 1, [4.8, 7.4, 8.7, 13.4, 16.4, 19.6, 22.5, 23.3, 19.8, 12.6, 9.0, 6.4]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2021, 1, [3.8, 7.1, 7.6, 10.3, 14.5, 22.2, 23.8, 22.2, 19.2, 13.0, 9.3, 5.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2022, 1, [3.5, 5.7, 7.8, 11.3, 18.8, 23.8, 25.7, 24.4, 17.9, 16.2, 10.2, 7.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
@@ -5404,6 +5443,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     }
     
     //---- oznake na X osi
+    let addX, addY; // 21.12.2023
     let tmpVacc, tmpMonth, tmpMonthValue, tmpMonthValue2, tmpYear, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
     switch (vp_graphType) {
         case cv_graphType_vaccExcessDeath:
@@ -5497,21 +5537,29 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 vl_xOld = x;
             }
             //---- oznaka osi
-            font = "bold italic 11pt cambria";
-            switch (vp_place) {
-                case cv_allPlace:
-                    tmpStr = "Time";
-                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    x = cv_graphRight - tmpW + 10
-                    y = yOsX + 15;
+            switch (gl_mode) { //(vp_place) {
+                case cv_mode_timeAvgTempSingle: //case cv_allPlace:
+                    tmpStr = "Time"; addX = 10; addY = 15;
+                    break;
+                case cv_mode_timeAvgTempMultiTimeSlice:
+                    switch (vp_timeSlice) {
+                        case cv_timeSliceSeason: case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                            tmpStr = "Time"; addX = -2; addY = 14;
+                            break;
+                        default:
+                            tmpStr = "t"; addX = -2; addY = 14;
+                            break;
+                    }
                     break;
                 default:
-                    tmpStr = "t";
-                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    x = cv_graphRight - tmpW - 2;
-                    y = yOsX + 14;
+                    tmpStr = "t"; addX = -2; addY = 14;
+                    if (vp_width > 700) { tmpStr = "Time"; addX = -2; addY = 14; };
                     break;
             }
+            font = "bold italic 11pt cambria";
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            x = cv_graphRight - tmpW + addX
+            y = yOsX + addY;
             ctx.beginPath; ctx.rect(x - 1, y - tmpH - 1, tmpW + 2, tmpH + 2); ctx.closePath; ctx.fillStyle = bckgColor; ctx.fill();
             gText(tmpStr, font, "darkSlateGray", x, y);
     }
@@ -5689,6 +5737,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                         if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
                         break;
                 }
+                if (vp_timeSlice == cv_timeSliceWinter && lf_yearValue(month) == 2015 && tmpMonthValue == 2) {
+                    month = month;
+                }
                 //---- glede timeSlice smo na pravi točki (mesecu). Je ta v redu z vidika povprečenja?
                 if (vl_previousPointValid) {
                     //---- ker je prejšnja valid, je tudi ta sigurno valid
@@ -5711,7 +5762,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                             if (monthIndex >= 13 && placeMonth >= 13) { vl_firstGraphDataPoint = false };
                             break;
                         case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
-                            if (monthIndex >= 15 && placeMonth >= 15) { vl_firstGraphDataPoint = false };
+                            //if (monthIndex >= 15 && placeMonth >= 15) { vl_firstGraphDataPoint = false };
+                            if (monthIndex >= 13 && placeMonth >= 15) { vl_firstGraphDataPoint = false };
                             break;
                     }
                 }
@@ -5919,7 +5971,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     switch (vp_place) {
                         case cv_allPlace:
                             //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
-                            gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                            //gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                            if (lo_addMarkWidth >= 3) {
+                                gText(tmpStr, "bold 11pt verdana", placeNameColor, lastPlaceMarkerX[place] + 10, lastPlaceMarkerY[place] + 3);
+                            } else if (lo_addMarkWidth >= 2) {
+                                gText(tmpStr, "normal 10pt verdana", placeNameColor, lastPlaceMarkerX[place] + 9, lastPlaceMarkerY[place] + 3);
+                            } else {
+                                gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                            }
                             break;
                     }
                 }
