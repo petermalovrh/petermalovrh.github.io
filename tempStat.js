@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.5"
+const gl_versionNr = "v1.6"
 const gl_versionDate = "21.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2036,6 +2036,7 @@ var lo_keyDownU = false;      //6.12.2023
 var lo_keyDownD = false;      //6.12.2023
 var lo_keyDownW = false;      //13.12.2023
 var lo_keyDownE = false;      //15.12.2023
+var lo_keyDownShiftLeft = false; // 21.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 //----
@@ -3353,6 +3354,8 @@ window.addEventListener("wheel", event => {
 window.addEventListener("keydown", (event) => {
 
     switch (event.code) {
+        case 'ShiftLeft':
+            lo_keyDownShiftLeft = true; console.log(lo_keyDownShiftLeft); break;
         case 'KeyA':
             lo_keyDownA = true; break;
         case 'KeyT':
@@ -3444,7 +3447,7 @@ window.addEventListener("keyup", (event) => {
                 if (event.shiftKey) { lf_changeValueTimeSlice(1) } else { lf_changeValueTimeSlice(-1) };
                 lf_changeTimeSlice(gl_timeSlice, true);
             }
-            gl_changeByMouseWheel_timeSlice = false; 
+            gl_changeByMouseWheel_timeSlice = false;
             //console.log("UP: false");
             //console.log("----");
             break;
@@ -3458,6 +3461,8 @@ window.addEventListener("keyup", (event) => {
             lo_keyDownW = false; break;
         case 'KeyE':
             lo_keyDownE = false; break;
+        case 'ShiftLeft':
+            lo_keyDownShiftLeft = false; console.log(lo_keyDownShiftLeft); break;
         //case 'KeyP':
         //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
     }
@@ -3499,7 +3504,11 @@ function canvas_touchMove(e) {
 function resizeCanvas() {
     //dimenzioniranje in pozicioniranje canvas-a
     ctxW = window.innerWidth - 6;
+    if (lo_keyDownShiftLeft && valueBetween(ctxW, 1200, 1360)) { ctxW = 1280 }; // 21.12.2023
+    if (lo_keyDownShiftLeft && valueBetween(ctxW, 1840, 2000)) { ctxW = 1920 }; // 21.12.2023
     ctxH = window.innerHeight - 6;
+    if (lo_keyDownShiftLeft && valueBetween(ctxH, 640, 800)) { ctxH = 720 }; // 21.12.2023
+    if (lo_keyDownShiftLeft && valueBetween(ctxH, 1010, 1150)) { ctxH = 1080 }; // 21.12.2023
     ctxMinDim = Math.min(ctxW, ctxH)
     elMyCanvas.width = ctxW     //da je na obeh straneh minimalen rob
     elMyCanvas.height = ctxH //da je na obeh straneh minimalen rob
@@ -4953,7 +4962,7 @@ function paint_graph_timeAvgTemp_multiPlace(marginLeft, marginTop, marginRight, 
     //---- dimenzije matrike
     cols = Math.trunc(Math.sqrt(nrSelectedPlaces - 1)) + 1;
     let ratio = ctxW / (ctxH + 1);
-    if (ratio > 1.7) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 };
+    if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
     if (cols > nrSelectedPlaces) { cols = nrSelectedPlaces };
     rows = Math.trunc((nrSelectedPlaces - 1) / cols) + 1;
     //----
@@ -5018,7 +5027,7 @@ function paint_graph_timeAvgTemp_multiTimeSlice(marginLeft, marginTop, marginRig
     //---- dimenzije matrike
     cols = Math.trunc(Math.sqrt(nrGraphs - 1)) + 1;
     let ratio = ctxW / (ctxH + 1);
-    if (ratio > 1.7) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 };
+    if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
     if (cols > nrGraphs) { cols = nrGraphs };
     rows = Math.trunc((nrGraphs - 1) / cols) + 1;
     //----
