@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.9"
+const gl_versionNr = "v1.10"
 const gl_versionDate = "22.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -3475,6 +3475,8 @@ window.addEventListener("keydown", (event) => {
             lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); break;
         case 'KeyS':
             lf_changeNrMonthsAvgAll(!lo_nrMonthsAvgAll, true); break;
+        case 'KeyL':
+            lf_changeDeltaT(!gl_deltaT, true); break;
         case 'KeyC':
             lf_changeEnablePlaceAll(!lo_enabledPlaceAll, true); break;
         case 'KeyN': case 'F2':
@@ -4357,7 +4359,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 20;
+            let nrTipRows = 22;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -4411,6 +4413,16 @@ function paint_tips() {
             gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... all time average", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
+            y += vStep;
+            gBannerRectWithText2("L", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... " + scDelta + "T(t) diagram", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //            
+            y += vStep;
+            gBannerRectWithText2("O", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... " + scDelta + "T(t) smoothing", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //            
             y += vStep;
             gBannerRectWithText2("U", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("D", x0 +22, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -6169,7 +6181,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             }
             //----
             if (lo_enabledIntChooserSmoothYears && intChooserSmoothYears.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-                gText("F10+mWheel", "italic 10pt cambria", "darkGray", intChooserSmoothYears.left + intChooserSmoothYears.width - 65, 10);
+                gText("O+mWheel", "italic 10pt cambria", "darkGray", intChooserSmoothYears.left + intChooserSmoothYears.width - 55, 10);
             }
             //----
             tmpStr = lf_monthStrMMYY(gl_monthStart) + "-" + lf_monthStrMMYY(gl_monthEnd);
