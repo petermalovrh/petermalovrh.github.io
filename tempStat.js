@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.8"
+const gl_versionNr = "v1.9"
 const gl_versionDate = "22.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2016,7 +2016,7 @@ var gl_modeLast = gl_mode; // 19.12.2023
 
 //----
 var gl_deltaT = false; // 22.12.2023 ali gledamo T(t) ali pa deltaT(t)
-var gl_deltaTavgMonths = 24;
+//var gl_deltaTavgMonths = 24;
 var gl_deltaTLast = gl_deltaT; // 22.12.2023
 
 //---- nivo prikaza imena lokacije (15.12.2023)
@@ -2066,6 +2066,16 @@ var lo_nrMonthsAvgLast = lo_nrMonthsAvg; // 19.12.2023
 var lo_nrMonthsAvgOld = 5                   // 25.1.2023 v1.1
 var lo_nrMonthsAvgAll = false;
 var lo_enabledIntChooserNrMonthsAvg = true; // 25.1.2023 v1.1
+//---- 22.12.2023
+const cv_nrSmoothYearsMin = 0;   
+const cv_nrSmoothYearsMax = 3;  
+const cv_nrSmoothYearsMaxExceed = 19; 
+const cv_nrSmoothYearsMult = 12; 
+var lo_nrSmoothYears = 1
+var lo_nrSmoothYearsLast = lo_nrSmoothYears;
+var lo_enabledIntChooserSmoothYears = gl_deltaT; 
+//----
+
 var gl_monthEnd = nrMonthsAll;
 //var gl_monthEndLast = gl_monthEnd; // 19.12.2023
 var gl_tailMonths = 5  //za koliko mesecev nazaj se še riše od trenutno izbranega meseca gl_monthEnd
@@ -2082,11 +2092,13 @@ var lo_keyDownD = false;      //6.12.2023
 var lo_keyDownW = false;      //13.12.2023
 var lo_keyDownE = false;      //15.12.2023
 var lo_keyDownShiftLeft = false; // 21.12.2023
+var lo_keyDownO = false; // 22.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 //----
 var gl_changeByMouseWheel_nrMonthsAvg = false; //21.12.2023
 var gl_changeByMouseWheel_timeSlice = false;   //21.12.2023
+var gl_changeByMouseWheel_nrSmoothYears = false; //22.12.2023
 //----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
@@ -3000,6 +3012,7 @@ switch (lo_GUI_layout) {
         var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
         var checkBoxDeltaT = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, scDelta + "T", "gray", "normal 10pt verdana", 4, "above-middle", gl_deltaT, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
+        var intChooserSmoothYears = new intChooser(guiPanelLeft, guiPanelTop + 16, 80, cv_nrSmoothYearsMax - cv_nrSmoothYearsMin + 1, lo_nrSmoothYears, cv_nrSmoothYearsMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserSmoothYears, disabledControlLineColor, disabledControlTextColor, false);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, nrMonthsAll, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
@@ -3078,6 +3091,7 @@ function main() {
     resizeCanvas();
     lf_changeNrMonthsAvg(lo_nrMonthsAvg, false);
     lf_changeTimeSlice(gl_timeSlice, false); //10.12.2023
+    lf_changeNrSmoothYears(lo_nrSmoothYears, false); // 22.12.2023
     lf_setMode(gl_mode, false);
     lf_changeMonthEnd(gl_monthEnd, false);
 
@@ -3209,6 +3223,14 @@ elMyCanvas.addEventListener('click', (e) => {
             lf_changeDeltaT(boolRslt, true)
             vl_end = true
         }
+    }  
+    if (!vl_end && lo_showGUI && lo_enabledIntChooserSmoothYears) {
+        rslt = intChooserSmoothYears.eventClick(e.offsetX, e.offsetY)
+        //console.log("click(): rslt=" + rslt.toString())
+        if (rslt >= cv_nrSmoothYearsMin && rslt != lo_nrSmoothYears) {
+            lf_changeNrSmoothYears(rslt, true);
+            vl_end = true
+        }
     }    
     if (!vl_end && lo_showGUI & !lo_dragIntervalIgnoreFirstClick) {
         rslt2 = sliderMonthEnd.eventClick(e.offsetX, e.offsetY);
@@ -3294,6 +3316,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         else if (intChooserNrMonthsAvg.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
         else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (checkBoxDeltaT.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (intChooserSmoothYears.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
         else if (buttonPlay.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (placePanelToggle.eventMouseWithin(e.offsetX, e.offsetY)) {
             document.body.style.cursor = "pointer";
@@ -3350,6 +3373,14 @@ window.addEventListener("wheel", event => {
         lf_changeTimeSlice(gl_timeSlice, true);
         return
     }
+    if (lo_keyDownO) {
+        if (lo_enabledIntChooserSmoothYears) {
+            lf_changeValueNrSmoothYears(delta);
+            gl_changeByMouseWheel_nrSmoothYears = true; // 22.12.2023
+            lf_changeNrSmoothYears(lo_nrSmoothYears, true);
+        }
+        return
+    }        
     else if (lo_keyDown0) {
         if (sliderMonthEnd.useValue0) {
             gl_monthStart -= delta;
@@ -3412,6 +3443,8 @@ window.addEventListener("keydown", (event) => {
             lo_keyDownShiftLeft = true; console.log(lo_keyDownShiftLeft); break;
         case 'KeyA':
             lo_keyDownA = true; break;
+        case 'KeyO':
+            lo_keyDownO = true; break;
         case 'KeyT':
             lo_keyDownT = true;
             //gl_changeByMouseWheel_timeSlice = false; //sem pogruntal, da zaradi multiple keyDown eventov tegale ne smem imeti tu. Na FALSE se itak postavi po obdelavi keyUp eventa
@@ -3491,6 +3524,17 @@ window.addEventListener("keyup", (event) => {
                 lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
             }
             gl_changeByMouseWheel_nrMonthsAvg = false;
+            break;
+        case 'KeyO':
+            lo_keyDownO = false;
+            // Ali spreminja vrednost samo s pomočjo tipke brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_nrSmoothYears) {
+                // 21.12.2023 tole je primer spreminjanja spremenljivke samo s pomočjo tipke // obratno: že med vrtenjem koleščka smo spreminjali vrednost spremenljivke
+                //console.log("UP: process keyPress(T)");
+                if (event.shiftKey) { lf_changeValueNrSmoothYears(1) } else { lf_changeValueNrSmoothYears(-1) };
+                lf_changeNrSmoothYears(lo_nrSmoothYears, true);
+            }
+            gl_changeByMouseWheel_nrSmoothYears = false;
             break;
         case 'KeyT':
             lo_keyDownT = false;
@@ -3603,7 +3647,7 @@ function paint() {
             break;
         case false:
             //---- ne riše se prvič ... preverim, ali se je konfiguracija spremenila
-            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast && gl_deltaT == gl_deltaTLast);
+            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast && gl_deltaT == gl_deltaTLast && lo_nrSmoothYears == lo_nrSmoothYearsLast);
             //let noChangeCond2 = (valueBetween(gl_monthStart, gl_monthStartLast, gl_monthEndLast) && valueBetween(gl_monthEnd, gl_monthStartLast, gl_monthEndLast));
             //if (noChangeCond1 && noChangeCond2) {
             //    gl_configChanged = false;
@@ -3624,6 +3668,7 @@ function paint() {
     lo_nrMonthsAvgLast = lo_nrMonthsAvg;
     gl_timeSliceLast = gl_timeSlice;
     gl_deltaTLast = gl_deltaT; // 22.12.2023
+    lo_nrSmoothYearsLast = lo_nrSmoothYears; // 22.12.2023
     //gl_monthStartLast = gl_monthStart;
     //gl_monthEndLast = gl_monthEnd;
     
@@ -3945,6 +3990,7 @@ function lf_setNrMonthsAvgText() {
             else if (lo_nrMonthsAvg == 5) { tmpStr2 += " mesecev" }
             else { tmpStr2 += " mesecev" }
             tmpStr += tmpStr2
+            break;
         case cv_guiLayoutB:
             //console.log("lo_nrMonthsAvg=" + lo_nrMonthsAvg.toString());
             tmpStr = "Average: "
@@ -3956,8 +4002,31 @@ function lf_setNrMonthsAvgText() {
             }
             //if (lo_nrMonthsAvg == 0) { tmpStr2 = "none" } else { tmpStr2 += " years" };
             tmpStr += tmpStr2
+            break;
     }
     intChooserNrMonthsAvg.text = tmpStr;
+}
+
+function lf_setNrSmoothYearsText() {
+
+    let tmpStr, tmpStr2;
+    switch (lo_GUI_layout) {
+        case cv_guiLayoutA:
+            break;
+        case cv_guiLayoutB:
+            //console.log("lo_nrSmoothYears=" + lo_nrSmoothYears.toString());
+            tmpStr = "Smooth: "
+            tmpStr2 = lo_nrSmoothYears.toString();
+            switch (lo_nrSmoothYears) {
+                case 0: tmpStr2 = "0"; break;
+                case 1: tmpStr2 += "y"; break;
+                default: tmpStr2 += "y"; break;
+            }
+            //if (lo_nrSmoothYears == 0) { tmpStr2 = "none" } else { tmpStr2 += " years" };
+            tmpStr += tmpStr2
+            break;
+    }
+    intChooserSmoothYears.text = tmpStr;
 }
 
 function lf_setNrMonthsAvgTextShort() {
@@ -4126,7 +4195,7 @@ function paint_GUI() {
     //---- mode button
     buttonMode.paint();
     
-    //---- izbiranje števila mesecev za povprečenje   
+    //---- izbiranje števila mesecev za povprečenje podatkov  
     intChooserNrMonthsAvg.paint()
     //intChooserNrMonthsAvg2.paint()
     
@@ -4135,6 +4204,9 @@ function paint_GUI() {
     
     //---- check box za deltaT(t) namesto T(t)
     checkBoxDeltaT.paint();
+    
+    //---- izbiranje števila let za glajenje krivulje deltaT(t)
+    intChooserSmoothYears.paint()
     
     //---- za koliko časa nazaj se bo risal "rep"
     sliderTailMonths.paint();
@@ -4398,6 +4470,8 @@ function paint_tips() {
 
 function paint_GUI_layoutB() {
 
+    let vl_lastControlLeft, vl_lastControlWidth;
+
     const xAuthor = 200;
     guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = ctxW - guiPanelLeft - xAuthor; guiPanelHeight = 50;
     if (guiPanelWidth < 300) { guiPanelWidth = 300 };
@@ -4410,7 +4484,7 @@ function paint_GUI_layoutB() {
                 guiPanelHeight = 0;
                 lo_layout_marginTop = guiPanelTop + guiPanelHeight;
                 return;
-                break;     
+                break;
         }
     }; //4.2.2023 v1.12
     //----
@@ -4420,67 +4494,47 @@ function paint_GUI_layoutB() {
     intChooserNrMonthsAvg.left = buttonMode.left + buttonMode.width + 15;
     intChooserNrMonthsAvg.top = guiPanelTop + 16;
     intChooserNrMonthsAvg.width = 180;
-      //----
-      //intChooserNrMonthsAvg2.left = 450;
-      //intChooserNrMonthsAvg2.top =  200;
     //----
-    checkBoxNrMonthsAvgAll.left = intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width + 10;
+    //intChooserNrMonthsAvg2.left = 450;
+    //intChooserNrMonthsAvg2.top =  200;
+    //----
+    checkBoxNrMonthsAvgAll.left = intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width + 5;
     checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 3;
     checkBoxNrMonthsAvgAll.width = 18;
     //---- 22.12.2023 deltaT(t)
-    checkBoxDeltaT.left = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 10;
+    checkBoxDeltaT.left = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 15;
     checkBoxDeltaT.top = checkBoxNrMonthsAvgAll.top;
     checkBoxDeltaT.width = 18;
+    //----
+    vl_lastControlLeft = checkBoxDeltaT.left; vl_lastControlWidth = checkBoxDeltaT.width;
+    if (gl_deltaT) {
+        intChooserSmoothYears.left = vl_lastControlLeft + vl_lastControlWidth + 6;
+        intChooserSmoothYears.top = guiPanelTop + 16;
+        intChooserSmoothYears.width = 80;
+        vl_lastControlLeft = intChooserSmoothYears.left; vl_lastControlWidth = intChooserSmoothYears.width;
+    }
     //----
     let x1, x2, gap1, gap2, d1, d2, dHalf;
     const minTailWidth = 100; const maxTailWidth = 300;
     const minMonthEndWidth = 100; const maxMonthEndWidth = 500;
-    switch (sliderTailMonths.visible) {
-        case true:
-            gap1 = 30; // od checkBox-a do prvega sliderja
-            //x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
-            x1 = checkBoxDeltaT.left + checkBoxDeltaT.width + gap1; // 22.12.2023
-            x2 = ctxW - xAuthor;
-            d1 = x2 - x1;
-            gap2 = 200; //med obema sliderjema
-            dHalf = (d1 - gap2) / 2;
-            //----
-            sliderTailMonths.left = x1;
-            sliderTailMonths.bodyMiddle = guiPanelTop + 22;
-            if (dHalf > maxTailWidth) { sliderTailMonths.width = maxTailWidth; }
-            else if (dHalf < minTailWidth) { sliderTailMonths.width = minTailWidth; }
-            else { sliderTailMonths.width = dHalf; };
-            //----
-            sliderMonthEnd.left = sliderTailMonths.left + sliderTailMonths.width + gap2;
-            sliderMonthEnd.bodyMiddle = sliderTailMonths.bodyMiddle;
-            d2 = x2 - sliderTailMonths.left - sliderTailMonths.width - gap2;
-            if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
-            else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
-            else { sliderMonthEnd.width = d2; };
-            //----
-            //lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 50;
-            lo_currentMonthTextLeft = sliderTailMonths.left + sliderTailMonths.width + 37; //zaradi buttonPlay
-            lo_currentMonthTextTop = 21;
-            break;
-        case false:
-            gap2 = 200; //prostor za izpis tekočega meseca
-            //x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
-            x1 = checkBoxDeltaT.left + checkBoxDeltaT.width; // 22.12.2023
-            //x2 = x1 + gap2;
-            x2 = x1 + gap2 + 20;
-            x3 = ctxW - xAuthor;
-            //----
-            lo_currentMonthTextLeft = x1 + 15;
-            lo_currentMonthTextTop = 21;
-            //----
-            sliderMonthEnd.left = x2;
-            sliderMonthEnd.bodyMiddle = guiPanelTop + 22; //sliderTailMonths.bodyMiddle;
-            d2 = x3 - x2;
-            if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
-            else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
-            else { sliderMonthEnd.width = d2; };
-            break;
-    }
+
+    gap2 = 200; //prostor za izpis tekočega meseca
+    //x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
+    x1 = vl_lastControlLeft + vl_lastControlWidth; // 22.12.2023
+    //x2 = x1 + gap2;
+    x2 = x1 + gap2 + 20;
+    x3 = ctxW - xAuthor;
+    //----
+    lo_currentMonthTextLeft = x1 + 15;
+    lo_currentMonthTextTop = 21;
+    //----
+    sliderMonthEnd.left = x2;
+    sliderMonthEnd.bodyMiddle = guiPanelTop + 22; //sliderTailMonths.bodyMiddle;
+    d2 = x3 - x2;
+    if (d2 > maxMonthEndWidth) { sliderMonthEnd.width = maxMonthEndWidth; }
+    else if (d2 < minMonthEndWidth) { sliderMonthEnd.width = minMonthEndWidth; }
+    else { sliderMonthEnd.width = d2; };
+
     buttonPlay.left = sliderMonthEnd.left - 31; // + sliderMonthEnd.width +5;
 }
 
@@ -4724,6 +4778,10 @@ function lf_changeDeltaT(vp_newValue, vp_paint) {
     gl_deltaT = vp_newValue;
 
     checkBoxDeltaT.value = gl_deltaT;
+    lo_enabledIntChooserSmoothYears = gl_deltaT;
+    intChooserSmoothYears.enabled = gl_deltaT;
+    intChooserSmoothYears.visible = gl_deltaT;
+    lo_GUIlayoutHasChanged = true;
 
     if (vp_paint) { paint() }
 
@@ -4855,6 +4913,23 @@ function lf_changeNrMonthsAvg(vp_newValue, vp_paint) {
     }
 }
 
+function lf_changeNrSmoothYears(vp_newValue, vp_paint) {
+
+    //console.log("lf_changeNrSmoothYears: newValue=" + vp_newValue)
+    
+    if (vp_newValue < cv_nrSmoothYearsMin || vp_newValue > nrMonthsAll) { return };
+
+    lo_nrSmoothYears = vp_newValue;
+
+    lf_setNrSmoothYearsText();
+    intChooserSmoothYears.value = lo_nrSmoothYears;
+
+    if (vp_paint) {
+        //console.log("lf_changeNrSmoothYears: call Paint() now ...")
+        paint()
+    }
+}
+
 function lf_changeValueNrMonthsAvg(vp_changeValue) {
 
     //console.log("lf_changeValueNrMonthsAvg: changeValue=" + vp_changeValue)
@@ -4865,6 +4940,18 @@ function lf_changeValueNrMonthsAvg(vp_changeValue) {
     if (lo_nrMonthsAvg < cv_nrMonthsAvgMin) { lo_nrMonthsAvg = cv_nrMonthsAvgMin };
     
     //console.log("lf_changeValueNrMonthsAvg: call Paint() now ...")
+}
+
+function lf_changeValueNrSmoothYears(vp_changeValue) {
+
+    //console.log("lf_changeValueNrSmoothYears: changeValue=" + vp_changeValue)
+    
+    lo_nrSmoothYears -= vp_changeValue;
+    //if (lo_nrSmoothYears > cv_nrSmoothYearsMax) { lo_nrSmoothYears = cv_nrSmoothYearsMax };
+    if (lo_nrSmoothYears > cv_nrSmoothYearsMaxExceed) { lo_nrSmoothYears = cv_nrSmoothYearsMaxExceed }; //12.12.2023
+    if (lo_nrSmoothYears < cv_nrSmoothYearsMin) { lo_nrSmoothYears = cv_nrSmoothYearsMin };
+    
+    //console.log("lf_changeValueNrSmoothYears: call Paint() now ...")
 }
 
 function lf_changeTimeSlice(vp_newValue, vp_paint) {
@@ -5275,19 +5362,21 @@ function paint_graph_timeAvgTemp_cache() {
             avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - 120]);
         }
     }
-    //---- opravim še 12-mesečno glajenje krivulje
-    let sum = 0; let nrData = 0;
-    for (place = 1; place <= nrPlaces; place++) {
-        for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
-            sum = 0; nrData = 0;
-            for (month = 0; month <= gl_deltaTavgMonths - 1; month++) {
-                if (!isNaN(avgTempCache[place][placeMonth])) {
-                    sum += avgTempCache[place][placeMonth - month];
-                    nrData += 1;
+    //---- opravim še 12-mesečno glajenje krivulje. Če glajenje ni zahtevano, preskočim.
+    if (lo_nrSmoothYears > 0) {
+        let sum = 0; let nrData = 0;
+        for (place = 1; place <= nrPlaces; place++) {
+            for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
+                sum = 0; nrData = 0;
+                for (month = 0; month <= lo_nrSmoothYears * 12 - 1; month++) {
+                    if (!isNaN(avgTempCache[place][placeMonth])) {
+                        sum += avgTempCache[place][placeMonth - month];
+                        nrData += 1;
+                    }
                 }
+                avgTempCache[place][placeMonth] = sum / nrData;
             }
-            avgTempCache[place][placeMonth] = sum / nrData;
-        }
+        }        
     }
 }
 
@@ -6077,6 +6166,10 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             //gText("A+mWheel", "italic 8pt cambria", "darkGray", intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width - 50, 9);
             if (lo_enabledIntChooserNrMonthsAvg && intChooserNrMonthsAvg.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
                 gText("A+mWheel", "italic 10pt cambria", "darkGray", intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width - 55, 12);
+            }
+            //----
+            if (lo_enabledIntChooserSmoothYears && intChooserSmoothYears.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+                gText("F10+mWheel", "italic 10pt cambria", "darkGray", intChooserSmoothYears.left + intChooserSmoothYears.width - 65, 10);
             }
             //----
             tmpStr = lf_monthStrMMYY(gl_monthStart) + "-" + lf_monthStrMMYY(gl_monthEnd);
