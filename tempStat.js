@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.7"
-const gl_versionDate = "21.12.2023"
+const gl_versionNr = "v1.8"
+const gl_versionDate = "22.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -24,6 +24,7 @@ const scStopinj = String.fromCharCode(0xB0)
 const scPI = String.fromCharCode(0xB6)
 const scPower2 = String.fromCharCode(0xB2)
 const scInfinity = String.fromCharCode(0x221E)
+const scDelta = String.fromCharCode(0x0394)
 //----
 const scTch = String.fromCharCode(0x10C)
 const scTchLow = String.fromCharCode(0x10D)
@@ -2013,6 +2014,11 @@ const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
 var gl_modeLast = gl_mode; // 19.12.2023
 
+//----
+var gl_deltaT = false; // 22.12.2023 ali gledamo T(t) ali pa deltaT(t)
+var gl_deltaTavgMonths = 24;
+var gl_deltaTLast = gl_deltaT; // 22.12.2023
+
 //---- nivo prikaza imena lokacije (15.12.2023)
 const cv_showPlaceNameLevel_none = 0;
 const cv_showPlaceNameLevel_abbr = 1;
@@ -2993,6 +2999,7 @@ switch (lo_GUI_layout) {
         var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
         var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
         var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
+        var checkBoxDeltaT = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, scDelta + "T", "gray", "normal 10pt verdana", 4, "above-middle", gl_deltaT, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, nrMonthsAll, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
@@ -3196,6 +3203,13 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     }
+    if (!vl_end && lo_showGUI) {
+        boolRslt = checkBoxDeltaT.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != gl_deltaT) {
+            lf_changeDeltaT(boolRslt, true)
+            vl_end = true
+        }
+    }    
     if (!vl_end && lo_showGUI & !lo_dragIntervalIgnoreFirstClick) {
         rslt2 = sliderMonthEnd.eventClick(e.offsetX, e.offsetY);
         //console.log("  [value0, value]=" + rslt2)
@@ -3279,6 +3293,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (intChooserNrMonthsAvg.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
         else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (checkBoxDeltaT.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonPlay.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (placePanelToggle.eventMouseWithin(e.offsetX, e.offsetY)) {
             document.body.style.cursor = "pointer";
@@ -3588,7 +3603,7 @@ function paint() {
             break;
         case false:
             //---- ne riše se prvič ... preverim, ali se je konfiguracija spremenila
-            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast);
+            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast && gl_deltaT == gl_deltaTLast);
             //let noChangeCond2 = (valueBetween(gl_monthStart, gl_monthStartLast, gl_monthEndLast) && valueBetween(gl_monthEnd, gl_monthStartLast, gl_monthEndLast));
             //if (noChangeCond1 && noChangeCond2) {
             //    gl_configChanged = false;
@@ -3608,6 +3623,7 @@ function paint() {
     gl_modeLast = gl_mode;
     lo_nrMonthsAvgLast = lo_nrMonthsAvg;
     gl_timeSliceLast = gl_timeSlice;
+    gl_deltaTLast = gl_deltaT; // 22.12.2023
     //gl_monthStartLast = gl_monthStart;
     //gl_monthEndLast = gl_monthEnd;
     
@@ -4117,6 +4133,9 @@ function paint_GUI() {
     //---- check box za povprečenje čez vse mesece covid epidemije
     checkBoxNrMonthsAvgAll.paint();
     
+    //---- check box za deltaT(t) namesto T(t)
+    checkBoxDeltaT.paint();
+    
     //---- za koliko časa nazaj se bo risal "rep"
     sliderTailMonths.paint();
 
@@ -4408,6 +4427,10 @@ function paint_GUI_layoutB() {
     checkBoxNrMonthsAvgAll.left = intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width + 10;
     checkBoxNrMonthsAvgAll.top = intChooserNrMonthsAvg.top - 3;
     checkBoxNrMonthsAvgAll.width = 18;
+    //---- 22.12.2023 deltaT(t)
+    checkBoxDeltaT.left = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 10;
+    checkBoxDeltaT.top = checkBoxNrMonthsAvgAll.top;
+    checkBoxDeltaT.width = 18;
     //----
     let x1, x2, gap1, gap2, d1, d2, dHalf;
     const minTailWidth = 100; const maxTailWidth = 300;
@@ -4415,7 +4438,8 @@ function paint_GUI_layoutB() {
     switch (sliderTailMonths.visible) {
         case true:
             gap1 = 30; // od checkBox-a do prvega sliderja
-            x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
+            //x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + gap1;
+            x1 = checkBoxDeltaT.left + checkBoxDeltaT.width + gap1; // 22.12.2023
             x2 = ctxW - xAuthor;
             d1 = x2 - x1;
             gap2 = 200; //med obema sliderjema
@@ -4440,7 +4464,8 @@ function paint_GUI_layoutB() {
             break;
         case false:
             gap2 = 200; //prostor za izpis tekočega meseca
-            x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
+            //x1 = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width;
+            x1 = checkBoxDeltaT.left + checkBoxDeltaT.width; // 22.12.2023
             //x2 = x1 + gap2;
             x2 = x1 + gap2 + 20;
             x3 = ctxW - xAuthor;
@@ -4690,6 +4715,16 @@ function lf_changeNrMonthsAvgAll(vp_newValue, vp_paint) {
     lf_setNrMonthsAvgText();
     checkBoxNrMonthsAvgAll.value = lo_nrMonthsAvgAll;
     intChooserNrMonthsAvg.enabled = lo_enabledIntChooserNrMonthsAvg;
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeDeltaT(vp_newValue, vp_paint) {
+
+    gl_deltaT = vp_newValue;
+
+    checkBoxDeltaT.value = gl_deltaT;
+
     if (vp_paint) { paint() }
 
 }
@@ -5225,6 +5260,35 @@ function paint_graph_timeAvgTemp_cache() {
     //---- izpis potrebnega časa za izris
     let myTime2 = Date.now()
     //console.log("cach fill: " + (myTime2 - myTime1).toString() + "ms");
+
+    //-------------------------- SPREMINAJNJE TEMPERATURE --------------------------------
+    if (!gl_deltaT) { return };
+
+    // 22.12.2023 namesto temperatur hočemo spremembo temperature glede na prejšnji interval
+    // se pravi, če timeSliceAll in nrMonthsAvg=3 se pogleda razliko med današnjo vrednostjo in vrednostjo pred 3 leti
+    // da si ne povozim podatkov v cache, grem za vsak place od zadnjega meseca podatkov nazaj proti prvemu
+    for (place = 1; place <= nrPlaces; place++) {
+        for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
+            //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 3 leti, in nato ekstrapoliram z 10/3 na obdobje 10 let
+            //avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - actualMonthsAvg]) * 10 / lo_nrMonthsAvg;
+            //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 10 leti, in to že pove spremembo T na 10 let
+            avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - 120]);
+        }
+    }
+    //---- opravim še 12-mesečno glajenje krivulje
+    let sum = 0; let nrData = 0;
+    for (place = 1; place <= nrPlaces; place++) {
+        for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
+            sum = 0; nrData = 0;
+            for (month = 0; month <= gl_deltaTavgMonths - 1; month++) {
+                if (!isNaN(avgTempCache[place][placeMonth])) {
+                    sum += avgTempCache[place][placeMonth - month];
+                    nrData += 1;
+                }
+            }
+            avgTempCache[place][placeMonth] = sum / nrData;
+        }
+    }
 }
 
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
@@ -5292,12 +5356,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             break;
     }
     //---- 6.12.2023 upoštvam ročno kalibracijo minY in maxY
-    if (vl_maxY - vl_minY - 1 > lo_addTempMarginDown) {
-        vl_minY += lo_addTempMarginDown }
-    else { vl_minY += Math.trunc(vl_maxY - vl_minY - 1) };
-    if (vl_maxY - vl_minY - 1 > -lo_addTempMarginUp) {
-        vl_maxY += lo_addTempMarginUp }
-    else { vl_maxY += Math.trunc(vl_maxY - vl_minY - 1) };
+    let vl_addTempMarginDown = lo_addTempMarginDown; let vl_addTempMarginUp = lo_addTempMarginUp;
+    if (gl_deltaT) { vl_addTempMarginDown /= 10; vl_addTempMarginUp /= 10 };
+    if (vl_maxY - vl_minY - 1 > vl_addTempMarginDown) {
+        vl_minY += vl_addTempMarginDown
+    } else { vl_minY += Math.trunc(vl_maxY - vl_minY - 1) };
+    if (vl_maxY - vl_minY - 1 > -vl_addTempMarginUp) {
+        vl_maxY += vl_addTempMarginUp
+    } else { vl_maxY += Math.trunc(vl_maxY - vl_minY - 1) };
     vl_dataRange = vl_maxY - vl_minY;
     //console.log("minY=" + vl_minY.toString() + "  maxY=" + vl_maxY.toString() + "  range=" + vl_dataRange.toString());
     
@@ -5368,12 +5434,16 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     }
     
     //---- oznake na Y osi
-    gText("T [" + scStopinj + "]", "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 6);
-    let x, y, font, tmpW, tmpH
-    let tmpTemp, tmpTempAbs
+    let tmpStr = "T [" + scStopinj + "]";
+    if (gl_deltaT) { tmpStr = scDelta + "T/10y[" + scStopinj + "]"; };
+    gText(tmpStr, "bold italic 11pt cambria", "darkSlateGray", cv_graphLeft - 17, cv_graphTopAxis - 6);
+    let x, y, font, tmpW, tmpH;
+    let tmpTemp, tmpTempAbs, tmpTemp2;
     let yMark10 = true; let yMark5 = true; let yMark1 = true;
-    if (vl_dataRange > 27) { yMark1 = false }
-    if (vl_dataRange > 100) { yMark5 = false }
+    let vl_dataRangeFactor = gl_deltaT ? 10 : 1;
+    //if (vl_dataRange * vl_dataRangeFactor > 27) { yMark1 = false };
+    if (vl_dataRange * vl_dataRangeFactor > 50) { yMark1 = false };
+    if (vl_dataRange * vl_dataRangeFactor > 100) { yMark5 = false };
     let tmpShift; //8.12.2023
     switch (vp_place) {
         case cv_allPlace: {
@@ -5404,13 +5474,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             }
             continue;
         }
-        tmpTempAbs = Math.abs(tmpTemp)
+        tmpTempAbs = Math.abs(tmpTemp);
+        tmpTemp2 = tmpTemp / vl_dataRangeFactor; // 22.12.2023
         //---- gosta temnejša linija na vsakih 10 stopinj in številčna oznaka na Y osi
         if (yMark10 && (Math.abs(tmpTempAbs - 10 * Math.trunc(tmpTempAbs / 10)) < 0.00001)) {
-            y = cv_graphY0 - ky * tmpTemp
+            y = cv_graphY0 - ky * tmpTemp2
             if (y <= cv_graphBottom && y >= cv_graphTopData) {
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "gray", [2, 1])
-                tmpStr = tmpTemp.toString() + scStopinj;
+                tmpStr = tmpTemp2.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                 x = cv_graphLeft - tmpW - tmpShift
                 gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
@@ -5419,27 +5490,33 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         }
         //---- srednje gosta srednje temna linija na vsakih 5 stopinj in številčna oznaka na Y osi
         if (yMark5 && (Math.abs(tmpTempAbs - 5 * Math.trunc(tmpTempAbs / 5)) < 0.00001)) {
-            y = cv_graphY0 - ky * tmpTemp
+            y = cv_graphY0 - ky * tmpTemp2
             if (y <= cv_graphBottom && y >= cv_graphTopData) {
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "gray", [2, 3])
-                tmpStr = tmpTemp.toString() + scStopinj;
+                tmpStr = tmpTemp2.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                 x = cv_graphLeft - tmpW - tmpShift
                 gText(tmpStr, font, "dimGray", x, y + tmpH / 2 - 1);
             }
             continue;
         }
-        //---- redka svetlejša linija na vsako stopinjo in številčna oznaka na Y osi
-        if (yMark1 && ky > 12) {
-            y = cv_graphY0 - ky * tmpTemp
+        //---- redka svetlejša linija na vsako stopinjo
+        if (yMark1 && ky / vl_dataRangeFactor > 8) {
+            y = cv_graphY0 - ky * tmpTemp2
             if (y <= cv_graphBottom && y >= cv_graphTopData) {
                 gLine(cv_graphLeft - 2, y, cv_graphRightData, y, 1, "darkGray", [2, 5])
-                tmpStr = tmpTemp.toString() + scStopinj;
+            }
+        }
+        //---- številčna oznaka na Y osi na vsao stopinjo
+        if (yMark1 && ky / vl_dataRangeFactor > 12) {
+            y = cv_graphY0 - ky * tmpTemp2
+            if (y <= cv_graphBottom && y >= cv_graphTopData) {
+                tmpStr = tmpTemp2.toString() + scStopinj;
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                 x = cv_graphLeft - tmpW - tmpShift
                 gText(tmpStr, font, "gray", x, y + tmpH / 2 - 1);
             }
-        }
+        }        
     }
     
     //---- oznake na X osi
@@ -6293,8 +6370,11 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
     //---- postavitev toolTip okvirja znotraj okna
     //---- postavitev po Y-u
     let frameTop = lo_mouseMoveY - frameHeight / 2; //po Y postavi tako, da je cursor na sredini toolTip-a
-    if (frameTop < vp_top) { frameTop = vp_top };   //če zgoraj gre ven, naj se začne na vrhu
-    if (frameTop + frameHeight > cv_graphBottom) { frameTop = cv_graphBottom - frameHeight }; //če spodaj gre ven, naj gre spodaj ravno do roba
+    if (frameTop < vp_top) {
+        frameTop = vp_top;  //če zgoraj gre ven, naj se začne na vrhu
+    } else if (frameTop + frameHeight > cv_graphBottom) {
+        frameTop = cv_graphBottom - frameHeight; //če spodaj gre ven, naj gre spodaj ravno do roba
+    }
     //---- postavitev po X-u
     let frameLeft = lo_mouseMoveX - 8 - frameWidth;                   //postavi toolTip malce levo od kurzorja miške
     if (frameLeft < cv_graphLeft) { frameLeft = lo_mouseMoveX + 10 }; //če levo gre ven, naj se začne na levi na začetku
