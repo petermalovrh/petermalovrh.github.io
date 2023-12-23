@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.10"
-const gl_versionDate = "22.12.2023"
+const gl_versionNr = "v1.11"
+const gl_versionDate = "23.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -113,6 +113,7 @@ var nrMonthsAll = 0;   // število vseh mesečnih podatkov gledano generalno od 
 
 var avgTemp = [];
 var avgTempCache = []; // 19.12.2023
+var avgTempCacheAll = []; // 19.12.2023
 let station, station2;
 
 // ŠKOFJA LOKA
@@ -2013,12 +2014,13 @@ const cv_minMode = 1;
 const cv_maxMode = 3;
 var gl_mode = cv_mode_timeAvgTempSingle;
 var gl_modeLast = gl_mode; // 19.12.2023
-
 //----
 var gl_deltaT = false; // 22.12.2023 ali gledamo T(t) ali pa deltaT(t)
 //var gl_deltaTavgMonths = 24;
 var gl_deltaTLast = gl_deltaT; // 22.12.2023
-
+//----
+var gl_showAvgAllPlace = false; // 22.12.2023
+var gl_showAvgAllPlaceLast = gl_showAvgAllPlace; // 23.12.2023
 //---- nivo prikaza imena lokacije (15.12.2023)
 const cv_showPlaceNameLevel_none = 0;
 const cv_showPlaceNameLevel_abbr = 1;
@@ -3510,6 +3512,9 @@ window.addEventListener("keydown", (event) => {
             lf_changeShowPlaceNameLevel(true); break;
         case 'F9':
             lf_changeShowStations(!lo_showStations, true); break;
+        case 'BracketRight': // "Đ" //23.12.2023 pritisk na tipko "Đ"
+            //console.log("V pressed");
+            gl_showAvgAllPlace = !gl_showAvgAllPlace; paint(); break;
     }
 });
 
@@ -3649,7 +3654,13 @@ function paint() {
             break;
         case false:
             //---- ne riše se prvič ... preverim, ali se je konfiguracija spremenila
-            noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast && gl_deltaT == gl_deltaTLast && lo_nrSmoothYears == lo_nrSmoothYearsLast);
+            //noChangeCond1 = (gl_mode == gl_modeLast && lo_nrMonthsAvg == lo_nrMonthsAvgLast && gl_timeSlice == gl_timeSliceLast && gl_deltaT == gl_deltaTLast && lo_nrSmoothYears == lo_nrSmoothYearsLast);
+            noChangeCond1 = (gl_mode == gl_modeLast);
+            noChangeCond1 = noChangeCond1 && (lo_nrMonthsAvg == lo_nrMonthsAvgLast);
+            noChangeCond1 = noChangeCond1 && (gl_timeSlice == gl_timeSliceLast);
+            noChangeCond1 = noChangeCond1 && (gl_deltaT == gl_deltaTLast);
+            noChangeCond1 = noChangeCond1 && (lo_nrSmoothYears == lo_nrSmoothYearsLast);
+            noChangeCond1 = noChangeCond1 && (gl_showAvgAllPlace == gl_showAvgAllPlaceLast); // 23.12.2023
             //let noChangeCond2 = (valueBetween(gl_monthStart, gl_monthStartLast, gl_monthEndLast) && valueBetween(gl_monthEnd, gl_monthStartLast, gl_monthEndLast));
             //if (noChangeCond1 && noChangeCond2) {
             //    gl_configChanged = false;
@@ -3670,7 +3681,8 @@ function paint() {
     lo_nrMonthsAvgLast = lo_nrMonthsAvg;
     gl_timeSliceLast = gl_timeSlice;
     gl_deltaTLast = gl_deltaT; // 22.12.2023
-    lo_nrSmoothYearsLast = lo_nrSmoothYears; // 22.12.2023
+    lo_nrSmoothYearsLast = lo_nrSmoothYears;      // 22.12.2023
+    gl_showAvgAllPlaceLast = gl_showAvgAllPlace; // 23.12.2023
     //gl_monthStartLast = gl_monthStart;
     //gl_monthEndLast = gl_monthEnd;
     
@@ -4359,7 +4371,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 22;
+            let nrTipRows = 23;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -4422,7 +4434,11 @@ function paint_tips() {
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... " + scDelta + "T(t) smoothing", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
+            //   
+            y += vStep;
+            gBannerRectWithText2(String.fromCharCode(0x0110), x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... all station average", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //                
             y += vStep;
             gBannerRectWithText2("U", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("D", x0 +22, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -5325,7 +5341,7 @@ function paint_graph_timeAvgTemp_cache() {
 
     gl_configChanged = true; // zato da bo pri klicih izračuna vrednosti nafilal to vrednosti tudi v cache
 
-    let place, tmpValue, placeMonth, monthValue, timeSlice;
+    let place, tmpValue, month, placeMonth, monthValue, timeSlice;
     let actualMonthsAvg = cv_nrMonthsAvgMult * lo_nrMonthsAvg;
     for (place = 1; place <= nrPlaces; place++) {
         for (placeMonth = 1; placeMonth <= nrMonths[place]; placeMonth++) {
@@ -5356,40 +5372,67 @@ function paint_graph_timeAvgTemp_cache() {
             }
         }
     }
-    //---- izpis potrebnega časa za izris
-    let myTime2 = Date.now()
-    //console.log("cach fill: " + (myTime2 - myTime1).toString() + "ms");
+  
 
     //-------------------------- SPREMINAJNJE TEMPERATURE --------------------------------
-    if (!gl_deltaT) { return };
+    //if (!gl_deltaT) {
+    //    //---- izpis potrebnega časa za postopek
+    //    let myTime2 = Date.now()
+    //    //console.log("cache fill: " + (myTime2 - myTime1).toString() + "ms");        
+    //    return;
+    //};
 
-    // 22.12.2023 namesto temperatur hočemo spremembo temperature glede na prejšnji interval
-    // se pravi, če timeSliceAll in nrMonthsAvg=3 se pogleda razliko med današnjo vrednostjo in vrednostjo pred 3 leti
-    // da si ne povozim podatkov v cache, grem za vsak place od zadnjega meseca podatkov nazaj proti prvemu
-    for (place = 1; place <= nrPlaces; place++) {
-        for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
-            //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 3 leti, in nato ekstrapoliram z 10/3 na obdobje 10 let
-            //avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - actualMonthsAvg]) * 10 / lo_nrMonthsAvg;
-            //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 10 leti, in to že pove spremembo T na 10 let
-            avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - 120]);
-        }
-    }
-    //---- opravim še 12-mesečno glajenje krivulje. Če glajenje ni zahtevano, preskočim.
-    if (lo_nrSmoothYears > 0) {
-        let sum = 0; let nrData = 0;
+    if (gl_deltaT) {
+        // 22.12.2023 namesto temperatur hočemo spremembo temperature glede na prejšnji interval
+        // se pravi, če timeSliceAll in nrMonthsAvg=3 se pogleda razliko med današnjo vrednostjo in vrednostjo pred 3 leti
+        // da si ne povozim podatkov v cache, grem za vsak place od zadnjega meseca podatkov nazaj proti prvemu
         for (place = 1; place <= nrPlaces; place++) {
             for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
-                sum = 0; nrData = 0;
-                for (month = 0; month <= lo_nrSmoothYears * 12 - 1; month++) {
+                //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 3 leti, in nato ekstrapoliram z 10/3 na obdobje 10 let
+                //avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - actualMonthsAvg]) * 10 / lo_nrMonthsAvg;
+                //---- pri 3-letnem povprečenju pogledam razliko glede na 3-letno povprečje pred 10 leti, in to že pove spremembo T na 10 let
+                avgTempCache[place][placeMonth] = (avgTempCache[place][placeMonth] - avgTempCache[place][placeMonth - 120]);
+            }
+        }
+        //---- opravim še lo_nrSmoothYears-letno glajenje krivulje. Če glajenje ni zahtevano, preskočim.
+        let sum, nrData;
+        if (lo_nrSmoothYears > 0) {
+            let sum = 0; let nrData = 0;
+            for (place = 1; place <= nrPlaces; place++) {
+                for (placeMonth = nrMonths[place]; placeMonth >= 1; placeMonth--) {
+                    sum = 0; nrData = 0;
+                    for (month = 0; month <= lo_nrSmoothYears * 12 - 1; month++) {
+                        if (!isNaN(avgTempCache[place][placeMonth])) {
+                            sum += avgTempCache[place][placeMonth - month];
+                            nrData += 1;
+                        }
+                    }
+                    avgTempCache[place][placeMonth] = sum / nrData;
+                }
+            }
+        }
+    }
+
+    //---- še cache tabela za povprečje vseh (selektiranih) postaj (22.12.2023)
+    for (month = 1; month <= nrMonthsAll; month++) {
+        sum = 0; nrData = 0;
+        for (place = 1; place <= nrPlaces; place++) {
+            if (lo_enabledPlace[place]) {
+                placeMonth = month - offsetMonths[place];
+                if (placeMonth >= 1) {
                     if (!isNaN(avgTempCache[place][placeMonth])) {
-                        sum += avgTempCache[place][placeMonth - month];
+                        sum += avgTempCache[place][placeMonth];
                         nrData += 1;
                     }
                 }
-                avgTempCache[place][placeMonth] = sum / nrData;
             }
-        }        
+        }
+        avgTempCacheAll[month] = sum / nrData;
     }
+
+    //---- izpis potrebnega časa za postopek
+    //let myTime2 = Date.now(); console.log("cache fill: " + (myTime2 - myTime1).toString() + "ms");
+    
 }
 
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
@@ -5428,9 +5471,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     //---- določanje začetnega meseca
     let vl_monthStart
     switch (vp_graphType) {
-        case cv_graphType_vaccExcessDeath: vl_monthStart = gl_monthEnd - gl_tailMonths; break;
-        //case cv_graphType_timeAvgTemp: vl_monthStart = 1; break;
-        case cv_graphType_timeAvgTemp: vl_monthStart = gl_monthStart; break;
+        case cv_graphType_timeAvgTemp:
+            vl_monthStart = gl_monthStart; break;
     }
     //---- določanje razpona mesecev in kx
     let vl_nrMonths = gl_monthEnd - vl_monthStart + 1;
@@ -5450,7 +5492,11 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_minY, vl_maxY, vl_dataRange;
     switch (vp_forceDataRangeY) { //24.10.2023 je Y range že vnaprej določen za vse lokacije enako?
         case false:
-            ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_place, vp_timeSlice, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+            if (gl_showAvgAllPlace && vp_place == cv_allPlace) {
+                ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValuesAvgAllPlace(vp_timeSlice, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+            } else {
+                ;[vl_minY, vl_maxY, vl_dataRange] = lf_inspectDataValues(vp_place, vp_timeSlice, vl_monthStart, gl_monthEnd, lo_nrMonthsAvg)
+            }
             break;
         default:
             vl_minY = vp_minY; vl_maxY = vp_maxY; vl_dataRange = vp_dataRange;
@@ -5742,27 +5788,17 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             gText(tmpStr, font, "darkSlateGray", x, y);
     }
 
-    //---- risanje backround tullTip krogcev in vertikalne linije zanje
+    //---- risanje backround toolTip krogcev in vertikalne linije zanje
     paint_graph_timeAvgTemp_tipBeforeGraph(vp_place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom);
-
-    //---- risanje korelacijske linije precepljenost/excessDeaths
-    //if (vp_graphType == cv_graphType_vaccExcessDeath) {
-    //    paint_graph_vaccExcessDeath_corelationLine(gl_monthEnd, lo_nrMonthsAvg, kx, ky, cv_graphLeftData, cv_graphY0, cv_graphTopData, cv_graphBottom, vp_place)
-    //}
 
     //---- risanje diagrama    
     let xValue, xValue0, monthIndex, kkk;
     let dataLineColor, dataLineColorFinal, dataPointColor, dataPointColorFinal, placeNameColor, dataLineWidth;
     switch (vp_graphType) {
-        case cv_graphType_vaccExcessDeath: xValue0 = 0; break;
-        case cv_graphType_timeAvgTemp: xValue0 = vl_monthStart; break;
+        case cv_graphType_timeAvgTemp:
+            xValue0 = vl_monthStart; break;
     }
-    font = "bold 10pt verdana"
-    let kk = 0;
-    if (gl_monthEnd > 26) {
-        kk = 2; if (gl_tailMonths > 10) { kk = 1 }; if (gl_tailMonths > 20) { kk = 0 }
-    }
-    kk = 0;
+    font = "bold 10pt verdana";
 
     //---- debelina markerja je odvisna od gostote izpisa
     let placeStart, placeEnd;
@@ -5788,95 +5824,105 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_firstGraphDataPoint; //10.12.2023
     let vl_haveValidDataPoints, vl_currentPointValid, vl_previousPointValid, vl_showPoint; //12.12.2023
     let vl_pointUndefData; //14.12.2023
+    let vl_showingAvgAllPlace = false; // 22.12.2023
 
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
     //----------------------------------------------
-    let tmpInt = 226; // =E2
+    let tmpInt = 226; // =0xE2
     let cv_colorHideData = "rgb(" + tmpInt.toString() + ", " + tmpInt.toString() + ", " + tmpInt.toString() + ")";
     for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
         
-        place = placeLoopIndex;
-        //13.2.2023 v1.14
-        vl_focus = false; vl_disabled = false;
-        if (lf_regularPlace(lo_focusPlace)) {
-            if (place == lo_focusPlace) { vl_focus = true }
-            else { vl_disabled = true };
+        //---- 22.12.2023
+        if (placeLoopIndex == placeStart && gl_showAvgAllPlace && vp_place == cv_allPlace) {
+            vl_showingAvgAllPlace = true;
         }
-        //17.5.2023 v1.22 lokacijo, ki je v fokusu (miška nad lokacijo v legendi lokacij) izrišem zadnjo, da je risana čez sive črte drugih lokacij in jo te ne prekrivajo
-        switch (vp_place) {
-            case cv_allPlace:
-                switch (vl_focus) { 
-                    case true: //smo na lokaciji s fokusom
-                        //če lokacija s fokusom ni zadnja lokacija, potem najprej prikažem naslednjo lokacijo in to kot disabled
-                        if (placeLoopIndex < placeEnd) {
-                            vl_focus = false; vl_disabled = true;  //false;
-                            place = placeLoopIndex + 1;
-                        }
-                        break;
-                    default: //nismo na lokaciji s fokusom
-                        //če ena lokacija ima fokus, in je ta lokacija že pred trenutno lokacijo, potem je treba prikazati naslednjo lokacijo, razen če je to zadnja lokacija v zanki (takrat je treba prikazati lokacijo s fokusom)
-                        switch (lf_regularPlace(lo_focusPlace)) { 
-                            case true: //na eni drugi lokaciji je trenutno fokus
-                                if (placeLoopIndex == placeEnd) {
-                                    //ena lokacija ima fokus, mi pa smo sedaj na zadnji lokaciji v zanki, zato je zdaj čas, da se nariše še lokacijo v fokusu, ki bo tako narisana čez vse
-                                    vl_focus = true; vl_disabled = false;
-                                    place = lo_focusPlace;
-                                } else if (placeLoopIndex > lo_focusPlace) {
-                                    //ena lokacija ima fokus, mi pa smo sedaj za njo, kar pomeni, da moramo risati eno naprej in to v disabled načinu 
-                                    vl_focus = false; vl_disabled = true;
-                                    place = placeLoopIndex + 1;
-                                }
-                                break;
-                            default: //nobena lokacija nima fokusa
-                                //normalno rišemo tekočo lokacijo
-                                break;
-                        }
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
-        //---- če je prikaz lokacije izključen, potem to lokacijo preskočim (25.1.2023 v1.1)
-        if (!lo_enabledPlace[place]) { continue };
-        //
-        //if (place == cv_fin) {
-        //    place = place
-        //};
-        placeNameColor = placeColor[place];
-        dataLineWidth = 1;
-        switch (vp_graphType) {
-            case cv_graphType_vaccExcessDeath:
-                switch (vp_place) {
-                    case cv_allPlace: dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(80, placeColor[place]); break;
-                    default: dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; break;
-                }
-                break;
-            case cv_graphType_timeAvgTemp:
-                dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; break;
+        //---- 22.12.2023
+        if (vl_showingAvgAllPlace) {
+            vl_disabled = false; vl_focus = false;
+            dataPointColor = "darkBlue"; dataLineColor = "darkBlue"; placeNameColor = "darkBlue";
+        } else {
+            place = placeLoopIndex;
+            //13.2.2023 v1.14
+            vl_focus = false; vl_disabled = false;
+            if (lf_regularPlace(lo_focusPlace)) {
+                if (place == lo_focusPlace) { vl_focus = true }
+                else { vl_disabled = true };
+            }
+            //17.5.2023 v1.22 lokacijo, ki je v fokusu (miška nad lokacijo v legendi lokacij) izrišem zadnjo, da je risana čez sive črte drugih lokacij in jo te ne prekrivajo
+            switch (vp_place) {
+                case cv_allPlace:
+                    switch (vl_focus) {
+                        case true: //smo na lokaciji s fokusom
+                            //če lokacija s fokusom ni zadnja lokacija, potem najprej prikažem naslednjo lokacijo in to kot disabled
+                            if (placeLoopIndex < placeEnd) {
+                                vl_focus = false; vl_disabled = true;  //false;
+                                place = placeLoopIndex + 1;
+                            }
+                            break;
+                        default: //nismo na lokaciji s fokusom
+                            //če ena lokacija ima fokus, in je ta lokacija že pred trenutno lokacijo, potem je treba prikazati naslednjo lokacijo, razen če je to zadnja lokacija v zanki (takrat je treba prikazati lokacijo s fokusom)
+                            switch (lf_regularPlace(lo_focusPlace)) {
+                                case true: //na eni drugi lokaciji je trenutno fokus
+                                    if (placeLoopIndex == placeEnd) {
+                                        //ena lokacija ima fokus, mi pa smo sedaj na zadnji lokaciji v zanki, zato je zdaj čas, da se nariše še lokacijo v fokusu, ki bo tako narisana čez vse
+                                        vl_focus = true; vl_disabled = false;
+                                        place = lo_focusPlace;
+                                    } else if (placeLoopIndex > lo_focusPlace) {
+                                        //ena lokacija ima fokus, mi pa smo sedaj za njo, kar pomeni, da moramo risati eno naprej in to v disabled načinu 
+                                        vl_focus = false; vl_disabled = true;
+                                        place = placeLoopIndex + 1;
+                                    }
+                                    break;
+                                default: //nobena lokacija nima fokusa
+                                    //normalno rišemo tekočo lokacijo
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            //---- če je prikaz lokacije izključen, potem to lokacijo preskočim (25.1.2023 v1.1)
+            if (!lo_enabledPlace[place]) { continue };
+            //
+            //if (place == cv_fin) {
+            //    place = place
+            //};
+            placeNameColor = placeColor[place];
+            dataLineWidth = 1;
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath:
+                    switch (vp_place) {
+                        case cv_allPlace: dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(80, placeColor[place]); break;
+                        default: dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; break;
+                    }
+                    break;
+                case cv_graphType_timeAvgTemp:
+                    dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; break;
                 //24.7.2023 tole spodaj sem raje spet ukinil, ker je delalo narobe
                 //switch (vp_place) {
                 //    case cv_allPlace: dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(80, placeColor[place]); break;
                 //    default: dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; break;
                 //}
                 //break;            
+            }
+            if (vl_focus) {
+                dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; dataLineWidth = 2;
+            };
+            //---- 15.12.2023
+            dataLineWidth += lo_addMarkWidth;
+            if (dataLineWidth < 1) { dataLineWidth = 1 };
+            //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray"; };
+            if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(25, placeColor[place]); placeNameColor = "lightGray"; };
+            //console.log("placeNameColor=" + placeNameColor);
         }
-        if (vl_focus) {
-            dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; dataLineWidth = 2;
-        };
-        //---- 15.12.2023
-        dataLineWidth += lo_addMarkWidth;
-        if (dataLineWidth < 1) { dataLineWidth = 1 };
-        //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray"; };
-        if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = gf_alphaColor(25, placeColor[place]); placeNameColor = "lightGray";};
-        //console.log("placeNameColor=" + placeNameColor);
-        
+
         //-----------------------------------------
         //---- GRAF: najprej linije med krogci točk
         //-----------------------------------------
         vl_xOld = 0; vl_xOldExact = 0; vl_pointUndefData = false;
-        offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
         vl_firstGraphDataPoint = true;
         vl_haveValidDataPoints = false; vl_currentPointValid = false; vl_previousPointValid = false; //12.12.2023
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
@@ -5884,10 +5930,14 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //---- zanka čez vse mesece v izbranem razponu
         if (vl_drawLines) {
             for (month = vl_monthStart; month <= gl_monthEnd; month++) {
-                if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
-                placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
-                if (gf_withinUndefPeriod(place, month)) { vl_pointUndefData = true; continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
-                //if (vl_pointUndefData) { vl_pointUndefData = false; continue }; // če je bila prejšnja točka še v nedefiniranem področju, potem linije ne rišem, za naprej si pa popravim, da zdaj nismo več v nedefiniranem področju
+                if (vl_showingAvgAllPlace) {
+                    placeMonth = month
+                } else {
+                    if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
+                    placeMonth = month - offsetMonths[place];      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
+                    if (gf_withinUndefPeriod(place, month)) { vl_pointUndefData = true; continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+                    //if (vl_pointUndefData) { vl_pointUndefData = false; continue }; // če je bila prejšnja točka še v nedefiniranem področju, potem linije ne rišem, za naprej si pa popravim, da zdaj nismo več v nedefiniranem področju
+                }
                 monthIndex = month - vl_monthStart + 1       //na grafu je tole zaporedna številka meseca po X osi
                 tmpMonthValue = lf_monthValue(month);
                 switch (vp_graphType) {
@@ -5897,7 +5947,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 //---- če imamo povprečenje vrednosti (lo_nrMonthsAvg>0), in se zahteva tudi izris točnih posameznih vrednosti (gl_showExactValuesToo), 
                 //     zraven pa moramo imeti ali samo eno selektirano lokacijo (nrSelectedPlaces==1), ali pa risanje lokacije v fokusu (place == lo_focusPlace),
                 //     potem najprej posivljeno izrišem točno vrednost (6.12.2023)            
-                if (lo_nrMonthsAvg > 0 && gl_showExactLinesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
+                if (!vl_showingAvgAllPlace && lo_nrMonthsAvg > 0 && gl_showExactLinesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                     yValue = avgTemp[place][placeMonth];
                     y = cv_graphY0 - ky * yValue
                     gLine(vl_xOldExact, vl_yOldExact, x, y, dataLineWidth, gf_alphaColor(80, placeColor[place]), []);
@@ -5912,12 +5962,16 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
                         tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
                         if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
-                        if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                        if (vl_showingAvgAllPlace) {
+                            if (month < 3) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                        } else {
+                            if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                        }
                         break;
                 }
-                if (vp_timeSlice == cv_timeSliceWinter && lf_yearValue(month) == 2015 && tmpMonthValue == 2) {
-                    month = month;
-                }
+                //if (vp_timeSlice == cv_timeSliceWinter && lf_yearValue(month) == 2015 && tmpMonthValue == 2) {
+                //    month = month;
+                //}
                 //---- glede timeSlice smo na pravi točki (mesecu). Je ta v redu z vidika povprečenja?
                 if (vl_previousPointValid) {
                     //---- ker je prejšnja valid, je tudi ta sigurno valid
@@ -5927,7 +5981,11 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     vl_currentPointValid = paint_graph_timeAvgTemp_enoughDataForAveraging(placeMonth, vp_timeSlice);
                 }
                 //---- zdaj pa še osnovno zahtevano povezovanje vrednosti            
-                yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+                if (vl_showingAvgAllPlace) {
+                    yValue = avgTempCacheAll[month];
+                } else {
+                    yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+                }
                 y = cv_graphY0 - ky * yValue
                 //---- pri prvi podatkovni točki še ne more biti linije od prejšnje do te
                 //---- pogoj za prvi data point pa je odvisen od vp_timeSlice (10.12.2023)
@@ -5983,9 +6041,13 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             //if (month == 901) { //debug
             //    month = month;
             //}
-            if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
-            placeMonth = month - offsetPlaceMonths;      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
-            if (gf_withinUndefPeriod(place, month)) { continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+            if (vl_showingAvgAllPlace) {
+                placeMonth = month
+            } else {
+                if (!valueBetween(month, firstMonth[place], lastMonth[place])) { continue }; //6.12.2023
+                placeMonth = month - offsetMonths[place];      //4.12.2023 ta mesec je v podatkih te lokacije na mestu placeMonth med podatki
+                if (gf_withinUndefPeriod(place, month)) { continue }; //---- 14.12.2023 če smo na mesecu in lokaciji znotraj katerega od nedefiniranih intervalov podatkov
+            }
             monthIndex = month - vl_monthStart + 1;      //na grafu je tole zaporedna številka meseca po X osi
             tmpMonthValue = lf_monthValue(month);
             switch (vp_graphType) {
@@ -5995,7 +6057,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             //---- če imamo povprečenje vrednosti (lo_nrMonthsAvg>0), in se zahteva tudi izris točnih posameznih vrednosti (gl_showExactValuesToo), 
             //     zraven pa moramo imeti ali samo eno selektirano lokacijo (nrSelectedPlaces==1), ali pa risanje lokacije v fokusu (place == lo_focusPlace),
             //     potem najprej posivljeno izrišem točno vrednost (6.12.2023)
-            if (lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
+            if (!vl_showingAvgAllPlace && lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
                 if (y > cv_graphTopAxis) { //ne sme biti nad področjem predvidenim za graf
@@ -6011,11 +6073,19 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
                     tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter);   //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
                     if (tmpMonthValue !== tmpMonthValue2) { continue };             //rišem pri zadnjem mesecu letnega časa
-                    if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                    if (vl_showingAvgAllPlace) {
+                        if (month < 3) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                    } else {
+                        if (!valueBetween(placeMonth, 3, nrMonths[place])) { continue } //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                    }
                     break;                
             }
             //---- zdaj pa še osnovno zahtevano označevanje vrednosti
-            yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            if (vl_showingAvgAllPlace) {
+                yValue = avgTempCacheAll[month];
+            } else {
+                yValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg);
+            }
             y = cv_graphY0 - ky * yValue
             //---- za risanje ne smemo biti preko maxY
             if (y >= cv_graphTopAxis) {
@@ -6037,132 +6107,134 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 lastPlaceMarkerY[place] = y;
             }
         }
+        if (vl_showingAvgAllPlace) { break }; // 23.12.2023 če smo risali za povprečje lokacij, potem ne smem nadaljevati zanke po lokacijah
     }
     //---------------------------------------------------------------------------
     //---- zdaj pa še za oznake lokacij, zato da so te v vsakem primeru preko krogcev točk in linij med krogci (ta problem je sicer le pri VACC-ExcessDeath diagramu)
     //---------------------------------------------------------------------------
     //---- zanka čez vse mesece v izbranem razponu
-    for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
-        place = placeLoopIndex;
-        //13.2.2023 v1.14
-        vl_focus = false; vl_disabled = false;
-        if (lf_regularPlace(lo_focusPlace)) {
-            if (place == lo_focusPlace) { vl_focus = true }
-            else { vl_disabled = true };
-        }
-        //17.5.2023 v1.22 lokacijo, ki je v fokusu (miška nad lokacijo v legendi lokacij) izrišem zadnjo, da je risana čez sive črte drugih lokacij in jo te ne prekrivajo
-        //srednji pogoj spodaj dodal 24.7.2023, da naslednje lokacije od fokusirane ne izpiše z neko srednje močno barvo
-        switch (vp_place) {
-            case cv_allPlace:
-                if (vl_focus && placeLoopIndex < placeEnd) {
-                    vl_focus = false; vl_disabled = true;
-                    place = placeLoopIndex + 1;
-                } else if (!vl_focus && lf_regularPlace(lo_focusPlace) && placeLoopIndex > lo_focusPlace && placeLoopIndex < placeEnd) {
-                    vl_focus = false; vl_disabled = true;
-                    place = placeLoopIndex + 1;
-                } else if (!vl_focus && lf_regularPlace(lo_focusPlace) && placeLoopIndex == placeEnd) {
-                    vl_focus = true; vl_disabled = false;
-                    place = lo_focusPlace;
-                }
-                break;
-            default:
-                break;
-        }
-        //---- če je prikaz lokacije izključen, potem to lokacijo preskočim (25.1.2023 v1.1)
-        if (!lo_enabledPlace[place]) { continue };
-        month = gl_monthEnd
-        monthIndex = month - vl_monthStart + 1
-        switch (vp_graphType) {
-            case cv_graphType_vaccExcessDeath:
-                xValue = placeVaccByMonth[place][month - 1];
-                break;
-            case cv_graphType_timeAvgTemp:
-                //---- če so se podatki za to lokacijo končali že prej kot na gl_monthEnd, je treba mesec postaviti na zadnji mesec podatkov te lokacije (5.12.2023)
-                if (lastMonth[place] < month) {
-                    month = lastMonth[place];
-                    monthIndex = month - vl_monthStart + 1;
-                };
-                xValue = month;
-                break;
-        }
-
-        //---- 8.12.2023 izpis lokacije v kotu desno zgoraj v primeru MULTI grafov sem preselil sem, da se izpiše tudi za lokacije, ki so že definirane, nimajo pa še definiranih podatkov.
-        //if (vp_place != cv_allPlace) {
-        //    tmpStr = placeName[place];
-        //    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-        //    gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
-        //}
-        switch (vp_place) {
-            case cv_allPlace:
-                //---- risanje skupno za vse lokacije. Vprašanje je, ali delamo ločeno po mesecih ali letnih časih (multiTimeSlice), ali ne?
-                switch (gl_mode) {
-                    case cv_mode_timeAvgTempMultiTimeSlice:
-                        //---- multi mode - risanje skupno za vse lokacije in ločeno po mesecih ali pa letnih časih
-                        tmpStr = lf_setTimeSliceNameENG(vp_timeSlice);
-                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                        gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "gray", 1, "lightGray", "bold 10pt verdana", "white", tmpStr, "lightGray", 2, 2);
-                        break;
-                }
-                break;
-            default:
-                //---- risanje ločeno za eno lokacijo, se pravi da smo očitno v multiPlace mode
-                tmpStr = placeName[place];
+    font = "bold 10pt verdana";
+    if (vl_showingAvgAllPlace) {
+        switch (gl_mode) {
+            case cv_mode_timeAvgTempMultiTimeSlice:
+                //---- multi mode - risanje skupno za vse lokacije in ločeno po mesecih ali pa letnih časih
+                tmpStr = lf_setTimeSliceNameENG(vp_timeSlice);
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+                gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "gray", 1, "lightGray", "bold 10pt verdana", "white", tmpStr, "lightGray", 2, 2);
                 break;
         }
-
-        //---- če je mesec prikaza lokacije izven podatkovnega območja te lokacije
-        if (month < firstMonth[place]) { continue };
-
-        x = cv_graphLeftData + kx * (xValue - xValue0);
-        yValue = lf_getAvgValue(place, vp_timeSlice, lf_getPlaceMonthDataIndex(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
-        y = cv_graphY0 - ky * yValue
-
-        placeNameColor = placeColor[place];
-        //if (vl_focus) { dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; };
-        //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray" };
-        if (vl_disabled) { placeNameColor = "lightGray" };
-        //console.log("placeNameColor=" + placeNameColor);
-        switch (vp_graphType) {
-            case cv_graphType_vaccExcessDeath:
-                kk = 0;
-                x = x - kk * (vl_nrMonths / 2 - monthIndex + 1);
-                switch (vp_place) {
-                    case cv_allPlace:
-                        tmpStr = placeNameAbbr[place];
-                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                        gBannerRectWithText(x + 10, y - 8, x + tmpW + 9, y + 4, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2)
-                        break;
-                }
-                break;
-            case cv_graphType_timeAvgTemp:
-                //tmpStr = placeNameAbbr[place];
-                //tmpStr = placeName[place];
-                if (gl_showPlaceNameLevel !== cv_showPlaceNameLevel_none) { //15.12.2023
-                    switch (gl_showPlaceNameLevel) {
-                        case cv_showPlaceNameLevel_abbr: tmpStr = placeNameAbbr[place]; break;
-                        case cv_showPlaceNameLevel_short: tmpStr = placeNameShort[place]; break;
-                        case cv_showPlaceNameLevel_full: tmpStr = placeName[place]; break;
+    } else {
+        for (placeLoopIndex = placeStart; placeLoopIndex <= placeEnd; placeLoopIndex++) {
+            place = placeLoopIndex;
+            //13.2.2023 v1.14
+            vl_focus = false; vl_disabled = false;
+            if (lf_regularPlace(lo_focusPlace)) {
+                if (place == lo_focusPlace) { vl_focus = true }
+                else { vl_disabled = true };
+            }
+            //17.5.2023 v1.22 lokacijo, ki je v fokusu (miška nad lokacijo v legendi lokacij) izrišem zadnjo, da je risana čez sive črte drugih lokacij in jo te ne prekrivajo
+            //srednji pogoj spodaj dodal 24.7.2023, da naslednje lokacije od fokusirane ne izpiše z neko srednje močno barvo
+            switch (vp_place) {
+                case cv_allPlace:
+                    if (vl_focus && placeLoopIndex < placeEnd) {
+                        vl_focus = false; vl_disabled = true;
+                        place = placeLoopIndex + 1;
+                    } else if (!vl_focus && lf_regularPlace(lo_focusPlace) && placeLoopIndex > lo_focusPlace && placeLoopIndex < placeEnd) {
+                        vl_focus = false; vl_disabled = true;
+                        place = placeLoopIndex + 1;
+                    } else if (!vl_focus && lf_regularPlace(lo_focusPlace) && placeLoopIndex == placeEnd) {
+                        vl_focus = true; vl_disabled = false;
+                        place = lo_focusPlace;
                     }
-                    //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    switch (vp_place) {
-                        case cv_allPlace:
-                            //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
-                            //gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
-                            if (lo_addMarkWidth >= 3) {
-                                gText(tmpStr, "bold 11pt verdana", placeNameColor, lastPlaceMarkerX[place] + 10, lastPlaceMarkerY[place] + 3);
-                            } else if (lo_addMarkWidth >= 2) {
-                                gText(tmpStr, "normal 10pt verdana", placeNameColor, lastPlaceMarkerX[place] + 9, lastPlaceMarkerY[place] + 3);
-                            } else {
-                                gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
-                            }
+                    break;
+                default:
+                    break;
+            }
+            //---- če je prikaz lokacije izključen, potem to lokacijo preskočim (25.1.2023 v1.1)
+            if (!lo_enabledPlace[place]) { continue };
+            month = gl_monthEnd
+            monthIndex = month - vl_monthStart + 1
+            switch (vp_graphType) {
+                case cv_graphType_vaccExcessDeath:
+                    xValue = placeVaccByMonth[place][month - 1];
+                    break;
+                case cv_graphType_timeAvgTemp:
+                    //---- če so se podatki za to lokacijo končali že prej kot na gl_monthEnd, je treba mesec postaviti na zadnji mesec podatkov te lokacije (5.12.2023)
+                    if (lastMonth[place] < month) {
+                        month = lastMonth[place];
+                        monthIndex = month - vl_monthStart + 1;
+                    };
+                    xValue = month;
+                    break;
+            }
+
+            //---- 8.12.2023 izpis lokacije v kotu desno zgoraj v primeru MULTI grafov sem preselil sem, da se izpiše tudi za lokacije, ki so že definirane, nimajo pa še definiranih podatkov.
+            //if (vp_place != cv_allPlace) {
+            //    tmpStr = placeName[place];
+            //    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            //    gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+            //}
+            switch (vp_place) {
+                case cv_allPlace:
+                    //---- risanje skupno za vse lokacije. Vprašanje je, ali delamo ločeno po mesecih ali letnih časih (multiTimeSlice), ali ne?
+                    switch (gl_mode) {
+                        case cv_mode_timeAvgTempMultiTimeSlice:
+                            //---- multi mode - risanje skupno za vse lokacije in ločeno po mesecih ali pa letnih časih
+                            tmpStr = lf_setTimeSliceNameENG(vp_timeSlice);
+                            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                            gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "gray", 1, "lightGray", "bold 10pt verdana", "white", tmpStr, "lightGray", 2, 2);
                             break;
                     }
-                }
-                break;
+                    break;
+                default:
+                    //---- risanje ločeno za eno lokacijo, se pravi da smo očitno v multiPlace mode
+                    tmpStr = placeName[place];
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    gBannerRectWithText(vp_left + vp_width - 6 - tmpW, vp_top + 5, vp_left + vp_width - 6, vp_top + 15, 3, 3, "white", 1, "lightGray", "bold 10pt verdana", placeNameColor, tmpStr, "lightGray", 2, 2);
+                    break;
+            }
+
+            //---- če je mesec prikaza lokacije izven podatkovnega območja te lokacije
+            if (month < firstMonth[place]) { continue };
+
+            x = cv_graphLeftData + kx * (xValue - xValue0);
+            yValue = lf_getAvgValue(place, vp_timeSlice, lf_getPlaceMonthDataIndex(place, month), cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            y = cv_graphY0 - ky * yValue
+
+            placeNameColor = placeColor[place];
+            //if (vl_focus) { dataLineColor = placeColor[place]; dataPointColor = placeColor[place]; };
+            //if (vl_disabled) { dataLineColor = "lightGray"; dataPointColor = "lightGray"; placeNameColor = "lightGray" };
+            if (vl_disabled) { placeNameColor = "lightGray" };
+            //console.log("placeNameColor=" + placeNameColor);
+            switch (vp_graphType) {
+                case cv_graphType_timeAvgTemp:
+                    //tmpStr = placeNameAbbr[place];
+                    //tmpStr = placeName[place];
+                    if (gl_showPlaceNameLevel !== cv_showPlaceNameLevel_none) { //15.12.2023
+                        switch (gl_showPlaceNameLevel) {
+                            case cv_showPlaceNameLevel_abbr: tmpStr = placeNameAbbr[place]; break;
+                            case cv_showPlaceNameLevel_short: tmpStr = placeNameShort[place]; break;
+                            case cv_showPlaceNameLevel_full: tmpStr = placeName[place]; break;
+                        }
+                        //;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                        switch (vp_place) {
+                            case cv_allPlace:
+                                //gText(tmpStr, "normal 9pt verdana", placeNameColor, x + 8, y + 3);
+                                //gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                                if (lo_addMarkWidth >= 3) {
+                                    gText(tmpStr, "bold 11pt verdana", placeNameColor, lastPlaceMarkerX[place] + 10, lastPlaceMarkerY[place] + 3);
+                                } else if (lo_addMarkWidth >= 2) {
+                                    gText(tmpStr, "normal 10pt verdana", placeNameColor, lastPlaceMarkerX[place] + 9, lastPlaceMarkerY[place] + 3);
+                                } else {
+                                    gText(tmpStr, "normal 9pt verdana", placeNameColor, lastPlaceMarkerX[place] + 8, lastPlaceMarkerY[place] + 3);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+            }
+            vl_xOld = x; vl_yOld = y
         }
-        vl_xOld = x; vl_yOld = y
     }
 
     //---- foreground toolTip krogci
@@ -7212,6 +7284,47 @@ function lf_inspectDataValues(vp_place, vp_timeSlice, vp_monthStart, vp_monthEnd
                 }
             }
         }
+    }
+    if (minY > 0) { minY = 0 };
+    return [minY, maxY, maxY - minY]
+}
+
+function lf_inspectDataValuesAvgAllPlace(vp_timeSlice, vp_monthStart, vp_monthEnd, vp_nrMonthsAvg) {
+    //----------------------------------------------
+    // 22.12.2023
+    //----------------------------------------------
+
+    //console.log("------------------------")
+
+    let minY = 101
+    let maxY = -50
+    let tmpValue, tmpMonthValue, tmpMonthValue2, placeMonth;
+
+    //---- zanka čez ustrezne mesece povprečja vseh lokacij
+    for (month = vp_monthStart; month <= vp_monthEnd; month++) {
+        //---- potrebno je upoštevati vp_timeSlice, se pravi ali delamo za vse, za mesec, ali za letni čas
+        switch (vp_timeSlice) {
+            case cv_timeSliceAll: break; //podatek v vsakem primeru upoštevamo
+            case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12:
+                if (lf_monthValue(month) !== vp_timeSlice) { continue };
+                break;
+            case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn:
+                tmpMonthValue = lf_monthValue(month);
+                tmpMonthValue2 = 2 + 3 * (vp_timeSlice - cv_timeSliceWinter); //mora priti 2 za zimo, 5 za pomlad, 8 za poletje in 11 za jesen, primer za poletje: 2+3*(15-13)=8
+                if (tmpMonthValue !== tmpMonthValue2) { continue };           //računam pri zadnjem mesecu letnega časa
+                if (!valueBetween(month, 3, nrMonthsAll)) { continue };       //podatki morajo biti prisotni za vse tri mesece tega letnega časa, torej tudi za prva dva meseca tega letnega časa
+                break;
+        }
+        tmpValue = avgTempCacheAll[month];
+        if (tmpValue < minY) {
+            minY = tmpValue
+            //console.log("AllPlaceAvg: month=" + month + " minY=" + minY + " (maxY="+maxY+")")
+        }
+        if (tmpValue > maxY) {
+            maxY = tmpValue
+            //console.log("AllPlaceAvg: month=" + month + " maxY=" + maxY + " (minY="+minY+")")
+        }
+
     }
     if (minY > 0) { minY = 0 };
     return [minY, maxY, maxY - minY]
