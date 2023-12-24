@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.11"
-const gl_versionDate = "23.12.2023"
+const gl_versionNr = "v1.12"
+const gl_versionDate = "24.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -15,6 +15,7 @@ console.clear;
 // https://codepen.io/   ... The best place to build, test, and discover front-end code. (primer: https://codepen.io/alterebro/pen/VNJmEJ)
 
 //https://www.w3schools.com/charsets/ref_utf_basic_latin.asp
+//https://www.toptal.com/developers/keycode/table
 //https://stackoverflow.com/questions/13093126/insert-unicode-character-into-javascript
 // � (U+00B0)   � (U+00B6)    ? (U+03B1)   ? (U+221A)
 const scAlpha = String.fromCharCode(0x3B1)
@@ -6502,8 +6503,9 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
     const cv_heightSingle = 16;
     let cv_heightBody;
     let tmpStr, tmpW, tmpH, font, x, y;
-    let place; //, offsetPlaceMonths;
+    let place;
     //prilagoditev širine in višine toolTip okvirja
+    font = "normal 12px verdana";
     switch (vp_place) {
         case cv_allPlace:
             //if (!lo_enabledPlace[cv_placeSkofjaLoka]) {
@@ -6515,20 +6517,26 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
             //cv_heightBody = nrSelectedPlaces * cv_heightSingle   //zakomentiral 4.12.2023, ker selektiranih lokacoij je že lahko toliko, a nimajo vse podatkov na mesti toolTip-a!
             let tipPlacesWithData = 0;
             let maxWidth = 0;
-            for (place = 1; place <= nrPlaces; place++) { 
-                if (!lo_enabledPlace[place]) { continue };
-                //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
-                //if (lo_tipMonth <= offsetPlaceMonths) { continue }
-                //if (lo_tipMonth <= offsetMonths[place]) { continue }
-                if (!valueBetween(lo_tipMonth, firstMonth[place], lastMonth[place])) { continue }
-                tipPlacesWithData += 1;
-                font = "normal 12px verdana";
-                tmpStr = placeName[place];
+            if (gl_showAvgAllPlace) {
+                tmpStr = "average";
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                if (tmpW > maxWidth) { maxWidth = tmpW }
+                if (tmpW > 110) { frameWidth = tmpW + 64 };
+                cv_heightBody = cv_heightSingle;
+            } else {
+                for (place = 1; place <= nrPlaces; place++) { 
+                    if (!lo_enabledPlace[place]) { continue };
+                    //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
+                    //if (lo_tipMonth <= offsetPlaceMonths) { continue }
+                    //if (lo_tipMonth <= offsetMonths[place]) { continue }
+                    if (!valueBetween(lo_tipMonth, firstMonth[place], lastMonth[place])) { continue }
+                    tipPlacesWithData += 1;
+                    tmpStr = placeName[place];
+                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                    if (tmpW > maxWidth) { maxWidth = tmpW }
+                }
+                cv_heightBody = tipPlacesWithData * cv_heightSingle
+                if (maxWidth > 110) { frameWidth = maxWidth + 64 };
             }
-            cv_heightBody = tipPlacesWithData * cv_heightSingle
-            if (maxWidth > 110) { frameWidth = maxWidth + 64 };
             break;
         default:
             //if (vp_place!=cv_placeSkofjaLoka) {
@@ -6540,7 +6548,13 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
             cv_heightBody = cv_heightSingle
             //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
             //if (lo_tipMonth <= offsetPlaceMonths) { cv_heightBody = 0 }
-            if (lo_tipMonth <= offsetMonths[place]) { cv_heightBody = 0 }
+            if (lo_tipMonth <= offsetMonths[place]) {
+                cv_heightBody = 0
+            } else {
+                tmpStr = placeName[vp_place];
+                ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+                if (tmpW > 110) { frameWidth = tmpW + 64 }
+            }
             break
     }
     const frameHeight = cv_heightMonth + cv_heightBody - 3;
@@ -6581,27 +6595,39 @@ function paint_graph_timeAvgTemp_tipContent_timeAvgTemp(vp_place, vp_timeSlice, 
     const cv_xDvopicje = frameLeft + frameWidth - 50;
     y += 20;
     font = "normal 12px verdana";
-    for (place = 1; place <= nrPlaces; place++) {
-        if (!lo_enabledPlace[place]) { continue };
-        if (vp_place != cv_allPlace && place != vp_place) { continue };
-        //----
-        //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
-        //if (lo_tipMonth <= offsetPlaceMonths) { continue }
-        //if (lo_tipMonth <= offsetMonths[place]) { continue }
-        if (!valueBetween(lo_tipMonth, firstMonth[place], lastMonth[place])) { continue }
-        //----
-        tmpStr = placeName[place];
+    if (gl_showAvgAllPlace && vp_place == cv_allPlace) {
+        tmpStr = "average";
         ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
         x = cv_xDvopicje - cv_gapLeft - tmpW;
-        gText(tmpStr, font, placeColor[place], x, y);
+        gText(tmpStr, font, "darkBlue", x, y);
         //----
         gText(":", font, "darkSlateGray", cv_xDvopicje, y);
         //----
-        //gText(lf_getAvgValue(place, lo_tipMonth - offsetPlaceMonths, cv_nrMonthsAvgMult * lo_nrMonthsAvg).toFixed(1) + scStopinj, font, placeColor[place], cv_xDvopicje + cv_gapRight, y);
-        gText(lf_getAvgValue(place, vp_timeSlice, lo_tipMonth - offsetMonths[place], cv_nrMonthsAvgMult * lo_nrMonthsAvg).toFixed(1) + scStopinj, font, placeColor[place], cv_xDvopicje + cv_gapRight, y);
-        //----
-        y += cv_heightSingle;
+        gText(avgTempCacheAll[lo_tipMonth].toFixed(1) + scStopinj, font, "darkBlue", cv_xDvopicje + cv_gapRight, y);
+    } else {
+        for (place = 1; place <= nrPlaces; place++) {
+            if (!lo_enabledPlace[place]) { continue };
+            if (vp_place != cv_allPlace && place != vp_place) { continue };
+            //----
+            //offsetPlaceMonths = (12 * minYear[place] + minMonth[place]) - (12 * minYearAll + minMonthAll); //4.12.2023
+            //if (lo_tipMonth <= offsetPlaceMonths) { continue }
+            //if (lo_tipMonth <= offsetMonths[place]) { continue }
+            if (!valueBetween(lo_tipMonth, firstMonth[place], lastMonth[place])) { continue }
+            //----
+            tmpStr = placeName[place];
+            ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
+            x = cv_xDvopicje - cv_gapLeft - tmpW;
+            gText(tmpStr, font, placeColor[place], x, y);
+            //----
+            gText(":", font, "darkSlateGray", cv_xDvopicje, y);
+            //----
+            //gText(lf_getAvgValue(place, lo_tipMonth - offsetPlaceMonths, cv_nrMonthsAvgMult * lo_nrMonthsAvg).toFixed(1) + scStopinj, font, placeColor[place], cv_xDvopicje + cv_gapRight, y);
+            gText(lf_getAvgValue(place, vp_timeSlice, lo_tipMonth - offsetMonths[place], cv_nrMonthsAvgMult * lo_nrMonthsAvg).toFixed(1) + scStopinj, font, placeColor[place], cv_xDvopicje + cv_gapRight, y);
+            //----
+            y += cv_heightSingle;
+        }
     }
+
 }
 
 function paint_graph_timeAvgTemp_tipBeforeGraph(vp_place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky, cv_graphLeft, cv_graphRight, cv_graphTopData, cv_graphBottom) {
@@ -6642,9 +6668,14 @@ function paint_graph_timeAvgTemp_tipBeforeGraph(vp_place, vp_timeSlice, vl_month
         //---- risanje background toolTip krogcev
         switch (gl_mode) {
             case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiTimeSlice:
-                for (place = 1; place <= nrPlaces; place++) {
-                    paint_graph_timeAvgTemp_tipMarkerDown(place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                if (gl_showAvgAllPlace) {
+                    paint_graph_timeAvgTemp_tipMarkerDown(cv_allPlace, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                } else {
+                    for (place = 1; place <= nrPlaces; place++) {
+                        paint_graph_timeAvgTemp_tipMarkerDown(place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                    }
                 }
+  
                 break;
             case cv_mode_timeAvgTempMultiPlace:
                 paint_graph_timeAvgTemp_tipMarkerDown(vp_place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
@@ -6694,8 +6725,12 @@ function paint_graph_timeAvgTemp_tipAfterGraph(vp_place, vp_timeSlice, vl_monthS
                     break;                    
             }            
             //grem čez vse lokacije in pri vsaki za lo_tipMonth narišem foreground marker
-            for (place = 1; place <= nrPlaces; place++) {
-                paint_graph_timeAvgTemp_tipMarkerUp(place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            if (gl_showAvgAllPlace) { // 24.12.2023
+                paint_graph_timeAvgTemp_tipMarkerUp(cv_allPlace, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+            } else {
+                for (place = 1; place <= nrPlaces; place++) {
+                    paint_graph_timeAvgTemp_tipMarkerUp(place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky);
+                }
             }
             break;
         case cv_mode_timeAvgTempMultiPlace:
@@ -6732,34 +6767,35 @@ function paint_graph_timeAvgTemp_tipMarkerDown(vp_place, vp_timeSlice, vl_monthS
     if (!lo_showToolTips) { return };
     if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
 
-    //lokacija mora biti selektirana
-    if (!lo_enabledPlace[vp_place]) { return };
-
-    //položaj miške za toolTip mora biti v področju s podatki za to lokacijo (4.12.2023)
-    if (lo_tipMonth <= offsetMonths[vp_place]) { return }
-    
-    //---- izračun koordinat tekočega data point-a
-    let x, y, yValue;
-    switch (gl_mode) {
-        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempMultiTimeSlice:
-            x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
-            y = cv_graphY0 - ky * yValue
-            break;
-        case cv_mode_vaccExcessDeathMulti:
-            x = placeGraphLeftData[vp_place] + placeVaccByMonth[vp_place][lo_focusMonth - 1] * placeGraphKx[vp_place];
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_focusMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg);
-            y = placeGraphBottomAxis[vp_place] - yValue * placeGraphKy[vp_place];
-            break;
-        case cv_mode_vaccExcessDeath:
-            x = lo_graphLeftData + placeVaccByMonth[vp_place][lo_focusMonth - 1] * lo_graphKx;
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_focusMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg);
-            y = lo_graphBottomAxis - yValue * lo_graphKy;
-            break;
+    if (!gl_showAvgAllPlace) { //24.12.2023
+        //lokacija mora biti selektirana
+        if (!lo_enabledPlace[vp_place]) { return };
+        //položaj miške za toolTip mora biti v področju s podatki za to lokacijo (4.12.2023)
+        if (lo_tipMonth <= offsetMonths[vp_place]) { return }
     }
     
+    //---- izračun koordinat tekočega data point-a
+    let x, y, yValue, color;
+    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+    switch (gl_mode) {
+        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiTimeSlice:
+            if (gl_showAvgAllPlace) {
+                yValue = avgTempCacheAll[lo_tipMonth]; // 24.12.2023
+                color = "darkBlue";
+            } else {
+                yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+                color = placeColor[vp_place];
+            }
+            break;
+        case cv_mode_timeAvgTempMultiPlace:
+            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            color = placeColor[vp_place];
+            break;
+    }
+    y = cv_graphY0 - ky * yValue;
+
     //risanje background krogca za to lokacijo in mesec
-    gEllipse(x, y, 9, 9, 0, gf_alphaColor(96, placeColor[vp_place]), 0, "");
+    gEllipse(x, y, 9, 9, 0, gf_alphaColor(96, color), 0, "");
 }
 
 function paint_graph_timeAvgTemp_tipMarkerUp(vp_place, vp_timeSlice, vl_monthStart, kx, cv_graphLeftData, cv_graphY0, ky) {
@@ -6768,35 +6804,36 @@ function paint_graph_timeAvgTemp_tipMarkerUp(vp_place, vp_timeSlice, vl_monthSta
     if (!lo_showToolTips) { return };
     if (lo_mouseOut) { return }; //29.7.2023 če je miška izven okna, se toolTip-i ne rišejo
 
-    //lokacija mora biti selektirana
-    if (!lo_enabledPlace[vp_place]) { return };
-    
-    //položaj miške za toolTip mora biti v področju s podatki za to lokacijo (4.12.2023)
-    if (lo_tipMonth <= offsetMonths[vp_place]) { return }
-    
-    //---- izračun koordinat tekočega data point-a
-    let x, y, yValue;
-    switch (gl_mode) {
-        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempMultiTimeSlice:
-            x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
-            y = cv_graphY0 - ky * yValue
-            break;
-        case cv_mode_vaccExcessDeathMulti:
-            x = placeGraphLeftData[vp_place] + placeVaccByMonth[vp_place][lo_focusMonth - 1] * placeGraphKx[vp_place];
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_focusMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg);
-            y = placeGraphBottomAxis[vp_place] - yValue * placeGraphKy[vp_place];
-            break;
-        case cv_mode_vaccExcessDeath:
-            x = lo_graphLeftData + placeVaccByMonth[vp_place][lo_focusMonth - 1] * lo_graphKx;
-            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_focusMonth, cv_nrMonthsAvgMult * lo_nrMonthsAvg);
-            y = lo_graphBottomAxis - yValue * lo_graphKy;
-            break;
+    if (!gl_showAvgAllPlace) {
+        //lokacija mora biti selektirana
+        if (!lo_enabledPlace[vp_place]) { return };
+        //položaj miške za toolTip mora biti v področju s podatki za to lokacijo (4.12.2023)
+        if (lo_tipMonth <= offsetMonths[vp_place]) { return }
     }
     
+    //---- izračun koordinat tekočega data point-a
+    let x, y, yValue, color;
+    x = cv_graphLeftData + kx * (lo_tipMonth - vl_monthStart);
+    switch (gl_mode) {
+        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiTimeSlice:
+            if (gl_showAvgAllPlace) {
+                yValue = avgTempCacheAll[lo_tipMonth];
+                color = "darkBlue";
+            } else {
+                yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+                color = placeColor[vp_place];
+            }
+            break;
+        case cv_mode_timeAvgTempMultiPlace:
+            yValue = lf_getAvgValue(vp_place, vp_timeSlice, lo_tipMonth - offsetMonths[vp_place], cv_nrMonthsAvgMult * lo_nrMonthsAvg)
+            color = placeColor[vp_place];
+            break;
+    }
+    y = cv_graphY0 - ky * yValue
+
     //risanje foreground krogca za to lokacijo in mesec
     gEllipse(x, y, 5, 5, 0, "white", 0, "");
-    gEllipse(x, y, 3, 3, 0, gf_alphaColor(192, placeColor[vp_place]), 0, "");
+    gEllipse(x, y, 3, 3, 0, gf_alphaColor(192, color), 0, "");
 
 }
 
