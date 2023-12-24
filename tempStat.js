@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.13"
+const gl_versionNr = "v1.14"
 const gl_versionDate = "24.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2564,7 +2564,7 @@ class slider2 {
 }
 
 class intChooser {
-    constructor(left, top, width, items, value, minItemValue, step, allowExceedValues, color, fillColor, crossColor, exceedCrossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
+    constructor(left, top, width, items, value, minItemValue, step, allowExceedValues, color, fillColor, crossColor, exceedCrossColor, outRadij, inRadij, selRadij, bodyWidth, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible, toolTipText, keyStroke) {
         this.left = left; this.top = top; this.width = width; // top: zgornji rob krogcev
         this.items = items; this.value = value; this.minItemValue = minItemValue; this.step = step; this.allowExceedValues = allowExceedValues;
         this.color = color;
@@ -2582,6 +2582,8 @@ class intChooser {
         this.clickGap = clickGap;
         this.enabled = enabled; this.disabledColor = disabledColor; this.disabledTextColor = disabledTextColor;
         this.visible = visible;
+        this.toolTipText = toolTipText; // 24.12.2023
+        this.keyStroke = keyStroke;     // 24.12.2023
     }
     paint() {
         if (!this.visible) { return };
@@ -2592,12 +2594,12 @@ class intChooser {
         let valueItem = Math.round((this.value - this.minItemValue) / this.step) + 1; //začnejo se z 1
         if (this.allowExceedValues && valueItem > this.items) { valueItem = this.items }; //12.12.2023
         const cv_bodyWidthHalf = Math.trunc(this.bodyWidth / 2);
-        let yBodyMiddle = this.top + this.outRadij; 
+        let yBodyMiddle = this.top + this.outRadij;
         if (focused) {
             let addM = 3; gBannerRect(this.left - addM, this.top - addM, this.width + 2 * addM, 2 * this.outRadij + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false);
             //gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth + 2, "limeGreen", []);
         }
-        gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth, myColor, []);            
+        gLine(this.left + 2 * this.outRadij - 2, yBodyMiddle, this.left + this.width - 2 * this.outRadij + 2, yBodyMiddle, this.bodyWidth, myColor, []);
         let xStep = (this.width - 2 * this.outRadij) / (this.items - 1);
         let step, x, tmpStr, tmpStr2, tmpW, tmpH
         //let font = "normal verdana 10pt"
@@ -2605,8 +2607,8 @@ class intChooser {
         for (step = 1; step <= this.items; step++) {
             x = this.left + this.outRadij + (step - 1) * xStep
             //---- prazen krogec za vsako opcijo
-            gEllipse(x, yBodyMiddle, this.outRadij, this.outRadij, 0, myColor, 0, "")        
-            gEllipse(x, yBodyMiddle, this.inRadij, this.inRadij, 0, this.fillColor, 0, "") 
+            gEllipse(x, yBodyMiddle, this.outRadij, this.outRadij, 0, myColor, 0, "")
+            gEllipse(x, yBodyMiddle, this.inRadij, this.inRadij, 0, this.fillColor, 0, "")
             //---- poln krogec za vsako opcijo
             if (step == valueItem) {
                 //gEllipse(x, yBodyMiddle, this.selRadij, this.selRadij, 0, myCrossColor, 0, "")
@@ -2623,6 +2625,11 @@ class intChooser {
                 ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
                 let myTextColor = this.enabled ? this.textColor : this.disabledTextColor;
                 gText(this.text, this.font, myTextColor, this.left, yBodyMiddle - this.outRadij - this.gap);
+        }
+        // toolTip (24.12.2023)
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
         }
     }
     eventClick(mouseX, mouseY) {
@@ -2803,7 +2810,7 @@ class intChooser2H {
 }
 
 class checkBox {
-    constructor(left, top, width, lineWidth, smoothPx, text, textColor, font, gap, posAlign, value, color, fillColor, crossColor, enabled, disabledLineColor, disabledFillColor, disabledTextColor, visible) {
+    constructor(left, top, width, lineWidth, smoothPx, text, textColor, font, gap, posAlign, value, color, fillColor, crossColor, enabled, disabledLineColor, disabledFillColor, disabledTextColor, visible, toolTipText, keyStroke) {
         this.left = left; this.top = top; this.width = width;
         this.lineWidth = lineWidth;
         this.smoothPx = smoothPx;
@@ -2816,6 +2823,8 @@ class checkBox {
         this.crossColor = crossColor;
         this.enabled = enabled; this.disabledLineColor = disabledLineColor, this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
         this.visible = visible;
+        this.toolTipText = toolTipText; // 24.12.2023
+        this.keyStroke = keyStroke;     // 24.12.2023
     }
     paint() {
         if (!this.visible) { return };
@@ -2858,6 +2867,11 @@ class checkBox {
             gLine(x1, y1, x2, y2, this.lineWidth + 1, this.crossColor, []);
             gLine(x1, y2, x2, y1, this.lineWidth + 1, this.crossColor, []);
         }
+        // toolTip (24.12.2023)
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
+        }        
     }
     eventClick(mouseX, mouseY) {
         if (!this.visible || !this.enabled) { return this.value; };
@@ -3012,10 +3026,11 @@ switch (lo_GUI_layout) {
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
         var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
-        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true);
-        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
-        var checkBoxDeltaT = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, scDelta + "T", "gray", "normal 10pt verdana", 4, "above-middle", gl_deltaT, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true);
-        var intChooserSmoothYears = new intChooser(guiPanelLeft, guiPanelTop + 16, 80, cv_nrSmoothYearsMax - cv_nrSmoothYearsMin + 1, lo_nrSmoothYears, cv_nrSmoothYearsMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserSmoothYears, disabledControlLineColor, disabledControlTextColor, false);
+        var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrMonthsAvg, disabledControlLineColor, disabledControlTextColor, true, "Averaging period", "A(+mWheel)");
+        var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Use all data for averaging", "S");
+        var checkBoxDeltaT = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, scDelta + "T", "gray", "normal 10pt verdana", 4, "above-middle", gl_deltaT, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Calculate differences over 10 years", "L");
+        var checkBoxAvgAllPlace = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "AVG", "gray", "normal 10pt verdana", 4, "above-middle", gl_showAvgAllPlace, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Average selected stations", String.fromCharCode(0x0110));
+        var intChooserSmoothYears = new intChooser(guiPanelLeft, guiPanelTop + 16, 80, cv_nrSmoothYearsMax - cv_nrSmoothYearsMin + 1, lo_nrSmoothYears, cv_nrSmoothYearsMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserSmoothYears, disabledControlLineColor, disabledControlTextColor, false, "Smoothing period", "O(+mWheel)");
         var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, nrMonthsAll, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
@@ -3227,6 +3242,13 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     }  
+    if (!vl_end && lo_showGUI) {
+        boolRslt = checkBoxAvgAllPlace.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != gl_showAvgAllPlace) {
+            lf_changeAvgAllPlace(boolRslt, true)
+            vl_end = true
+        }
+    }      
     if (!vl_end && lo_showGUI && lo_enabledIntChooserSmoothYears) {
         rslt = intChooserSmoothYears.eventClick(e.offsetX, e.offsetY)
         //console.log("click(): rslt=" + rslt.toString())
@@ -3320,6 +3342,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         else if (intChooserNrMonthsAvg.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
         else if (checkBoxNrMonthsAvgAll.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (checkBoxDeltaT.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (checkBoxAvgAllPlace.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }            
         else if (intChooserSmoothYears.eventMouseOverOption(e.offsetX, e.offsetY, false)) { document.body.style.cursor = "pointer" }
         else if (buttonPlay.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (placePanelToggle.eventMouseWithin(e.offsetX, e.offsetY)) {
@@ -3516,7 +3539,7 @@ window.addEventListener("keydown", (event) => {
             lf_changeShowStations(!lo_showStations, true); break;
         case 'BracketRight': // "Đ" //23.12.2023 pritisk na tipko "Đ"
             //console.log("V pressed");
-            gl_showAvgAllPlace = !gl_showAvgAllPlace; paint(); break;
+            lf_changeAvgAllPlace(!gl_showAvgAllPlace, true); break;
     }
 });
 
@@ -4221,6 +4244,9 @@ function paint_GUI() {
     //---- check box za deltaT(t) namesto T(t)
     checkBoxDeltaT.paint();
     
+    //---- check box za graf povprečja vse izbranih lokacij
+    checkBoxAvgAllPlace.paint();
+    
     //---- izbiranje števila let za glajenje krivulje deltaT(t)
     intChooserSmoothYears.paint()
     
@@ -4535,14 +4561,21 @@ function paint_GUI_layoutB() {
     checkBoxDeltaT.left = checkBoxNrMonthsAvgAll.left + checkBoxNrMonthsAvgAll.width + 15;
     checkBoxDeltaT.top = checkBoxNrMonthsAvgAll.top;
     checkBoxDeltaT.width = 18;
-    //----
     vl_lastControlLeft = checkBoxDeltaT.left; vl_lastControlWidth = checkBoxDeltaT.width;
+    //----
     if (gl_deltaT) {
         intChooserSmoothYears.left = vl_lastControlLeft + vl_lastControlWidth + 6;
         intChooserSmoothYears.top = guiPanelTop + 16;
         intChooserSmoothYears.width = 80;
         vl_lastControlLeft = intChooserSmoothYears.left; vl_lastControlWidth = intChooserSmoothYears.width;
     }
+    //---- 24.12.2023 povprečje vseh izbrnih lokacij
+    if (gl_mode !== cv_mode_timeAvgTempMultiPlace) {
+        checkBoxAvgAllPlace.left = vl_lastControlLeft + vl_lastControlWidth + 15;
+        checkBoxAvgAllPlace.top = checkBoxNrMonthsAvgAll.top;
+        checkBoxAvgAllPlace.width = 18;  
+        vl_lastControlLeft = checkBoxAvgAllPlace.left; vl_lastControlWidth = checkBoxAvgAllPlace.width;
+    }    
     //----
     let x1, x2, gap1, gap2, d1, d2, dHalf;
     const minTailWidth = 100; const maxTailWidth = 300;
@@ -4788,7 +4821,8 @@ function lf_changeNrMonthsAvgAll(vp_newValue, vp_paint) {
     switch (lo_nrMonthsAvgAll) {
         case true:
             lo_nrMonthsAvgOld = lo_nrMonthsAvg
-            lo_nrMonthsAvg = nrMonthsAll;
+            //lo_nrMonthsAvg = nrMonthsAll;
+            lo_nrMonthsAvg = Math.trunc(nrMonthsAll / 12) + 1;
             lo_enabledIntChooserNrMonthsAvg = false;
             break;
         case false:
@@ -4812,6 +4846,16 @@ function lf_changeDeltaT(vp_newValue, vp_paint) {
     intChooserSmoothYears.enabled = gl_deltaT;
     intChooserSmoothYears.visible = gl_deltaT;
     lo_GUIlayoutHasChanged = true;
+
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeAvgAllPlace(vp_newValue, vp_paint) {
+
+    gl_showAvgAllPlace = vp_newValue;
+
+    checkBoxAvgAllPlace.value = gl_showAvgAllPlace;
 
     if (vp_paint) { paint() }
 
@@ -4921,6 +4965,12 @@ function lf_setMode(vp_mode, vp_paint) {
             }
             sliderMonthEnd.useValue0 = true;
             sliderTailMonths.visible = false; break;
+    }
+    switch (gl_mode) { // 24.12.2023
+        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiTimeSlice:
+            checkBoxAvgAllPlace.visible = true; break;
+        case cv_mode_timeAvgTempMultiPlace:
+            checkBoxAvgAllPlace.visible = false; break;
     }
     lf_setMonthIntervalText();
     lo_GUIlayoutHasChanged = true;
@@ -6269,13 +6319,13 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             //---- tu je viden cel GUI - ta se je izrisal ločeno, med risanjem grafov pa se izriše še tale tabletek za izbrano obdobje
             //----
             //gText("A+mWheel", "italic 8pt cambria", "darkGray", intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width - 50, 9);
-            if (lo_enabledIntChooserNrMonthsAvg && intChooserNrMonthsAvg.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-                gText("A+mWheel", "italic 10pt cambria", "darkGray", intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width - 55, 12);
-            }
-            //----
-            if (lo_enabledIntChooserSmoothYears && intChooserSmoothYears.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-                gText("O+mWheel", "italic 10pt cambria", "darkGray", intChooserSmoothYears.left + intChooserSmoothYears.width - 55, 10);
-            }
+            //if (lo_enabledIntChooserNrMonthsAvg && intChooserNrMonthsAvg.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+            //    gText("A+mWheel", "italic 10pt cambria", "darkGray", intChooserNrMonthsAvg.left + intChooserNrMonthsAvg.width - 55, 12);
+            //}
+            ////----
+            //if (lo_enabledIntChooserSmoothYears && intChooserSmoothYears.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+            //    gText("O+mWheel", "italic 10pt cambria", "darkGray", intChooserSmoothYears.left + intChooserSmoothYears.width - 55, 10);
+            //}
             //----
             tmpStr = lf_monthStrMMYY(gl_monthStart) + "-" + lf_monthStrMMYY(gl_monthEnd);
             font = "bold 10pt verdana";
