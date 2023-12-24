@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.12"
+const gl_versionNr = "v1.13"
 const gl_versionDate = "24.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -3259,6 +3259,7 @@ elMyCanvas.addEventListener('click', (e) => {
         rslt = placePanelToggle.eventClick(e.offsetX, e.offsetY);
         if (rslt >= 1 && rslt <= nrPlaces) {
             lo_enabledPlace[rslt] = !lo_enabledPlace[rslt];
+            paint_graph_timeAvgTemp_cache_avgAllPlace(); // 24.12.2023
             paint()
             vl_end = true
         }
@@ -4823,6 +4824,7 @@ function lf_changeEnablePlaceAll(vp_newValue, vp_paint) {
     for (place = 1; place <= nrPlaces; place++) {
         lo_enabledPlace[place] = lo_enabledPlaceAll;
     }
+    paint_graph_timeAvgTemp_cache_avgAllPlace(); // 24.12.2023
     if (vp_paint) { paint() }
 }
 
@@ -5415,6 +5417,25 @@ function paint_graph_timeAvgTemp_cache() {
     }
 
     //---- še cache tabela za povprečje vseh (selektiranih) postaj (22.12.2023)
+    paint_graph_timeAvgTemp_cache_avgAllPlace();
+
+    //---- izpis potrebnega časa za postopek
+    //let myTime2 = Date.now(); console.log("cache fill: " + (myTime2 - myTime1).toString() + "ms");
+    
+}
+
+function paint_graph_timeAvgTemp_cache_avgAllPlace() {
+    //-------------------------
+    // 19.12.2023 pred novim risanjem zaradi spremembe konfiguracije (avg, time interval, mode, time slice) najprej napolnim cache, da lahko potem delam samo z njim brez vsakega izračunavanja povprečij itd.
+    // 24.12.2023 ločena funkcija, ker se lahko posebej kliče med selektiranjem/deselektiranjem lokacij
+    //-------------------------
+
+    let place, month, placeMonth;
+    let sum, nrData;
+
+    //let myTime1 = Date.now()
+    
+    //---- Cache tabela za povprečje vseh (selektiranih) postaj (22.12.2023)
     for (month = 1; month <= nrMonthsAll; month++) {
         sum = 0; nrData = 0;
         for (place = 1; place <= nrPlaces; place++) {
@@ -5433,7 +5454,6 @@ function paint_graph_timeAvgTemp_cache() {
 
     //---- izpis potrebnega časa za postopek
     //let myTime2 = Date.now(); console.log("cache fill: " + (myTime2 - myTime1).toString() + "ms");
-    
 }
 
 function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphType, vp_place, vp_timeSlice, vp_marginRight, vp_forceDataRangeY, vp_minY, vp_maxY, vp_dataRange) {
