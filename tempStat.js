@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.15"
+const gl_versionNr = "v1.16"
 const gl_versionDate = "25.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -5870,6 +5870,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_haveValidDataPoints, vl_currentPointValid, vl_previousPointValid, vl_showPoint; //12.12.2023
     let vl_pointUndefData; //14.12.2023
     let vl_showingAvgAllPlace = false; // 22.12.2023
+    let x0, x1, y0, y1, vl_drawThisLine; // 25.12.2023
 
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
@@ -6053,20 +6054,42 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     //---- 5.12.2023 če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim
                     dataLineColorFinal = dataLineColor;
                     if (!vl_currentPointValid || !vl_previousPointValid) { dataLineColorFinal = cv_colorHideData };
-                    //---- za risanje linije vsaj ena krajna točka daljice ne sme biti preko maxY
-                    if (vl_yOld >= cv_graphTopAxis && y >= cv_graphTopAxis) {
-                        //---- če sta obe krajišči znotraj, enostavno narišem linijo
-                        gLine(vl_xOld, vl_yOld, x, y, dataLineWidth, dataLineColorFinal, []);
-                    } else if (vl_yOld >= cv_graphTopAxis) {
-                        //---- če je znotraj le začetna (naraščajoča daljica), moram izračunati končno, ki bo po Y na meji ...
-                        kkk = (y - vl_yOld) / kx;
-                        tmpX = vl_xOld + (cv_graphTopAxis - vl_yOld) / kkk;
-                        gLine(vl_xOld, vl_yOld, tmpX, cv_graphTopAxis, dataLineWidth, dataLineColorFinal, []);
-                    } else if (y >= cv_graphTopAxis) {
-                        //---- če je znotraj le končna (padajoča daljica), moram izračunati začetno, ki bo po Y na meji ...
-                        kkk = (y - vl_yOld) / kx;
-                        tmpX = vl_xOld + (y - cv_graphTopAxis) / kkk;
-                        gLine(tmpX, cv_graphTopAxis, x, y, dataLineWidth, dataLineColorFinal, []);
+                    //---- za risanje linije morata obe točki po Y biti znotraj meja. Če nista, ju po liniji daljice postavim na rob območja. (25.12.2023)
+                    x0 = vl_xOld; y0 = vl_yOld; // začetna točka daljice (25.12.2023)
+                    x1 = x; y1 = y;             // končna točka daljice (25.12.2023)
+                    vl_drawThisLine = true;
+                    if (valueBetween(y0, cv_graphTopAxis, cv_graphBottom) && valueBetween(y1, cv_graphTopAxis, cv_graphBottom)) {
+                        //---- če sta obe krajišči po Y znotraj, enostavno narišem linijo
+                    } else if ((y0 < cv_graphTopAxis && y1 < cv_graphTopAxis) || (y0 > cv_graphBottom && y1 > cv_graphBottom)) {
+                        //---- če sta obe točki nad območjem ali obe pod območjem, potem linije ne rišem
+                        vl_drawThisLine = false;
+                    } else {
+                        //---- vsaj eno od krajišč je po Y zunaj, najdem situacijo in korigiram. V vsakem primeru rišem, tudi če je ena nad in druga pod (v tem primeru pač korigiram obe točki)
+                        //kkk = (y1 - y0) / kx;
+                        kkk = (y1 - y0) / (x1 - x0);
+                        //-------- najprej potencialne korekcije začetne točke (vl_xOld,vl_yOld) oziroma potem (x0,y0)
+                        if (y0 < cv_graphTopAxis && y1 >= cv_graphTopAxis) {
+                            // popravek prve točke navzdol (padajoča daljica)
+                            x0 = x0 + (cv_graphTopAxis - y0) / kkk;
+                            y0 = cv_graphTopAxis;
+                        } else if (y0 > cv_graphBottom && y1 <= cv_graphBottom) {
+                            // popravek prve točke navzgor (naraščajoča daljica)
+                            x0 = x0 + (cv_graphBottom - y0) / kkk;
+                            y0 = cv_graphBottom;
+                        }
+                        //-------- pa še potencialne korekcije končne točke (x,y) oziroma potem (x1,y1)
+                        if (y0 >= cv_graphTopAxis && y1 < cv_graphTopAxis) {
+                            // popravek druge točke navzdol (naraščajoča daljica)
+                            x1 = x0 + (cv_graphTopAxis - y0) / kkk;
+                            y1 = cv_graphTopAxis;
+                        } else if (y0 <= cv_graphBottom && y1 > cv_graphBottom) {
+                            // popravek druge točke navzgor (padajoča daljica)
+                            x1 = x0 + (cv_graphBottom - y0) / kkk;
+                            y1 = cv_graphBottom;
+                        }
+                    }
+                    if (vl_drawThisLine) {
+                        gLine(x0, y0, x1, y1, dataLineWidth, dataLineColorFinal, []);
                     }
                 }
                 vl_xOld = x; vl_yOld = y;
@@ -6105,7 +6128,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             if (!vl_showingAvgAllPlace && lo_nrMonthsAvg > 0 && gl_showExactValuesToo && (nrSelectedPlaces == 1 || place == lo_focusPlace)) {
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
-                if (y > cv_graphTopAxis) { //ne sme biti nad področjem predvidenim za graf
+                //if (y > cv_graphTopAxis) { //ne sme biti nad področjem predvidenim za graf
+                if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
                     gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
                 }
             }
@@ -6133,7 +6157,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             }
             y = cv_graphY0 - ky * yValue
             //---- za risanje ne smemo biti preko maxY
-            if (y >= cv_graphTopAxis) {
+            //if (y >= cv_graphTopAxis) {
+            if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
                 //---- če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim (5.12.2023)
                 dataPointColorFinal = dataPointColor;
                 vl_showPoint = true;
