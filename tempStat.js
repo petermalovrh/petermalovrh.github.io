@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.16"
+const gl_versionNr = "v1.17"
 const gl_versionDate = "25.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -5870,7 +5870,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let vl_haveValidDataPoints, vl_currentPointValid, vl_previousPointValid, vl_showPoint; //12.12.2023
     let vl_pointUndefData; //14.12.2023
     let vl_showingAvgAllPlace = false; // 22.12.2023
-    let x0, x1, y0, y1, vl_drawThisLine; // 25.12.2023
+    let x0, x1, y0, y1, vl_drawThisLine, mBottom, mTop; // 25.12.2023
 
     //----------------------------------------------
     //---- Risanje grafov po vrsti za vsako lokacijo
@@ -6058,9 +6058,11 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                     x0 = vl_xOld; y0 = vl_yOld; // začetna točka daljice (25.12.2023)
                     x1 = x; y1 = y;             // končna točka daljice (25.12.2023)
                     vl_drawThisLine = true;
-                    if (valueBetween(y0, cv_graphTopAxis, cv_graphBottom) && valueBetween(y1, cv_graphTopAxis, cv_graphBottom)) {
+                    //mBottom = cv_graphBottom; mTop = cv_graphTopAxis;
+                    mBottom = vp_top + vp_height - 5; mTop = vp_top + 5; //25.12.2023
+                    if (valueBetween(y0, mTop, mBottom) && valueBetween(y1, mTop, mBottom)) {
                         //---- če sta obe krajišči po Y znotraj, enostavno narišem linijo
-                    } else if ((y0 < cv_graphTopAxis && y1 < cv_graphTopAxis) || (y0 > cv_graphBottom && y1 > cv_graphBottom)) {
+                    } else if ((y0 < mTop && y1 < mTop) || (y0 > mBottom && y1 > mBottom)) {
                         //---- če sta obe točki nad območjem ali obe pod območjem, potem linije ne rišem
                         vl_drawThisLine = false;
                     } else {
@@ -6068,24 +6070,24 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                         //kkk = (y1 - y0) / kx;
                         kkk = (y1 - y0) / (x1 - x0);
                         //-------- najprej potencialne korekcije začetne točke (vl_xOld,vl_yOld) oziroma potem (x0,y0)
-                        if (y0 < cv_graphTopAxis && y1 >= cv_graphTopAxis) {
+                        if (y0 < mTop && y1 >= mTop) {
                             // popravek prve točke navzdol (padajoča daljica)
-                            x0 = x0 + (cv_graphTopAxis - y0) / kkk;
-                            y0 = cv_graphTopAxis;
-                        } else if (y0 > cv_graphBottom && y1 <= cv_graphBottom) {
+                            x0 = x0 + (mTop - y0) / kkk;
+                            y0 = mTop;
+                        } else if (y0 > mBottom && y1 <= mBottom) {
                             // popravek prve točke navzgor (naraščajoča daljica)
-                            x0 = x0 + (cv_graphBottom - y0) / kkk;
-                            y0 = cv_graphBottom;
+                            x0 = x0 + (mBottom - y0) / kkk;
+                            y0 = mBottom;
                         }
                         //-------- pa še potencialne korekcije končne točke (x,y) oziroma potem (x1,y1)
-                        if (y0 >= cv_graphTopAxis && y1 < cv_graphTopAxis) {
+                        if (y0 >= mTop && y1 < mTop) {
                             // popravek druge točke navzdol (naraščajoča daljica)
-                            x1 = x0 + (cv_graphTopAxis - y0) / kkk;
-                            y1 = cv_graphTopAxis;
-                        } else if (y0 <= cv_graphBottom && y1 > cv_graphBottom) {
+                            x1 = x0 + (mTop - y0) / kkk;
+                            y1 = mTop;
+                        } else if (y0 <= mBottom && y1 > mBottom) {
                             // popravek druge točke navzgor (padajoča daljica)
-                            x1 = x0 + (cv_graphBottom - y0) / kkk;
-                            y1 = cv_graphBottom;
+                            x1 = x0 + (mBottom - y0) / kkk;
+                            y1 = mBottom;
                         }
                     }
                     if (vl_drawThisLine) {
@@ -6105,7 +6107,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //---- če so točke zelo na gosto in solidno povprečeno/glajeno, lahko izrisujem samo vsako drugo pa ne bo nič kaj razlike, bo pa hitreje
         stepMonths = 1; //if (kx < 2.3 && vp_timeSlice == cv_timeSliceAll && lo_nrMonthsAvg >= 3 && cv_graphRangeY / ky > 27) { stepMonths = 2 }; //console.log("stepMonths=" + stepMonths.toString()); //14.12.2023
         //---- zanka čez vse mesece v izbranem razponu
-        for (month = vl_monthStart; month <= gl_monthEnd; month+=stepMonths) {
+        mBottom = vp_top + vp_height - 5; mTop = vp_top + 5; //25.12.2023
+        for (month = vl_monthStart; month <= gl_monthEnd; month += stepMonths) {
             //if (month == 901) { //debug
             //    month = month;
             //}
@@ -6129,7 +6132,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
                 yValue = avgTemp[place][placeMonth];
                 y = cv_graphY0 - ky * yValue
                 //if (y > cv_graphTopAxis) { //ne sme biti nad področjem predvidenim za graf
-                if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
+                //if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
+                if (valueBetween(y, mTop, mBottom)) { //po Y mora biti v mejah grafa
                     gEllipse(x, y, dataPointRadij, dataPointRadij, 0, gf_alphaColor(80, placeColor[place]), 0, "");
                 }
             }
@@ -6158,7 +6162,8 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             y = cv_graphY0 - ky * yValue
             //---- za risanje ne smemo biti preko maxY
             //if (y >= cv_graphTopAxis) {
-            if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
+            //if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) { //po Y mora biti v mejah grafa
+            if (valueBetween(y, mTop, mBottom)) { //po Y mora biti v mejah grafa
                 //---- če je to odsek, kjer še ni bilo dovolj podatkov za regularno povprečenje, potem posivim (5.12.2023)
                 dataPointColorFinal = dataPointColor;
                 vl_showPoint = true;
