@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.14"
-const gl_versionDate = "24.12.2023"
+const gl_versionNr = "v1.15"
+const gl_versionDate = "25.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -5520,7 +5520,11 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             cv_graphGapLeft = 0; cv_graphGapRight = 5; cv_graphGapTop = 5; cv_graphGapBottom = 0;
             break;
         case cv_graphType_timeAvgTemp:
-            cv_graphMarginLeft = 25; cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
+            switch (gl_mode) {
+                case cv_mode_timeAvgTempSingle: cv_graphMarginLeft = 26; break; // nekaj manj, ker ni okvirja in je že tako 8 rezerve
+                default: cv_graphMarginLeft = 28; break;                        // da minus ne bo gledal ven
+            }
+            cv_graphMarginRight = vp_marginRight; cv_graphMarginTop = 20; cv_graphMarginBottom = 16;
             cv_graphGapLeft = 14; cv_graphGapRight = 70; cv_graphGapTop = 5; cv_graphGapBottom = 0;
             if (vp_place != cv_allPlace) { cv_graphGapRight = 20 };
             break;
@@ -5596,6 +5600,7 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     gLine(cv_graphLeft, cv_graphBottom, cv_graphLeft, cv_graphTopAxis, 2, "gray", [])
     let yOsX = cv_graphY0; //7.12.2023 na tem Y bo risana X os in oznake na njej
     if (yOsX > cv_graphBottom) { yOsX = cv_graphBottom };
+    if (yOsX < cv_graphTopAxis) { yOsX = cv_graphTopAxis }; // 25.12.2023
     gLine(cv_graphLeft, yOsX, cv_graphRight, yOsX, 2, "gray", [])
     
     //---- nastavitev globalnih spremenljivk za pozicije in dimenzije all-place, multi-place ter multi-timeSlice grafov
@@ -5664,17 +5669,16 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     if (vl_dataRange * vl_dataRangeFactor > 100) { yMark5 = false };
     let tmpShift; //8.12.2023
     switch (vp_place) {
-        case cv_allPlace: {
+        case cv_allPlace: { // Mode1,3
             switch (gl_timeSlice) { //15.12.2023
-                case cv_timeSliceMonth: case cv_timeSliceSeason:
-                    font = "italic 10pt cambria"; break;
-                default:
-                    font = "italic 11pt cambria"; break;
+                case cv_timeSliceMonth: case cv_timeSliceSeason: // Mode3
+                    font = "italic 10pt cambria"; tmpShift = 5; break;
+                default: // Mode1
+                    font = "italic 11pt cambria"; tmpShift = 6; break;
             }
-            tmpShift = 6;
             break;
         }
-        default: {
+        default: { // Mode2
             font = "italic 10pt cambria"
             tmpShift = 4;
             break;
@@ -5684,8 +5688,9 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
         //---- izpis pri 0 stopinj
         if (tmpTemp == 0) {
             y = cv_graphY0;
-            if (y <= cv_graphBottom) {
-                tmpStr = tmpTemp.toString();
+            //if (y <= cv_graphBottom) {
+            if (valueBetween(y, cv_graphTopAxis, cv_graphBottom)) {
+                tmpStr = "0"; //tmpTemp.toString();
                 ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
                 x = cv_graphLeft - tmpW - tmpShift
                 gText(tmpStr, font, "darkSlateGray", x, y + tmpH / 2 - 1);
@@ -5741,37 +5746,6 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
     let addX, addY; // 21.12.2023
     let tmpVacc, tmpMonth, tmpMonthValue, tmpMonthValue2, tmpYear, vl_xOld, vl_yOld, vl_xOldExact, vl_yOldExact;
     switch (vp_graphType) {
-        case cv_graphType_vaccExcessDeath:
-            switch (vp_place) {
-                case cv_allPlace:
-                    font = "bold italic 11pt cambria";
-                    tmpStr = "Vaccinated [%]";
-                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    x = cv_graphRight - tmpW + 10;
-                    y = cv_graphY0 + 15;
-                    break;
-                default:
-                    font = "bold italic 10pt cambria";
-                    tmpStr = "V";
-                    ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                    x = cv_graphRight - tmpW - 2;
-                    y = cv_graphY0 + 13;
-                    break;
-            }
-            gText(tmpStr, font, "darkSlateGray", x, y);
-            font = "italic 9pt cambria";
-            for (tmpVacc = 10; tmpVacc <= 100; tmpVacc += 10) {
-                x = cv_graphLeftData + kx * tmpVacc
-                if (x >= cv_graphLeftData && x <= cv_graphRightData) {
-                    gLine(x, cv_graphY0 - 2, x, cv_graphY0 + 2, 1, "darkSlateGray", [])
-                    if (tmpVacc != 100) {
-                        tmpStr = tmpVacc.toString();
-                        ;[tmpW, tmpH] = gMeasureText(tmpStr, font);
-                        gText(tmpStr, font, "dimGray", x - tmpW / 2, cv_graphY0 + tmpH + 4);
-                    }
-                }
-            }
-            break;
         case cv_graphType_timeAvgTemp:
             //---- oznake mesecev
             font = "normal 9pt cambria";
