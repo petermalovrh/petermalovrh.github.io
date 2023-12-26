@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.18"
+const gl_versionNr = "v1.19"
 const gl_versionDate = "26.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -259,7 +259,7 @@ station = addStation(cv_placeLogatec, 2650, "Logatec", "14.2032", "45.9077", "A"
 
 // TOLMIN lokacije in ARSO-Id postaj glej spodaj med podatki  ... 18.12.2023  
 const cv_placeTolmin = addPlace("Tolmin - Vol" + scTchLow + "e (188m)", "Tolmin - Vol" + scTchLow + "e", "TOLV", "Tolmin", "brown", "white");
-station = addStation(cv_placeTolmin, 2650, "TOLMIN - VOL" + scTch + "E", "13.7180", "46.1777", "A", 188, 10, 2015, 0, 0);
+station = addStation(cv_placeTolmin, 2841, "TOLMIN - VOL" + scTch + "E", "13.7180", "46.1777", "A", 188, 10, 2015, 0, 0);
 
 // VELENJE - TEŠ  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 19.12.2023  
 const cv_placeVelenje = addPlace("Velenje - TE" + scSch + " (388m)", "Velenje - TE" + scSch, "VELTE" + scSch, "Velenje", "darkSlateGray", "white");
@@ -275,9 +275,6 @@ station = addStation(cv_placePtuj, 2701, "PTUJ", "15.8492", "46.4197", "A", 222,
 // AJDOVŠČINA  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 21.12.2023  
 const cv_placeAjdovscina = addPlace("Ajdov" + scSchLow + scTchLow + "ina (86m)", "Ajdov" + scSchLow + scTchLow + "ina", "AJDV", "Ajdov" + scSchLow + scTchLow + "ina", "seaGreen", "white");
 station = addStation(cv_placeAjdovscina, 1857, "AJDOV" + scSch + scTch + "INA - DOLENJE", "13.9013", "45.8662", "A", 86, 2, 1993, 0, 0);
-
-// id=1266 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8543 lat = 46.4219 viš = 223m)
-// id=1859 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8512 lat = 46.4213 viš = 222m)
 
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
@@ -384,6 +381,7 @@ addAvgTempYear(cv_placeSkofjaLoka, 2023, 1, [2.4, 1.6, 6.8, 9.1, 14.9, 19.7, 21.
 addAvgTempYear(cv_placeMariborVrbanskiPlato, 2020, 1, [0.1, 5.3, 6.3, 11, 14.1, 18.3, 20, 21, 16.4, 10.7, 4.4, 1.6]);
 addAvgTempYear(cv_placeMariborVrbanskiPlato, 2021, 1, [1.5, 3.4, 5.2, 8.4, 12.7, 21.2, 21.8, 19, 15.9, 9.1, 5.1, 1.6]);
 addAvgTempYear(cv_placeMariborVrbanskiPlato, 2022, 1, [1.5, 4.1, 4.7, 9.1, 16.6, 20.9, 21.5, 21, 14.7, 12.7, 6.6, 2.2]);
+addAvgTempYear(cv_placeMariborVrbanskiPlato, 2023, 1, [3.3, 2.8, 7.1, 9, 14.2, 18.9, 21.2, 20.3, 18.1, 14.2, 6.3]);
 
 //5.12.2023 https://meteo.arso.gov.si/met/sl/app/webmet/#webmet==8Sdwx2bhR2cv0WZ0V2bvEGcw9ydlJWblR3LwVnaz9SYtVmYh9iclFGbt9SaulGdugXbsx3cs9mdl5WahxXYyNGapZXZ8tHZv1WYp5mOnMHbvZXZulWYnwCchJXYtVGdlJnOn0UQQdSf;
 //---- https://meteo.arso.gov.si/uploads/probase/www/climate/text/sl/stations/Maribor%20Tabor.pdf
@@ -523,6 +521,7 @@ addAvgTempYear(cv_placeLjubljanaBezigrad, 2019, 1, [0.7, 4.9, 9, 11.6, 12.9, 23.
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2020, 1, [1.9, 6.8, 7.2, 13, 15.3, 19.6, 21.8, 22.2, 17.5, 11.9, 5.3, 2.9]);
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2021, 1, [1.2, 5.9, 6.7, 9.1, 13.5, 23.1, 23.3, 21, 17.5, 9.8, 5.9, 1.3]);
 addAvgTempYear(cv_placeLjubljanaBezigrad, 2022, 1, [0.8, 5.1, 6.6, 10.4, 18.1, 23.4, 24.5, 23, 16, 14.4, 7.9, 4.4]);
+addAvgTempYear(cv_placeLjubljanaBezigrad, 2023, 1, [3.8, 3.6, 8.6, 10.2, 15.9, 21, 22.7, 21.8, 19.1, 15, 6.9]);
 
 //id=  Novo Mesto Kandija
 //addAvgTempYear(cv_placeNovoMestoKandija, 1948, 1, [4, 0, 5.7, 11.4, 16, 16.9, 17.2, 18.9, 15.3, 11.1, 4.4, -1.4]);
@@ -633,6 +632,7 @@ addAvgTempYear(cv_placeNovoMesto, 2019, 1, [0.1, 4.3, 8.5, 11.2, 12.8, 22.9, 21.
 addAvgTempYear(cv_placeNovoMesto, 2020, 1, [1.5, 6.5, 7.4, 12.2, 14.8, 19.4, 21, 21.8, 16.7, 11.6, 4.9, 3]);
 addAvgTempYear(cv_placeNovoMesto, 2021, 1, [1.4, 5.1, 6.2, 8.9, 13.6, 22.5, 22.8, 20.2, 16.3, 9.4, 5.7, 2.2]);
 addAvgTempYear(cv_placeNovoMesto, 2022, 1, [1.3, 4.6, 5.7, 10, 17.5, 22.1, 23, 21.7, 15.4, 13.8, 7.1, 3.7]);
+addAvgTempYear(cv_placeNovoMesto, 2023, 1, [3.4, 2.8, 8, 9.8, 15.4, 20.6, 22.6, 21, 18.2, 14.8, 6.9]);
 
 //---- POSTOJNA ... https://meteo.arso.gov.si/uploads/probase/www/climate/text/sl/stations/postojna.pdf
 addAvgTempYear(cv_placePostojna, 1950, 1, [-2.8, 3.2, 5.1, 7.7, 14.1, 17.9, 20.5, 18.5, 13.9, 8.4, 5.2, 0.7]);
@@ -708,6 +708,7 @@ addAvgTempYear(cv_placePostojna, 2019, 1, [-0.2, 4.2, 7, 9.6, 10.4, 21, 20.4, 20
 addAvgTempYear(cv_placePostojna, 2020, 1, [2.7, 5.2, 5.4, 10.3, 13.1, 17, 19.5, 19.8, 15.7, 10.2, 5.6, 3.4]);
 addAvgTempYear(cv_placePostojna, 2021, 1, [0.9, 5.3, 4.5, 6.7, 11.7, 20, 20.5, 18.7, 15.6, 8.9, 5.7, 1.8]);
 addAvgTempYear(cv_placePostojna, 2022, 1, [1.1, 3.5, 4.3, 8.4, 15.7, 21.1, 22.5, 20.8, 14.1, 13.2, 6.9, 4]);
+addAvgTempYear(cv_placePostojna, 2023, 1, [2.9, 2.6, 6.3, 7.8, 14.1, 18.6, 21, 20.1, 17.5, 13.8, 6.7]);
 
 //addAvgTempYear(cv_placeNovaGoricaBilje51m, 1962, 4, [11.4, 14.9, 18.4, 20.4, 23.8, 17.9, 13, 7.9, 1.2]);
 //addAvgTempYear(cv_placeNovaGoricaBilje51m, 1963, 1, [-0.4, 0.9, 5.1, 11.1, 16.5, 19.3, 22.3, 21.2, 17.7, 12.4, 11.1, 2.3]);
@@ -834,6 +835,7 @@ addAvgTempYear(cv_placeNovaGoricaBilje, 2019, 1, [2, 5.9, 9.2, 12.7, 14.2, 24.3,
 addAvgTempYear(cv_placeNovaGoricaBilje, 2020, 1, [3.7, 6.8, 8.5, 13.3, 17.1, 20.3, 23, 23.2, 19, 12.6, 8.1, 6.2]);
 addAvgTempYear(cv_placeNovaGoricaBilje, 2021, 1, [3.7, 6.6, 7, 10.4, 15, 22.8, 24.2, 22.6, 19, 11.7, 9.4, 4.1]);
 addAvgTempYear(cv_placeNovaGoricaBilje, 2022, 1, [2.8, 5.5, 7, 11.5, 19.1, 24.2, 26.5, 24.4, 17.9, 15.6, 9.6, 6.9]);
+addAvgTempYear(cv_placeNovaGoricaBilje, 2023, 1, [6.4, 5.2, 9.3, 11.1, 17.7, 21.9, 24, 23, 20.4, 16.1, 8.4]);
 
 //id=1890
 addAvgTempYear(cv_placeKredarica, 1955, 1, [-5.1, -9.8, -8, -5.5, -0.5, 2.9, 5.7, 4.1, 2.7, -1.3, -4.8, -5]);
@@ -904,6 +906,7 @@ addAvgTempYear(cv_placeKredarica, 2019, 1, [-10.9, -4.3, -4.9, -2.6, -2, 8.9, 8.
 addAvgTempYear(cv_placeKredarica, 2020, 1, [-3.1, -4.5, -6.2, -1.2, 0.8, 4.6, 7.3, 8.5, 5.3, -0.4, 0.4, -5.5]);
 addAvgTempYear(cv_placeKredarica, 2021, 1, [-10.2, -4.4, -6.8, -5.5, -1.2, 7.3, 8, 6.5, 5.5, 0.2, -2.2, -5.6]);
 addAvgTempYear(cv_placeKredarica, 2022, 1, [-6.5, -6.5, -5.7, -3.9, 3.5, 8.4, 9, 8, 2.7, 5, -2.9, -3.6]);
+addAvgTempYear(cv_placeKredarica, 2023, 1, [-6.7, -6.2, -4.4, -4.9, 0.9, 6.2, 9.1, 8.8, 7.6, 4.3, -4.6]);
 
 //id=1054 1053  1897
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 1949, 7, [17.3, 16.5, 14.4, 9.7, 4.4, -1.1]);
@@ -980,6 +983,7 @@ addAvgTempYear(cv_placeSlovenjGradecSmartno, 2019, 1, [-1.6, 2.7, 6, 9.6, 11.1, 
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2020, 1, [-0.9, 3.6, 4.6, 9.8, 13.1, 17.4, 18.9, 19.6, 14.6, 9.7, 3.3, 0.8]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2021, 1, [-1.7, 1.9, 3.7, 6.8, 11.8, 20.3, 20.9, 17.9, 14.2, 8.4, 4.2, -1.4]);
 addAvgTempYear(cv_placeSlovenjGradecSmartno, 2022, 1, [-1.2, 2.2, 2.8, 8.2, 15.8, 20.1, 21.1, 20.2, 13.7, 12, 5.7, 0.1]);
+addAvgTempYear(cv_placeSlovenjGradecSmartno, 2023, 1, [0.9, -0.2, 6, 7.9, 13.5, 18.3, 20.1, 19.1, 16.3, 12.8, 4.2]);
 
 //myTool POZOR: id=14
 addAvgTempYear(cv_placeKrvavec, 1961, 1, [-5.8, -2.2, -3.3, 6, 6.1, 11.2, 11.2, 12.5, 12.4, 6.6, 1.3, -3.7]); //manjkajoči mar, nadomestim s povprečjem iz dveh naslednjih podatka
@@ -1047,6 +1051,7 @@ addAvgTempYear(cv_placeKrvavec, 2019, 1, [-6.5, 0.1, -0.1, 2.5, 3.3, 14.5, 13.7,
 addAvgTempYear(cv_placeKrvavec, 2020, 1, [-0.1, -1.4, -1.8, 4, 6.1, 9.9, 12.4, 13.8, 9.6, 3.9, 3.6, -1.9]);
 addAvgTempYear(cv_placeKrvavec, 2021, 1, [-6.2, -1.2, -1.9, -0.8, 3.8, 13.3, 13.8, 11.8, 9.8, 4.3, 1.5, -2.2]);
 addAvgTempYear(cv_placeKrvavec, 2022, 1, [-2.1, -2.7, -1.7, 0.9, 9.1, 13.8, 14.9, 13.8, 7.8, 9.3, 1.6, -0.9]);
+addAvgTempYear(cv_placeKrvavec, 2023, 1, [-2.7, -1.7, -0.4, 0.3, 6.1, 11, 13.6, 13.6, 11.7, 8.6, 0.1]);
 
 //id=996  MURSKA SOBOTA - RAKIČAN I (lon=16.1950, lat=46.6497, viš=187m)
 addAvgTempYear(cv_placeMurskaSobota, 1949, 4, [10.9, 14.5, 15.8, 18.9, 17.3, 15.1, 10.5, 6.1, 1.5]);
@@ -1134,6 +1139,7 @@ addAvgTempYear(cv_placeMurskaSobota, 2019, 1, [-0.1, 3.7, 7.8, 11.5, 13, 22.7, 2
 addAvgTempYear(cv_placeMurskaSobota, 2020, 1, [0, 6, 6.9, 11.7, 14.7, 19.2, 20.5, 21.6, 16, 11.1, 5, 2.3]);
 addAvgTempYear(cv_placeMurskaSobota, 2021, 1, [1.8, 3.1, 5.5, 8.6, 13.5, 21.6, 22.8, 19.3, 15.7, 9.2, 5.3, 1.8]);
 addAvgTempYear(cv_placeMurskaSobota, 2022, 1, [0.8, 4.2, 4.7, 9.7, 17.4, 21.7, 21.9, 21.5, 15.2, 12.4, 6.5, 2.1]);
+addAvgTempYear(cv_placeMurskaSobota, 2023, 1, [3.5, 2.7, 7.5, 9.5, 15.1, 19.9, 21.9, 20.8, 18.3, 14.3, 5.8]);
 
 //id=40  JAVORJE NAD POLJANAMI (lon=14.1786, lat=46.1663, viš=700m)
 addAvgTempYear(cv_placeJavorje, 1955, 1, [-0.4, 0.7, 0.2, 7.1, 10.7, 14.7, 17.4, 16.5, 14, 8.7, 2.8, 2.3]);
@@ -1274,7 +1280,7 @@ addAvgTempYear(cv_placeCelje, 2019, 1, [-0.6, 3.3, 7.3, 10.3, 12.5, 21.7, 21.2, 
 addAvgTempYear(cv_placeCelje, 2020, 1, [0.7, 5.7, 6.2, 10.7, 14.3, 18.3, 20.1, 20.8, 15.7, 11.2, 4.4, 2]);
 addAvgTempYear(cv_placeCelje, 2021, 1, [0.7, 4.3, 5.1, 8.4, 12.9, 21.1, 21.8, 19.1, 15.2, 8.8, 5, 1.1]);
 addAvgTempYear(cv_placeCelje, 2022, 1, [0.4, 3.7, 4.1, 9.4, 16.9, 21.5, 22.1, 21.5, 14.8, 13.3, 7, 3.2]);
-
+addAvgTempYear(cv_placeCelje, 2023, 1, [3, 1.9, 7, 9.1, 14.5, 19.5, 21.2, 20.2, 17.5, 14.3, 6.3]);
 
 //id=389 BABNO POLJE (lon=14.5359, lat=45.6467, viš=753m)
 addAvgTempYear(cv_placeBabnoPolje, 1949, 11, [2.8, 0]);
@@ -1360,6 +1366,7 @@ addAvgTempYear(cv_placeBabnoPolje, 2019, 1, [-2.9, 0.3, 3.2, 6.5, 8.3, 18.6, 17.
 addAvgTempYear(cv_placeBabnoPolje, 2020, 1, [-0.8, 2.6, 2.3, 6.8, 10.6, 14.8, 16.2, 16.8, 11.7, 7.4, 2.2, 0.7]);
 addAvgTempYear(cv_placeBabnoPolje, 2021, 1, [-2.5, 2.3, 1.2, 3.6, 9.9, 17.5, 18.5, 16, 11.8, 5.9, 3.2, -0.6]);
 addAvgTempYear(cv_placeBabnoPolje, 2022, 1, [-2.5, 0.8, 0.5, 5.7, 13.2, 18.4, 18.6, 17.3, 11.6, 9.7, 4.3, 2.5]);
+addAvgTempYear(cv_placeBabnoPolje, 2023, 1, [0.3, -2.2, 3.2, 5.2, 11.7, 16.1, 18.4, 17.1, 13.8, 11.2, 4.3]);
 
 //id=1896  PORTOROŽ - LETALIŠČE (lon=13.6160, lat=45.4753, viš=2m)
 addAvgTempYear(cv_placePortorozLetalisce, 1988, 6, [19.4, 23.9, 22.5, 17.3, 14.8, 5.7, 4.5]);
@@ -1398,7 +1405,7 @@ addAvgTempYear(cv_placePortorozLetalisce, 2019, 1, [4.1, 6.7, 10.3, 12.9, 14.6, 
 addAvgTempYear(cv_placePortorozLetalisce, 2020, 1, [5.5, 7.8, 9, 13.3, 18.1, 21, 23.2, 24, 19.5, 13.7, 9.4, 7.9]);
 addAvgTempYear(cv_placePortorozLetalisce, 2021, 1, [5, 7.6, 7.7, 11, 16, 22.9, 24.4, 23, 18.9, 12.9, 10.6, 5.9]);
 addAvgTempYear(cv_placePortorozLetalisce, 2022, 1, [4.4, 6.6, 6.7, 11.9, 18.9, 24.2, 25.9, 24.6, 18.8, 16.3, 11.1, 8.5]);
-
+addAvgTempYear(cv_placePortorozLetalisce, 2023, 1, [7.5, 5.7, 10, 11.5, 17.7, 22.2, 24.4, 23.3, 20.9, 17.5, 10.6]);
 
 //id=2512  KOČEVJE (lon=14.8589, lat=45.6375, viš=464m)
 addAvgTempYear(cv_placeKocevje, 1950, 1, [-4.2, 2.3, 5.3, 8.6, 15.8, 19.5, 21.8, 19.2, 14.1, 7.6, 5, -0.2]);
@@ -1483,6 +1490,7 @@ addAvgTempYear(cv_placeKocevje, 2019, 1, [-1, 2.5, 6.2, 9.4, 10.7, 20.3, 19.6, 1
 addAvgTempYear(cv_placeKocevje, 2020, 1, [0.7, 5, 4.9, 10, 12.9, 17.2, 18.7, 19.6, 14.6, 9.9, 3.8, 1.9]);
 addAvgTempYear(cv_placeKocevje, 2021, 1, [-0.4, 4, 3.7, 6.6, 12, 19.9, 20.5, 18, 14.3, 7.7, 4.7, 1.2]);
 addAvgTempYear(cv_placeKocevje, 2022, 1, [-0.5, 2.7, 3.2, 7.9, 15.3, 20.2, 20.5, 19.3, 13.6, 12.3, 6.1, 3]);
+addAvgTempYear(cv_placeKocevje, 2023, 1, [1.8, -0.1, 5.7, 7.9, 13.2, 18.2, 20.5, 19.2, 16.1, 13.6, 6.2]);
 
 //id=1086  RATEČE (lon=13.7129, lat=46.4971, viš=864m)
 addAvgTempYear(cv_placeRatece, 1948, 1, [-0.8, -4.2, 2.7, 6.7, 11.4, 13.4, 13.4, 15.3, 11.9, 7.2, 2.1, -3.3]);
@@ -1561,6 +1569,7 @@ addAvgTempYear(cv_placeRatece, 2019, 1, [-3.7, 0.2, 3.8, 7.2, 8.5, 19.4, 18.5, 1
 addAvgTempYear(cv_placeRatece, 2020, 1, [-1.7, 1.6, 2, 7.9, 11.3, 14.7, 17, 17.4, 12.8, 6.8, 1.7, -1.8]);
 addAvgTempYear(cv_placeRatece, 2021, 1, [-5.3, -0.5, 1.2, 4.7, 9, 18.2, 18, 15.7, 13.2, 6.1, 2.3, -3.6]);
 addAvgTempYear(cv_placeRatece, 2022, 1, [-3.6, -0.4, 1.2, 5.9, 13.3, 18.4, 19.1, 17.4, 11.7, 10.2, 3.1, -1.6]);
+addAvgTempYear(cv_placeRatece, 2023, 1, [-1, -1, 3.6, 5.6, 11.5, 16.5, 17.9, 17.3, 14.4, 10.5, 2.2]);
 
 //id=192  VOJSKO (lon=13.9031, lat=46.0250, viš=1070m)
 addAvgTempYear(cv_placeVojsko, 1958, 11, [-0.1, 0.5]);
@@ -1631,7 +1640,7 @@ addAvgTempYear(cv_placeVojsko, 2019, 1, [-3.2, 1.7, 3.6, 7, 8.1, 19, 18, 17.4, 1
 addAvgTempYear(cv_placeVojsko, 2020, 1, [0.9, 2, 1.9, 7.9, 10.5, 14.5, 17.1, 17.7, 12.8, 7.3, 3.1, -0.1]);
 addAvgTempYear(cv_placeVojsko, 2021, 1, [-2.6, 1.1, 1.7, 3.7, 8.4, 17.4, 17.5, 15.7, 12.9, 6.2, 3.2, -0.4]);
 addAvgTempYear(cv_placeVojsko, 2022, 1, [-1.2, 0.8, 1.3, 5.2, 12.9, 18.1, 19.1, 18, 10.9, 11.3, 4.3, 0.6]);
-
+addAvgTempYear(cv_placeVojsko, 2023, 1, [-0.1, -0.7, 3.4, 5.1, 10.8, 16.2, 17.4, 17.1, 14.8, 11.1, 3.2]);
 
 //id=1076  BRNIK - LETALIŠČE (lon=14.4574, lat=46.2288, viš=380m)
 addAvgTempYear(cv_placeBrnikLetalisce, 1964, 1, [-6.7, -1.3, 2.2, 9.2, 13.6, 18.7, 18.8, 16.8, 14, 8.7, 4.7, -0.7]);
@@ -1705,6 +1714,7 @@ addAvgTempYear(cv_placeBrnikLetalisce, 2019, 1, [-1.5, 2.6, 6, 9.7, 11.4, 21.2, 
 addAvgTempYear(cv_placeBrnikLetalisce, 2020, 1, [-0.6, 4.3, 4.9, 10.6, 13.6, 18, 19.7, 20.2, 15.3, 10.1, 3.5, 1.5]);
 addAvgTempYear(cv_placeBrnikLetalisce, 2021, 1, [-1.1, 3, 4, 7.3, 11.7, 20.7, 21.1, 18.7, 15.1, 8.1, 4.2, -0.9]);
 addAvgTempYear(cv_placeBrnikLetalisce, 2022, 1, [-1.4, 2.7, 3.6, 8.4, 16, 21.2, 22.3, 21.4, 14.3, 12.4, 6.2, 2.6]);
+addAvgTempYear(cv_placeBrnikLetalisce, 2023, 1, [1.7, 0.8, 6.1, 8.3, 14.4, 19.3, 20.7, 19.7, 17.1, 13.2, 5]);
 
 // id=532  BIZELJSKO - STARA VAS (lon=15.6945, lat=45.9910, viš=163m)
 addAvgTempYear(cv_placeBizeljsko, 1949, 7, [19.6, 19.3, 17.3, 11, 6.8, 2.4]);
@@ -1791,6 +1801,7 @@ addAvgTempYear(cv_placeBizeljsko, 2019, 1, [0.2, 4.3, 8.6, 11.7, 12.9, 22.8, 21.
 addAvgTempYear(cv_placeBizeljsko, 2020, 1, [0.4, 6.6, 7.8, 12.8, 15.1, 19.4, 21.1, 22.2, 17, 11.8, 5.2, 3.5]);
 addAvgTempYear(cv_placeBizeljsko, 2021, 1, [1.8, 4.8, 6.3, 9.2, 13.4, 22.2, 22.8, 20.4, 16.7, 9.4, 5.8, 2.2]);
 addAvgTempYear(cv_placeBizeljsko, 2022, 1, [0.8, 4.5, 6, 10, 18, 22.5, 23, 22.4, 15.8, 13.3, 7.3, 3.5]);
+addAvgTempYear(cv_placeBizeljsko, 2023, 1, [4, 3.4, 7.8, 10, 15.9, 20.5, 22, 21.2, 18.6, 14.5, 6.5]);
 
 // id=1902  LETALIŠČE EDVARDA RUSJANA MARIBOR (lon=15.6818, lat=46.4797, viš=264m)
 addAvgTempYear(cv_placeMariborLetalisce, 1977, 1, [1, 4.4, 7.6, 8.1, 14.2, 18.6, 18.8, 17.9, 12.4, 10.6, 5.4, -0.7]);
@@ -1839,6 +1850,7 @@ addAvgTempYear(cv_placeMariborLetalisce, 2019, 1, [0, 3.8, 8, 11.2, 12.8, 22.8, 
 addAvgTempYear(cv_placeMariborLetalisce, 2020, 1, [0.2, 5.9, 6.6, 11.6, 14.7, 19.1, 20.7, 21.3, 16.5, 11.4, 4.5, 1.9]);
 addAvgTempYear(cv_placeMariborLetalisce, 2021, 1, [1.4, 3.7, 5.5, 8.5, 13.4, 22.2, 22.7, 19.3, 15.7, 9.3, 5, 1]);
 addAvgTempYear(cv_placeMariborLetalisce, 2022, 1, [0.8, 4.2, 4.4, 9.5, 17.3, 21.8, 22.6, 21.7, 15.3, 13.1, 6.7, 2.1]);
+addAvgTempYear(cv_placeMariborLetalisce, 2023, 1, [3.2, 2.7, 7.4, 9.1, 14.7, 19.8, 21.7, 21.1, 18.4, 14.8, 6.3]);
 
 // id=2650 AVTOMATSKA!!  LOGATEC (lon = 14.2032 lat = 45.9077 viš = 485m)
 addAvgTempYear(cv_placeLogatec, 2014, 2, [2.6, 6.4, 10.2, 12.6, 17.0, 18.0, 17.1, 14.2, 11.5, 7.5, 2.3]); // !2784! 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
@@ -1850,6 +1862,7 @@ addAvgTempYear(cv_placeLogatec, 2019, 1, [-1.4, 2.3, 6.0, 8.8, 10.4, 20.2, 19.5,
 addAvgTempYear(cv_placeLogatec, 2020, 1, [0.5, 4.5, 4.6, 9.3, 12.5, 16.8, 18.6, 19.4, 14.4, 10.0, 3.6, 1.8]); // 4464 4176 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placeLogatec, 2021, 1, [-0.5, 3.9, 3.3, 6.4, 11.4, 19.5, 19.9, 17.9, 14.3, 7.3, 4.2, 0.1]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placeLogatec, 2022, 1, [-1.0, 2.7, 2.9, 7.9, 14.9, 20.0, 20.2, 19.6, 13.7, 11.7, 6.0, 3.1]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placeLogatec, 2023, 1, [2.3, 0.0, 5.9, 7.1, 13.1, 17.9, 20.1, 18.9, 15.9, 13.3, 5.5]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 3457
 
 // id=2841 AVTOMATSKA !!  TOLMIN - VOLČE (lon = 13.7180 lat = 46.1777 viš = 188m)
 addAvgTempYear(cv_placeTolmin, 2015, 10, [11.5, 6.6, 2.6]); // 48 48 48 48 48 48 48 48 2927 4464 4320 4464
@@ -1860,6 +1873,7 @@ addAvgTempYear(cv_placeTolmin, 2019, 1, [0.9, 5.1, 8.7, 11.8, 13.1, 22.5, 22.1, 
 addAvgTempYear(cv_placeTolmin, 2020, 1, [2.0, 5.8, 7.7, 12.8, 15.3, 18.3, 21.2, 21.5, 17.4, 11.5, 6.7, 3.5]); // 4464 4176 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placeTolmin, 2021, 1, [1.0, 5.5, 6.5, 9.2, 13.0, 21.3, 22.1, 19.9, 17.4, 11.0, 7.2, 1.4]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placeTolmin, 2022, 1, [1.4, 4.3, 6.7, 10.3, 17.4, 22.5, 24.7, 22.7, 15.9, 14.2, 8.3, 4.8]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placeTolmin, 2023, 1, [4.6, 4.2, 8.2, 10.2, 16.5, 20.2, 22.1, 21.1, 18.9, 14.8, 6.8]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 3457
 
 // id=1837 AVTOMATSKA !!  VELENJE - TEŠ (lon = 15.1119 lat = 46.3603 viš = 388m)
 addAvgTempYear(cv_placeVelenje, 1990, 8, [21.1, 13.3, 10.9, 5.0, 0.1]); // 48 48 48 48 48 48 48 1392 1440 1488 1440 1488
@@ -1898,6 +1912,7 @@ addAvgTempYear(cv_placeVelenje, 2019, 1, [0.4, 4.7, 8.2, 11.2, 12.4, 22.4, 22.0,
 addAvgTempYear(cv_placeVelenje, 2020, 1, [1.8, 5.7, 6.7, 12.0, 14.4, 18.7, 20.8, 21.7, 16.7, 10.7, 4.2, 1.1]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeVelenje, 2021, 1, [0.4, 3.9, 5.2, 7.8, 12.4, 21.1, 21.7, 19.4, 16.1, 9.2, 4.7, 0.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeVelenje, 2022, 1, [0.7, 3.6, 4.6, 8.9, 16.5, 21.2, 22.3, 21.5, 14.6, 13.4, 6.7, 1.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeVelenje, 2023, 1, [2.2, 1.7, 7.0, 8.8, 14.2, 19.1, 21.0, 20.4, 18.6, 14.8, 6.9]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1153
 
 // id=1266 AVTOMATSKA !!  PTUJ - TERME (lon = 15.8543 lat = 46.4219 viš = 223m)
 //addAvgTempYear(cv_placePtuj, 1995, 1, [?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 3.0 ?, 0.9]); // 48 48 48 48 48 48 48 48 48 48 96 1488
@@ -1940,6 +1955,7 @@ addAvgTempYear(cv_placePtuj, 2019, 1, [-0.2, 3.5, 8.0, 10.9, 12.8, 22.2, 21.5, 2
 addAvgTempYear(cv_placePtuj, 2020, 1, [0.1, 6.4, 6.9, 11.2, 14.6, 18.6, 20.3, 21.3, 16.1, 11.5, 4.6, 2.2]); // 4464 4176 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placePtuj, 2021, 1, [1.8, 4.1, 5.8, 8.5, 13.5, 21.5, 22.0, 19.2, 15.7, 9.2, 5.2, 1.5]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
 addAvgTempYear(cv_placePtuj, 2022, 1, [0.9, 4.6, 4.8, 9.7, 17.0, 21.3, 22.0, 21.6, 15.2, 13.0, 6.5, 2.7]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 4464
+addAvgTempYear(cv_placePtuj, 2023, 1, [3.5, 2.7, 7.4, 9.3, 14.7, 19.6, 21.6, 20.8, 18.1, 14.7, 6.6]); // 4464 4032 4464 4320 4464 4320 4464 4464 4320 4464 4320 3457
 
 // id=1859 AVTOMATSKA !!  AJDOVŠČINA - DOLENJE (lon = 13.9013 lat = 45.8662 viš = 86m)
 //addAvgTempYear(cv_placeAjdovscina, 1993, 1, [3.8 ?, 4.0, 6.2, 11.5, 18.0, 20.5, 20.7, 23.2, 16.4, 13.5, 6.3, 5.1]); // 288 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
@@ -1976,6 +1992,7 @@ addAvgTempYear(cv_placeAjdovscina, 2019, 1, [2.8, 6.8, 10.0, 12.9, 13.8, 24.1, 2
 addAvgTempYear(cv_placeAjdovscina, 2020, 1, [4.8, 7.4, 8.7, 13.4, 16.4, 19.6, 22.5, 23.3, 19.8, 12.6, 9.0, 6.4]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeAjdovscina, 2021, 1, [3.8, 7.1, 7.6, 10.3, 14.5, 22.2, 23.8, 22.2, 19.2, 13.0, 9.3, 5.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeAjdovscina, 2022, 1, [3.5, 5.7, 7.8, 11.3, 18.8, 23.8, 25.7, 24.4, 17.9, 16.2, 10.2, 7.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeAjdovscina, 2023, 1, [6.2, 5.6, 9.4, 11.3, 18.1, 21.6, 23.9, 23.3, 21.0, 16.5, 8.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1153
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
