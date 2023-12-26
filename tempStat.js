@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.19"
+const gl_versionNr = "v1.20"
 const gl_versionDate = "26.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -275,6 +275,14 @@ station = addStation(cv_placePtuj, 2701, "PTUJ", "15.8492", "46.4197", "A", 222,
 // AJDOVŠČINA  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 21.12.2023  
 const cv_placeAjdovscina = addPlace("Ajdov" + scSchLow + scTchLow + "ina (86m)", "Ajdov" + scSchLow + scTchLow + "ina", "AJDV", "Ajdov" + scSchLow + scTchLow + "ina", "seaGreen", "white");
 station = addStation(cv_placeAjdovscina, 1857, "AJDOV" + scSch + scTch + "INA - DOLENJE", "13.9013", "45.8662", "A", 86, 2, 1993, 0, 0);
+
+// ČRNOMELJ  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 21.12.2023  
+const cv_placeCrnomelj = addPlace(scTch+"rnomelj (157m)", scTch+"rnomelj", scTch+"RNM", scTch+"rnomelj", "chocolate", "white");
+station = addStation(cv_placeCrnomelj, 590, scTch + "RNOMELJ", "15.1913", "45.5745", "", 173, 1, 1950, 8, 1967);
+station = addStation(cv_placeCrnomelj, 591, scTch + "RNOMELJ", "15.1924", "45.5758", "", 191, 10, 1967, 11, 1984);
+station = addStation(cv_placeCrnomelj, 592, scTch + "RNOMELJ", "15.1899", "45.5789", "", 172, 1, 1985, 4, 1986);
+station = addStation(cv_placeCrnomelj, 593, scTch + "RNOMELJ", "15.1940", "45.5751", "", 179, 9, 1986, 4, 1988);
+station = addStation(cv_placeCrnomelj, 1735, scTch + "RNOMELJ - DOBLI" + scTch + "E", "15.1462", "45.5600", "", 157, 6, 1988, 0, 0);
 
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
@@ -1993,6 +2001,94 @@ addAvgTempYear(cv_placeAjdovscina, 2020, 1, [4.8, 7.4, 8.7, 13.4, 16.4, 19.6, 22
 addAvgTempYear(cv_placeAjdovscina, 2021, 1, [3.8, 7.1, 7.6, 10.3, 14.5, 22.2, 23.8, 22.2, 19.2, 13.0, 9.3, 5.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeAjdovscina, 2022, 1, [3.5, 5.7, 7.8, 11.3, 18.8, 23.8, 25.7, 24.4, 17.9, 16.2, 10.2, 7.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
 addAvgTempYear(cv_placeAjdovscina, 2023, 1, [6.2, 5.6, 9.4, 11.3, 18.1, 21.6, 23.9, 23.3, 21.0, 16.5, 8.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1153
+
+// id=590 ČRNOMELJ
+addAvgTempYear(cv_placeCrnomelj, 1950, 1, [-2.3, 3.7, 7.3, 10.8, 17.8, 21.7, 23.8, 21.8, 16.8, 9.4, 7, 2]);
+addAvgTempYear(cv_placeCrnomelj, 1951, 1, [3.2, 5.1, 6.1, 11, 15.7, 19.5, 20.1, 21.1, 18.2, 9.5, 8.8, 2.4]);
+addAvgTempYear(cv_placeCrnomelj, 1952, 1, [-0.3, 0, 5, 13.8, 14.9, 20, 22.5, 22.1, 14.4, 10.7, 5, 0.3]);
+addAvgTempYear(cv_placeCrnomelj, 1953, 1, [-1.2, 0.2, 4.8, 11.6, 14.9, 18.7, 21.4, 18.4, 16.6, 12.7, 3.8, 1.3]);
+addAvgTempYear(cv_placeCrnomelj, 1954, 1, [-4.9, -3.9, 6.7, 8.6, 14.2, 20.2, 18.8, 19.2, 16.7, 10.5, 5, 3.4]);
+addAvgTempYear(cv_placeCrnomelj, 1955, 1, [1.5, 2.8, 2.2, 8.5, 13.7, 18, 20.3, 18.1, 14.9, 9.9, 4.1, 3]);
+addAvgTempYear(cv_placeCrnomelj, 1956, 1, [2.7, -8.3, 2.6, 9.9, 15.5, 17.6, 20.9, 19.9, 16.6, 10, 2.3, -0.2]);
+addAvgTempYear(cv_placeCrnomelj, 1957, 1, [-3.4, 6.2, 8, 9.9, 12.4, 20.9, 20.8, 18.4, 14.9, 10.3, 6.5, 2.1]);
+addAvgTempYear(cv_placeCrnomelj, 1958, 1, [-1.2, 5.6, 2.3, 7.8, 19, 18.3, 21.4, 20.6, 15.9, 11, 6.4, 4]);
+addAvgTempYear(cv_placeCrnomelj, 1959, 1, [0.8, -1, 8.5, 11.2, 14.7, 17.9, 21.2, 18.8, 13.9, 8.7, 6.1, 4]);
+addAvgTempYear(cv_placeCrnomelj, 1960, 1, [-0.6, 2.9, 6, 10, 14.6, 19.2, 18.6, 19.8, 14.2, 12.1, 7.8, 4.2]);
+addAvgTempYear(cv_placeCrnomelj, 1961, 1, [-1.1, 3.5, 8, 13.7, 14, 18.7, 18.4, 18.6, 16.9, 12.1, 5.8, -0.6]);
+addAvgTempYear(cv_placeCrnomelj, 1962, 1, [0.4, 0.8, 2, 10.3, 14, 16.5, 18.6, 20.8, 15, 10.5, 4.3, -3.6]);
+addAvgTempYear(cv_placeCrnomelj, 1963, 1, [-6.2, -3.1, 4.2, 11.2, 14.6, 19.5, 21.2, 20.4, 16.4, 9.9, 11.2, -3.2]);
+addAvgTempYear(cv_placeCrnomelj, 1964, 1, [-5.8, 0.3, 3.6, 11.5, 15.1, 20.2, 20.1, 18.4, 15.4, 10.3, 7.1, 0.7]);
+addAvgTempYear(cv_placeCrnomelj, 1965, 1, [1, -2.3, 6, 9.2, 13.8, 18.7, 20.1, 17.4, 15.9, 9.9, 3.9, 3.1]);
+addAvgTempYear(cv_placeCrnomelj, 1966, 1, [-3.2, 8.5, 5.2, 12.9, 15.2, 19.7, 19.2, 18.2, 16.2, 14.5, 3.4, 1.3]);
+//addAvgTempYear(cv_placeCrnomelj, 1967, 1, [-1.8, 2.7, 7.6, 9.4, 15.7, 17.8, 21.6, 19.6, , , ,]);
+// id=591
+//addAvgTempYear(cv_placeCrnomelj, 1967, 1, [, , , , , , , , , 12.1, 5.7, -0.3]);
+addAvgTempYear(cv_placeCrnomelj, 1967, 1, [-1.8, 2.7, 7.6, 9.4, 15.7, 17.8, 21.6, 19.6, 15.8, 12.1, 5.7, -0.3]); //manjkal sep, dopolnjeno s povprečjem istih mesecev leto prej in potem
+addAvgTempYear(cv_placeCrnomelj, 1968, 1, [-1.8, 3.8, 6.8, 12.9, 15.6, 18.3, 20.2, 18.4, 15.4, 11.8, 6.3, -1.7]);
+addAvgTempYear(cv_placeCrnomelj, 1969, 1, [-1.6, -0.1, 4.1, 10.5, 17.3, 17.7, 19.7, 18.4, 16.3, 9.8, 9.5, -3]);
+addAvgTempYear(cv_placeCrnomelj, 1970, 1, [-0.3, 1.6, 4.2, 9.7, 13.2, 19.7, 19.9, 20, 16.1, 10.4, 8.7, 0.1]);
+addAvgTempYear(cv_placeCrnomelj, 1971, 1, [-0.1, 2.9, 2.9, 12.1, 16.9, 17.9, 20.8, 21.1, 13.1, 9.6, 5, -0.1]);
+addAvgTempYear(cv_placeCrnomelj, 1972, 1, [-1.3, 3.1, 7.9, 10.4, 14.8, 19, 20.2, 18.9, 12.6, 9.4, 5.6, 1.4]);
+addAvgTempYear(cv_placeCrnomelj, 1973, 1, [-0.5, 1.9, 5.2, 8.4, 16.4, 18.6, 20, 19.2, 16.1, 8.8, 3.2, 1]);
+addAvgTempYear(cv_placeCrnomelj, 1974, 1, [1, 6.2, 7.6, 9.7, 14.3, 16.7, 19.7, 20.4, 15.5, 6.3, 6.5, 3.7]);
+addAvgTempYear(cv_placeCrnomelj, 1975, 1, [5.1, 1.7, 6.9, 10.2, 16.1, 16.9, 19.7, 18.6, 17.6, 9.8, 4.3, 0.9]);
+addAvgTempYear(cv_placeCrnomelj, 1976, 1, [1.7, 0.3, 1.8, 10.5, 14.9, 18.1, 20.4, 16.1, 14.5, 10.4, 7, 0.4]);
+addAvgTempYear(cv_placeCrnomelj, 1977, 1, [2.4, 5.3, 9.4, 9.1, 14.8, 18.8, 19.7, 18.8, 13.2, 12, 6.2, -0.1]);
+addAvgTempYear(cv_placeCrnomelj, 1978, 1, [0.2, 0.7, 7.2, 9.1, 13, 17.9, 18.6, 17.8, 14.5, 9.7, 0.9, 1.2]);
+addAvgTempYear(cv_placeCrnomelj, 1979, 1, [-1.4, 2.4, 8.2, 9.3, 16.1, 20, 19, 18.1, 15.9, 9.3, 5.3, 3.8]);
+addAvgTempYear(cv_placeCrnomelj, 1980, 1, [-1.7, 3.2, 5.9, 8.1, 12.5, 17.8, 19.3, 19.6, 15.7, 10.2, 3.8, -1.3]);
+addAvgTempYear(cv_placeCrnomelj, 1981, 1, [-2.8, 0.4, 8.8, 10.7, 15.1, 19, 19.9, 19.2, 16.3, 12.8, 4.5, 0.7]);
+addAvgTempYear(cv_placeCrnomelj, 1982, 1, [-1.5, -0.5, 5.2, 7.6, 15.5, 19.6, 21.5, 19.6, 18.3, 11.7, 5.9, 4.3]);
+addAvgTempYear(cv_placeCrnomelj, 1983, 1, [2.7, -0.8, 6.8, 13.3, 16.7, 18.6, 22.6, 19.9, 16, 10.3, 2.5, 0.5]);
+//addAvgTempYear(cv_placeCrnomelj, 1984, 1, [0.6, 0, 4.4, 9.5, 13.8, 17.8, 19, 18.5, 15.4, 11.7, 6.2, ]); 
+addAvgTempYear(cv_placeCrnomelj, 1984, 1, [0.6, 0, 4.4, 9.5, 13.8, 17.8, 19, 18.5, 15.4, 11.7, 6.2, 2.5]); //manjkal dec, dopolnjeno s povprečjem istih mesecev leto prej in potem
+// id=592
+addAvgTempYear(cv_placeCrnomelj, 1985, 1, [-5.6, -2.9, 4.7, 10.2, 16.2, 16.7, 20.8, 19.9, 16, 9.5, 3, 4.5]);
+//addAvgTempYear(cv_placeCrnomelj, 1986, 1, [0.6, -3.3, 2.6, 10.8, , , , , , , ,]);
+// id=593
+//addAvgTempYear(cv_placeCrnomelj, 1986, 1, [, , , , , , , , 14.8, 9.6, 5.4, -0.6]);
+addAvgTempYear(cv_placeCrnomelj, 1986, 1, [0.6, -3.3, 2.6, 10.8, 15, 17.6, 21, 19.1, 14.8, 9.6, 5.4, -0.6]); //manjkal maj-avg, dopolnjeno s povprečjem istih mesecev leto prej in potem
+addAvgTempYear(cv_placeCrnomelj, 1987, 1, [-3.4, 0.8, 1, 11, 13.7, 18.6, 21.3, 18.2, 18.8, 11.5, 4.5, 1.4]);
+//addAvgTempYear(cv_placeCrnomelj, 1988, 1, [4.3, 3.7, 5.3, 9.8, , , , , , , ,]);
+// id=1735 ČRNOMELJ - DOBLIČE
+//addAvgTempYear(cv_placeCrnomelj, 1988, 1, [, , , , , 17.6, 21.4, 20, 15.2, 10.4, 1.2, 0.3]);
+addAvgTempYear(cv_placeCrnomelj, 1988, 1, [4.3, 3.7, 5.3, 9.8, 13.8, 17.6, 21.4, 20, 15.2, 10.4, 1.2, 0.3]); //manjkal maj, dopolnjeno s povprečjem istih mesecev leto prej in potem
+addAvgTempYear(cv_placeCrnomelj, 1989, 1, [-0.6, 4, 8.5, 11, 13.9, 16.5, 20.1, 19.3, 15.3, 9.8, 3, 3]);
+addAvgTempYear(cv_placeCrnomelj, 1990, 1, [-0.2, 5.8, 8, 9.3, 15.8, 18, 19.6, 19.3, 14, 11.2, 5.3, 0.7]);
+addAvgTempYear(cv_placeCrnomelj, 1991, 1, [1, -2.4, 8, 7.8, 11.8, 18.1, 21.3, 19.9, 16.3, 8.7, 5.6, -2.3]);
+addAvgTempYear(cv_placeCrnomelj, 1992, 1, [0.6, 2.9, 5.6, 10.8, 14.7, 18.5, 20.7, 23, 15.8, 10, 6.5, 0.8]);
+addAvgTempYear(cv_placeCrnomelj, 1993, 1, [1.3, -0.3, 5, 11, 17.1, 18.9, 20, 19.9, 15, 11.5, 1.7, 2.5]);
+addAvgTempYear(cv_placeCrnomelj, 1994, 1, [2.8, 2.1, 10, 9.7, 15.3, 19.2, 22.2, 22.3, 17.4, 8.4, 7.2, 1.7]);
+addAvgTempYear(cv_placeCrnomelj, 1995, 1, [0.6, 5, 5, 11.7, 15.2, 17.3, 22.3, 18.8, 14.7, 11.8, 4.9, 1]);
+addAvgTempYear(cv_placeCrnomelj, 1996, 1, [-1.4, -1.5, 2.6, 10.2, 15.7, 20, 18.4, 19.5, 12.7, 10.7, 7.3, -2.8]);
+addAvgTempYear(cv_placeCrnomelj, 1997, 1, [-1.3, 4.2, 6.5, 8.2, 17.1, 20.4, 21.3, 20.4, 16.3, 9.3, 5.2, 2.9]);
+addAvgTempYear(cv_placeCrnomelj, 1998, 1, [4.4, 5.4, 5.4, 12.8, 16.2, 21.6, 22.5, 22, 16, 11.9, 3.8, -4.1]);
+addAvgTempYear(cv_placeCrnomelj, 1999, 1, [1, 1.5, 8.6, 12.2, 16.9, 19.7, 21.3, 20.9, 18.2, 11.6, 2.6, 0.8]);
+addAvgTempYear(cv_placeCrnomelj, 2000, 1, [-2.3, 4.1, 8.1, 14.2, 18, 22.1, 21.3, 23.5, 17.2, 13.4, 9.3, 5.5]);
+addAvgTempYear(cv_placeCrnomelj, 2001, 1, [3.8, 3.6, 10.1, 10.5, 18.1, 18.9, 22.6, 23.1, 14.5, 14.3, 2.7, -2]);
+addAvgTempYear(cv_placeCrnomelj, 2002, 1, [0.6, 6, 8.7, 9.8, 17.7, 21, 21.9, 20.7, 15, 11.9, 9.5, 1.9]);
+addAvgTempYear(cv_placeCrnomelj, 2003, 1, [-1.4, -2, 6.6, 10.1, 19.2, 23.7, 23.4, 25.2, 15.1, 8.7, 7.5, 1.6]);
+addAvgTempYear(cv_placeCrnomelj, 2004, 1, [-0.5, 2.5, 4.6, 11.3, 15.1, 19.2, 21, 20.9, 15.3, 13.3, 6.6, 1.4]);
+addAvgTempYear(cv_placeCrnomelj, 2005, 1, [-0.2, -1.4, 4.8, 11.6, 16, 19.5, 21.1, 18.3, 16.5, 11.8, 5.3, 1.6]);
+addAvgTempYear(cv_placeCrnomelj, 2006, 1, [-1.5, 0.6, 4.9, 11.9, 15.7, 20.3, 23.4, 18.1, 17.2, 13.2, 9.4, 4]);
+addAvgTempYear(cv_placeCrnomelj, 2007, 1, [5.5, 6.1, 8.6, 13.9, 17.4, 21.6, 22.1, 20.6, 14.1, 9.8, 4.6, -0.2]);
+addAvgTempYear(cv_placeCrnomelj, 2008, 1, [1.7, 4.9, 6.7, 11.9, 17.6, 21.2, 21.7, 21.1, 14.9, 12.5, 7.3, 2.6]);
+addAvgTempYear(cv_placeCrnomelj, 2009, 1, [-2.2, 2.1, 7, 14.1, 18.7, 19.4, 22.7, 22.3, 17.7, 11.3, 7.9, 2.4]);
+addAvgTempYear(cv_placeCrnomelj, 2010, 1, [-1.8, 0.7, 5.8, 11.2, 15.7, 19.8, 23.1, 20.8, 14.7, 8.9, 8.4, -2.9]);
+addAvgTempYear(cv_placeCrnomelj, 2011, 1, [1.4, 0.8, 6, 12.7, 15.9, 20.1, 21, 22.2, 18.5, 9.6, 2.9, 3.7]);
+addAvgTempYear(cv_placeCrnomelj, 2012, 1, [1.3, -3.2, 8.6, 11.6, 15.6, 21.8, 22.7, 22, 16.4, 11.3, 8.6, -0.2]);
+addAvgTempYear(cv_placeCrnomelj, 2013, 1, [0.9, 0.7, 2.6, 12.2, 15.7, 19.6, 22.3, 22, 15.6, 13.2, 7.2, 2.8]);
+addAvgTempYear(cv_placeCrnomelj, 2014, 1, [5.4, 5, 9.8, 13.2, 15.7, 19.7, 21.4, 19.8, 16.2, 13.6, 9, 4.3]);
+addAvgTempYear(cv_placeCrnomelj, 2015, 1, [3.6, 1.4, 7.6, 12.2, 17.4, 20.6, 24.1, 22.1, 16.6, 11.2, 7.6, 3]);
+addAvgTempYear(cv_placeCrnomelj, 2016, 1, [2, 6.8, 7.5, 12.5, 16.1, 20.7, 23.1, 20.3, 17.6, 10.7, 6.9, -0.3]);
+addAvgTempYear(cv_placeCrnomelj, 2017, 1, [-3.6, 4.9, 9.4, 11.9, 17, 22.4, 23.8, 23.1, 14.5, 11.5, 6.8, 3.4]);
+addAvgTempYear(cv_placeCrnomelj, 2018, 1, [5.1, -0.7, 4.4, 15, 18, 20.9, 21.7, 22.7, 16.4, 12.5, 7.7, 1.9]);
+addAvgTempYear(cv_placeCrnomelj, 2019, 1, [0.2, 4.1, 8.8, 10.9, 13.1, 22.5, 21.7, 22, 15.9, 12.7, 8.2, 3.8]);
+addAvgTempYear(cv_placeCrnomelj, 2020, 1, [1.6, 7.2, 7.5, 12.4, 14.9, 19.8, 21.1, 22.1, 16.6, 11.8, 5.1, 3.4]);
+addAvgTempYear(cv_placeCrnomelj, 2021, 1, [1.9, 5.9, 6, 9, 14.4, 21.7, 22.8, 19.9, 16.2, 9.4, 6.2, 3.2]);
+addAvgTempYear(cv_placeCrnomelj, 2022, 1, [1.4, 4.9, 5, 9.8, 17.7, 22, 22.5, 22.2, 16.1, 13.8, 7.7, 4.8]);
+addAvgTempYear(cv_placeCrnomelj, 2023, 1, [3.9, 3.9, 8.1, 9.9, 15.4, 20.7, 23.1, 21.2, 18.4, 15.3, 7.6]);
+
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
 for (place = 1; place <= nrPlaces; place++) {
