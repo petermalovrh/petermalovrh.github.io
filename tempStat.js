@@ -1,6 +1,6 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.21"
+const gl_versionNr = "v1.22"
 const gl_versionDate = "26.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -285,10 +285,15 @@ station = addStation(cv_placeCrnomelj, 593, scTch + "RNOMELJ", "15.1940", "45.57
 station = addStation(cv_placeCrnomelj, 1735, scTch + "RNOMELJ - DOBLI" + scTch + "E", "15.1462", "45.5600", "", 157, 6, 1988, 0, 0);
 
 // GODNJE  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 26.12.2023  
-const cv_placeGodnje = addPlace("Godnje (320m)", "Godnje", "GODNJE", "Godnje", "chocolate", "white");
+const cv_placeGodnje = addPlace("Godnje (320m)", "Godnje", "GODNJE", "Godnje", "dodgerBlue", "white");
 station = addStation(cv_placeGodnje, 256, "GODNJE", "13.8502", "45.7549", "", 335, 5, 1955, 12, 1955);
 station = addStation(cv_placeGodnje, 257, "GODNJE", "13.8420", "45.7528", "", 295, 2, 1956, 3, 1992);
 station = addStation(cv_placeGodnje, 1669, "GODNJE", "13.8439", "45.7550", "", 320, 5, 1992, 0, 0);
+
+// BOVEC - LETALIŠČE  lokacije in ARSO-Id postaj glej spodaj med podatki  ... 26.12.2023  
+const cv_placeBovec = addPlace("Bovec - Letali" + scSchLow + scTchLow + "e (441m)", "Bovec", "BOVEC", "Bovec", "cadetBlue", "white");
+station = addStation(cv_placeBovec, 528, "BOVEC - LETALI" + scSch + scTch + "E", "13.5543", "46.3308", "A", 441, 12, 1999, 4, 2012);
+station = addStation(cv_placeBovec, 1868, "BOVEC - LETALI" + scSch + scTch + "E", "13.5538", "46.3317", "A", 441, 5, 2012, 0, 0);
 
 
 //---- pomočnik za pripravo vzorca za novo postajo, rezultat v debug konzoli
@@ -2173,6 +2178,36 @@ addAvgTempYear(cv_placeGodnje, 2020, 1, [4.8, 6.5, 7.4, 12.6, 15.4, 18.6, 21.7, 
 addAvgTempYear(cv_placeGodnje, 2021, 1, [3.1, 6.5, 6.5, 9.3, 13.7, 21.8, 22.7, 21.4, 18.1, 11.4, 8.4, 4.5]);
 addAvgTempYear(cv_placeGodnje, 2022, 1, [3.7, 5.2, 6.4, 10.2, 17.6, 22.9, 24.7, 22.9, 16.3, 15.2, 9.1, 5.8]);
 addAvgTempYear(cv_placeGodnje, 2023, 1, [5.1, 4.8, 8.3, 10, 16.4, 20.6, 22.9, 22, 19.6, 15.6, 8.4]);
+
+// id=528 BOVEC - LETALIŠČE
+addAvgTempYear(cv_placeBovec, 1999, 12, [-2.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2000, 1, [-3.4, 2.1, 5.5, 11.4, 14.8, 18.9, 17.2, 20.1, 15.2, 11.5, 6.8, 2.5]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2001, 1, [2.1, 3.5, 6.7, 8.5, 15.8, 16.7, 19.4, 20.8, 12.7, 12.6, 3.5, -1.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2002, 1, [-1.4, 3.0, 7.9, 9.7, 14.6, 19.2, 19.3, 18.1, 13.9, 9.8, 7.8, 2.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2003, 1, [-0.7, -1.5, 6.5, 8.3, 15.4, 21.0, 19.9, 22.0, 13.6, 7.3, 5.7, 0.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2004, 1, [-1.8, 0.4, 4.1, 9.5, 11.8, 16.8, 18.8, 18.7, 14.9, 11.9, 4.5, 0.5]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2005, 1, [-1.2, -0.5, 4.2, 9.0, 14.9, 18.0, 19.5, 17.7, 15.4, 10.2, 4.0, -1.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2006, 1, [-2.3, -0.4, 3.5, 9.8, 14.0, 18.9, 22.7, 16.4, 16.8, 12.2, 6.4, 2.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2007, 1, [2.8, 4.2, 7.7, 13.7, 15.6, 18.4, 19.6, 18.8, 13.5, 10.2, 4.4, 0.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2008, 1, [1.8, 2.7, 4.8, 9.0, 15.0, 18.5, 19.5, 19.5, 14.0, 10.6, 4.7, 0.5]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2009, 1, [-1.3, 1.0, 5.4, 11.3, 16.5, 17.0, 19.3, 20.9, 16.2, 10.1, 6.0, 1.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2010, 1, [-1.9, 0.9, 5.1, 10.1, 13.4, 18.3, 21.5, 18.5, 13.9, 8.8, 6.1, -1.4]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2011, 1, [0.1, 1.4, 5.5, 12.2, 15.4, 18.0, 18.9, 20.2, 18.0, 9.1, 3.6, 1.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+//addAvgTempYear(cv_placeBovec, 2012, 1, [-0.4, -0.1, 9.5, 8.4 ?, ?, ?, ?, ?, ?, ?, ?, ?]); // 1488 1392 1488 817 48 48 48 48 48 48 48 48
+// id=1868
+//addAvgTempYear(cv_placeBovec, 2012, 1, [?, ?, ?, 10.8 ?, 14.8, 18.9, 20.6, 21.6, 16.3, 10.4, 6.7, -0.5]); // 48 48 48 719 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2012, 1, [-0.4, -0.1, 9.5, 11.6, 14.8, 18.9, 20.6, 21.6, 16.3, 10.4, 6.7, -0.5]); // 1488 1392 1488 x 1488 1440 1488 1488 1440 1488 1440 1488 manjakl apr, dopolnjeno s povprečjem istih mesecev leto prej in potem
+addAvgTempYear(cv_placeBovec, 2013, 1, [0.5, -0.1, 3.2, 11.0, 12.6, 17.6, 21.6, 20.5, 15.0, 11.4, 6.2, 1.7]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2014, 1, [3.5, 2.9, 8.3, 11.7, 13.8, 17.8, 18.6, 17.8, 15.5, 12.3, 7.9, 2.8]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2015, 1, [1.8, 1.9, 6.9, 10.6, 15.3, 18.7, 21.9, 20.3, 13.9, 10.1, 5.9, 1.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2016, 1, [0.0, 3.4, 6.4, 10.7, 13.2, 17.6, 20.9, 19.2, 17.0, 9.6, 5.9, -0.9]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2017, 1, [-3.9, 3.0, 9.0, 10.3, 15.1, 19.5, 18.9, 20.8, 13.1, 11.0, 5.0, 0.2]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2018, 1, [2.4, 0.1, 4.0, 13.0, 15.9, 18.9, 20.9, 21.2, 16.5, 12.2, 7.0, 1.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2019, 1, [-0.3, 4.4, 8.0, 10.6, 11.6, 21.6, 20.9, 20.8, 15.9, 11.9, 7.0, 2.1]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2020, 1, [0.8, 4.7, 6.2, 12.1, 14.2, 17.2, 20.0, 20.3, 16.1, 10.1, 4.6, 1.3]); // 1488 1392 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2021, 1, [-1.9, 3.2, 5.3, 8.0, 11.4, 20.3, 21.0, 18.7, 16.3, 9.5, 5.4, 0.0]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2022, 1, [0.3, 3.5, 5.3, 8.9, 16.1, 21.1, 23.0, 21.0, 14.5, 13.0, 6.9, 2.5]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1488
+addAvgTempYear(cv_placeBovec, 2023, 1, [3.0, 2.4, 6.9, 8.9, 14.8, 19.0, 20.6, 19.9, 17.8, 13.2, 5.3]); // 1488 1344 1488 1440 1488 1440 1488 1488 1440 1488 1440 1153
 
 
 //---- podatki so vpisani, zdaj je treba za vsako lokacijo določiti offset, se pravi za koliko mesecev naprej od splošno prvega podatka se začnejo podatki posamezne lokacije
