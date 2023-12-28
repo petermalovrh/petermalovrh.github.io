@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.23"
-const gl_versionDate = "26.12.2023"
+const gl_versionNr = "v1.24"
+const gl_versionDate = "28.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -2321,6 +2321,7 @@ var lo_tipMonth = 0;
 var lo_tipMultiMonth = 0;                   // 26.12.2023
 var lo_tipMultiPlace = cv_allPlace;         // 26.12.2023
 var lo_tipMultiTimeSlice = cv_timeSliceAll; // 26.12.2023
+var lo_tipMultiKx = 0;                      // 28.12.2023
 var nrToolTips = 0;             // 25.12.2023
 const arrToolTipMonth = [];     // 25.12.2023
 const arrToolTipMode = [];      // 26.12.2023
@@ -3787,17 +3788,17 @@ window.addEventListener("keydown", (event) => {
             //console.log("+ pressed");
             if (event.altKey) {
                 lf_clearToolTipMonthsByMode(gl_mode);
-                paint();
             } else {
                 switch (gl_mode) {
                     case cv_mode_timeAvgTempSingle:
-                        lf_addToolTipMonth(lo_tipMonth, cv_allPlace, gl_timeSlice, lo_mouseMoveY);
+                        lf_addToolTipMonth(lo_tipMonth, cv_allPlace, gl_timeSlice, lo_graphKx, lo_mouseMoveY);
                         break;
                     case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempMultiTimeSlice:
-                        lf_addToolTipMonth(lo_tipMultiMonth, lo_tipMultiPlace, lo_tipMultiTimeSlice, lo_mouseMoveY);
+                        lf_addToolTipMonth(lo_tipMultiMonth, lo_tipMultiPlace, lo_tipMultiTimeSlice, lo_tipMultiKx, lo_mouseMoveY);
                         break;
                 }
             }
+            paint();
             break;
     }
 });
@@ -7057,6 +7058,7 @@ function paint_graph_timeAvgTemp_tipBeforeGraph(vp_place, vp_timeSlice, vp_month
                     lo_tipMultiMonth = lo_tipMonth;
                     lo_tipMultiPlace = vp_place;
                     lo_tipMultiTimeSlice = vp_timeSlice;
+                    lo_tipMultiKx = kx;
                 }; // 26.12.2023
         }
     }
@@ -8853,13 +8855,17 @@ function gf_withinUndefPeriod(vp_place, vp_month) {
     
 }
 
-function lf_addToolTipMonth(vp_month, vp_place, vp_timeSlice, vp_mouseY) {
-    // 26.12.2023
+function lf_addToolTipMonth(vp_month, vp_place, vp_timeSlice, vp_kx, vp_mouseY) {
+    //-----------------------------------------------------------------
+    // 26.12.2023 doda toolTip, če pa je tam toolTip že bil, ga izbriše
+    //-----------------------------------------------------------------
 
     //---- ali ta morda že obstaja v tabeli? Če obstaja, ga zbrišemo
     let listIndex, listIndex2;
     for (listIndex = 1; listIndex <= nrToolTips; listIndex++) {
-        if (arrToolTipMonth[listIndex] == vp_month && arrToolTipMode[listIndex] == gl_mode && arrToolTipPlace[listIndex] == vp_place && arrToolTipTimeSlice[listIndex] == vp_timeSlice) {
+        //if (arrToolTipMonth[listIndex] == vp_month && arrToolTipMode[listIndex] == gl_mode && arrToolTipPlace[listIndex] == vp_place && arrToolTipTimeSlice[listIndex] == vp_timeSlice) {
+        const cv_diffX = 15; //---- 28.12.2023 zbrišem prvega, ki je za toliko pikslov oddaljen od trenutne vertikale miške
+        if (vp_kx * Math.abs(arrToolTipMonth[listIndex] - vp_month) <= cv_diffX && arrToolTipMode[listIndex] == gl_mode && arrToolTipPlace[listIndex] == vp_place && arrToolTipTimeSlice[listIndex] == vp_timeSlice) {
             //---- ta mesec je v tem mode že bil notri, treba ga je pobrisati ven
             //     se pravi vse naslednje premakniti za 1 nazaj, potem pa dolžino tabele skrajšati za 1
             if (listIndex !== nrToolTips) {
