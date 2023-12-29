@@ -1,7 +1,7 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.24"
-const gl_versionDate = "28.12.2023"
+const gl_versionNr = "v1.25"
+const gl_versionDate = "29.12.2023"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 
@@ -2361,6 +2361,10 @@ var lo_graphMarginLeft, lo_graphMarginTop, lo_graphMarginRight, lo_graphMarginBo
 var lo_showGUI = true
 var lo_showHelpTips = true
 var lo_showStations = false
+var lo_showMap = false;    // 29.12.2023
+var lo_gMapLoaded = false; // 29.12.2023
+var lo_mapCreated = false; // 29.12.2023
+var gMarker = [];          // 29.12.2023
 
 var lo_showToolTips = true
 
@@ -3298,6 +3302,9 @@ const cv_panelGUI_height = 100
 //placePanelToggle.left = placePanelToggle.right - 41;
 placePanelToggle.adjustToCtxWidth();
 
+var gMap; // 29.12.2023
+var mapLocation, mapOptions, gMapDiv;
+
 var ctx = elMyCanvas.getContext("2d");
 const bckgColor = "#F4F8F8";
 
@@ -3800,6 +3807,8 @@ window.addEventListener("keydown", (event) => {
             }
             paint();
             break;
+        case 'F8':
+            lf_changeShowMap(!lo_showMap, true); break;
     }
 });
 
@@ -3925,7 +3934,35 @@ function resizeCanvas() {
     lo_GUIlayoutHasChanged = true;
 }
 
+function resizeMap() {
+    //dimenzioniranje in pozicioniranje canvas-a
+    //ctxW = window.innerWidth - 6;
+    //ctxH = window.innerHeight - 6;
+    //ctxMinDim = Math.min(ctxW, ctxH);
+    gMapDiv.style.width = "100%"; //ctxW     //da je na obeh straneh minimalen rob
+    gMapDiv.style.height = "100%" //ctxH; //da je na obeh straneh minimalen rob
+    gMapDiv.style.position = "absolute";     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+    gMapDiv.style.left = "0px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+    gMapDiv.style.top = "0px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
+
+    //if (window.innerHeight == screen.height) {
+        // browser is fullscreen
+    //}
+    if ((screen.availHeight || screen.height - 30) <= window.innerHeight) {
+        // browser is almost certainly fullscreen
+    } else {
+        // browser almost certainly isn't in fullscreen
+        if (lo_fullScreen) {
+            lo_fullScreen = ""
+            //checkFullScreen.checked = ""
+        }
+    }
+    //lo_GUIlayoutHasChanged = true;
+}
+
 function paint() {
+
+    if (lo_showMap) { return }; // 29.12.2023
 
     let myTime1 = Date.now()
 
@@ -4659,7 +4696,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 24;
+            let nrTipRows = 25;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -4778,6 +4815,10 @@ function paint_tips() {
             gBannerRectWithText2("F9", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... list of weather stations", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
+            y += vStep;
+            gBannerRectWithText2("F8", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... weather stations on the map", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //            
             y += vStep;
             gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... hide/show tool tips", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
@@ -5154,6 +5195,62 @@ function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 function lf_changeShowStations(vp_newValue, vp_paint) {
 
     lo_showStations = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
+function lf_changeShowMap(vp_newValue, vp_paint) {
+    //----------------------------------------
+    // 29.12.2023 prikaz postaj na google maps
+    //----------------------------------------
+    
+    lo_showMap = vp_newValue;
+
+    //elMyCanvas.visible = false;
+    switch (lo_showMap) {
+        case true:
+            elMyCanvas.style.display = "none";
+            //elMyCanvas.style.visibility = "hidden";
+            //----
+            if (!lo_mapCreated) { 
+                //---- v obstoječem DIV gMapDiv google mapa še ni bila kreirana
+                //mapLocation = { lat: 46.159934997558594, lng: 14.310297012329102 }; // Škofja Loka
+                mapLocation = { lat: 46.1, lng: 15 };
+                mapOptions = { center: mapLocation, zoom: 9 };
+                gMap = new google.maps.Map(gMapDiv, mapOptions);
+                lo_mapCreated = true;
+                //---- še oznake postaj
+                //gMapMarker.setAttribute("id",id);
+                
+                //gMarker[1] = new google.maps.Marker({ position: siliconValley, map: gMap });
+                let station, tmpStr;
+                for (station = 1; station <= nrStations; station++) {
+                    mapLocation.lat = +stationLat[station]; mapLocation.lng = +stationLon[station];
+                    tmpStr = stationName[station];
+                    tmpStr += " (";
+                    switch (stationType[station]) {
+                        case "A": tmpStr += "ARSO-samodejna postaja"; break;
+                        case "P": tmpStr += "Privatna postaja"; break;
+                        default: tmpStr += "ARSO"; break;
+                    }
+                    tmpStr += ", " + stationHeight[station].toString() + "m";
+                    tmpStr += ", " + lf_dateStrMMMsepYY(stationMonthStart[station], stationYearStart[station], ":", 0, 0, "live");
+                    tmpStr += " .. " + lf_dateStrMMMsepYY(stationMonthEnd[station], stationYearEnd[station], ":", 0, 0, "live");
+                    tmpStr += ")"
+                    gMarker[station] = new google.maps.Marker({ position: mapLocation, map: gMap, title: tmpStr });
+                }
+            }
+            gMapDiv.style.visibility = "visible";
+            //----
+            break;
+        case false:
+            gMapDiv.style.visibility = "hidden";
+            //----
+            elMyCanvas.style.display = "block";
+            elMyCanvas.style.visibility = "visible";
+            break;
+    }
+    
+
     if (vp_paint) { paint() }
 }
 
@@ -7827,6 +7924,7 @@ function gf_alphaColor(vp_alpha, vp_color) {
 
 window.onresize = function (event) {
     resizeCanvas();
+    resizeMap(); // 29.12.2023
     paint();
 };
 
@@ -8929,4 +9027,27 @@ function cLogVarStr(myVar) {
     //a = window[myVar];
     return myVar + '=' + window[myVar]; //tole deluje, ampak samo za globalne spremenljivke!!! 14.12.2023
 
+}
+
+function gMapsCallback() {
+    //console.log("map done!");
+    if (!lo_gMapLoaded) {
+        lo_gMapLoaded = true;
+        console.log("google maps API created");
+        //---- tudi tale način kreacije DIV deluje
+        //const cv_divOptions = { width: "100%", height: "400px" };
+        //gMapDiv = document.createElement('div', cv_divOptions);
+        //---- uporabim pa tale način
+        gMapDiv = document.createElement('div');
+        gMapDiv.style.left = "0px";
+        gMapDiv.style.top = "0px";
+        gMapDiv.style.width = "100%";
+        gMapDiv.style.height = window.innerHeight.toString() + "px";  //"100%"; //"500px";
+        gMapDiv.style.position = "absolute";
+        gMapDiv.style.margin = "0px";
+        gMapDiv.style.padding = "0px";
+        gMapDiv.style.visibility = "hidden";
+        gMapDiv.style.background = "lightGray";
+        document.body.appendChild(gMapDiv);
+    }
 }
