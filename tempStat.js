@@ -1,9 +1,21 @@
 //------------------------------------
 //---- pričetek razvoja 2.12.2023
-const gl_versionNr = "v1.26"
-const gl_versionDate = "30.12.2023"
+const gl_versionNr = "v1.27"
+const gl_versionDate = "1.1.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
+
+// tole je bilo prej (do 1.1.2024) v HTML
+// <!-- The callback parameter is required, so we use console.debug as a noop -->
+// <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD_hEmuBFJDFcmdqQHqh3fYIN6DKo3vAE4&callback=gMapsCallback&libraries=maps,marker&v=beta">
+// </script>
+// zdaj (1.1.2024) sem naredil po muštru (sam zraven dodal async!) https://stackoverflow.com/questions/28490425/how-to-use-google-maps-api-v3-without-add-script-tag-on-html
+window.addEventListener('load', async function () {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD_hEmuBFJDFcmdqQHqh3fYIN6DKo3vAE4&callback=gMapsCallback&libraries=maps,marker&v=beta';
+    document.body.appendChild(script);
+});
 
 console.clear;
 
@@ -26,6 +38,7 @@ const scPI = String.fromCharCode(0xB6)
 const scPower2 = String.fromCharCode(0xB2)
 const scInfinity = String.fromCharCode(0x221E)
 const scDelta = String.fromCharCode(0x0394)
+const scCopyR = String.fromCharCode(0x00A9)
 //----
 const scTch = String.fromCharCode(0x10C)
 const scTchLow = String.fromCharCode(0x10D)
@@ -455,7 +468,7 @@ addAvgTempYear(cv_placeSkofjaLoka, 2019, 1, [-0.5, 3.5, 6.9, 10, 11.7, 21.9, 21.
 addAvgTempYear(cv_placeSkofjaLoka, 2020, 1, [0.6, 4.8, 5.8, 11.2, 13.8, 16.7, 20.2, 20.9, 16.3, 10.4, 4.6, 1.9]);
 addAvgTempYear(cv_placeSkofjaLoka, 2021, 1, [-0.7, 3.9, 5, 7.9, 12.2, 21.2, 21.9, 19.3, 16.2, 8.8, 4.4, -0.3]);
 addAvgTempYear(cv_placeSkofjaLoka, 2022, 1, [-0.4, 3.4, 4.9, 9.2, 16.7, 21.6, 22.8, 21.8, 14.7, 13.0, 6.5, 2.8]);
-addAvgTempYear(cv_placeSkofjaLoka, 2023, 1, [2.4, 1.6, 6.8, 9.1, 14.9, 19.7, 21.6, 20.4, 17.4, 13.5, 5.5]);
+addAvgTempYear(cv_placeSkofjaLoka, 2023, 1, [2.4, 1.6, 6.8, 9.1, 14.9, 19.7, 21.6, 20.4, 17.4, 13.5, 5.5, 2.8]);
 
 addAvgTempYear(cv_placeMariborVrbanskiPlato, 2020, 1, [0.1, 5.3, 6.3, 11, 14.1, 18.3, 20, 21, 16.4, 10.7, 4.4, 1.6]);
 addAvgTempYear(cv_placeMariborVrbanskiPlato, 2021, 1, [1.5, 3.4, 5.2, 8.4, 12.7, 21.2, 21.8, 19, 15.9, 9.1, 5.1, 1.6]);
@@ -6609,7 +6622,10 @@ function paint_graph_timeAvgTemp(vp_left, vp_top, vp_width, vp_height, vp_graphT
             break;
         }
     }
-    for (tmpTemp = -25; tmpTemp <= 30; tmpTemp++) {
+    let tmpTemp0, tmpTemp1;
+    tmpTemp0 = -25; tmpTemp1 = 30;
+    if (gl_deltaT) { tmpTemp0 = -150; tmpTemp1 = 150; } // 1.1.2024
+    for (tmpTemp = tmpTemp0; tmpTemp <= tmpTemp1; tmpTemp++) {
         //---- izpis pri 0 stopinj
         if (tmpTemp == 0) {
             y = cv_graphY0;
@@ -8297,12 +8313,13 @@ function lf_inspectDataValues(vp_place, vp_timeSlice, vp_monthStart, vp_monthEnd
 
     let minY = 101
     let maxY = -50
-    let tmpValue, tmpMonthValue, tmpMonthValue2, placeStart, placeEnd, offsetPlaceMonths, placeMonth;
+    let tmpValue, tmpMonthValue, tmpMonthValue2, placeStart, placeEnd, placeMonth;
     let vl_placeMonthStart, vl_placeMonthEnd;
     switch (vp_place) {
         case cv_allPlace: placeStart = 1; placeEnd = nrPlaces; break;
         default: placeStart = vp_place; placeEnd = vp_place; break;
     }
+    let haveData = false;
     for (place = placeStart; place <= placeEnd; place++) {
         //---- znotraj lokacije preverim, da z meseci ne bom brez veze hodil preko indeksov, kjer sploh ni podatkov te lokacije
         vl_placeMonthStart = vp_monthStart; if (vp_monthStart < firstMonth[place]) { vl_placeMonthStart = firstMonth[place] };
@@ -8310,7 +8327,6 @@ function lf_inspectDataValues(vp_place, vp_timeSlice, vp_monthStart, vp_monthEnd
         //---- zanka čez ustrezne mesece tekoče lokacije
         //for (month = vp_monthStart; month <= vp_monthEnd; month++) {
         for (month = vl_placeMonthStart; month <= vl_placeMonthEnd; month++) {
-            //placeMonth = month - offsetPlaceMonths;
             placeMonth = month - offsetMonths[place];
             if (valueBetween(placeMonth, 1, nrMonths[place])) {  //zaporedna številka meseca mora biti znotraj razpona mesecev za to merilno lokacijo
                 //---- smo znotraj razpona podatkov za trenutno lokacijo
@@ -8329,16 +8345,20 @@ function lf_inspectDataValues(vp_place, vp_timeSlice, vp_monthStart, vp_monthEnd
                 }
                 tmpValue = lf_getAvgValue(place, vp_timeSlice, placeMonth, cv_nrMonthsAvgMult * vp_nrMonthsAvg)
                 if (tmpValue < minY) {
-                    minY = tmpValue
+                    minY = tmpValue;
+                    haveData = true;
                     //console.log("place=" + place + " month=" + month + " minY=" + minY + " (maxY="+maxY+")")
                 }
                 if (tmpValue > maxY) {
-                    maxY = tmpValue
+                    maxY = tmpValue;
+                    haveData = true;
                     //console.log("place=" + place + " month=" + month + " maxY=" + maxY + " (minY="+minY+")")
                 }
             }
         }
     }
+    if (!haveData) { return [-1, 2.1, 3.1] }; // 1.1.2024
+    if (maxY < minY) { maxY = minY + 1 }; // 1.1.2024
     if (minY > 0) { minY = 0 };
     return [minY, maxY, maxY - minY]
 }
@@ -8387,7 +8407,7 @@ function lf_inspectDataValuesAvgAllPlace(vp_timeSlice, vp_monthStart, vp_monthEn
 function paint_author() {
 
     //======== AVTOR
-    let tmpStr = "Peter Malovrh, 2023"
+    let tmpStr = scCopyR + "2023 Peter Malovrh";
     let font = "italic bold 18px cambria"; // podpičje pred destrukturiranjem nujno !!!!!
     let [tmpW, tmpH] = gMeasureText(tmpStr, font);
     //console.log("x=" + (ctxW - wh[0] - 6) + " y=" + (wh[1] + 6))
