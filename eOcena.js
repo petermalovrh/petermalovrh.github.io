@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.0"
+const gl_versionNr = "v1.1"
 const gl_versionDate = "1.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1410,7 +1410,7 @@ class intChooser {
 }
     
 class intChooser2H {
-    constructor(left, top, items, value, addString, minItemValue, step, focusMargin, arrowWidth, arrowHeight, arrowGap, arrowColor, color, fillColor, crossColor, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible) {
+    constructor(left, top, items, value, addString, minItemValue, step, focusMargin, arrowWidth, arrowHeight, arrowGap, arrowColor, color, fillColor, crossColor, text, font, gap, posAlign, textColor, clickGap, enabled, disabledColor, disabledTextColor, visible, toolTipText, keyStroke) {
         this.left = left; this.top = top;
         this.items = items; this.value = value; this.addString = addString; this.minItemValue = minItemValue; this.step = step;
         this.focusMargin = focusMargin;
@@ -1426,6 +1426,8 @@ class intChooser2H {
         this.clickGap = clickGap;
         this.enabled = enabled; this.disabledColor = disabledColor; this.disabledTextColor = disabledTextColor;
         this.visible = visible;
+        this.toolTipText = toolTipText; 
+        this.keyStroke = keyStroke; 
         //---- additional object properties
         this.width = 100;
         this.height = 30;
@@ -1495,7 +1497,14 @@ class intChooser2H {
         //---- risanje bannerja
         gBannerRoundRectWithText(textLeft, textTop, textWidth, textHeight, this.font, this.color, this.value.toString() + this.addString, this.gap, this.gap, 7, "white", 1, "lightGray", "#D0D0D040", 2, 2, true)
         //ctx.beginPath(); ctx.rect(bannerLeft, bannerTop, bannerWidth, bannerHeight); ctx.closePath(); ctx.setLineDash([]); ctx.strokeStyle = "gray"; ctx.strokeWidth = 1; ctx.stroke();
-        //ctx.beginPath(); ctx.rect(textLeft, textTop, textWidth, textHeight); ctx.closePath(); ctx.setLineDash([]); ctx.strokeStyle = "gray"; ctx.strokeWidth = 1; ctx.stroke();
+        //ctx.beginPath(); ctx.rect(textLeft, textTop, textWidth, textHeight); ctx.closePath(); ctx.setLineDash([]); ctx.strokeStyle = "gray"; ctx.strokeWidth = 1; ctx.stroke();     
+    }
+    showToolTip() {
+        //---- toolTip
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
+        }          
     }
     eventClick(mouseX, mouseY) {
         if (!this.visible || !this.enabled) { return false; };
@@ -1820,7 +1829,7 @@ function cLog4(var1str, var1, var2str, var2, var3str, var3, var4str, var4) {
 //                                          =
 //===========================================
 
-const cv_nrTock_min = 10; const cv_nrTock_max = 150;
+const cv_nrTock_min = 6; const cv_nrTock_max = 150;
 const cv_kriterij12min = 20; const cv_kriterij12max = 60;
 const cv_kriterij23min = 40; const cv_kriterij23max = 75;
 const cv_kriterij34min = 60; const cv_kriterij34max = 90;
@@ -1852,6 +1861,8 @@ const cv_naborKriterijev_2 = 2;
 const cv_naborKriterijev_min = 1;
 const cv_naborKriterijev_max = 2;
 var lo_naborKriterijev = cv_naborKriterijev_1;
+
+var lo_tockovnik = "";
 
 const cv_printLevelMax = 4;
 const cv_printLevelMin = 0;
@@ -1900,6 +1911,7 @@ var lo_keyDownD = false;      //6.12.2023
 var lo_keyDownW = false;      //13.12.2023
 var lo_keyDownE = false;      //15.12.2023
 var lo_keyDownShiftLeft = false; // 21.12.2023
+var lo_keyDownControlLeft = false; // 1.4.2024
 var lo_keyDownO = false; // 22.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
@@ -1973,11 +1985,11 @@ switch (lo_GUI_layout) {
         //var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         //var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
         //var placePanelToggle = new placePanel(ctxW - pickPlaceLeftDiff - 41, pickPlaceTop, ctxW, pickPlaceHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
-        var intChooserNrTock = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_nrTock, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 15pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrTock, disabledControlLineColor, disabledControlTextColor, true);
-        var intChooserKriterij12 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij12, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij12, disabledControlLineColor, disabledControlTextColor, true);
-        var intChooserKriterij23 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij23, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij23, disabledControlLineColor, disabledControlTextColor, true);
-        var intChooserKriterij34 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij34, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij34, disabledControlLineColor, disabledControlTextColor, true);
-        var intChooserKriterij45 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij45, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij45, disabledControlLineColor, disabledControlTextColor, true);
+        var intChooserNrTock = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_nrTock, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 15pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserNrTock, disabledControlLineColor, disabledControlTextColor, true, scSch + "tevilo to" + scTchLow + "k na testu (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        var intChooserKriterij12 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij12, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij12, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 1 in 2 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        var intChooserKriterij23 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij23, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij23, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 2 in 3 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        var intChooserKriterij34 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij34, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij34, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 3 in 4 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        var intChooserKriterij45 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij45, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij45, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 4 in 5 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
 }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2361,6 +2373,9 @@ window.addEventListener("keydown", (event) => {
     switch (event.code) {
         case 'ShiftLeft':
             lo_keyDownShiftLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;
+        case 'ControlLeft':
+            // CTRL+mouseWheel = ZOOM v browserju !!!
+            lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;        
         case 'KeyA':
             lo_keyDownA = true; break;
         case 'KeyO':
@@ -2408,9 +2423,9 @@ window.addEventListener("keydown", (event) => {
         case 'KeyY': case 'KeyZ': //24.10.2023
             //console.log("Y pressed");
             //lf_changeSameScaleY(!gl_sameScaleY, true); break;
-        case 'KeyQ': //18.11.2023
+        case 'KeyC': //1.4.2024
             //console.log("W pressed");
-            //lf_resizeWindowToFullHD(true); break;
+            if (lo_tockovnik !== "") { navigator.clipboard.writeText(lo_tockovnik) }; break;
         case 'KeyV': //6.12.2023
             //console.log("V pressed");
             //lf_changeShowExactValuesToo(true); break;
@@ -2449,7 +2464,9 @@ window.addEventListener("keyup", (event) => {
         case 'KeyE':
             lo_keyDownE = false; break;
         case 'ShiftLeft':
-            lo_keyDownShiftLeft = false; console.log(lo_keyDownShiftLeft); break;
+            lo_keyDownShiftLeft = false; break; // console.log(lo_keyDownShiftLeft); 
+        case 'ControlLeft':
+            lo_keyDownControlLeft = false; break; // console.log(lo_keyDownControlLeft); 
         //case 'KeyP':
         //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
     }
@@ -2645,7 +2662,8 @@ function paint_eOcene() {
     const hAddLinear = 35;
     let addText=""
     if (lo_printLevel <= 0) { addText = " to" + scTchLow + "k" };
-    
+    lo_tockovnik = "";
+
     //---- ocena 5
     y = (h100 + h45) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop };
@@ -2653,8 +2671,10 @@ function paint_eOcene() {
     tmpText = lo_tock5b.toString() + addText + " (" + (lo_tock5b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
     if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + addText + " (100%)" };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-    
+    lo_tockovnik += tmpText;
+
     //---- ocena 4
+    //lo_tockovnik += System.lineSeparator();
     y = (h45 + h34) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 1 * hAddLinear };
     gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
@@ -2662,19 +2682,27 @@ function paint_eOcene() {
         tmpText = lo_tock4b.toString() + addText + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + addText + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
+        lo_tockovnik += "\n" + tmpText;
+    } else {
+        lo_tockovnik += "\nOcena 4:";
     }
 
     //---- ocena 3
+    //lo_tockovnik += System.lineSeparator();
     y = (h34 + h23) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 2 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "gray", "#C0C0C040", 4, 4, false)
+    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false)
     if (lo_validOcena3) {
         tmpText = lo_tock3b.toString() + addText + " (" + (lo_tock3b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + addText + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
+        lo_tockovnik += "\n" + tmpText;
+    } else {
+        lo_tockovnik += "\nOcena 3:";
     }
 
     //---- ocena 2
+    //lo_tockovnik += System.lineSeparator();
     y = (h23 + h12) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 3 * hAddLinear };
     gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false)
@@ -2682,15 +2710,20 @@ function paint_eOcene() {
         tmpText = lo_tock2b.toString() + addText + " (" + (lo_tock2b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + addText + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
+        lo_tockovnik += "\n" + tmpText;
+    } else {
+        lo_tockovnik += "\nOcena 2:";
     }
 
     //---- ocena 1
+    //lo_tockovnik += System.lineSeparator();
     y = (h12 + h0) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 4 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "1", ddx, ddy, 14, "gold", 1, "gray", "#80808040", 4, 4, false)
+    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "lightGray", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     tmpText = "0" + addText + " (0%) - " + lo_tock1t.toString() + addText + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
- 
+    lo_tockovnik += "\n" + tmpText;
+
 }
 
 function lf_calculateMejeTock() {
@@ -2847,6 +2880,14 @@ function paint_GUI() {
         checkBoxHalfPoint.paint()
     }
 
+    if (lo_showToolTips) { //1.4.2024
+        intChooserNrTock.showToolTip();
+        intChooserKriterij12.showToolTip();
+        intChooserKriterij23.showToolTip();
+        intChooserKriterij34.showToolTip();
+        intChooserKriterij45.showToolTip();
+    }
+
     //---- on-screen namigi/pomoč
     if (lo_showHelpTips) { paint_tips() };
     //if (lo_showStations) { paint_stations() };
@@ -2868,7 +2909,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 8;
+            let nrTipRows = 10;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -2907,6 +2948,14 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("G", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i avtorja in sistemske meritve", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //     
+            y += vStep;
+            gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... shrani to" + scTchLow + "kovnik na odlo" + scZhLow + "i" + scSchLow + scTchLow + "e (clipboard)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -3246,6 +3295,12 @@ function lf_changeNaborKriterijev(vp_newValue, vp_paint) {
 
     if (vp_paint) { paint() }
 
+}
+
+function lf_changeShowToolTips(vp_newValue, vp_paint) {
+
+    lo_showToolTips = vp_newValue;
+    if (vp_paint) { paint() }
 }
 
 function lf_changeMode(vp_shift, vp_paint) {
