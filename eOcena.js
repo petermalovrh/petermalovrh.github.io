@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.1"
+const gl_versionNr = "v1.2"
 const gl_versionDate = "1.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2606,8 +2606,8 @@ function paint_eOcene() {
         gBannerRect(gLeft, h100, gWidth, h45 - h100, 0, 0, "rgb(255, 255, 255)", 0, "", "", 0, 0, false);
         gBannerRect(gLeft, h45, gWidth, h34 - h45, 0, 0, "rgb(228, 228, 228)", 0, "", "", 0, 0, false);
         gBannerRect(gLeft, h34, gWidth, h23 - h34, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h23, gWidth, h12 - h23, 0, 0, "rgb(188, 188, 188)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h12, gWidth, h0 - h12, 0, 0, "rgb(164, 164, 164)", 0, "", "", 0, 0, false);
+        gBannerRect(gLeft, h23, gWidth, h12 - h23, 0, 0, "rgb(196, 196, 196)", 0, "", "", 0, 0, false);
+        gBannerRect(gLeft, h12, gWidth, h0 - h12, 0, 0, "rgb(180, 180, 180)", 0, "", "", 0, 0, false);
     }
 
     //---- črtkane meje med posivljenimi področji ocen
@@ -2719,7 +2719,7 @@ function paint_eOcene() {
     //lo_tockovnik += System.lineSeparator();
     y = (h12 + h0) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 4 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "lightGray", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
+    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     tmpText = "0" + addText + " (0%) - " + lo_tock1t.toString() + addText + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "\n" + tmpText;
