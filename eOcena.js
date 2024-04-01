@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.2"
+const gl_versionNr = "v1.3"
 const gl_versionDate = "1.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1902,8 +1902,13 @@ var nrToolTips = 0;             // 25.12.2023
 const arrToolTipY = [];         // 25.12.2023
 //arrToolTipMonth[1] = 890; arrToolTipY[1] = 500; nrToolTips = 1;
 
-var lo_keyDownA = false
-var lo_keyDownP = false
+var lo_keyDownP = false;
+var lo_keyDownT = false;
+var lo_keyDown2 = false;
+var lo_keyDown3 = false;
+var lo_keyDown4 = false;
+var lo_keyDown5 = false;
+
 var lo_keyDown0 = false; //2.2.2023 v1.11
 //---- spreminjanje zgornje in spodnje meje grafa po Y (6.12.2023)
 var lo_keyDownU = false;      //6.12.2023
@@ -1916,9 +1921,12 @@ var lo_keyDownO = false; // 22.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 //----
-var gl_changeByMouseWheel_nrMonthsAvg = false; //21.12.2023
-var gl_changeByMouseWheel_printLevel = false;   //21.12.2023
-var gl_changeByMouseWheel_nrSmoothYears = false; //22.12.2023
+var gl_changeByMouseWheel_nrTock = false;       //4.1.2024
+var gl_changeByMouseWheel_printLevel = false;   //4.1.2024
+var gl_changeByMouseWheel_kriterij12 = false;   //4.1.2024
+var gl_changeByMouseWheel_kriterij23 = false;   //4.1.2024
+var gl_changeByMouseWheel_kriterij34 = false;   //4.1.2024
+var gl_changeByMouseWheel_kriterij45 = false;   //4.1.2024
 //----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
@@ -2315,54 +2323,103 @@ window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
     let newValue, change, maxDiff;
     
-    if (lo_enabledIntChooserNrTock && intChooserNrTock.eventMouseWithin(lo_mouseMoveX,lo_mouseMoveY)) {
-        change = delta * lo_stepTock;
-        if (lo_keyDownShiftLeft) { change = 5 * delta/Math.abs(delta) };
-        newValue = lf_changeValueNrTock(change);
-        //gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-        lf_changeNrTock(newValue, true);
-    }    
-    else if (lo_enabledIntChooserKriterij12 && intChooserKriterij12.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueKriterij("12", change);
-        //gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-        lf_changeKriterij("12", newValue, true);
+    //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja število točk na testu
+    if (lo_keyDownT) {
+        if (lo_enabledIntChooserNrTock) {
+            change = delta * lo_stepTock;
+            if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+            newValue = lf_changeValueNrTock(change);
+            gl_changeByMouseWheel_nrTock = true; // 4.1.2024
+            lf_changeNrTock(newValue, true);
+        }
+        return; //konec prverjanja, ker je s pritisnjeno tipko T povedal, da hoče točno to in nič drugega
     }
-    else if (lo_enabledIntChooserKriterij23 && intChooserKriterij23.eventMouseWithin(lo_mouseMoveX,lo_mouseMoveY)) {
-        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueKriterij("23", change);
-        //gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-        lf_changeKriterij("23", newValue, true);
+    //---- če vrti kolešček miške ob pritisnjeni tipki 2, s tem spreminja kriterij za oceno 2
+    if (lo_keyDown2) {
+        if (lo_enabledIntChooserKriterij12) {
+            change = delta * lo_stepTock;
+            if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+            newValue = lf_changeValueKriterij("12", change);
+            gl_changeByMouseWheel_kriterij12 = true;
+            lf_changeKriterij("12", newValue, true);
+        }
+        return; //konec prverjanja, ker je s pritisnjeno tipko povedal, da hoče točno to in nič drugega
     }
-    else if (lo_enabledIntChooserKriterij34 && intChooserKriterij34.eventMouseWithin(lo_mouseMoveX,lo_mouseMoveY)) {
-        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueKriterij("34", change);
-        //gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-        lf_changeKriterij("34", newValue, true);
+    //---- če vrti kolešček miške ob pritisnjeni tipki 3, s tem spreminja kriterij za oceno 3
+    if (lo_keyDown3) {
+        if (lo_enabledIntChooserKriterij23) {
+            change = delta * lo_stepTock;
+            if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+            newValue = lf_changeValueKriterij("23", change);
+            gl_changeByMouseWheel_kriterij23 = true;
+            lf_changeKriterij("23", newValue, true);
+        }
+        return; //konec prverjanja, ker je s pritisnjeno tipko povedal, da hoče točno to in nič drugega
     }
-    else if (lo_enabledIntChooserKriterij45 && intChooserKriterij45.eventMouseWithin(lo_mouseMoveX,lo_mouseMoveY)) {
-        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueKriterij("45", change);
-        //gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-        lf_changeKriterij("45", newValue, true);
+    //---- če vrti kolešček miške ob pritisnjeni tipki 4, s tem spreminja kriterij za oceno 4
+    if (lo_keyDown4) {
+        if (lo_enabledIntChooserKriterij34) {
+            change = delta * lo_stepTock;
+            if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+            newValue = lf_changeValueKriterij("34", change);
+            gl_changeByMouseWheel_kriterij34 = true;
+            lf_changeKriterij("34", newValue, true);
+        }
+        return; //konec prverjanja, ker je s pritisnjeno tipko povedal, da hoče točno to in nič drugega
     }
-
-    //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja dolžino "repa"
-    //if (lo_keyDownA) {
-    //    if (lo_enabledIntChooserKriterij12) {
-    //        lf_changeValueNrMonthsAvg(delta);
-    //        gl_changeByMouseWheel_nrMonthsAvg = true; // 21.12.2023
-    //        lf_changeNrMonthsAvg(lo_nrMonthsAvg, true);
-    //    }
-    //    return
-    //}
+    //---- če vrti kolešček miške ob pritisnjeni tipki 5, s tem spreminja kriterij za oceno 5
+    if (lo_keyDown5) {
+        if (lo_enabledIntChooserKriterij45) {
+            change = delta * lo_stepTock;
+            if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+            newValue = lf_changeValueKriterij("45", change);
+            gl_changeByMouseWheel_kriterij45 = true;
+            lf_changeKriterij("45", newValue, true);
+        }
+        return; //konec prverjanja, ker je s pritisnjeno tipko povedal, da hoče točno to in nič drugega
+    }
+    //---- če vrti kolešček miške ob pritisnjeni tipki P, s tem spreminja nivo prikaza za kopiranje slike
     else if (lo_keyDownP) {
         lf_changeValuePrintLevel(-delta);
         gl_changeByMouseWheel_printLevel = true; // 21.12.2023
         //console.log("WHEEL: true");
         lf_changePrintLevel(lo_printLevel, true);
-        return
+        return; //konec prverjanja, ker je s pritisnjeno tipko P povedal, da hoče točno to in nič drugega
     }
+    else if (lo_enabledIntChooserNrTock && intChooserNrTock.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta * lo_stepTock;
+        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+        newValue = lf_changeValueNrTock(change);
+        gl_changeByMouseWheel_nrTock = true; // 4.1.2024
+        lf_changeNrTock(newValue, true);
+    }
+    else if (lo_enabledIntChooserKriterij12 && intChooserKriterij12.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
+        newValue = lf_changeValueKriterij("12", change);
+        gl_changeByMouseWheel_kriterij12 = true; // 21.12.2023
+        lf_changeKriterij("12", newValue, true);
+    }
+    else if (lo_enabledIntChooserKriterij23 && intChooserKriterij23.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
+        newValue = lf_changeValueKriterij("23", change);
+        gl_changeByMouseWheel_kriterij23 = true; // 21.12.2023
+        lf_changeKriterij("23", newValue, true);
+    }
+    else if (lo_enabledIntChooserKriterij34 && intChooserKriterij34.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
+        newValue = lf_changeValueKriterij("34", change);
+        gl_changeByMouseWheel_kriterij34 = true; // 21.12.2023
+        lf_changeKriterij("34", newValue, true);
+    }
+    else if (lo_enabledIntChooserKriterij45 && intChooserKriterij45.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta; if (lo_keyDownShiftLeft) { change *= 5 };
+        newValue = lf_changeValueKriterij("45", change);
+        gl_changeByMouseWheel_kriterij45 = true; // 21.12.2023
+        lf_changeKriterij("45", newValue, true);
+    }
+
+
+
         
     //---- ... sicer spreminja ...?
     
@@ -2376,8 +2433,16 @@ window.addEventListener("keydown", (event) => {
         case 'ControlLeft':
             // CTRL+mouseWheel = ZOOM v browserju !!!
             lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;        
-        case 'KeyA':
-            lo_keyDownA = true; break;
+        case 'KeyT':
+            lo_keyDownT = true; break;
+        case 'Digit2':
+            lo_keyDown2 = true; break;
+        case 'Digit3':
+            lo_keyDown3 = true; break;
+        case 'Digit4':
+            lo_keyDown4 = true; break;
+        case 'Digit5':
+            lo_keyDown5 = true; break;
         case 'KeyO':
             lo_keyDownO = true; break;
         case 'KeyP':
@@ -2393,45 +2458,45 @@ window.addEventListener("keydown", (event) => {
         case 'KeyE':
             lo_keyDownE = true; break;
         case 'ArrowRight':
-            //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
-            //break;
+        //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
+        //break;
         case 'ArrowLeft':
-            //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, -1, 1, nrMonthsAll), true)
-            //break;
+        //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, -1, 1, nrMonthsAll), true)
+        //break;
         case 'Home':
-            //if (sliderMonthEnd.useValue0) { lf_changeMonthEnd(gl_monthStart, true) } else { lf_changeMonthEnd(1, true) }; break;
-            //if (sliderMonthEnd.useValue0) { lf_changeMonthStart(1, true) } else { lf_changeMonthEnd(1, true) }; break; //11.12.2023
+        //if (sliderMonthEnd.useValue0) { lf_changeMonthEnd(gl_monthStart, true) } else { lf_changeMonthEnd(1, true) }; break;
+        //if (sliderMonthEnd.useValue0) { lf_changeMonthStart(1, true) } else { lf_changeMonthEnd(1, true) }; break; //11.12.2023
         case 'End':
-            //lf_changeMonthEnd(nrMonthsAll, true); break;
+        //lf_changeMonthEnd(nrMonthsAll, true); break;
         case 'KeyG': // GUI
             lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); break;
         case 'KeyL':
-            //lf_changeDeltaT(!gl_deltaT, true); break;
+        //lf_changeDeltaT(!gl_deltaT, true); break;
         case 'KeyN': case 'F2':
             lf_changeShowHelpTips(!lo_showHelpTips, true); break;
         case 'KeyI':
             lf_changeShowToolTips(!lo_showToolTips, true); break;
-        case 'KeyT':
+        case 'KeyH':
             //console.log("P pressed");
             lf_changeUseHalfPoint(!lo_useHalfPoint, true); break;
         case 'KeyK':
             //console.log("K pressed");
             if (lo_keyDownShiftLeft) { lf_changeNaborKriterijev(lo_naborKriterijev - 1, true) } else { lf_changeNaborKriterijev(lo_naborKriterijev + 1, true); }; break;
         case 'KeyM':
-            //console.log("M pressed"); 
-            //lf_changeMode(event.shiftKey, true); break;
+        //console.log("M pressed"); 
+        //lf_changeMode(event.shiftKey, true); break;
         case 'KeyY': case 'KeyZ': //24.10.2023
-            //console.log("Y pressed");
-            //lf_changeSameScaleY(!gl_sameScaleY, true); break;
+        //console.log("Y pressed");
+        //lf_changeSameScaleY(!gl_sameScaleY, true); break;
         case 'KeyC': //1.4.2024
             //console.log("W pressed");
             if (lo_tockovnik !== "") { navigator.clipboard.writeText(lo_tockovnik) }; break;
         case 'KeyV': //6.12.2023
-            //console.log("V pressed");
-            //lf_changeShowExactValuesToo(true); break;
+        //console.log("V pressed");
+        //lf_changeShowExactValuesToo(true); break;
         case 'BracketRight': // "Đ" //23.12.2023 pritisk na tipko "Đ"
-            //console.log("Đ pressed");
-            //lf_changeAvgAllPlace(!gl_showAvgAllPlace, true); break;
+        //console.log("Đ pressed");
+        //lf_changeAvgAllPlace(!gl_showAvgAllPlace, true); break;
         case 'Equal': // "+" //26.12.2023 pritisk na tipko "+" (26.12.2023)
             break;
     }
@@ -2439,19 +2504,95 @@ window.addEventListener("keydown", (event) => {
 
 window.addEventListener("keyup", (event) => {
     
+    let change, newValue;
+
     switch (event.code) {
         case 'KeyP':
             lo_keyDownP = false;
-            // 21.12.2023 Ali spreminja vrednost lo_printLevel samo s pomočjo tipke T brez vrtenja koleščka miške?
+            // 21.12.2023 Ali spreminja vrednost lo_printLevel samo s pomočjo tipke P brez vrtenja koleščka miške?
             if (!gl_changeByMouseWheel_printLevel) {
-                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
+                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke P  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
                 //console.log("UP: process keyPress(T)");
                 if (event.shiftKey) { lf_changeValuePrintLevel(-1) } else { lf_changeValuePrintLevel(1) };
                 lf_changePrintLevel(lo_printLevel, true);
             }
             gl_changeByMouseWheel_printLevel = false;
-            //console.log("UP: false");
-            //console.log("----");
+            //console.log("UP: false"); console.log("----");
+            break;
+        case 'KeyT':
+            lo_keyDownT = false;
+            // 1.4.2024 Ali spreminja vrednost lo_nrTock samo s pomočjo tipke T brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_nrTock) {
+                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
+                //console.log("UP: process keyPress(T)");
+                change = lo_stepTock;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueNrTock(-change);
+                lf_changeNrTock(newValue, true);
+            }
+            gl_changeByMouseWheel_nrTock = false;
+            //console.log("UP: false"); console.log("----");
+            break;
+        case 'Digit2':
+            lo_keyDown2 = false;
+            // 1.4.2024 Ali spreminja vrednost lo_kriterij12 samo s pomočjo tipke 2 brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_kriterij12) {
+                // 21.12.2023 tole je primer spreminjanja lo_kriterij12 samo s pomočjo tipke 2  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij12
+                //console.log("UP: process keyPress(T)");
+                change = 1;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueKriterij("12", -change);
+                lf_changeKriterij("12", newValue, true);
+            }
+            gl_changeByMouseWheel_kriterij12 = false;
+            //console.log("UP: false"); console.log("----");
+            break;
+        case 'Digit3':
+            lo_keyDown3 = false;
+            // 1.4.2024 Ali spreminja vrednost lo_kriterij23 samo s pomočjo tipke 3 brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_kriterij23) {
+                // 21.12.2023 tole je primer spreminjanja lo_kriterij23 samo s pomočjo tipke 2  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij23
+                //console.log("UP: process keyPress(T)");
+                change = 1;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueKriterij("23", -change);
+                lf_changeKriterij("23", newValue, true);
+            }
+            gl_changeByMouseWheel_kriterij23 = false;
+            //console.log("UP: false"); console.log("----");
+            break;
+        case 'Digit4':
+            lo_keyDown4 = false;
+            // 1.4.2024 Ali spreminja vrednost lo_kriterij34 samo s pomočjo tipke 4 brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_kriterij34) {
+                // 21.12.2023 tole je primer spreminjanja lo_kriterij34 samo s pomočjo tipke 4  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij34
+                //console.log("UP: process keyPress(T)");
+                change = 1;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueKriterij("34", -change);
+                lf_changeKriterij("34", newValue, true);
+            }
+            gl_changeByMouseWheel_kriterij34 = false;
+            //console.log("UP: false"); console.log("----");
+            break;
+        case 'Digit5':
+            lo_keyDown5 = false;
+            // 1.4.2024 Ali spreminja vrednost lo_kriterij45 samo s pomočjo tipke 5 brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_kriterij45) {
+                // 21.12.2023 tole je primer spreminjanja lo_kriterij45 samo s pomočjo tipke 5  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij45
+                //console.log("UP: process keyPress(T)");
+                change = 1;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueKriterij("45", -change);
+                lf_changeKriterij("45", newValue, true);
+            }
+            gl_changeByMouseWheel_kriterij45 = false;
+            //console.log("UP: false"); console.log("----");
             break;
         case 'Digit0':
             lo_keyDown0 = false; break;
@@ -2909,7 +3050,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 10;
+            let nrTipRows = 15;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -2924,15 +3065,45 @@ function paint_tips() {
             //
             y += vStep;
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni " + scSchLow + "tevilo to" + scTchLow + "k in kriterije (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("... spremeni " + scSchLow + "tevilo to" + scTchLow + "k ali kriterije (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("SHIFT", x0 + 50, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... hitrej" + scSchLow + "e spreminjanje ob pritisnjenem SHIFT", x1 + 20, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
+            //   
             y += vStep;
             gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni " + scSchLow + "tevilo to" + scTchLow + "k na testu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni kriterij (%) za oceno 2", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("3", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni kriterij (%) za oceno 3", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("4", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni kriterij (%) za oceno 4", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("5", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni kriterij (%) za oceno 5", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... vklop/izklop to" + scTchLow + "kovanja na pol to" + scTchLow + "ke", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
