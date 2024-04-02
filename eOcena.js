@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.3"
-const gl_versionDate = "1.4.2024"
+const gl_versionNr = "v1.4"
+const gl_versionDate = "2.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2799,9 +2799,9 @@ function paint_eOcene() {
     const cv_kriterijiStepV = 40;
     const hAdd = 8; const tAdd = 13;
     
-    let y; 
+    let y;
     const hAddLinear = 35;
-    let addText=""
+    let addText = ""
     if (lo_printLevel <= 0) { addText = " to" + scTchLow + "k" };
     lo_tockovnik = "";
 
@@ -2819,7 +2819,7 @@ function paint_eOcene() {
     y = (h45 + h34) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 1 * hAddLinear };
     gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
-    if (lo_validOcena4) {    
+    if (lo_validOcena4) {
         tmpText = lo_tock4b.toString() + addText + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + addText + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
@@ -2865,6 +2865,75 @@ function paint_eOcene() {
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "\n" + tmpText;
 
+    //---- Grafična predstavitev točk v pasovih ocen
+    let tmpX, tmpYt, tmpYb;
+    const cv_xDiff = 0;
+    const myColor = "maroon";
+    const myColor2 = "gray";
+    const tmpFont = "9pt serif";
+    const vDiffTop = 5; const vDiffBottom = 2;
+    if (lo_printLevel >= 2) {
+        //---- ocena 5
+        tmpX = gRight + 10;
+        if (lo_tock5b < lo_nrTock) {
+            tmpYb = h0 - (lo_tock5b / lo_nrTock) * gHeight;
+            gLine(tmpX, h100, tmpX, tmpYb, 2, myColor2, []);
+            gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
+            gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+        }
+        gEllipse(tmpX, h100, 3, 3, 0, myColor, 0, "");
+        gText(lo_nrTock.toString(), tmpFont, myColor2, tmpX + 5, h100 + vDiffTop);
+        //---- ocena 4
+        tmpX += cv_xDiff;
+        if (lo_validOcena4) {
+            tmpYt = h0 - (lo_tock4t / lo_nrTock) * gHeight;
+            if (lo_tock4b < lo_tock4t) {
+                tmpYb = h0 - (lo_tock4b / lo_nrTock) * gHeight;
+                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
+                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
+                gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+            }
+            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
+            gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+        }
+        //---- ocena 3
+        tmpX -= cv_xDiff;
+        if (lo_validOcena3) {
+            tmpYt = h0 - (lo_tock3t / lo_nrTock) * gHeight;
+            if (lo_tock3b < lo_tock3t) {
+                tmpYb = h0 - (lo_tock3b / lo_nrTock) * gHeight;
+                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
+                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
+                gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+            }
+            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
+            gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+        }
+        //---- ocena 2
+        tmpX += cv_xDiff;
+        if (lo_validOcena2) {
+            tmpYt = h0 - (lo_tock2t / lo_nrTock) * gHeight;
+            if (lo_tock2b < lo_tock2t) {
+                tmpYb = h0 - (lo_tock2b / lo_nrTock) * gHeight;
+                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
+                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
+                gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+            }
+            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
+            gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+        }
+        //---- ocena 1
+        tmpX -= cv_xDiff;
+        tmpYt = h0 - (lo_tock1t / lo_nrTock) * gHeight;
+        if (lo_tock1b < lo_tock1t) {
+            tmpYb = h0 - (lo_tock1b / lo_nrTock) * gHeight;
+            gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
+            gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
+            gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+        }
+        gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
+        gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+    }
 }
 
 function lf_calculateMejeTock() {
