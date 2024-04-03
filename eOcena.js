@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.4"
-const gl_versionDate = "2.4.2024"
+const gl_versionNr = "v1.5"
+const gl_versionDate = "3.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1864,9 +1864,9 @@ var lo_naborKriterijev = cv_naborKriterijev_1;
 
 var lo_tockovnik = "";
 
-const cv_printLevelMax = 4;
+const cv_printLevelMax = 5;
 const cv_printLevelMin = 0;
-var lo_printLevel = cv_printLevelMax; //4-vse, 3-manjka checkBox, 2-manjka checkBox in posivitve tabele, 1-manjka checkBox in posivitve tabele in črte vmes, 0-manjkajo checkBox / posivitve tabele / črte vmes / točke / kriteriji
+var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še grafične točke, 2-manjkajo še posivitve tabele, 1-manjkajo še črte vmes, 0-samo vrstični izpis točkovnika
 
 console.clear;
 
@@ -2753,12 +2753,12 @@ function paint_eOcene() {
 
     //---- črtkane meje med posivljenimi področji ocen
     if (lo_printLevel >= 2) {
-        gLine(gLeft, h100, gRight, h100, 2, "gray", [4, 4]);
+        gLine(gLeft, h100 - 1, gRight, h100 - 1, 2, "gray", [4, 4]);
         gLine(gLeft, h45, gRight, h45, 2, "gray", [4, 4]);
         gLine(gLeft, h34, gRight, h34, 2, "gray", [4, 4]);
         gLine(gLeft, h23, gRight, h23, 2, "gray", [4, 4]);
         gLine(gLeft, h12, gRight, h12, 2, "gray", [4, 4]);
-        gLine(gLeft, h0, gRight, h0, 2, "gray", [4, 4]);
+        gLine(gLeft, h0 + 1, gRight, h0 + 1, 2, "gray", [4, 4]);
     }
 
     //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
@@ -2812,58 +2812,57 @@ function paint_eOcene() {
     tmpText = lo_tock5b.toString() + addText + " (" + (lo_tock5b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
     if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + addText + " (100%)" };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-    lo_tockovnik += tmpText;
+    lo_tockovnik += "odl(5): " + tmpText;
 
     //---- ocena 4
-    //lo_tockovnik += System.lineSeparator();
     y = (h45 + h34) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 1 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
     if (lo_validOcena4) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
         tmpText = lo_tock4b.toString() + addText + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + addText + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\n" + tmpText;
+        lo_tockovnik += "\npdb(4): " + tmpText;
     } else {
-        lo_tockovnik += "\nOcena 4:";
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
+        lo_tockovnik += "\npdb(4): ";
     }
 
     //---- ocena 3
-    //lo_tockovnik += System.lineSeparator();
     y = (h34 + h23) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 2 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false)
     if (lo_validOcena3) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
         tmpText = lo_tock3b.toString() + addText + " (" + (lo_tock3b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + addText + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\n" + tmpText;
+        lo_tockovnik += "\n db(3): " + tmpText;
     } else {
-        lo_tockovnik += "\nOcena 3:";
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
+        lo_tockovnik += "\n db(3): ";
     }
 
     //---- ocena 2
-    //lo_tockovnik += System.lineSeparator();
     y = (h23 + h12) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 3 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false)
     if (lo_validOcena2) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
         tmpText = lo_tock2b.toString() + addText + " (" + (lo_tock2b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + addText + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\n" + tmpText;
+        lo_tockovnik += "\n zd(2): " + tmpText;
     } else {
-        lo_tockovnik += "\nOcena 2:";
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
+        lo_tockovnik += "\n zd(2): ";
     }
 
     //---- ocena 1
-    //lo_tockovnik += System.lineSeparator();
     y = (h12 + h0) / 2 - hAdd;
     if (lo_printLevel == 0) { y = gTop + 4 * hAddLinear };
     gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     tmpText = "0" + addText + " (0%) - " + lo_tock1t.toString() + addText + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-    lo_tockovnik += "\n" + tmpText;
+    lo_tockovnik += "\nnzd(1): " + tmpText;
 
     //---- Grafična predstavitev točk v pasovih ocen
     let tmpX, tmpYt, tmpYb;
@@ -2872,29 +2871,44 @@ function paint_eOcene() {
     const myColor2 = "gray";
     const tmpFont = "9pt serif";
     const vDiffTop = 5; const vDiffBottom = 2;
-    if (lo_printLevel >= 2) {
+    const lineWidth = 3; let r; const r2 = 3;
+    var pixPerStepTock = gHeight / (lo_nrTock / lo_stepTock); //toliko pikslov pride na en orak pri številu točk na testu
+    if (pixPerStepTock < 7) { r = 3; } else { r = 4; };
+    if (lo_printLevel >= 4) {
         //---- ocena 5
         tmpX = gRight + 10;
         if (lo_tock5b < lo_nrTock) {
             tmpYb = h0 - (lo_tock5b / lo_nrTock) * gHeight;
-            gLine(tmpX, h100, tmpX, tmpYb, 2, myColor2, []);
-            gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
-            gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+            gLine(tmpX, h100, tmpX, tmpYb, lineWidth, myColor2, []);
+            gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
+            gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            if (pixPerStepTock > 8) {
+                for (i = 1; i <= ((lo_tock5t - lo_tock5b) / lo_stepTock - 1); i++) {
+                    tmpYb = h0 - ((lo_tock5b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                    gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
+                }
+            }
         }
-        gEllipse(tmpX, h100, 3, 3, 0, myColor, 0, "");
-        gText(lo_nrTock.toString(), tmpFont, myColor2, tmpX + 5, h100 + vDiffTop);
+        gEllipse(tmpX, h100, r, r, 0, myColor, 0, "");
+        gText(lo_nrTock.toString(), tmpFont, myColor2, tmpX + r + 2, h100 + vDiffTop);
         //---- ocena 4
         tmpX += cv_xDiff;
         if (lo_validOcena4) {
             tmpYt = h0 - (lo_tock4t / lo_nrTock) * gHeight;
             if (lo_tock4b < lo_tock4t) {
                 tmpYb = h0 - (lo_tock4b / lo_nrTock) * gHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
-                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
-                gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
+                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
+                gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (pixPerStepTock > 8) {
+                    for (i = 1; i <= ((lo_tock4t - lo_tock4b) / lo_stepTock - 1); i++) {
+                        tmpYb = h0 - ((lo_tock4b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
+                    }
+                }                
             }
-            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
-            gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
+            gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
         }
         //---- ocena 3
         tmpX -= cv_xDiff;
@@ -2902,12 +2916,18 @@ function paint_eOcene() {
             tmpYt = h0 - (lo_tock3t / lo_nrTock) * gHeight;
             if (lo_tock3b < lo_tock3t) {
                 tmpYb = h0 - (lo_tock3b / lo_nrTock) * gHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
-                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
-                gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
+                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
+                gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (pixPerStepTock > 8) {
+                    for (i = 1; i <= ((lo_tock3t - lo_tock3b) / lo_stepTock - 1); i++) {
+                        tmpYb = h0 - ((lo_tock3b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
+                    }
+                }
             }
-            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
-            gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
+            gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
         }
         //---- ocena 2
         tmpX += cv_xDiff;
@@ -2915,24 +2935,36 @@ function paint_eOcene() {
             tmpYt = h0 - (lo_tock2t / lo_nrTock) * gHeight;
             if (lo_tock2b < lo_tock2t) {
                 tmpYb = h0 - (lo_tock2b / lo_nrTock) * gHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
-                gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
-                gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
+                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
+                gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (pixPerStepTock > 8) {
+                    for (i = 1; i <= ((lo_tock2t - lo_tock2b) / lo_stepTock - 1); i++) {
+                        tmpYb = h0 - ((lo_tock2b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
+                    }
+                }
             }
-            gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
-            gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
+            gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
         }
         //---- ocena 1
         tmpX -= cv_xDiff;
         tmpYt = h0 - (lo_tock1t / lo_nrTock) * gHeight;
         if (lo_tock1b < lo_tock1t) {
             tmpYb = h0 - (lo_tock1b / lo_nrTock) * gHeight;
-            gLine(tmpX, tmpYt, tmpX, tmpYb, 2, myColor2, []);
-            gEllipse(tmpX, tmpYb, 3, 3, 0, myColor, 0, "");
-            gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + 5, tmpYb + vDiffBottom);
+            gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
+            gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
+            gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            if (pixPerStepTock > 8) {
+                for (i = 1; i <= ((lo_tock1t - lo_tock1b) / lo_stepTock - 1); i++) {
+                    tmpYb = h0 - ((lo_tock1b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                    gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
+                }
+            }
         }
-        gEllipse(tmpX, tmpYt, 3, 3, 0, myColor, 0, "");
-        gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + 5, tmpYt + vDiffTop);
+        gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
+        gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
     }
 }
 
@@ -3086,7 +3118,7 @@ function paint_GUI() {
     }
 
     //---- točkovanje na pol točke
-    if (lo_printLevel >= 4) {
+    if (lo_printLevel >= 5) {
         checkBoxHalfPoint.paint()
     }
 
