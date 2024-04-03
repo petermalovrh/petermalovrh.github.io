@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.5"
+const gl_versionNr = "v1.6"
 const gl_versionDate = "3.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1927,6 +1927,18 @@ var gl_changeByMouseWheel_kriterij12 = false;   //4.1.2024
 var gl_changeByMouseWheel_kriterij23 = false;   //4.1.2024
 var gl_changeByMouseWheel_kriterij34 = false;   //4.1.2024
 var gl_changeByMouseWheel_kriterij45 = false;   //4.1.2024
+//---- grafične meje med razredi
+var gtMarginTop, gtMarginBottom
+var gtTop, gtBottom, gtHeight, gtLeft, gtRight, gtWidth;
+var h0, h12, h23, h34, h45, h100;
+//----
+var lo_selectedOcena1 = false; //4.4.2024
+var lo_selectedOcena2 = false;
+var lo_selectedOcena3 = false;
+var lo_selectedOcena4 = false;
+var lo_selectedOcena5 = false;
+//----
+var lo_selectedTock = -1; //4.4.2024
 //----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
@@ -2055,7 +2067,7 @@ const cv_hideTipsSteps = 30;
 const cv_hideTipsDuration = 700;
 const cv_hideTipsTick = cv_hideTipsDuration / cv_hideTipsSteps;
 const cv_hideTipsStepAlpha = 255 / cv_hideTipsSteps;
-
+    
 main();
 
 //---- main()
@@ -2314,6 +2326,27 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     lo_mouseMoveX = e.offsetX
     lo_mouseMoveY = e.offsetY
     //console.log(e.offsetX + "-" + e.offsetY)
+
+    //---- Preverjanje, ali je z miško nad eno od ocen v tabeli ocen
+    lo_selectedOcena1 = false; lo_selectedOcena2 = false; lo_selectedOcena3 = false; lo_selectedOcena4 = false; lo_selectedOcena5 = false;
+    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtLeft, h12, gtRight+35, h0)) { lo_selectedOcena1 = true }
+    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtLeft, h23, gtRight+35, h12)) { lo_selectedOcena2 = true }
+    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtLeft, h34, gtRight+35, h23)) { lo_selectedOcena3 = true }
+    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtLeft, h45, gtRight+35, h34)) { lo_selectedOcena4 = true }
+    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtLeft, h100, gtRight+35, h45)) { lo_selectedOcena5 = true }
+
+    //---- Preverjanje, ali je z miško nad grafičnim stolpcem točk desno od tabele ocen
+    lo_selectedTock = -1;
+    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gtRight - 30, h100 - 5, gtRight + 55, h0 + 5)) {
+        lo_selectedTock = (h0 - lo_mouseMoveY) / gtHeight * lo_nrTock;
+        if (lo_useHalfPoint) {
+            lo_selectedTock = (Math.trunc(2 * (lo_selectedTock + lo_stepTock / 2))) / 2;
+        } else {
+            lo_selectedTock = Math.trunc(lo_selectedTock + lo_stepTock / 2);
+        }
+        lo_selectedTock = fixForRange(lo_selectedTock, 0, lo_nrTock);
+    }
+    
     paint_delay() //da na oseh označi koordinate miške
     //console.log("mouse_move exit")
 });
@@ -2700,7 +2733,7 @@ function paint() {
     
     let marginLeft = 8; let marginRight = 8;
     var marginTop = lo_layout_marginTop; let marginBottom = 25;
-
+    
     paint_eOcene();
     paint_GUI()
     
@@ -2719,52 +2752,57 @@ function paint() {
 
 }
 function paint_eOcene() {
-   
-    //gText("To" + scTchLow + "k:", "bold 11pt verdana", "darkSlateGray", 28, 45);
-    //gText("Kriteriji:", "bold 11pt verdana", "darkSlateGray", 66, 112);
 
     //---- grafične meje med razredi
-    const marginTop = 20; const marginBottom = 16;
-    const gTop = marginTop;
-    const gHeight = ctxH - marginTop - marginBottom; //550;
-    const gLeft = 200
-    let gWidth = 280;
-    if (lo_useHalfPoint) { gWidth += 30 };
-    let gRight = gLeft + gWidth;
-    let gBottom = gTop + gHeight;
+    gtMarginTop = 20; gtMarginBottom = 16;
+    //----
+    gtTop = gtMarginTop;
+    gtHeight = ctxH - gtMarginTop - gtMarginBottom; //550;
+    gtBottom = gtTop + gtHeight;
+    //----
+    gtLeft = 200;
+    gtWidth = 280;
+    if (lo_useHalfPoint) { gtWidth += 30 };
+    gtRight = gtLeft + gtWidth;
     
-    let h0 = gBottom;
-    let h12 = gBottom - lo_kriterij12 * gHeight / 100;
-    let h23 = gBottom - lo_kriterij23 * gHeight / 100;
-    let h34 = gBottom - lo_kriterij34 * gHeight / 100;
-    let h45 = gBottom - lo_kriterij45 * gHeight / 100;
-    let h100 = gTop;
+    h0 = gtBottom;
+    h12 = gtBottom - lo_kriterij12 * gtHeight / 100;
+    h23 = gtBottom - lo_kriterij23 * gtHeight / 100;
+    h34 = gtBottom - lo_kriterij34 * gtHeight / 100;
+    h45 = gtBottom - lo_kriterij45 * gtHeight / 100;
+    h100 = gtTop;
 
     //---- printLevel: 4-vse, 3-manjka checkBox, 2-manjka checkBox in posivitve tabele, 1-manjka checkBox in posivitve tabele in črte vmes, 0-manjkajo checkBox / posivitve tabele / črte vmes / točke / kriteriji
 
     //---- različno posivljena področja ocen
     if (lo_printLevel >= 3) {
-        gBannerRect(gLeft, h100, gWidth, h45 - h100, 0, 0, "rgb(255, 255, 255)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h45, gWidth, h34 - h45, 0, 0, "rgb(228, 228, 228)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h34, gWidth, h23 - h34, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h23, gWidth, h12 - h23, 0, 0, "rgb(196, 196, 196)", 0, "", "", 0, 0, false);
-        gBannerRect(gLeft, h12, gWidth, h0 - h12, 0, 0, "rgb(180, 180, 180)", 0, "", "", 0, 0, false);
+        gBannerRect(gtLeft, h100, gtWidth, h45 - h100, 0, 0, "rgb(255, 255, 255)", 0, "", "", 0, 0, false);
+        gBannerRect(gtLeft, h45, gtWidth, h34 - h45, 0, 0, "rgb(228, 228, 228)", 0, "", "", 0, 0, false);
+        gBannerRect(gtLeft, h34, gtWidth, h23 - h34, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
+        gBannerRect(gtLeft, h23, gtWidth, h12 - h23, 0, 0, "rgb(196, 196, 196)", 0, "", "", 0, 0, false);
+        gBannerRect(gtLeft, h12, gtWidth, h0 - h12, 0, 0, "rgb(180, 180, 180)", 0, "", "", 0, 0, false);
     }
-
+    const colorMask = "#DEB88720";
+    if (lo_selectedOcena5) { gBannerRect(gtLeft, h100, gtWidth, h45 - h100, 0, 0, colorMask, 0, "", "", 0, 0, false); gBannerRect(gtLeft+3, h100+3, gtWidth-6, h45 - h100-6, 0, 0, "", 6, "gold", "", 0, 0, false); }
+    else if (lo_selectedOcena4) { gBannerRect(gtLeft, h45, gtWidth, h34 - h45, 0, 0, colorMask, 0, "", "", 0, 0, false); gBannerRect(gtLeft+3, h45+3, gtWidth-6, h34 - h45-6, 0, 0, "", 6, "gold", "", 0, 0, false); }
+    else if (lo_selectedOcena3) { gBannerRect(gtLeft, h34, gtWidth, h23 - h34, 0, 0, colorMask, 0, "", "", 0, 0, false); gBannerRect(gtLeft+3, h34+3, gtWidth-6, h23 - h34-6, 0, 0, "", 6, "gold", "", 0, 0, false); }
+    else if (lo_selectedOcena2) { gBannerRect(gtLeft, h23, gtWidth, h12 - h23, 0, 0, colorMask, 0, "", "", 0, 0, false); gBannerRect(gtLeft+3, h23+3, gtWidth-6, h12 - h23-6, 0, 0, "", 6, "gold", "", 0, 0, false); }
+    else if (lo_selectedOcena1) { gBannerRect(gtLeft, h12, gtWidth, h0 - h12, 0, 0, colorMask, 0, "", "", 0, 0, false); gBannerRect(gtLeft+3, h12+3, gtWidth-6, h0 - h12-6, 0, 0, "", 6, "gold", "", 0, 0, false); }
+        
     //---- črtkane meje med posivljenimi področji ocen
     if (lo_printLevel >= 2) {
-        gLine(gLeft, h100 - 1, gRight, h100 - 1, 2, "gray", [4, 4]);
-        gLine(gLeft, h45, gRight, h45, 2, "gray", [4, 4]);
-        gLine(gLeft, h34, gRight, h34, 2, "gray", [4, 4]);
-        gLine(gLeft, h23, gRight, h23, 2, "gray", [4, 4]);
-        gLine(gLeft, h12, gRight, h12, 2, "gray", [4, 4]);
-        gLine(gLeft, h0 + 1, gRight, h0 + 1, 2, "gray", [4, 4]);
+        gLine(gtLeft, h100 - 1, gtRight, h100 - 1, 2, "gray", [4, 4]);
+        gLine(gtLeft, h45, gtRight, h45, 2, "gray", [4, 4]);
+        gLine(gtLeft, h34, gtRight, h34, 2, "gray", [4, 4]);
+        gLine(gtLeft, h23, gtRight, h23, 2, "gray", [4, 4]);
+        gLine(gtLeft, h12, gtRight, h12, 2, "gray", [4, 4]);
+        gLine(gtLeft, h0 + 1, gtRight, h0 + 1, 2, "gray", [4, 4]);
     }
 
     //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
     if (lo_printLevel >= 2) {
         let x0, y0, x1, y1;
-        x1 = gLeft - 10;
+        x1 = gtLeft - 10;
         //----
         x0 = intChooserKriterij45.left + intChooserKriterij45.width + 7;
         y0 = intChooserKriterij45.top + intChooserKriterij45.height / 2; y1 = h45;
@@ -2789,9 +2827,11 @@ function paint_eOcene() {
 
     //---- grafične oznake ocen
     let font = "bold 15pt verdana";
+    let fontOcenaSel = "bold 40pt verdana";
     let tmpText;
     let font2 = "bold 10pt verdana";
     let bw = 15; let bh = 14;
+    let bwSel = 40; let bhSel = 40;
     let ddx = 7; let ddy = 7;
     let cv_col3 = 215;
     if (lo_printLevel <= 0) { cv_col3 = 18 };
@@ -2807,8 +2847,12 @@ function paint_eOcene() {
 
     //---- ocena 5
     y = (h100 + h45) / 2 - hAdd;
-    if (lo_printLevel == 0) { y = gTop };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
+    if (lo_printLevel == 0) { y = gtTop };
+    if (lo_selectedOcena5) {
+        //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "5", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
+    } else {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
+    };
     tmpText = lo_tock5b.toString() + addText + " (" + (lo_tock5b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
     if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + addText + " (100%)" };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
@@ -2816,155 +2860,244 @@ function paint_eOcene() {
 
     //---- ocena 4
     y = (h45 + h34) / 2 - hAdd;
-    if (lo_printLevel == 0) { y = gTop + 1 * hAddLinear };
+    if (lo_printLevel == 0) { y = gtTop + 1 * hAddLinear };
     if (lo_validOcena4) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false)
+        if (lo_selectedOcena4) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "4", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
+        };
         tmpText = lo_tock4b.toString() + addText + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + addText + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\npdb(4): " + tmpText;
     } else {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
+        if (lo_selectedOcena4) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "4", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#D0D0D040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
+        };
         lo_tockovnik += "\npdb(4): ";
     }
 
     //---- ocena 3
     y = (h34 + h23) / 2 - hAdd;
-    if (lo_printLevel == 0) { y = gTop + 2 * hAddLinear };
+    if (lo_printLevel == 0) { y = gtTop + 2 * hAddLinear };
     if (lo_validOcena3) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
+        if (lo_selectedOcena3) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "3", ddx, ddy, 25, "gold", 1, "dimGray", "#C0C0C040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
+        };
         tmpText = lo_tock3b.toString() + addText + " (" + (lo_tock3b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + addText + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n db(3): " + tmpText;
     } else {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
+        if (lo_selectedOcena3) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "3", ddx, ddy, 25, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
+        };
         lo_tockovnik += "\n db(3): ";
     }
 
     //---- ocena 2
     y = (h23 + h12) / 2 - hAdd;
-    if (lo_printLevel == 0) { y = gTop + 3 * hAddLinear };
+    if (lo_printLevel == 0) { y = gtTop + 3 * hAddLinear };
     if (lo_validOcena2) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
+        if (lo_selectedOcena2) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "2", ddx, ddy, 25, "gold", 1, "gray", "#A0A0A040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
+        };
         tmpText = lo_tock2b.toString() + addText + " (" + (lo_tock2b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
         if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + addText + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n zd(2): " + tmpText;
     } else {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
+        if (lo_selectedOcena2) {
+            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "2", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#A0A0A040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
+        };
         lo_tockovnik += "\n zd(2): ";
     }
 
     //---- ocena 1
     y = (h12 + h0) / 2 - hAdd;
-    if (lo_printLevel == 0) { y = gTop + 4 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
+    if (lo_printLevel == 0) { y = gtTop + 4 * hAddLinear };
+    if (lo_selectedOcena1) {
+        //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
+    } else {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
+    };
     tmpText = "0" + addText + " (0%) - " + lo_tock1t.toString() + addText + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "\nnzd(1): " + tmpText;
+    
+    //---- Selektirana ocena naj se izpiše na vrhu!
+    if (lo_selectedOcena5) {
+        y = (h100 + h45) / 2 - hAdd;
+        gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "5", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
+    }
+    else if (lo_selectedOcena4) {
+        y = (h45 + h34) / 2 - hAdd;
+        if (lo_validOcena4) { 
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "4", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "4", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#D0D0D040", 6, 6, false);
+        }
+    }
+    else if (lo_selectedOcena3) {
+        y = (h34 + h23) / 2 - hAdd;
+        if (lo_validOcena3) { 
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "3", ddx, ddy, 25, "gold", 1, "dimGray", "#C0C0C040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "3", ddx, ddy, 25, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 6, 6, false);
+        }
+    }
+    else if (lo_selectedOcena2) {
+        y = (h23 + h12) / 2 - hAdd;
+        if (lo_validOcena2) { 
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "2", ddx, ddy, 25, "gold", 1, "gray", "#A0A0A040", 6, 6, false);
+        } else {
+            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "2", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#A0A0A040", 6, 6, false);
+        }
+    }
+    else if (lo_selectedOcena1) {
+        y = (h12 + h0) / 2 - hAdd;
+        gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
+    }
 
     //---- Grafična predstavitev točk v pasovih ocen
     let tmpX, tmpYt, tmpYb;
     const cv_xDiff = 0;
     const myColor = "maroon";
     const myColor2 = "gray";
-    const tmpFont = "9pt serif";
+    let tmpFont = "9pt serif";
     const vDiffTop = 5; const vDiffBottom = 2;
     const lineWidth = 3; let r; const r2 = 3;
-    var pixPerStepTock = gHeight / (lo_nrTock / lo_stepTock); //toliko pikslov pride na en orak pri številu točk na testu
+    var pixPerStepTock = gtHeight / (lo_nrTock / lo_stepTock); //toliko pikslov pride na en orak pri številu točk na testu
     if (pixPerStepTock < 7) { r = 3; } else { r = 4; };
+    if (pixPerStepTock > 10) { tmpFont = "bold 10pt verdana"; };
     if (lo_printLevel >= 4) {
         //---- ocena 5
-        tmpX = gRight + 10;
+        tmpX = gtRight + 10;
         if (lo_tock5b < lo_nrTock) {
-            tmpYb = h0 - (lo_tock5b / lo_nrTock) * gHeight;
+            tmpYb = h0 - (lo_tock5b / lo_nrTock) * gtHeight;
             gLine(tmpX, h100, tmpX, tmpYb, lineWidth, myColor2, []);
             gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-            gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            if (lo_tock5b !== lo_selectedTock) { 
+                gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            }
             if (pixPerStepTock > 8) {
                 for (i = 1; i <= ((lo_tock5t - lo_tock5b) / lo_stepTock - 1); i++) {
-                    tmpYb = h0 - ((lo_tock5b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                    tmpYb = h0 - ((lo_tock5b + i * lo_stepTock) / lo_nrTock) * gtHeight;
                     gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
                 }
             }
         }
         gEllipse(tmpX, h100, r, r, 0, myColor, 0, "");
-        gText(lo_nrTock.toString(), tmpFont, myColor2, tmpX + r + 2, h100 + vDiffTop);
+        if (lo_nrTock !== lo_selectedTock) { 
+            gText(lo_nrTock.toString(), tmpFont, myColor2, tmpX + r + 2, h100 + vDiffTop);
+        }
         //---- ocena 4
         tmpX += cv_xDiff;
         if (lo_validOcena4) {
-            tmpYt = h0 - (lo_tock4t / lo_nrTock) * gHeight;
+            tmpYt = h0 - (lo_tock4t / lo_nrTock) * gtHeight;
             if (lo_tock4b < lo_tock4t) {
-                tmpYb = h0 - (lo_tock4b / lo_nrTock) * gHeight;
+                tmpYb = h0 - (lo_tock4b / lo_nrTock) * gtHeight;
                 gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
                 gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (lo_tock4b !== lo_selectedTock) { 
+                    gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                }
                 if (pixPerStepTock > 8) {
                     for (i = 1; i <= ((lo_tock4t - lo_tock4b) / lo_stepTock - 1); i++) {
-                        tmpYb = h0 - ((lo_tock4b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        tmpYb = h0 - ((lo_tock4b + i * lo_stepTock) / lo_nrTock) * gtHeight;
                         gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
                     }
                 }                
             }
             gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            if (lo_tock4t !== lo_selectedTock) { 
+                gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            }
         }
         //---- ocena 3
         tmpX -= cv_xDiff;
         if (lo_validOcena3) {
-            tmpYt = h0 - (lo_tock3t / lo_nrTock) * gHeight;
+            tmpYt = h0 - (lo_tock3t / lo_nrTock) * gtHeight;
             if (lo_tock3b < lo_tock3t) {
-                tmpYb = h0 - (lo_tock3b / lo_nrTock) * gHeight;
+                tmpYb = h0 - (lo_tock3b / lo_nrTock) * gtHeight;
                 gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
                 gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (lo_tock3b !== lo_selectedTock) { 
+                    gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                }
                 if (pixPerStepTock > 8) {
                     for (i = 1; i <= ((lo_tock3t - lo_tock3b) / lo_stepTock - 1); i++) {
-                        tmpYb = h0 - ((lo_tock3b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        tmpYb = h0 - ((lo_tock3b + i * lo_stepTock) / lo_nrTock) * gtHeight;
                         gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
                     }
                 }
             }
             gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            if (lo_tock3t !== lo_selectedTock) { 
+                gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            }
         }
         //---- ocena 2
         tmpX += cv_xDiff;
         if (lo_validOcena2) {
-            tmpYt = h0 - (lo_tock2t / lo_nrTock) * gHeight;
+            tmpYt = h0 - (lo_tock2t / lo_nrTock) * gtHeight;
             if (lo_tock2b < lo_tock2t) {
-                tmpYb = h0 - (lo_tock2b / lo_nrTock) * gHeight;
+                tmpYb = h0 - (lo_tock2b / lo_nrTock) * gtHeight;
                 gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
                 gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                if (lo_tock2b !== lo_selectedTock) { 
+                    gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+                }
                 if (pixPerStepTock > 8) {
                     for (i = 1; i <= ((lo_tock2t - lo_tock2b) / lo_stepTock - 1); i++) {
-                        tmpYb = h0 - ((lo_tock2b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                        tmpYb = h0 - ((lo_tock2b + i * lo_stepTock) / lo_nrTock) * gtHeight;
                         gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
                     }
                 }
             }
             gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            if (lo_tock2t !== lo_selectedTock) { 
+                gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+            }
         }
         //---- ocena 1
         tmpX -= cv_xDiff;
-        tmpYt = h0 - (lo_tock1t / lo_nrTock) * gHeight;
+        tmpYt = h0 - (lo_tock1t / lo_nrTock) * gtHeight;
         if (lo_tock1b < lo_tock1t) {
-            tmpYb = h0 - (lo_tock1b / lo_nrTock) * gHeight;
+            tmpYb = h0 - (lo_tock1b / lo_nrTock) * gtHeight;
             gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
             gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-            gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            if (lo_tock1b !== lo_selectedTock) { 
+                gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
+            }
             if (pixPerStepTock > 8) {
                 for (i = 1; i <= ((lo_tock1t - lo_tock1b) / lo_stepTock - 1); i++) {
-                    tmpYb = h0 - ((lo_tock1b + i * lo_stepTock) / lo_nrTock) * gHeight;
+                    tmpYb = h0 - ((lo_tock1b + i * lo_stepTock) / lo_nrTock) * gtHeight;
                     gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
                 }
             }
         }
         gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-        gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+        if (lo_tock1t !== lo_selectedTock) { 
+            gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
+        }
+        //---- št. točk pod miško? 4.4.2024
+        if (lo_selectedTock >= 0 && lo_selectedTock <= lo_nrTock) {
+            let tmpY = h0 - (lo_selectedTock / lo_nrTock) * gtHeight;
+            gEllipse(tmpX, tmpY, 8, 8, 0, "", 5, "blue");
+            gText(lo_selectedTock.toString() + " to" + scTchLow + "k" + " (" + (lo_selectedTock / lo_nrTock * 100).toFixed(2) + "%)", "bold 11pt verdana", "blue", tmpX + 14, tmpY + 7);
+        }
     }
 }
 
