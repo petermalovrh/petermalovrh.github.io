@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.7"
-const gl_versionDate = "5.4.2024"
+const gl_versionNr = "v1.8"
+const gl_versionDate = "6.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2877,8 +2877,8 @@ function paint_eOcene() {
     } else {
         gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
     };
-    tmpText = lo_tock5b.toString() + addText + " (" + (lo_tock5b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
-    if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + addText + " (100%)" };
+    tmpText = lo_tock5b.toString() + lf_addTextTock(lo_tock5b) + " (" + (lo_tock5b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
+    if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + lf_addTextTock(lo_tock5t) + " (100%)" };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "odl(5): " + tmpText;
 
@@ -2891,8 +2891,8 @@ function paint_eOcene() {
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
         };
-        tmpText = lo_tock4b.toString() + addText + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + addText + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
+        tmpText = lo_tock4b.toString() + lf_addTextTock(lo_tock4b) + " (" + (lo_tock4b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
+        if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + lf_addTextTock(lo_tock4t) + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\npdb(4): " + tmpText;
     } else {
@@ -2913,8 +2913,8 @@ function paint_eOcene() {
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
         };
-        tmpText = lo_tock3b.toString() + addText + " (" + (lo_tock3b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + addText + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)" };
+        tmpText = lo_tock3b.toString() + lf_addTextTock(lo_tock3b) + " (" + (lo_tock3b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
+        if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + lf_addTextTock(lo_tock3t) + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n db(3): " + tmpText;
     } else {
@@ -2935,8 +2935,8 @@ function paint_eOcene() {
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
         };
-        tmpText = lo_tock2b.toString() + addText + " (" + (lo_tock2b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + addText + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)" };
+        tmpText = lo_tock2b.toString() + lf_addTextTock(lo_tock2b) + " (" + (lo_tock2b / lo_nrTock * 100).toFixed(2) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
+        if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + lf_addTextTock(lo_tock2t) + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)" };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n zd(2): " + tmpText;
     } else {
@@ -2956,7 +2956,7 @@ function paint_eOcene() {
     } else {
         gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     };
-    tmpText = "0" + addText + " (0%) - " + lo_tock1t.toString() + addText + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
+    tmpText = "0" + lf_addTextTock(lo_tock1b) + " (0%) - " + lo_tock1t.toString() + lf_addTextTock(lo_tock1t) + " (" + (lo_tock1t / lo_nrTock * 100).toFixed(2) + "%)";
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "\nnzd(1): " + tmpText;
     
@@ -3123,6 +3123,50 @@ function paint_eOcene() {
             gText(lo_selectedTock.toString() + " to" + scTchLow + "k" + " (" + (lo_selectedTock / lo_nrTock * 100).toFixed(2) + "%)", "bold 11pt verdana", "blue", tmpX + 14, tmpY + 7);
         }
     }
+}
+
+function lf_addTextTock(vp_tock) {
+    //-------------------------------
+    // 0 .. točk, 1 .. točka, .. 2 .. točki, .. 3 .. točke, 4 .. točke, 5 .. točk, 6 .. točk, ....
+    // 0.5, 1.5, 2.5, 3.5, ... točke
+    //-------------------------------
+
+    let addText = ""
+
+    //---- če ni na minimalnem prikazu, se ne izpisuje besede "točk/a/e/i"
+    if (!lo_drawListSimple) {
+        return addText;
+    }
+
+    //---- default rezultat je " točk"
+    let strTock = " to" + scTchLow + "k";
+    
+    //---- za primer 0.5, 1.5, 2.5, 3.5, .... je rezultat " točke" (primer: https://www.gov.si/teme/nadaljnje-izobrazevanje-in-usposabljanje-strokovnih-delavcev-v-vzgoji-in-izobrazevanju/)
+    if (vp_tock !== Math.trunc(vp_tock)) {
+        addText = strTock + "e";
+        return addText;
+    }
+
+    //---- za celoštevilčno število točk
+    switch (vp_tock) {
+        case 0:
+            addText = strTock;
+            break;
+        case 1:
+            addText = strTock + "a";
+            break;
+        case 2:
+            addText = strTock + "i";
+            break;
+        case 3: case 4:
+            addText = strTock + "e";
+            break;
+        default:
+            addText = strTock;
+            break;
+    }
+    return addText;
+
 }
 
 function lf_calculateMejeTock() {
