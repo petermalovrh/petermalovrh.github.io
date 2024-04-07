@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.9"
-const gl_versionDate = "7.4.2024"
+const gl_versionNr = "v1.10"
+const gl_versionDate = "8.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1869,6 +1869,7 @@ var lo_drawTabelaOcenLines = true;
 var lo_drawTabelaOcenRects = true;
 var lo_drawVTocke = true;
 var lo_drawListSimple = true;
+var lo_drawListSimpleNoPercent = true;
 var lo_enabledKriteriji = true;
 
 const cv_naborKriterijev_1 = 1;
@@ -1879,7 +1880,7 @@ var lo_naborKriterijev = cv_naborKriterijev_1;
 
 var lo_tockovnik = "";
 
-const cv_printLevelMax = 5;
+const cv_printLevelMax = 6;
 const cv_printLevelMin = 0;
 var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še grafične točke, 2-manjkajo še posivitve tabele, 1-manjkajo še črte vmes, 0-samo vrstični izpis točkovnika
 
@@ -2382,13 +2383,13 @@ window.addEventListener("wheel", event => {
     
     //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja število točk na testu
     if (lo_keyDownT) {
-        if (lo_enabledIntChooserNrTock) {
+        //if (lo_enabledIntChooserNrTock) {
             change = delta * lo_stepTock;
             if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
             newValue = lf_changeValueNrTock(change);
             gl_changeByMouseWheel_nrTock = true; // 4.1.2024
             lf_changeNrTock(newValue, true);
-        }
+        //}
         return; //konec prverjanja, ker je s pritisnjeno tipko T povedal, da hoče točno to in nič drugega
     }
     //---- če vrti kolešček miške ob pritisnjeni tipki 2, s tem spreminja kriterij za oceno 2
@@ -3007,11 +3008,12 @@ function paint_eOcene_tockeOcen() {
         if (lo_tock1t !== lo_selectedTock) {
             gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
         }
+
         //---- št. točk pod miško? 4.4.2024
         if (lo_selectedTock >= 0 && lo_selectedTock <= lo_nrTock) {
             let tmpY = h0 - (lo_selectedTock / lo_nrTock) * gtHeight;
             gEllipse(tmpX, tmpY, 8, 8, 0, "", 5, "blue");
-            gText(lo_selectedTock.toString() + " to" + scTchLow + "k" + " (" + (lo_selectedTock / lo_nrTock * 100).toFixed(2) + "%)", "bold 11pt verdana", "blue", tmpX + 14, tmpY + 7);
+            gText(lo_selectedTock.toString() + lf_textTock(lo_selectedTock) + " (" + (lo_selectedTock / lo_nrTock * 100).toFixed(2) + "%)", "bold 11pt verdana", "blue", tmpX + 14, tmpY + 7);
         }
     }
 }
@@ -3027,41 +3029,41 @@ function paint_eOcene_tabelaOcen_text() {
     let bwSel = 40; let bhSel = 40;
     let ddx = 7; let ddy = 7;
     let cv_col3 = 215;
-    if (lo_drawListSimple) { cv_col3 = 18 };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { cv_col3 = 18 };
     let cv_col4 = cv_col3 + 35;
     const cv_kriterijiStepV = 40;
     const hAdd = 8; const tAdd = 13;
         
     let y;
     const hAddLinear = 35;
-    let addText = ""
-    if (lo_drawListSimple) { addText = " to" + scTchLow + "k" };
     lo_tockovnik = "";
     
     //---- ocena 5
     y = (h100 + h45) / 2 - hAdd;
-    if (lo_drawListSimple) { y = gtTop };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop };
     if (lo_selectedOcena5) {
         //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "5", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
     } else {
         gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
     };
-    tmpText = lo_tock5b.toString() + lf_addTextTock(lo_tock5b) + " (" + lf_fixProcent((lo_tock5b / lo_nrTock * 100).toFixed(2)) + "%)" //+ " - " + lo_tock5t.toString() + " (100%)";
-    if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + lf_addTextTock(lo_tock5t) + " (100%)" };
+    tmpText = lo_tock5b.toString() + lf_addTextTock(lo_tock5b) + lf_addTextPercent(lo_tock5b);
+    if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + lf_addTextTock(lo_tock5t) + lf_addTextPercent(lo_tock5t) };
+    if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock5t) };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "odl(5): " + tmpText;
     
     //---- ocena 4
     y = (h45 + h34) / 2 - hAdd;
-    if (lo_drawListSimple) { y = gtTop + 1 * hAddLinear };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 1 * hAddLinear };
     if (lo_validOcena4) {
         if (lo_selectedOcena4) {
             //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "4", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
         };
-        tmpText = lo_tock4b.toString() + lf_addTextTock(lo_tock4b) + " (" + lf_fixProcent((lo_tock4b / lo_nrTock * 100).toFixed(2)) + "%)" //+ " - " + lo_tock4t.toString() + " (" + (lo_tock4t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + lf_addTextTock(lo_tock4t) + " (" + lf_fixProcent((lo_tock4t / lo_nrTock * 100).toFixed(2)) + "%)" };
+        tmpText = lo_tock4b.toString() + lf_addTextTock(lo_tock4b) + lf_addTextPercent(lo_tock4b);
+        if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + lf_addTextTock(lo_tock4t) + lf_addTextPercent(lo_tock4t) };
+        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock4t) };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\npdb(4): " + tmpText;
     } else {
@@ -3075,15 +3077,16 @@ function paint_eOcene_tabelaOcen_text() {
     
     //---- ocena 3
     y = (h34 + h23) / 2 - hAdd;
-    if (lo_drawListSimple) { y = gtTop + 2 * hAddLinear };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 2 * hAddLinear };
     if (lo_validOcena3) {
         if (lo_selectedOcena3) {
             //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "3", ddx, ddy, 25, "gold", 1, "dimGray", "#C0C0C040", 6, 6, false);
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
         };
-        tmpText = lo_tock3b.toString() + lf_addTextTock(lo_tock3b) + " (" + lf_fixProcent((lo_tock3b / lo_nrTock * 100).toFixed(2)) + "%)" //+ " - " + lo_tock3t.toString() + " (" + (lo_tock3t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + lf_addTextTock(lo_tock3t) + " (" + lf_fixProcent((lo_tock3t / lo_nrTock * 100).toFixed(2)) + "%)" };
+        tmpText = lo_tock3b.toString() + lf_addTextTock(lo_tock3b) + lf_addTextPercent(lo_tock3b);
+        if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + lf_addTextTock(lo_tock3t) + lf_addTextPercent(lo_tock3t) };
+        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock3t) };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n db(3): " + tmpText;
     } else {
@@ -3097,15 +3100,16 @@ function paint_eOcene_tabelaOcen_text() {
     
     //---- ocena 2
     y = (h23 + h12) / 2 - hAdd;
-    if (lo_drawListSimple) { y = gtTop + 3 * hAddLinear };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 3 * hAddLinear };
     if (lo_validOcena2) {
         if (lo_selectedOcena2) {
             //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "2", ddx, ddy, 25, "gold", 1, "gray", "#A0A0A040", 6, 6, false);
         } else {
             gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
         };
-        tmpText = lo_tock2b.toString() + lf_addTextTock(lo_tock2b) + " (" + lf_fixProcent((lo_tock2b / lo_nrTock * 100).toFixed(2)) + "%)" //+ " - " + lo_tock2t.toString() + " (" + (lo_tock2t / lo_nrTock * 100).toFixed(2) + "%)";
-        if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + lf_addTextTock(lo_tock2t) + " (" + lf_fixProcent((lo_tock2t / lo_nrTock * 100).toFixed(2)) + "%)" };
+        tmpText = lo_tock2b.toString() + lf_addTextTock(lo_tock2b) + lf_addTextPercent(lo_tock2b);
+        if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + lf_addTextTock(lo_tock2t) + lf_addTextPercent(lo_tock2t) };
+        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock2t) };
         gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
         lo_tockovnik += "\n zd(2): " + tmpText;
     } else {
@@ -3119,13 +3123,14 @@ function paint_eOcene_tabelaOcen_text() {
     
     //---- ocena 1
     y = (h12 + h0) / 2 - hAdd;
-    if (lo_drawListSimple) { y = gtTop + 4 * hAddLinear };
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 4 * hAddLinear };
     if (lo_selectedOcena1) {
         //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
     } else {
         gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     };
-    tmpText = "0" + lf_addTextTock(lo_tock1b) + " (0%) - " + lo_tock1t.toString() + lf_addTextTock(lo_tock1t) + " (" + lf_fixProcent((lo_tock1t / lo_nrTock * 100).toFixed(2)) + "%)";
+    tmpText = "0" + lf_addTextTock(lo_tock1b) + lf_addTextPercent(lo_tock1b) + " - " + lo_tock1t.toString() + lf_addTextTock(lo_tock1t) + lf_addTextPercent(lo_tock1t);
+    if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock1t) };
     gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
     lo_tockovnik += "\nnzd(1): " + tmpText;
         
@@ -3174,6 +3179,14 @@ function lf_fixProcent(vp_nrStr) {
     }
 }
 
+function lf_addTextPercent(vp_tock) {
+
+    if (lo_drawListSimpleNoPercent) { return "" };
+
+    return " (" + lf_fixProcent((vp_tock / lo_nrTock * 100).toFixed(2)) + "%)";
+
+}
+
 function lf_addTextTock(vp_tock) {
     //-------------------------------
     // 0 .. točk, 1 .. točka, .. 2 .. točki, .. 3 .. točke, 4 .. točke, 5 .. točk, 6 .. točk, ....
@@ -3186,6 +3199,18 @@ function lf_addTextTock(vp_tock) {
     if (!lo_drawListSimple) {
         return addText;
     }
+
+    return lf_textTock(vp_tock);
+
+}
+
+function lf_textTock(vp_tock) {
+    //-------------------------------
+    // 0 .. točk, 1 .. točka, .. 2 .. točki, .. 3 .. točke, 4 .. točke, 5 .. točk, 6 .. točk, ....
+    // 0.5, 1.5, 2.5, 3.5, ... točke
+    //-------------------------------
+
+    let addText = ""
 
     //---- default rezultat je " točk"
     let strTock = " to" + scTchLow + "k";
@@ -3782,16 +3807,24 @@ function lf_setPrintLevel(vp_paint) {
     lo_drawTabelaOcenRects = true;
     lo_drawVTocke = true;
     lo_drawListSimple = false;
+    lo_drawListSimpleNoPercent = false; // 8.4.2024
     switch (lo_printLevel) {
-        case 5: break;
-        case 4: lo_enabledUseHalfPoint = false; break;
-        case 3: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; break;
-        case 2: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; break;
-        case 1: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; break;
+        case 6: break;
+        case 5: lo_enabledUseHalfPoint = false; break;
+        case 4: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; break;
+        case 3: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; break;
+        case 2: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; break;
+        case 1:
+            lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; lo_drawTabelaOcen = false;
+            lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false;
+            lo_enabledIntChooserKriterij12 = false; lo_enabledIntChooserKriterij23 = false; lo_enabledIntChooserKriterij34 = false; lo_enabledIntChooserKriterij45 = false;
+            lo_drawListSimple = true;
+            break;
         case 0:
             lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; lo_drawTabelaOcen = false;
-            lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false; lo_drawListSimple = true;
+            lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false;
             lo_enabledIntChooserKriterij12 = false; lo_enabledIntChooserKriterij23 = false; lo_enabledIntChooserKriterij34 = false; lo_enabledIntChooserKriterij45 = false;
+            lo_drawListSimpleNoPercent = true;
             break;
     }
         
