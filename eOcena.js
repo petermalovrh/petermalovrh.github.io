@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.10"
-const gl_versionDate = "8.4.2024"
+const gl_versionNr = "v1.11"
+const gl_versionDate = "11.4.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -654,7 +654,7 @@ function gBannerRectWithText2(text, xiLeft, yiTop, font, xGap, yGap, ddx, ddy, f
 function gBannerRectWithText3(text, xiLeft, yiTop, font, xGap, yGapTop, yGapBottom, ddx, ddy, fillColor, strokeWidth, strokeColor, fontColor, shaddowColor, xShaddow, yShaddow) {
     //-------------------------------
     // xiLeft,yiTop,x1,y1 ... notranji nevidni okvir, tudi tekst se spodaj izpisuje na y1 (nad y1)
-    // dd          ... toliko od notranjega okvirja od zunanjega izrisanega okvirja
+    // dd          ... toliko od notranjega okvirja do zunanjega izrisanega okvirja
     // x(y)Shaddow ... kako daleč pade senca desno in navzdol
     //-------------------------------
     let w, h;
@@ -809,7 +809,31 @@ function gBannerRoundRectPath(left, top, right, bottom, ddx, ddy, radius, xShadd
 function gBannerRoundRectWithText(left, top, width, height, font, fontColor, text, ddx, ddy, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
     //-------------------------------
     // funkcija nariše pobarvan (opcija), osenčen (opcija), obkrožen (opcija), in zaobljen (nastavljiv radius) okvir s tekstom (opcija)
-    // left, top, width, height ... okvir
+    // left, top, width, height ... virtualni okvir teksta
+    // font, fontColor          ... parametri za tekst
+    // text                     ... tekst za izpis (če je prazen se ne izpiše nič)
+    // ddx, ddy                 ... koliko praznega prostora po X in Y je okoli virtualnega okvirja teksta
+    // radius                   ... vogali zaoljeni s krogom tega polmera
+    // fillColor                ... notranja barva (če je "" potem se ne polni)
+    // strokeWidth              ... debelina črte okoli okvirja (če je 0, potem se črte ne riše)
+    // strokeColor              ... barva črte okoli okvirja
+    // shaddowColor             ... barva senčenja okvirja
+    // xShaddow, yShaddow       ... kako daleč pade senca desno in navzdol
+    // shaddowAll               ... ali mora biti senčeno okoli in okoli (=true), ali pač desno navzdol (=false)
+    //-------------------------------
+
+    //---- banner
+    gBannerRoundRect(left - ddx, top - ddy, width + 2 * ddx, height + 2 * ddy, radius, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll);
+    //---- text
+    if (text != "") {
+        gText(text, font, fontColor, left, top + height)
+    }
+}
+
+function gBannerRoundRectWithText3(left, top, width, height, font, fontColor, text, xGap, yGapTop, yGapBottom, ddx, ddy, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+    //-------------------------------
+    // funkcija nariše pobarvan (opcija), osenčen (opcija), obkrožen (opcija), in zaobljen (nastavljiv radius) okvir s tekstom (opcija)
+    // left, top, width, height ... virtualni okvir teksta
     // font, fontColor          ... parametri za tekst
     // text                     ... tekst za izpis (če je prazen se ne izpiše nič)
     // ddx, ddy                 ... koliko praznega prostora po X in Y je okoli virtualnega okvirja teksta
@@ -1849,6 +1873,7 @@ var lo_kriterij12 = 50;
 var lo_kriterij23 = 65;
 var lo_kriterij34 = 80;
 var lo_kriterij45 = 90;
+var tblKriteriji = [lo_kriterij12, lo_kriterij23, lo_kriterij34, lo_kriterij45];
 var lo_validOcena2, lo_validOcena3, lo_validOcena4;
 
 var lo_tock5t, lo_tock5b;
@@ -1869,7 +1894,8 @@ var lo_drawTabelaOcenLines = true;
 var lo_drawTabelaOcenRects = true;
 var lo_drawVTocke = true;
 var lo_drawListSimple = true;
-var lo_drawListSimpleNoPercent = true;
+var lo_drawListSimpleNoPercent = true; //8.4.2024
+var lo_drawGraphicalH = true; //9.4.2024
 var lo_enabledKriteriji = true;
 
 const cv_naborKriterijev_1 = 1;
@@ -1880,7 +1906,7 @@ var lo_naborKriterijev = cv_naborKriterijev_1;
 
 var lo_tockovnik = "";
 
-const cv_printLevelMax = 6;
+const cv_printLevelMax = 7;
 const cv_printLevelMin = 0;
 var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še grafične točke, 2-manjkajo še posivitve tabele, 1-manjkajo še črte vmes, 0-samo vrstični izpis točkovnika
 
@@ -1988,7 +2014,7 @@ var lo_mouseDownX, lo_mouseDownY;
 
 var lo_lastMouseLocation 
 
-const lo_backgroundColor = "whiteSmoke"
+const lo_backgroundColor = "white";  //"whiteSmoke"
 const disabledControlLineColor = "silver";
 const disabledControlBackColor = "#F0F0F0FF";
 const disabledControlTextColor = "silver";
@@ -2041,7 +2067,8 @@ var ctxMinDim = Math.min(ctxW, ctxH)
 const cv_panelGUI_height = 100
 
 var ctx = elMyCanvas.getContext("2d");
-const bckgColor = "#F4F8F8";
+//const bckgColor = "#F4F8F8";
+const bckgColor = "white"; //10.4.2024
 
 const cv_displayMode_landscape = 1
 const  cv_displayMode_portrait = 2
@@ -2776,7 +2803,23 @@ function paint() {
     }
 
 }
+
 function paint_eOcene() {
+    //---------------------------------------------
+    // a) Grafična tabela ocen in točk s seznamom ocen/točk/procentov ali poenostavljeno samo v enostaven tekstovni seznam ocen/točk/procentov
+    // b) Grafična predstavitev ocen/kriterijev
+    //---------------------------------------------
+
+    if (lo_drawGraphicalH) {
+        paint_eOcene_graphicalH(); //9.4.2024
+        return;
+    } 
+
+    paint_eOcene_tabelaOcen();
+
+}
+
+function paint_eOcene_tabelaOcen() {
 
     //---- printLevel: 4-vse, 3-manjka checkBox, 2-manjka checkBox in posivitve tabele, 1-manjka checkBox in posivitve tabele in črte vmes, 0-manjkajo checkBox / posivitve tabele / črte vmes / točke / kriteriji
 
@@ -2792,11 +2835,11 @@ function paint_eOcene() {
     //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
     paint_eOcene_tabelaOcen_linijePovezaveNaKriterije();
 
-    //---- grafične oznake ocen
+    //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
     paint_eOcene_tabelaOcen_text();
 
     //---- Grafična predstavitev točk v pasovih ocen
-    paint_eOcene_tockeOcen();
+    paint_eOcene_tabelaOcen_tockeGraficno();
 
 }
 
@@ -2884,7 +2927,7 @@ function paint_eOcene_tabelaOcen_linijePovezaveNaKriterije() {
     }
 }
 
-function paint_eOcene_tockeOcen() {
+function paint_eOcene_tabelaOcen_tockeGraficno() {
     
     //---- Grafična predstavitev točk v pasovih ocen
     let tmpX, tmpYt, tmpYb;
@@ -3019,8 +3062,10 @@ function paint_eOcene_tockeOcen() {
 }
 
 function paint_eOcene_tabelaOcen_text() {
+    //-----------------------------------
+    // Ocena, točke, procenti znotraj grafične tabele ocen
+    //-----------------------------------
 
-    //---- grafične oznake ocen
     let font = "bold 15pt verdana";
     let fontOcenaSel = "bold 40pt verdana";
     let tmpText;
@@ -3166,6 +3211,42 @@ function paint_eOcene_tabelaOcen_text() {
     else if (lo_selectedOcena1) {
         y = (h12 + h0) / 2 - hAdd;
         gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
+    }
+    
+}
+
+function paint_eOcene_graphicalH() {
+    //-----------------------------------
+    // 9.4.2024
+    //-----------------------------------
+
+    let posTop = 5;
+    let posLeft = 10; let posRight = 465;
+    let tableWidth = posRight - posLeft;
+    let ocenaRadij = 9;
+    let ocenaColWidth = (tableWidth - 2 * ocenaRadij) / 4;
+    let fontOcena = "bold 18pt verdana";
+
+    let w, h;
+    let tmpText;
+    let fontKriterij = "bold 12pt verdana";
+    let bw = 16; let bh = 17;
+    let bwSel = 40; let bhSel = 40;
+    let ddx = 7; let ddy = 7;
+
+    let ocena, x, y;
+    //gLine(posLeft + 5, posTop + 22, posRight - 5, posTop + 22, 7, "#C8C8C8FF", []);
+    gLine(posLeft + 5, posTop + 22, posRight - 5, posTop + 22, 7, "gold", []);
+    y = posTop + 15;
+    for (ocena = 1; ocena <= 5; ocena++) {
+        x = posLeft + ocenaRadij + (ocena - 1) * ocenaColWidth; //na sredini markerja tekoče ocene
+        gBannerRoundRectWithText(x, y, bw, bh, fontOcena, "indigo", ocena.toString(), ddx, ddy, ocenaRadij, "gold", 1, "gray", "#80808040", 3, 3, false);
+        if (ocena < 5) {
+            tmpText = tblKriteriji[ocena - 1].toString() + "%";
+            ;[w, h] = gMeasureText(tmpText, fontKriterij);
+            x += ocenaColWidth / 2 - w / 2 + 8;
+            gBannerRectWithText3(tmpText, x, y + 2, fontKriterij, 2, 5, 5, 5, 5, bckgColor, 0, "", "black", "", 0, 0);
+        }
     }
     
 }
@@ -3728,19 +3809,19 @@ function lf_changeKriterij(vp_typeKriterij, vp_newValue, vp_paint) {
 
     switch (vp_typeKriterij) {
         case "12": {
-            lo_kriterij12 = vp_newValue;
+            lo_kriterij12 = vp_newValue; tblKriteriji[0] = vp_newValue;
             intChooserKriterij12.value = lo_kriterij12; break;
         };
         case "23": {
-            lo_kriterij23 = vp_newValue;
+            lo_kriterij23 = vp_newValue; tblKriteriji[1] = vp_newValue;
             intChooserKriterij23.value = lo_kriterij23; break;
         };
         case "34": {
-            lo_kriterij34 = vp_newValue;
+            lo_kriterij34 = vp_newValue; tblKriteriji[2] = vp_newValue;
             intChooserKriterij34.value = lo_kriterij34; break;
         };
         case "45": {
-            lo_kriterij45 = vp_newValue;
+            lo_kriterij45 = vp_newValue; tblKriteriji[3] = vp_newValue;
             intChooserKriterij45.value = lo_kriterij45; break;
         };            
     }
@@ -3808,23 +3889,30 @@ function lf_setPrintLevel(vp_paint) {
     lo_drawVTocke = true;
     lo_drawListSimple = false;
     lo_drawListSimpleNoPercent = false; // 8.4.2024
+    lo_drawGraphicalH = false; // 9.4.2024
     switch (lo_printLevel) {
-        case 6: break;
-        case 5: lo_enabledUseHalfPoint = false; break;
-        case 4: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; break;
-        case 3: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; break;
-        case 2: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; break;
-        case 1:
+        case 7: break;
+        case 6: lo_enabledUseHalfPoint = false; break;
+        case 5: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; break;
+        case 4: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; break;
+        case 3: lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; break;
+        case 2:
             lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; lo_drawTabelaOcen = false;
             lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false;
             lo_enabledIntChooserKriterij12 = false; lo_enabledIntChooserKriterij23 = false; lo_enabledIntChooserKriterij34 = false; lo_enabledIntChooserKriterij45 = false;
             lo_drawListSimple = true;
             break;
-        case 0:
+        case 1:
             lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; lo_drawTabelaOcen = false;
             lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false;
             lo_enabledIntChooserKriterij12 = false; lo_enabledIntChooserKriterij23 = false; lo_enabledIntChooserKriterij34 = false; lo_enabledIntChooserKriterij45 = false;
             lo_drawListSimpleNoPercent = true;
+            break;
+        case 0:
+            lo_enabledUseHalfPoint = false; lo_drawVTocke = false; lo_drawTabelaOcenRects = false; lo_drawTabelaOcenLines = false; lo_drawTabelaOcen = false;
+            lo_enabledIntChooserNrTock = false; lo_enabledKriteriji = false;
+            lo_enabledIntChooserKriterij12 = false; lo_enabledIntChooserKriterij23 = false; lo_enabledIntChooserKriterij34 = false; lo_enabledIntChooserKriterij45 = false;
+            lo_drawGraphicalH = true;
             break;
     }
         
@@ -3873,6 +3961,8 @@ function lf_changeNaborKriterijev(vp_newValue, vp_paint) {
             lo_kriterij45 = 90;
             break;
     }
+    tblKriteriji[0] = lo_kriterij12; tblKriteriji[1] = lo_kriterij23; tblKriteriji[2] = lo_kriterij34; tblKriteriji[3] = lo_kriterij45; //9.4.2024
+    //----
     intChooserKriterij12.value = lo_kriterij12;
     intChooserKriterij23.value = lo_kriterij23;
     intChooserKriterij34.value = lo_kriterij34;
