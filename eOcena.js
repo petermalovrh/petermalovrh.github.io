@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 31.3.2024
-const gl_versionNr = "v1.11"
-const gl_versionDate = "11.4.2024"
+const gl_versionNr = "v1.12"
+const gl_versionDate = "11.6.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2836,6 +2836,9 @@ function paint_eOcene_tabelaOcen() {
     paint_eOcene_tabelaOcen_linijePovezaveNaKriterije();
 
     //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
+    paint_eOcene_oceneLevo();
+    
+    //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
     paint_eOcene_tabelaOcen_text();
 
     //---- Grafična predstavitev točk v pasovih ocen
@@ -2903,27 +2906,94 @@ function paint_eOcene_tabelaOcen_linijePovezaveNaKriterije() {
     //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
     if (lo_drawTabelaOcenLines) {
         let x0, y0, x1, y1;
-        x1 = gtLeft - 10;
-        //----
-        x0 = intChooserKriterij45.left + intChooserKriterij45.width + 7;
-        y0 = intChooserKriterij45.top + intChooserKriterij45.height / 2; y1 = h45;
-        gLine(x0, y0, x1, y1, 1, "darkGray", [2, 4]);
-        gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
-        //----
+        let x00, y00, x10, y10;
+        let color;
+        x1 = gtLeft - 10; x10 = x1;
+        //---- posivljen pas za oceno 4
+        x00 = intChooserKriterij45.left + intChooserKriterij45.width + 7;
+        y00 = intChooserKriterij45.top + intChooserKriterij45.height / 2; y10 = h45;
         x0 = intChooserKriterij34.left + intChooserKriterij34.width + 7;
         y0 = intChooserKriterij34.top + intChooserKriterij34.height / 2; y1 = h34;
+        //---- pobarvam področje proti oceni 4 v tabeli
+        color = "#F6F6F6FF"; //"#FAFAFAFF";
+        ctx.beginPath();
+        ctx.moveTo(x00, y00)
+        ctx.lineTo(x10, y10)
+        ctx.lineTo(x1, y1)
+        ctx.lineTo(x0, y0)
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!    
+        //---- pobarvam desno naravnost proti tabeli
+        ctx.beginPath()
+        ctx.moveTo(x10, y10);
+        ctx.lineTo(gtLeft - 0, y10);
+        ctx.lineTo(gtLeft - 0, y1);
+        ctx.lineTo(x1, y1);
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!  
+        //---- pobarvam levo pod kriteriji
+        ctx.beginPath()
+        ctx.moveTo(intChooserKriterij45.left - 15, y00);
+        ctx.lineTo(x00, y00);
+        ctx.lineTo(x00, y0);
+        ctx.lineTo(intChooserKriterij45.left - 15, y0);
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
+        //---- črtici levo med ocenami
+        gLine(intChooserKriterij45.left - 15, y00, x00, y00, 1, "darkGray", [2, 2]);
+        gLine(intChooserKriterij45.left - 15, y0, x00, y0, 1, "darkGray", [2, 2]);
+        //---- meja med 4 in 5
+        gLine(x00, y00, x10, y10, 1, "darkGray", [2, 4]);
+        //gEllipse(x00, y00, 2, 2, 0, "darkGray", 0, ""); gEllipse(x10, y10, 2, 2, 0, "darkGray", 0, "");
+        //---- meja med 3 in 4        
         gLine(x0, y0, x1, y1, 1, "darkGray", [2, 4]);
-        gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
-        //----
-        x0 = intChooserKriterij23.left + intChooserKriterij23.width + 7;
-        y0 = intChooserKriterij23.top + intChooserKriterij23.height / 2; y1 = h23;
-        gLine(x0, y0, x1, y1, 1, "darkGray", [2, 4]);
-        gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
-        //----
+        //gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
+   
+        //---- posivljen pas za oceno 2
+        color = "#F4F4F4FF";
+        x00 = intChooserKriterij23.left + intChooserKriterij23.width + 7;
+        y00 = intChooserKriterij23.top + intChooserKriterij23.height / 2; y10 = h23;
         x0 = intChooserKriterij12.left + intChooserKriterij12.width + 7;
         y0 = intChooserKriterij12.top + intChooserKriterij12.height / 2; y1 = h12;
+        //---- pobarvam področje proti oceni 2 v tabeli
+        ctx.beginPath()
+        ctx.moveTo(x00, y00)
+        ctx.lineTo(x10, y10)
+        ctx.lineTo(x1, y1)
+        ctx.lineTo(x0, y0)
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
+        //---- pobarvam desno naravnost proti tabeli
+        ctx.beginPath()
+        ctx.moveTo(x10, y10);
+        ctx.lineTo(gtLeft - 0, y10);
+        ctx.lineTo(gtLeft - 0, y1);
+        ctx.lineTo(x1, y1);
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!  
+        //---- pobarvam levo pod kriteriji
+        ctx.beginPath()
+        ctx.moveTo(intChooserKriterij45.left - 15, y00);
+        ctx.lineTo(x00, y00);
+        ctx.lineTo(x00, y0);
+        ctx.lineTo(intChooserKriterij45.left - 15, y0);
+        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
+        ctx.fillStyle = color; //"lightGray";
+        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!! 
+        //---- črtici levo med ocenami
+        gLine(intChooserKriterij45.left - 15, y00, x00, y00, 1, "darkGray", [2, 2]);
+        gLine(intChooserKriterij45.left - 15, y0, x00, y0, 1, "darkGray", [2, 2]);
+        //---- meja med 2 in 3        
+        gLine(x00, y00, x10, y10, 1, "darkGray", [2, 4]);
+        //gEllipse(x00, y00, 2, 2, 0, "darkGray", 0, ""); gEllipse(x10, y10, 2, 2, 0, "darkGray", 0, "");
+        //---- meja med 1 in 2        
         gLine(x0, y0, x1, y1, 1, "darkGray", [2, 4]);
-        gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
+        //gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
     }
 }
 
@@ -3212,6 +3282,67 @@ function paint_eOcene_tabelaOcen_text() {
         y = (h12 + h0) / 2 - hAdd;
         gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
     }
+    
+}
+
+function paint_eOcene_oceneLevo() {
+    //-----------------------------------
+    // Ocena, točke, procenti znotraj grafične tabele ocen
+    //-----------------------------------
+
+    let font = "bold 13pt verdana";
+    let fontOcenaSel = "bold 40pt verdana";
+    let tmpText;
+    let font2 = "bold 10pt verdana";
+    let bw = 13; let bh = 13;
+    let bwSel = 40; let bhSel = 40;
+    let ddx = 7; let ddy = 7;
+    let cv_col3 = intChooserKriterij45.left - 20;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { cv_col3 = 18 };
+    let cv_col4 = cv_col3 + 35;
+    const cv_kriterijiStepV = intChooserKriterij34.top - intChooserKriterij45.top;
+    const hAdd = 8; const tAdd = 13;
+        
+    let y;
+    const hAddLinear = 35;
+    lo_tockovnik = "";
+    
+    //---- ocena 5
+    y = intChooserKriterij45.top - 14;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop };
+    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
+    
+    //---- ocena 4
+    y += cv_kriterijiStepV;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 1 * hAddLinear };
+    //if (lo_validOcena4) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
+    //} else {
+    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
+    //}
+    
+    //---- ocena 3
+    y += cv_kriterijiStepV;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 2 * hAddLinear };
+    //if (lo_validOcena3) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
+    //} else {
+    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
+    //}
+    
+    //---- ocena 2
+    y += cv_kriterijiStepV;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 3 * hAddLinear };
+    //if (lo_validOcena2) {
+        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
+    //} else {
+    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
+    //}
+    
+    //---- ocena 1
+    y += cv_kriterijiStepV;
+    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gtTop + 4 * hAddLinear };
+    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
     
 }
 
