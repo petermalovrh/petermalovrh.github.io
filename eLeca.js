@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.3"
+const gl_versionNr = "v0.4"
 const gl_versionDate = "30.12.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2006,8 +2006,12 @@ var gpMarginTop, gpMarginBottom, gpMarginLeft, gpMarginRight
 var gpTop, gpBottom, gpHeight, gpLeft, gpRight, gpWidth;
 var lo_gxO, lo_gyO;
 var rsltPanelLeft, rsltPanelTop;
+var legendPanelLeft, legendPanelTop;
 var lo_gf, lo_gxF1d, lo_gxF2d, lo_gxF1l, lo_gxF2l;
-var lo_ga, lo_ghP, lo_gxP, lo_gwPS, lo_gyP;
+var lo_ga, lo_ghP, lo_gxP, lo_gyP;
+var lo_gwPS = 8; // šrina predmeta v pikslih
+var lo_gwArrowPS = 14; // šrina predmeta v pikslih
+var lo_ghArrowPS = 18; // šrina predmeta v pikslih
 var lo_gdLece, lo_gxRobLeceL, lo_gxRobLeceD;
 var lo_xNrF = 6; // toliko goriščnih razdalj zaobsega celotna x os, pol F-jev na levi, pol na desni strani leče
 var lo_f, lo_a, lo_b, lo_dLece, lo_P, lo_povecava, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS;
@@ -2953,6 +2957,9 @@ function initGraphicalEnvironment() {
     //---- panel za rezultate (29.12.2024)
     rsltPanelLeft = gpLeft + 30;    // lo_gxO + 48;
     rsltPanelTop = lo_gyO + 70; // gpTop + 28;
+    //---- panel za legendo žarkov (30.12.2024)
+    legendPanelLeft = gpRight - 150;
+    legendPanelTop = gpTop + 150;
 };
 
 function paint() {
@@ -3056,11 +3063,10 @@ function paint_eLeca_calculate() {
     lo_ga = kx * lo_a; // oddaljenost predmeta od sredine v pikslih
     lo_gxP = lo_gxO - lo_ga; // x koordinata predmeta na levi
     lo_ghP = kx * lo_P; // višina predmeta v pikslih
-    lo_gwPS = 5; // šrina predmeta v pikslih
     lo_gyP = lo_gyO - lo_ghP; // y koordinata vrha predmeta na levi
     //----
     lo_gdLece = kx * lo_dLece;
-    lo_gdLece = 10; // zaenkrat samo takole, kasneje pa bom lečo debelil in ožal z lo_dLece
+    lo_gdLece = 8; // zaenkrat samo takole, kasneje pa bom lečo debelil in ožal z lo_dLece
     lo_gxRobLeceD = lo_gxO + lo_gdLece;
     lo_gxRobLeceL = lo_gxO - lo_gdLece;
     //----
@@ -3090,7 +3096,32 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     let w, h;
 
     // LEČA
-    gBannerRect(lo_gxO - lo_gdLece, gpTop + gpHeight / 10, 2 * lo_gdLece, gpHeight * 4 / 5, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
+    //---- pravokoten sredinski del leče
+    let lecaTop = gpTop + 0.05 * gpHeight;
+    let lecaHeight = 0.9 * gpHeight;
+    let lecaBottom = lecaTop + lecaHeight;
+    let lecaLeft = lo_gxO - lo_gdLece;
+    let lecaWidth = 2 * lo_gdLece;
+    let lecaRight = lecaLeft + lecaWidth;
+    gBannerRect(lecaLeft, lecaTop, lecaWidth, lecaHeight, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
+    //---- priprava podatkov za risanje zaobljenosti leče na levi in desni
+    let lecaDWidth = 20; // za toliko se na obeh straneh izboči na kontrolnih točkah (na sredi se bo še nekoliko bolj!)
+    let lecaLeftCurv = lecaLeft - lecaDWidth;
+    let lecaRightCurv = lecaRight + lecaDWidth;
+    let lecaYcurv1 = lecaTop + 0.3 * lecaHeight;
+    let lecaYcurv2 = lecaBottom - 0.3 * lecaHeight;
+    //---- zaobljenost leče na levi
+    ctx.beginPath();
+    ctx.moveTo(lecaLeft, lecaTop);
+    ctx.bezierCurveTo(lecaLeftCurv, lecaYcurv1, lecaLeftCurv, lecaYcurv2, lecaLeft, lecaBottom);
+    ctx.fillStyle = "lightGray";
+    ctx.fill();
+    //---- zaobljenost leče na desni
+    ctx.beginPath();
+    ctx.moveTo(lecaRight, lecaTop);
+    ctx.bezierCurveTo(lecaRightCurv, lecaYcurv1, lecaRightCurv, lecaYcurv2, lecaRight, lecaBottom);
+    ctx.fillStyle = "lightGray";
+    ctx.fill();
 
     // OS LEČE
     gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
@@ -3138,22 +3169,28 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     gText("O", font2, "darkSlateGray", lo_gxO - w + 2, lo_gyO + tAdd - 3);
 
     // PREDMET
-    let arrowHeight = 15;
-    let arrowWidth = 12;
-    gBannerRect(lo_gxP - lo_gwPS / 2, lo_gyO - lo_ghP + arrowHeight, lo_gwPS, lo_ghP - arrowHeight, 0, 0, "rgb(0, 0, 255)", 0, "", "", 0, 0, false);
+    let arrowHeight = lo_ghArrowPS;
+    let arrowWidth = lo_gwArrowPS;
+    //gBannerRect(lo_gxP - lo_gwPS / 2, lo_gyO - lo_ghP + arrowHeight, lo_gwPS, lo_ghP - arrowHeight, 0, 0, "rgb(0, 0, 255)", 0, "", "", 0, 0, false);
     //
     tmpText = "PREDMET";
     ;[w, h] = gMeasureText(tmpText, font3);
     gText(tmpText, font3, "blue", lo_gxP - w - 7, lo_gyP + h + 5);
     //
-    ctx.beginPath()
-    ctx.moveTo(lo_gxP, lo_gyP);
-    ctx.lineTo(lo_gxP + arrowWidth / 2, lo_gyP + arrowHeight);
-    ctx.lineTo(lo_gxP - arrowWidth / 2, lo_gyP + arrowHeight);
-    ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
-    ctx.fillStyle = "blue";
-    ctx.fill();
-    
+    if (lo_ghP > arrowHeight) {
+        gBannerRect(lo_gxP - lo_gwPS / 2, lo_gyO - lo_ghP + arrowHeight, lo_gwPS, lo_ghP - arrowHeight, 0, 0, "rgb(0, 0, 255)", 0, "", "", 0, 0, false);
+        // ---- puščica na vrhu predmeta 
+        ctx.beginPath()
+        ctx.moveTo(lo_gxP, lo_gyP);
+        ctx.lineTo(lo_gxP + arrowWidth / 2, lo_gyP + arrowHeight);
+        ctx.lineTo(lo_gxP - arrowWidth / 2, lo_gyP + arrowHeight);
+        ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = "blue";
+        ctx.fill();
+    } else {
+        gBannerRect(lo_gxP - lo_gwPS / 2, lo_gyO - lo_ghP, lo_gwPS, lo_ghP, 0, 0, "rgb(0, 0, 255)", 0, "", "", 0, 0, false);
+    };
+
 }
  
 function paint_eLeca_Zarki() {
@@ -3167,17 +3204,19 @@ function paint_eLeca_Zarki() {
     //let font2 = "bold 12pt verdana";
     let font3 = "bold 10pt verdana";
     let w, h;
+    let dZarek = 3;
+    let dashDotZarek = [4, 4];
 
     //---- VODORAVNI ŽAREK
     //     1) od vrha predmeta do osi leče
-    gLine(lo_gxP, lo_gyP, lo_gxO, lo_gyP, 2, "green", [3, 3]);
+    gLine(lo_gxP, lo_gyP, lo_gxO, lo_gyP, dZarek, "green", dashDotZarek);
     //---- 2) od osi leče do konca
     k = (gpWidth / 2) / lo_gf; // toliko je razmerje med celotno desno polovico in goriščno razdaljo
     if ((lo_gyP + k * lo_ghP) > gpBottom) {
         k = (gpBottom - lo_gyP) / lo_ghP;
-        gLine(lo_gxO, lo_gyP, lo_gxO + k * lo_gf, gpBottom, 2, "green", [3, 3]);
+        gLine(lo_gxO, lo_gyP, lo_gxO + k * lo_gf, gpBottom, dZarek, "green", dashDotZarek);
     } else { 
-        gLine(lo_gxO, lo_gyP, gpRight, lo_gyP + k * lo_ghP, 2, "green", [3, 3]);
+        gLine(lo_gxO, lo_gyP, gpRight, lo_gyP + k * lo_ghP, dZarek, "green", dashDotZarek);
     };
     if (lo_a < lo_f) {
         //---- v tem primeru bo navidezna slika in nariši še navidezen podaljšek žarka na levo
@@ -3195,9 +3234,9 @@ function paint_eLeca_Zarki() {
     k = (gpWidth / 2) / lo_ga; // toliko je razmerje med celotno desno polovico in razdaljo predmeta na levi od središča
     if ((lo_gyO + k * lo_ghP) > gpBottom) {
         k = (gpBottom - lo_gyP) / lo_ghP;
-        gLine(lo_gxP, lo_gyP, lo_gxP + k * lo_ga, gpBottom, 2, "red", [3, 3]);
+        gLine(lo_gxP, lo_gyP, lo_gxP + k * lo_ga, gpBottom, dZarek, "red", dashDotZarek);
     } else {
-        gLine(lo_gxP, lo_gyP, gpRight, lo_gyO + k * lo_ghP, 2, "red", [3, 3]);
+        gLine(lo_gxP, lo_gyP, gpRight, lo_gyO + k * lo_ghP, dZarek, "red", dashDotZarek);
     };
     if (lo_a < lo_f) {
         //---- v tem primeru bo navidezna slika in nariši še navidezen podaljšek žarka na levo
@@ -3215,17 +3254,32 @@ function paint_eLeca_Zarki() {
         //---- 1) od vrha predmeta skozi gorišče do osi leče
         if (lo_gyS <= gpBottom) {
             // cel goriščni žarek narišem samo, če spodaj ne gre že ven iz risalnega okvirja
-            gLine(lo_gxP, lo_gyP, lo_gxO, lo_gyS, 2, "purple", [3, 3]);
+            gLine(lo_gxP, lo_gyP, lo_gxO, lo_gyS, dZarek, "purple", dashDotZarek);
         } else {
             // ... sicer narišem spodaj žarek samo do meje risalnega okvirja
             k = (gpBottom - lo_gyP) / (lo_ghP + lo_ghS);
-            gLine(lo_gxP, lo_gyP, lo_gxP + k * lo_ga, gpBottom, 2, "purple", [3, 3]);
+            gLine(lo_gxP, lo_gyP, lo_gxP + k * lo_ga, gpBottom, dZarek, "purple", dashDotZarek);
         };
         //---- 2) od osi leče do vrha slike na desni
         if (lo_gyS <= gpBottom) {
             // rišem samo, če ni vse skupaj spodaj že izven risalnega okvirja
-            gLine(lo_gxO, lo_gyS, gpRight, lo_gyS, 2, "purple", [3, 3]);
+            gLine(lo_gxO, lo_gyS, gpRight, lo_gyS, dZarek, "purple", dashDotZarek);
         };
+    };
+
+    //---- OSNI ŽAREK ... rišem samo za realno sliko, ko je predmet na levi, slika pa na desni
+    if (lo_a > lo_f) {
+        //---- 1) od vznožja predmeta na optični osi do vznožja slike na optični osi
+        gLine(lo_gxP, lo_gyO - 1, gpRight, lo_gyO - 1, 1, "deepSkyBlue", dashDotZarek);
+        gLine(lo_gxP, lo_gyO + 1, gpRight, lo_gyO + 1, 1, "deepSkyBlue", dashDotZarek);
+    };
+    
+    //---- na strani predmeta po potrebi še pobrišem žarke in del predmeta, ki so nad risalno površino
+    if (lo_gyP < gpTop) {
+        let x0 = lo_gxP - 80;
+        if (x0 < -80) { x0 = -80 };
+        ctx.fillStyle = bckgColor; // "lightGray";
+        ctx.fillRect(x0, 0, lo_gxO - 1, gpTop - 1);
     };
 
 }
@@ -3243,8 +3297,8 @@ function paint_eLeca_Slika() {
     let w, h;
 
     // SLIKA
-    let arrowHeight = 15;
-    let arrowWidth = 12;
+    let arrowHeight = lo_ghArrowPS;
+    let arrowWidth = lo_gwArrowPS;
     //gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS - arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
     tmpText = "SLIKA";
     ;[w, h] = gMeasureText(tmpText, font3);
@@ -3252,8 +3306,8 @@ function paint_eLeca_Slika() {
     if (lo_a > lo_f) {
         // ---- realna slika
         
-        gText("REALNA", font3, "indigo", lo_gxS + 7, lo_gyS - h - 9 - 4);
-        gText(tmpText, font3, "indigo", lo_gxS + 7, lo_gyS - 9);
+        gText("REALNA", font3, "indigo", lo_gxS + 8, lo_gyS - h - 9 - 4);
+        gText(tmpText, font3, "indigo", lo_gxS + 8, lo_gyS - 9);
         if (lo_ghS > arrowHeight) {
             if (lo_gyS<gpBottom) {
                 gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS - arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
@@ -3973,11 +4027,7 @@ function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
 
 function paint_GUI() {
 
-    let x = guiPanelLeft; let y = guiPanelTop + 130;
-    if (!lo_showGUI) { x = 8; y = ctxH - 8 };
-    x = 8; y = ctxH - 8; //kar vedno spodaj levo naj bo
-    //gText("data: Eurostat (excess death), OWID (vaccination)", "italic 11pt serif", "maroon", x, y);
-    //gText("data: ARSO / VP Trnje " + scSch + "kofja Loka / VP Stra" + scZhLow + "i" + scSchLow + scTchLow + "e Kranj", "italic 11pt serif", "maroon", x, y);
+    let x, y;
 
     if (!lo_showGUI) {
         //---- on-screen namigi/pomoč
@@ -3995,6 +4045,7 @@ function paint_GUI() {
     let cv_col1 = rsltPanelLeft + 2; //lo_gxO + 50;
     let cv_col2 = cv_col1 + 174; //lo_gxO + 214;
     let cv_col3 = cv_col1 + 95;  //lo_gxO + 135;
+    let cv_col4 = cv_col2 + 15;
     let vStep = 25;
     let tmpText = "";
 
@@ -4003,23 +4054,26 @@ function paint_GUI() {
     //---- goriščna razdalja
     if (lo_enabledintChooserF) {
         gText("Gori" + scSchLow + scTchLow + "na razdalja", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-        gText("f[" + lo_unitStr + "]:", "bold 10pt verdana", "darkSlateGray", cv_col2, y);
+        gText("f", "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "darkSlateGray", cv_col4, y);
         intChooserF.paint()
     }
 
     //---- oddaljenost predmeta
     y += vStep;
     if (lo_enabledintChooserA) {
-        gText("Oddaljenost predmeta", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-        gText("a[" + lo_unitStr + "]:", "bold 10pt verdana", "darkSlateGray", cv_col2, y);
+        gText("Oddaljenost predmeta", "bold 10pt verdana", "blue", cv_col1, y);
+        gText("a", "bold 11pt verdana", "blue", cv_col2, y);
+        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "blue", cv_col4, y);
         intChooserA.paint()
     }
     
     //---- velikost predmeta
     y += vStep;
     if (lo_enabledintChooserP) {
-        gText("Velikost predmeta", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-        gText("P[" + lo_unitStr + "]:", "bold 10pt verdana", "darkSlateGray", cv_col2, y);
+        gText("Velikost predmeta", "bold 10pt verdana", "blue", cv_col1, y);
+        gText("P", "bold 11pt verdana", "blue", cv_col2, y);
+        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "blue", cv_col4, y);
         intChooserP.paint()
     }
     
@@ -4029,26 +4083,26 @@ function paint_GUI() {
     //---- oddaljenost slike
     y += vStep - 3;
     //if (lo_enabledintChooserA) {
-    gText("Oddaljenost slike:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
+    gText("Oddaljenost slike:", "bold 10pt verdana", "purple", cv_col1, y);
     if (Math.abs(lo_b) >= 100) { tmpText = "b = " + lo_b.toFixed(0).toString() }
     else if (Math.abs(lo_b) >= 10) { tmpText = "b = " + lo_b.toFixed(1).toString() }
     else if (Math.abs(lo_b) >= 1) { tmpText = "b = " + lo_b.toFixed(2).toString() }
     else if (Math.abs(lo_b) >= 0.1) { tmpText = "b = " + lo_b.toFixed(3).toString() }
     else { tmpText = "b = " + lo_b.toString() };
-    gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+    gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "purple", cv_col2, y);
     intChooserA.paint()
     //}
         
     //---- velikost slike
     y += vStep;
     //if (lo_enabledintChooserP) {
-    gText("Velikost slike:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
+    gText("Velikost slike:", "bold 10pt verdana", "purple", cv_col1, y);
     if (Math.abs(lo_S) >= 100) { tmpText = "S = " + lo_S.toFixed(0).toString() }
     else if (Math.abs(lo_S) >= 10) { tmpText = "S = " + lo_S.toFixed(1).toString() }
     else if (Math.abs(lo_S) >= 1) { tmpText = "S = " + lo_S.toFixed(2).toString() }
     else if (Math.abs(lo_S) >= 0.1) { tmpText = "S = " + lo_S.toFixed(3).toString() }
     else { tmpText = "S = " + lo_S.toString() };
-    gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+    gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "purple", cv_col2, y);
     intChooserP.paint()
     //}
     
@@ -4075,30 +4129,33 @@ function paint_GUI() {
     intChooserP.paint()
     //}
     
-    //---- kriterij za ocene
-    //if (lo_enabledKriteriji) {
-    //    gText("Kriteriji:", "bold 11pt verdana", "darkSlateGray", 66, 112);
-    //    intChooserKriterij12.paint()
-    //    intChooserKriterij23.paint()
-    //    intChooserKriterij34.paint()
-    //    intChooserKriterij45.paint()
-    //}
-
-    //---- točkovanje na pol točke
-    //if (lo_enabledUseHalfPoint) {
-    //    checkBoxHalfPoint.paint()
-    //}
-
+    //---- LEGENDA ŽARKOV
+    cv_col1 = legendPanelLeft + 2; //lo_gxO + 50;
+    cv_col2 = cv_col1 + 50;
+    vStep = 22;
+    let dy = 5;
+    let dx = 8;
+    y = legendPanelTop + 2;
+    gText("ZNA" + scTch + "ILNI " + scZh + "ARKI:", "bold 11pt verdana", "darkSlateGray", cv_col1, y);
+    y += vStep;
+    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "green", [4, 4]);
+    gText("Vodoravni", "bold 11pt verdana", "green", cv_col2, y);
+    y += vStep;
+    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "red", [4, 4]);
+    gText("Sredi" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "red", cv_col2, y);
+    y += vStep;
+    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "purple", [4, 4]);
+    gText("Gori" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "purple", cv_col2, y);
+    y += vStep;
+    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "deepSkyBlue", [4, 4]);
+    gText("Osni", "bold 11pt verdana", "deepSkyBlue", cv_col2, y);
+    
     if (lo_showToolTips) { //1.4.2024
         if (lo_enabledintChooserF) { intChooserF.showToolTip() };
         if (lo_enabledintChooserP) { intChooserP.showToolTip() };
         if (lo_enabledintChooserA) { intChooserA.showToolTip() };
         if (lo_enabledUnitCm) { checkBoxUnitCm.showToolTip() };
         if (lo_enabledUnitMm) { checkBoxUnitMm.showToolTip() };
-    //    if (lo_enabledIntChooserKriterij12) { intChooserKriterij12.showToolTip() };
-    //    if (lo_enabledIntChooserKriterij23) { intChooserKriterij23.showToolTip() };
-    //    if (lo_enabledIntChooserKriterij34) { intChooserKriterij34.showToolTip() };
-    //    if (lo_enabledIntChooserKriterij45) { intChooserKriterij45.showToolTip() };
     }
 
     //---- on-screen namigi/pomoč
@@ -4338,14 +4395,14 @@ function paint_GUI_layoutB() {
     lo_layout_marginTop = guiPanelTop + guiPanelHeight;
    
     //---- enote v centimetrih
-    checkBoxUnitCm.left = rsltPanelLeft + 194; // lo_gxO + 232;
+    checkBoxUnitCm.left = rsltPanelLeft + 2; // rsltPanelLeft + 194; // lo_gxO + 232;
     checkBoxUnitCm.top = rsltPanelTop + 2;   // gpTop + 30;
 
     //---- enote v centimetrih
     checkBoxUnitMm.left = checkBoxUnitCm.left + checkBoxUnitCm.width + 40;
     checkBoxUnitMm.top = checkBoxUnitCm.top;
     
-    const cv_col1 = rsltPanelLeft + 234; // lo_gxO + 282;
+    const cv_col1 = rsltPanelLeft + 240; // lo_gxO + 282;
     let vStep = 25;
     let y = rsltPanelTop + 24;  // gpTop + 52;
 
