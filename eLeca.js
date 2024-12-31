@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.4"
+const gl_versionNr = "v0.5"
 const gl_versionDate = "30.12.2024"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1904,6 +1904,8 @@ var lo_enabledintChooserA = true;
 var lo_enabledintChooserP = true;
 var lo_enabledUnitCm = true;
 var lo_enabledUnitMm = true;
+var lo_enabledRuler = true;
+var lo_enabledLegend = true;
 var lo_enabledIntChooserKriterij12 = true;
 var lo_enabledIntChooserKriterij23 = true;
 var lo_enabledIntChooserKriterij34 = true;
@@ -2014,13 +2016,18 @@ var lo_gwArrowPS = 14; // šrina predmeta v pikslih
 var lo_ghArrowPS = 18; // šrina predmeta v pikslih
 var lo_gdLece, lo_gxRobLeceL, lo_gxRobLeceD;
 var lo_xNrF = 6; // toliko goriščnih razdalj zaobsega celotna x os, pol F-jev na levi, pol na desni strani leče
-var lo_f, lo_a, lo_b, lo_dLece, lo_P, lo_povecava, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS;
+var lo_f, lo_a, lo_b, lo_dLece, lo_P, lo_povecava, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS, lo_Sstr;
 var kx; // koliko pikslov na cm
 //----
 lo_f = 25;  // // f25 a60 P30    3; // goriščna razdalja leče [cm] ... f=3cm
 lo_dLece = 0.2; //debelina leče [cm]
 lo_a = 60;  // f25 a60 P30    1.6 * lo_f; //pozicija predmeta na levi strani
 lo_P = 30;  // f25 a60 P30    2; // višina predmeta [cm]
+//----
+var lo_drawRulerH = true; // 30.12.2024
+var lo_drawRulerV = true; // 30.12.2024
+var lo_showRuler = true; // 31.12.2024
+var lo_showLegend = true; // 31.12.2024
 //----
 var lo_selectedOcena1 = false; //4.4.2024
 var lo_selectedOcena2 = false;
@@ -2100,6 +2107,8 @@ switch (lo_GUI_layout) {
         var intChooserP = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_P, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserP, disabledControlLineColor, disabledControlTextColor, true, "Velikost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var checkBoxUnitCm = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "cm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitCm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v centimetrih", "C");  //String.fromCharCode(0x0110));
         var checkBoxUnitMm = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "mm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitMm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v milimetrih", "M");  //String.fromCharCode(0x0110));
+        var checkBoxRuler = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
+        var checkBoxLegend = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //----
         var intChooserKriterij12 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij12, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij12, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 1 in 2 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var intChooserKriterij23 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij23, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij23, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 2 in 3 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
@@ -2436,6 +2445,22 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     }  
+    //---- prikaz ravnila
+    if (!vl_end && lo_showGUI && lo_enabledRuler) {
+        boolRslt = checkBoxRuler.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != lo_showRuler) {
+            lf_changeShowRuler(boolRslt, true)
+            vl_end = true
+        }
+    } 
+    //---- prikaz legende
+    if (!vl_end && lo_showGUI && lo_enabledLegend) {
+        boolRslt = checkBoxLegend.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != lo_showLegend) {
+            lf_changeShowLegend(boolRslt, true)
+            vl_end = true
+        }
+    } 
     
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 
@@ -2654,6 +2679,16 @@ window.addEventListener("keydown", (event) => {
             lf_changeUnitMm(!lo_unitMm, true);
             lf_changeUnitCm(!lo_unitCm, true);
             break;
+        case 'KeyR':
+            //lo_keyDownR = true; break;
+            //console.log("R pressed");
+            lf_changeShowRuler(!lo_showRuler, true);
+            break; 
+        case 'KeyL':
+            //lo_keyDownL = true; break;
+            //console.log("L pressed");
+            lf_changeShowLegend(!lo_showLegend, true);
+            break;         
         case 'Digit2':
             lo_keyDown2 = true; break;
         case 'Digit3':
@@ -2689,8 +2724,6 @@ window.addEventListener("keydown", (event) => {
         //lf_changeMonthEnd(nrMonthsAll, true); break;
         case 'KeyG': // GUI
             lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); break;
-        case 'KeyL':
-        //lf_changeDeltaT(!gl_deltaT, true); break;
         case 'KeyN': case 'F2':
             lf_changeShowHelpTips(!lo_showHelpTips, true); break;
         case 'KeyI':
@@ -3025,6 +3058,9 @@ function paint_eLeca_tabelaOcen() {
     //---- dimenzije grafične tabele ocen
     paint_eLeca_calculate();
     
+    //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
+    paint_eLeca_Rulers();
+    
     //---- različno posivljena področja ocen
     paint_eLeca_LecaOsLeceOpticnaOs();
     
@@ -3033,15 +3069,6 @@ function paint_eLeca_tabelaOcen() {
     
     //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
     paint_eLeca_Slika();
-
-    //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
-    //paint_eLeca_oceneLevo();
-    
-    //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
-    //paint_eLeca_tabelaOcen_text();
-
-    //---- Grafična predstavitev točk v pasovih ocen
-    //paint_eLeca_tabelaOcen_tockeGraficno();
 
 }
 
@@ -3083,6 +3110,14 @@ function paint_eLeca_calculate() {
     lo_gb = kx * lo_b; // oddaljenost slike na desni od sredine leče v pikslih
     lo_gxS = lo_gxO + lo_gb; // x koordinata slike na desni v pikslih
     lo_gyS = lo_gyO + lo_ghS; // y koordinata slike na desni v pikslih
+    //---- 31.12.2024 velikost spravimo v lepo strng številko na ne preveč mest
+    if (lo_S==Math.trunc(lo_S) ) { lo_Sstr = lo_S.toString() }
+    else if (Math.abs(lo_S) >= 100) { lo_Sstr = lo_S.toFixed(0).toString() }
+    else if (Math.abs(lo_S) >= 10) { lo_Sstr = lo_S.toFixed(1).toString() }
+    else if (Math.abs(lo_S) >= 1) { lo_Sstr = lo_S.toFixed(2).toString() }
+    else if (Math.abs(lo_S) >= 0.1) { lo_Sstr = lo_S.toFixed(3).toString() }
+    else { lo_Sstr = lo_S.toString() };
+
 }
 
 function paint_eLeca_LecaOsLeceOpticnaOs() {
@@ -3093,7 +3128,7 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     let font1 = "12pt verdana";
     let font2 = "bold 12pt verdana";
     let font3 = "bold 10pt verdana";
-    let w, h;
+    let w, h, x, y, w1;
 
     // LEČA
     //---- pravokoten sredinski del leče
@@ -3105,7 +3140,21 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     let lecaRight = lecaLeft + lecaWidth;
     gBannerRect(lecaLeft, lecaTop, lecaWidth, lecaHeight, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
     //---- priprava podatkov za risanje zaobljenosti leče na levi in desni
-    let lecaDWidth = 20; // za toliko se na obeh straneh izboči na kontrolnih točkah (na sredi se bo še nekoliko bolj!)
+    let lecaDWidth = 30; // za toliko se na obeh straneh izboči na kontrolnih točkah (na sredi se bo še nekoliko bolj!)
+    
+    //---- Kaj pa če bi debelino leče naredil glede na goriščno razdaljo?
+    //     Recimo za f > 100 minimalno ukrivljena, za f = 1 maksimalno ukrivljena, vmes pa linearno
+    const cv_lecaDWidth_min = 4;
+    const cv_lecaDWidth_max = 60;
+    let cv_lecaDWidth_max2 = 0.5 * lo_gf;
+    if (cv_lecaDWidth_max2 > cv_lecaDWidth_max) {
+        cv_lecaDWidth_max2=cv_lecaDWidth_max
+    }
+    if (lo_f > 100) {
+        lecaDWidth = cv_lecaDWidth_min;
+    } else {
+        lecaDWidth = cv_lecaDWidth_min + (100 - lo_f) / 100 * (cv_lecaDWidth_max2 - cv_lecaDWidth_min);
+    };
     let lecaLeftCurv = lecaLeft - lecaDWidth;
     let lecaRightCurv = lecaRight + lecaDWidth;
     let lecaYcurv1 = lecaTop + 0.3 * lecaHeight;
@@ -3175,7 +3224,13 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     //
     tmpText = "PREDMET";
     ;[w, h] = gMeasureText(tmpText, font3);
-    gText(tmpText, font3, "blue", lo_gxP - w - 7, lo_gyP + h + 5);
+    x = lo_gxP - w - 7;
+    y = lo_gyP + h + 5;
+    gText(tmpText, font3, "blue", x, y);
+    tmpText = "P=" + lo_P.toString() + "" + lo_unitStr;
+    ;[w1, h] = gMeasureText(tmpText, font3);
+    if (w1 > w) { x = lo_gxP - w1 - 7 };
+    gText(tmpText, font3, "blue", x, y + 20);
     //
     if (lo_ghP > arrowHeight) {
         gBannerRect(lo_gxP - lo_gwPS / 2, lo_gyO - lo_ghP + arrowHeight, lo_gwPS, lo_ghP - arrowHeight, 0, 0, "rgb(0, 0, 255)", 0, "", "", 0, 0, false);
@@ -3305,7 +3360,7 @@ function paint_eLeca_Slika() {
     //
     if (lo_a > lo_f) {
         // ---- realna slika
-        
+        gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", lo_gxS + 8, lo_gyS - 2 * h - 9 - 18);
         gText("REALNA", font3, "indigo", lo_gxS + 8, lo_gyS - h - 9 - 4);
         gText(tmpText, font3, "indigo", lo_gxS + 8, lo_gyS - 9);
         if (lo_ghS > arrowHeight) {
@@ -3330,6 +3385,7 @@ function paint_eLeca_Slika() {
         // ---- navidezna slika
         gText("NAVIDEZNA", font3, "indigo", lo_gxS + 7, lo_gyS + 9 - h - 4);
         gText(tmpText, font3, "indigo", lo_gxS + 7, lo_gyS + 9);     
+        gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", lo_gxS + 7, lo_gyS + h + 9 + 18);
         if (Math.abs(lo_ghS) > arrowHeight) {
             gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS + arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
             // ---- puščica na vrhu slike 
@@ -3345,6 +3401,123 @@ function paint_eLeca_Slika() {
         };        
     };
 
+
+}
+
+function paint_eLeca_Rulers() {
+
+    if (lo_showRuler && lo_drawRulerH) { paint_eLeca_rulerH() };
+    if (lo_showRuler && lo_drawRulerV) { paint_eLeca_rulerV() };
+
+}
+
+function paint_eLeca_rulerH() {
+
+    let font3 = "10pt verdana";
+    let tmpText, w, h;
+    const colorRuler1 = "#CACACAFF";
+    const colorRuler5 = "#B0B0B0FF";
+    const colorRuler10 = "#A0A0A0FF";
+    const colorRuler50 = "#909090FF";
+    const colorRulerText = "#609090FF";
+    const rW = 12;
+    const dBottom = 7;
+    let dTop = dBottom + rW;
+    let rulerTop = lo_gyO - dTop;
+    let rulerBottom = lo_gyO - dBottom;
+    gBannerRect(gpLeft, rulerTop, gpWidth, rW, 0, 0, "#FAFAFAFF", 0, "", "", 0, 0, false); // opaque 100%, povsem svetlo siva
+    gLine(gpLeft, rulerTop, gpRight, rulerTop, 1, "lightGray", []);
+    gLine(gpLeft, rulerBottom, gpRight, rulerBottom, 1, "lightGray", []); // "lightGray"="D3D3D3FF"
+
+    let tmpEnd = false;
+    let draw = false;
+    let draw1 = false;
+    if (kx > 4) { draw1 = true };
+    let draw2parts = false;
+    let marker10 = false;
+    let printText = false; let printText1 = false; let printText5 = false; let printText10 = false; let printText50 = false;
+    if (1 * kx > 40) { printText1 = true };
+    if (5 * kx > 50) { printText5 = true };
+    if (10 * kx > 35) { printText10 = true };
+    if (50 * kx > 35) { printText50 = true };
+    let i;
+    let x, y, tmpColor, dx;
+    let cnt5 = 0; let cnt10 = 0; let cnt50 = 0;
+    for (i = 1; !tmpEnd && cv_f_max; i++) {
+
+        dx = i * kx;
+        // smo že čez celo širino??
+        if (dx >= gpWidth / 2) {
+            tmpEnd = true;
+            break;
+        }
+        cnt5++; cnt10++; cnt50++;
+        draw = true;
+        draw2parts = false;
+        marker10 = false;
+        printText = false;
+        // ---- na petkah
+        if (cnt5 == 5 && cnt10 != 10) {
+            tmpColor = colorRuler5; // "#E1E1E1FF";
+            cnt5 = 0;
+            printText = printText5;
+        // ---- na desetkah
+        } else if (cnt10 == 10 && cnt50 != 50) {
+            tmpColor = colorRuler10; // "#C5C5C5FF"; // "#D3D3D3FF";
+            cnt5 = 0; cnt10 = 0;
+            marker10 = true;
+            printText = printText10;
+        // ---- na petdesetkah
+        } else if (cnt50 == 50) {
+        tmpColor = colorRuler50; // "#C5C5C5FF"; // "#D3D3D3FF";
+        cnt5 = 0; cnt10 = 0; cnt50 = 0;
+        marker10 = true;
+        printText = printText50;        
+        // ---- na enkah
+        } else if (draw1) {
+            tmpColor = colorRuler1; //"#F0F0F0FF";
+            draw2parts = true;
+            printText = printText1;
+        } else {
+            draw = false;
+        }
+        if (draw) {
+            //---- leva stran
+            x = lo_gxO - i * kx;
+            if (draw2parts) {
+                gLine(x, rulerTop, x, rulerTop + rW / 3, 1, tmpColor, []);
+                gLine(x, rulerTop + rW * 2 / 3, x, rulerBottom, 1, tmpColor, []);
+            } else {
+                gLine(x, rulerTop, x, rulerBottom, 1, tmpColor, []);
+                if (marker10) { gLine(x, rulerTop + 0.3 * rW, x, rulerBottom - 0.3 * rW, 3, tmpColor, []); };
+            };
+            //---- izpis koordinate
+            if (printText) {
+                tmpText = i.toString();
+                ;[w, h] = gMeasureText(tmpText, font3);
+                gText(i.toString(), font3, colorRulerText, x - w / 2, rulerTop - 3);
+            }
+            //---- desna stran
+            x = lo_gxO + i * kx;
+            if (draw2parts) {
+                gLine(x, rulerTop, x, rulerTop + rW / 3, 1, tmpColor, []);
+                gLine(x, rulerTop + rW * 2 / 3, x, rulerBottom, 1, tmpColor, []);
+            } else {
+                gLine(x, rulerTop, x, rulerBottom, 1, tmpColor, []);
+                if (marker10) { gLine(x, rulerTop + 0.3 * rW, x, rulerBottom - 0.3 * rW, 3, tmpColor, []); };
+            };
+            //---- izpis koordinate
+            if (printText) {
+                tmpText = i.toString();
+                ;[w, h] = gMeasureText(tmpText, font3);
+                gText(i.toString(), font3, colorRulerText, x - w / 2, rulerTop - 3);
+            }
+        }
+
+    }
+}
+
+function paint_eLeca_rulerV() {
 
 }
 
@@ -4040,6 +4213,8 @@ function paint_GUI() {
     //if (lo_enabledUseHalfPoint) {
     checkBoxUnitCm.paint();
     checkBoxUnitMm.paint();
+    checkBoxLegend.paint();
+    checkBoxRuler.paint();
     //};
 
     let cv_col1 = rsltPanelLeft + 2; //lo_gxO + 50;
@@ -4097,12 +4272,13 @@ function paint_GUI() {
     y += vStep;
     //if (lo_enabledintChooserP) {
     gText("Velikost slike:", "bold 10pt verdana", "purple", cv_col1, y);
-    if (Math.abs(lo_S) >= 100) { tmpText = "S = " + lo_S.toFixed(0).toString() }
-    else if (Math.abs(lo_S) >= 10) { tmpText = "S = " + lo_S.toFixed(1).toString() }
-    else if (Math.abs(lo_S) >= 1) { tmpText = "S = " + lo_S.toFixed(2).toString() }
-    else if (Math.abs(lo_S) >= 0.1) { tmpText = "S = " + lo_S.toFixed(3).toString() }
-    else { tmpText = "S = " + lo_S.toString() };
-    gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "purple", cv_col2, y);
+    //if (Math.abs(lo_S) >= 100) { tmpText = "S = " + lo_S.toFixed(0).toString() }
+    //else if (Math.abs(lo_S) >= 10) { tmpText = "S = " + lo_S.toFixed(1).toString() }
+    //else if (Math.abs(lo_S) >= 1) { tmpText = "S = " + lo_S.toFixed(2).toString() }
+    //else if (Math.abs(lo_S) >= 0.1) { tmpText = "S = " + lo_S.toFixed(3).toString() }
+    //else { tmpText = "S = " + lo_S.toString() };
+    tmpText = "S = " + lo_Sstr + " " + lo_unitStr;
+    gText(tmpText, "bold 11pt verdana", "purple", cv_col2, y);
     intChooserP.paint()
     //}
     
@@ -4129,33 +4305,37 @@ function paint_GUI() {
     intChooserP.paint()
     //}
     
-    //---- LEGENDA ŽARKOV
-    cv_col1 = legendPanelLeft + 2; //lo_gxO + 50;
-    cv_col2 = cv_col1 + 50;
-    vStep = 22;
-    let dy = 5;
-    let dx = 8;
-    y = legendPanelTop + 2;
-    gText("ZNA" + scTch + "ILNI " + scZh + "ARKI:", "bold 11pt verdana", "darkSlateGray", cv_col1, y);
-    y += vStep;
-    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "green", [4, 4]);
-    gText("Vodoravni", "bold 11pt verdana", "green", cv_col2, y);
-    y += vStep;
-    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "red", [4, 4]);
-    gText("Sredi" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "red", cv_col2, y);
-    y += vStep;
-    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "purple", [4, 4]);
-    gText("Gori" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "purple", cv_col2, y);
-    y += vStep;
-    gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "deepSkyBlue", [4, 4]);
-    gText("Osni", "bold 11pt verdana", "deepSkyBlue", cv_col2, y);
+    if (lo_showLegend) {
+        //---- LEGENDA ŽARKOV
+        cv_col1 = legendPanelLeft + 2; //lo_gxO + 50;
+        cv_col2 = cv_col1 + 50;
+        vStep = 22;
+        let dy = 5;
+        let dx = 8;
+        y = legendPanelTop + 2;
+        gText("ZNA" + scTch + "ILNI " + scZh + "ARKI:", "bold 11pt verdana", "darkSlateGray", cv_col1, y);
+        y += vStep;
+        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "green", [4, 4]);
+        gText("Vodoravni", "bold 11pt verdana", "green", cv_col2, y);
+        y += vStep;
+        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "red", [4, 4]);
+        gText("Sredi" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "red", cv_col2, y);
+        y += vStep;
+        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "purple", [4, 4]);
+        gText("Gori" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "purple", cv_col2, y);
+        y += vStep;
+        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "deepSkyBlue", [4, 4]);
+        gText("Osni", "bold 11pt verdana", "deepSkyBlue", cv_col2, y);
     
-    if (lo_showToolTips) { //1.4.2024
-        if (lo_enabledintChooserF) { intChooserF.showToolTip() };
-        if (lo_enabledintChooserP) { intChooserP.showToolTip() };
-        if (lo_enabledintChooserA) { intChooserA.showToolTip() };
-        if (lo_enabledUnitCm) { checkBoxUnitCm.showToolTip() };
-        if (lo_enabledUnitMm) { checkBoxUnitMm.showToolTip() };
+        if (lo_showToolTips) { //1.4.2024
+            if (lo_enabledintChooserF) { intChooserF.showToolTip() };
+            if (lo_enabledintChooserP) { intChooserP.showToolTip() };
+            if (lo_enabledintChooserA) { intChooserA.showToolTip() };
+            if (lo_enabledUnitCm) { checkBoxUnitCm.showToolTip() };
+            if (lo_enabledUnitMm) { checkBoxUnitMm.showToolTip() };
+            if (lo_enabledLegend) { checkBoxLegend.showToolTip() };
+            if (lo_enabledRuler) { checkBoxRuler.showToolTip() };
+        }
     }
 
     //---- on-screen namigi/pomoč
@@ -4163,8 +4343,6 @@ function paint_GUI() {
     //if (lo_showStations) { paint_stations() };
 
 }
-
-
 
 function paint_tips() {
 
@@ -4393,7 +4571,15 @@ function paint_GUI_layoutB() {
     guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = ctxW - guiPanelLeft - xAuthor; guiPanelHeight = 50;
     if (guiPanelWidth < 300) { guiPanelWidth = 300 };
     lo_layout_marginTop = guiPanelTop + guiPanelHeight;
-   
+
+    //---- prikaz legende
+    checkBoxLegend.left = legendPanelLeft; // + 74;
+    checkBoxLegend.top = legendPanelTop - 50;
+
+    //---- prikaz ravnila
+    checkBoxRuler.left = legendPanelLeft; // + 74;
+    checkBoxRuler.top = legendPanelTop - 74;
+    
     //---- enote v centimetrih
     checkBoxUnitCm.left = rsltPanelLeft + 2; // rsltPanelLeft + 194; // lo_gxO + 232;
     checkBoxUnitCm.top = rsltPanelTop + 2;   // gpTop + 30;
@@ -4737,6 +4923,22 @@ function lf_changeUnitMm(vp_newValue, vp_paint) {
 
     //paint_eLeca_calculate();
 
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeShowRuler(vp_newValue, vp_paint) {
+
+    lo_showRuler = vp_newValue;
+    checkBoxRuler.value = lo_showRuler;
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeShowLegend(vp_newValue, vp_paint) {
+
+    lo_showLegend = vp_newValue;
+    checkBoxLegend.value = lo_showLegend;
     if (vp_paint) { paint() }
 
 }
