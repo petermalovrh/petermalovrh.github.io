@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.9"
+const gl_versionNr = "v1.0"
 const gl_versionDate = "1.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1970,6 +1970,8 @@ lo_P = 30;  // f25 a60 P30    2; // višina predmeta [cm]
 var lo_drawRulerH = true; // 30.12.2024
 var lo_drawRulerV = true; // 30.12.2024
 var lo_showRuler = true; // 31.12.2024
+var lo_rulerTop, lo_rulerBottom, lo_rulerHeight;
+//----
 var lo_showLegend = true; // 31.12.2024
 //----
 var lo_selectedA = false;
@@ -3289,6 +3291,7 @@ function paint_eLeca_Slika() {
     //let font1 = "12pt verdana";
     //let font2 = "bold 12pt verdana";
     let font3 = "bold 10pt verdana";
+    let font5 = "bold 11pt verdana";
     let w, h;
 
     // SLIKA
@@ -3331,6 +3334,20 @@ function paint_eLeca_Slika() {
             // ---- pobarvan pravokotnik za sliko            
             gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS, 0, 0, "indigo", 0, "", "", 0, 0, false);
         };
+        // ---- 3) oznaka na ravnilu
+        if ((lo_a > lo_f) && lo_gxS <= gpRight) {
+            // ---- 1) črtica na ravnilu
+            let addY = 0;
+            if (lo_showRuler) { gLine(lo_gxS, lo_rulerTop + 1, lo_gxS, lo_rulerBottom - 1, 3, "indigo", [2, 2]); }
+            else { addY = lo_rulerHeight + 3 };
+            // ---- 2) izpis b nad na ravnilom
+            tmpText = "b=" + lo_bStr + lo_unitStr;
+            ;[w, h] = gMeasureText(tmpText, font5);
+            ctx.fillStyle = bckgColor;
+            const dd = 2;
+            ctx.fillRect(lo_gxS - w / 2 - dd, lo_rulerTop - 5 - h - dd + addY, w + 2 * dd, h + 2 * dd);
+            gText(tmpText, font5, "indigo", lo_gxS - w / 2, lo_rulerTop - 5 + addY);
+        }
     } else {
         //======== NAVIDEZNA SLIKA ========
         // ---- 1) tekst pri sliki
@@ -3354,9 +3371,21 @@ function paint_eLeca_Slika() {
             ctx.fill();
         } else {
             gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS, 0, 0, "indigo", 0, "", "", 0, 0, false);
-        };        
+        }; 
+        if ((lo_a < lo_f) && lo_gxS >= gpLeft) {
+            // ---- 1) črtica na ravnilu
+            //if (lo_showRuler) {
+            //    gLine(lo_gxS, lo_rulerTop + 1, lo_gxS, lo_rulerBottom - 1, 3, "indigo", [2, 2]);
+            //}
+            // ---- 2) izpis b pod ravnilom oziroma pod optično osjo
+            tmpText = "b=" + lo_bStr + lo_unitStr;
+            ;[w, h] = gMeasureText(tmpText, font5);
+            ctx.fillStyle = bckgColor;
+            const dd = 2;
+            ctx.fillRect(lo_gxS - w / 2 - dd, lo_gyO + 5 - dd, w + 2 * dd, h + 2 * dd);
+            gText(tmpText, font5, "indigo", lo_gxS - w / 2, lo_gyO + 5 + h);
+        }        
     };
-
 
 }
 
@@ -3378,11 +3407,12 @@ function paint_eLeca_rulerH() {
     const rW = 12;
     const dBottom = 7;
     let dTop = dBottom + rW;
-    let rulerTop = lo_gyO - dTop;
-    let rulerBottom = lo_gyO - dBottom;
-    gBannerRect(gpLeft, rulerTop, gpWidth, rW, 0, 0, "#FAFAFAFF", 0, "", "", 0, 0, false); // opaque 100%, povsem svetlo siva
-    gLine(gpLeft, rulerTop, gpRight, rulerTop, 1, "lightGray", []);
-    gLine(gpLeft, rulerBottom, gpRight, rulerBottom, 1, "lightGray", []); // "lightGray"="D3D3D3FF"
+    lo_rulerTop = lo_gyO - dTop;
+    lo_rulerBottom = lo_gyO - dBottom;
+    lo_rulerHeight = rW;
+    gBannerRect(gpLeft, lo_rulerTop, gpWidth, rW, 0, 0, "#FAFAFAFF", 0, "", "", 0, 0, false); // opaque 100%, povsem svetlo siva
+    gLine(gpLeft, lo_rulerTop, gpRight, lo_rulerTop, 1, "lightGray", []);
+    gLine(gpLeft, lo_rulerBottom, gpRight, lo_rulerBottom, 1, "lightGray", []); // "lightGray"="D3D3D3FF"
 
     let tmpEnd = false;
     let draw = false;
@@ -3440,32 +3470,32 @@ function paint_eLeca_rulerH() {
             //---- leva stran
             x = lo_gxO - i * kx;
             if (draw2parts) {
-                gLine(x, rulerTop, x, rulerTop + rW / 3, 1, tmpColor, []);
-                gLine(x, rulerTop + rW * 2 / 3, x, rulerBottom, 1, tmpColor, []);
+                gLine(x,lo_rulerTop, x,lo_rulerTop + rW / 3, 1, tmpColor, []);
+                gLine(x,lo_rulerTop + rW * 2 / 3, x,lo_rulerBottom, 1, tmpColor, []);
             } else {
-                gLine(x, rulerTop, x, rulerBottom, 1, tmpColor, []);
-                if (marker10) { gLine(x, rulerTop + 0.3 * rW, x, rulerBottom - 0.3 * rW, 3, tmpColor, []); };
+                gLine(x,lo_rulerTop, x,lo_rulerBottom, 1, tmpColor, []);
+                if (marker10) { gLine(x,lo_rulerTop + 0.3 * rW, x,lo_rulerBottom - 0.3 * rW, 3, tmpColor, []); };
             };
             //---- izpis koordinate
             if (printText) {
                 tmpText = i.toString();
                 ;[w, h] = gMeasureText(tmpText, font3);
-                gText(i.toString(), font3, colorRulerText, x - w / 2, rulerTop - 3);
+                gText(i.toString(), font3, colorRulerText, x - w / 2,lo_rulerTop - 3);
             }
             //---- desna stran
             x = lo_gxO + i * kx;
             if (draw2parts) {
-                gLine(x, rulerTop, x, rulerTop + rW / 3, 1, tmpColor, []);
-                gLine(x, rulerTop + rW * 2 / 3, x, rulerBottom, 1, tmpColor, []);
+                gLine(x,lo_rulerTop, x,lo_rulerTop + rW / 3, 1, tmpColor, []);
+                gLine(x,lo_rulerTop + rW * 2 / 3, x,lo_rulerBottom, 1, tmpColor, []);
             } else {
-                gLine(x, rulerTop, x, rulerBottom, 1, tmpColor, []);
-                if (marker10) { gLine(x, rulerTop + 0.3 * rW, x, rulerBottom - 0.3 * rW, 3, tmpColor, []); };
+                gLine(x,lo_rulerTop, x,lo_rulerBottom, 1, tmpColor, []);
+                if (marker10) { gLine(x,lo_rulerTop + 0.3 * rW, x,lo_rulerBottom - 0.3 * rW, 3, tmpColor, []); };
             };
             //---- izpis koordinate
             if (printText) {
                 tmpText = i.toString();
                 ;[w, h] = gMeasureText(tmpText, font3);
-                gText(i.toString(), font3, colorRulerText, x - w / 2, rulerTop - 3);
+                gText(i.toString(), font3, colorRulerText, x - w / 2,lo_rulerTop - 3);
             }
         }
 
