@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.0"
-const gl_versionDate = "1.1.2025"
+const gl_versionNr = "v1.1"
+const gl_versionDate = "2.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -3655,6 +3655,7 @@ function paint_GUI() {
     let cv_col2 = cv_col1 + 174; //lo_gxO + 214;
     let cv_col3 = cv_col1 + 95;  //lo_gxO + 135;
     let cv_col4 = cv_col2 + 15;
+    let cv_col5 = cv_col4 + 50; // 2.1.2025
     let vStep = 25;
     let tmpText = "";
 
@@ -3723,7 +3724,7 @@ function paint_GUI() {
     //if (lo_enabledintChooserP) {
     gText("Pove" + scTchLow + "ava:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
     gText("f/(a-f)", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
-    gText("x = " + Math.abs(lo_povecava).toFixed(3).toString(), "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+    gText("x = " + Math.abs(lo_povecava).toFixed(3).toString(), "bold 11pt verdana", "darkSlateGray", cv_col5, y);
     intChooserP.paint()
     //}
 
@@ -3731,13 +3732,15 @@ function paint_GUI() {
     y += vStep;
     //if (lo_enabledintChooserP) {
     gText("Dioptrija:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-    gText("1/f", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
+    //gText("1/f", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
+    gText("D=1/f=1/a+1/b", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y); // 2.1.2024
     if (Math.abs(lo_dioptrija) >= 100) { tmpText = "D = " + lo_dioptrija.toFixed(0).toString() }
     else if (Math.abs(lo_dioptrija) >= 10) { tmpText = "D = " + lo_dioptrija.toFixed(1).toString() }
     else if (Math.abs(lo_dioptrija) >= 1) { tmpText = "D = " + lo_dioptrija.toFixed(2).toString() }
     else if (Math.abs(lo_dioptrija) >= 0.1) { tmpText = "D = " + lo_dioptrija.toFixed(3).toString() }
     else { tmpText = "D = " + lo_dioptrija.toString() };
-    gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+    //gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col2, y);
+    gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col5, y);
     intChooserP.paint()
     //}
     
