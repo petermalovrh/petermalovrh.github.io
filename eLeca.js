@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.6"
+const gl_versionNr = "v0.7"
 const gl_versionDate = "1.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2565,7 +2565,8 @@ window.addEventListener("wheel", event => {
         change = delta * lo_fStep;
         if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
         newValue = lf_changeValueF(change);
-        gl_changeByMouseWheel_F = true; 
+        gl_changeByMouseWheel_F = true;
+        lo_selectedF = true; // 1.1.2024
         lf_changeF(newValue, true);
         //}
         return; //konec prverjanja, ker je s pritisnjeno tipko F povedal, da hoče točno to in nič drugega
@@ -2577,6 +2578,7 @@ window.addEventListener("wheel", event => {
         if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
         newValue = lf_changeValueP(change);
         gl_changeByMouseWheel_P = true; 
+        lo_selectedPredmet = true; // 1.1.2024
         lf_changeP(newValue, true);
         //}
         return; //konec prverjanja, ker je s pritisnjeno tipko P povedal, da hoče točno to in nič drugega
@@ -2588,6 +2590,7 @@ window.addEventListener("wheel", event => {
         if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
         newValue = lf_changeValueA(change);
         gl_changeByMouseWheel_A = true; 
+        lo_selectedA = true; // 1.1.2024
         lf_changeA(newValue, true);
         //}
         return; //konec prverjanja, ker je s pritisnjeno tipko A povedal, da hoče točno to in nič drugega
@@ -2638,7 +2641,7 @@ window.addEventListener("wheel", event => {
         lf_changeA(newValue, true);
     }
     
-    //----
+    //---- ... sicer (2) spreminja ...?  
     //---- če je v bližini optične osi lahko z vrtenjem koleščka miške premikaš predmet levo-desno (spreminjaš a)
     else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX < lo_gxO)) {
         change = delta * lo_aStep;
@@ -2675,11 +2678,11 @@ window.addEventListener("keydown", (event) => {
             // CTRL+mouseWheel = ZOOM v browserju !!!
             lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;        
         case 'KeyF':
-            lo_keyDownF = true; break;
+            lo_keyDownF = true; lo_selectedF = true; paint(); break;
         case 'KeyP':
-            lo_keyDownP = true; break;
+            lo_keyDownP = true; lo_selectedPredmet = true; paint(); break;
         case 'KeyA':
-            lo_keyDownA = true; break;
+            lo_keyDownA = true; lo_selectedA = true; paint(); break;
         case 'KeyX':
             lo_keyDownX = true; break;
         case 'KeyC':
@@ -2793,8 +2796,10 @@ window.addEventListener("keyup", (event) => {
                 if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
                 if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
                 newValue = lf_changeValueF(-change);
-                lf_changeF(newValue, true);
+                lf_changeF(newValue, false);
             }
+            lo_selectedF = false;
+            paint();
             gl_changeByMouseWheel_F = false;
             //console.log("UP: false"); console.log("----");
             break;
@@ -2808,8 +2813,10 @@ window.addEventListener("keyup", (event) => {
                 if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
                 if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
                 newValue = lf_changeValueP(-change);
-                lf_changeP(newValue, true);
+                lf_changeP(newValue, false);
             }
+            lo_selectedPredmet = false; paint();
+            paint();
             gl_changeByMouseWheel_P = false;
             //console.log("UP: false"); console.log("----");
             break;
@@ -2823,8 +2830,10 @@ window.addEventListener("keyup", (event) => {
                 if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
                 if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
                 newValue = lf_changeValueA(-change);
-                lf_changeA(newValue, true);
+                lf_changeA(newValue, false);
             }
+            lo_selectedA = false;
+            paint();
             gl_changeByMouseWheel_A = false;
             //console.log("UP: false"); console.log("----");
             break;
@@ -4767,10 +4776,6 @@ function lf_changeValueF(vp_diff) {
 function lf_changeValueA(vp_diff) {
 
     let newValue;
-
-    //newValue = lo_a - vp_diff * lo_f;
-    //if (newValue < cv_a_min * lo_f) { newValue = cv_a_min * lo_f };
-    //if (newValue > cv_a_max * lo_f) { newValue = cv_a_max * lo_f };
 
     newValue = lo_a - vp_diff;
     if (newValue < cv_a_min) { newValue = cv_a_min };
