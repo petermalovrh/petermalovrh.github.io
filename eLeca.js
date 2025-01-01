@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.8"
+const gl_versionNr = "v0.9"
 const gl_versionDate = "1.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1958,7 +1958,7 @@ var lo_gwArrowPS = 14; // šrina predmeta v pikslih
 var lo_ghArrowPS = 18; // šrina predmeta v pikslih
 var lo_gdLece, lo_gxRobLeceL, lo_gxRobLeceD;
 var lo_xNrF = 6; // toliko goriščnih razdalj zaobsega celotna x os, pol F-jev na levi, pol na desni strani leče
-var lo_f, lo_a, lo_b, lo_dLece, lo_P, lo_povecava, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS;
+var lo_f, lo_a, lo_b, lo_dLece, lo_P, lo_povecava, lo_povecavaSlikeStr, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS;
 var lo_Sstr, lo_bStr;
 var kx; // koliko pikslov na cm
 //----
@@ -3008,7 +3008,12 @@ function paint_eLeca_calculate() {
     lo_gxRobLeceL = lo_gxO - lo_gdLece;
     //----
     lo_povecava = lo_f / (lo_a - lo_f); // povečava zbiralne leče
+    if (Math.abs(lo_S) > lo_P) { lo_povecavaSlikeStr = "pove" + scTchLow + "ana"; } // 1.1.2025
+    else if (Math.abs(lo_S) == lo_P) { lo_povecavaSlikeStr = "enako velika"; }
+    else { lo_povecavaSlikeStr = "pomanj" + scSchLow + "ana"; }
+    //----
     lo_dioptrija = - 1 / lo_f; // dioptrija
+    //----
     switch (lo_unit) {
         case cv_unit_cm: lo_dioptrija *= 100; break;
         case cv_unit_mm: lo_dioptrija *= 1000; break;
@@ -3020,6 +3025,7 @@ function paint_eLeca_calculate() {
     lo_gb = kx * lo_b; // oddaljenost slike na desni od sredine leče v pikslih
     lo_gxS = lo_gxO + lo_gb; // x koordinata slike na desni v pikslih
     lo_gyS = lo_gyO + lo_ghS; // y koordinata slike na desni v pikslih
+
     //---- 31.12.2024 velikost slike spravimo v lepo string številko na ne preveč mest
     if (lo_S==Math.trunc(lo_S) ) { lo_Sstr = lo_S.toString() }
     else if (Math.abs(lo_S) >= 100) { lo_Sstr = lo_S.toFixed(0).toString() }
@@ -3275,7 +3281,7 @@ function paint_eLeca_Zarki() {
 
 function paint_eLeca_Slika() {
      
-    let k;
+    let k, x, y, yTop, yBottom;
 
     //let font = "bold 15pt verdana";
     //let fontOcenaSel = "bold 40pt verdana";
@@ -3289,16 +3295,24 @@ function paint_eLeca_Slika() {
     let arrowHeight = lo_ghArrowPS;
     let arrowWidth = lo_gwArrowPS;
     //gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS - arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
-    tmpText = "SLIKA";
+    tmpText = "S";
     ;[w, h] = gMeasureText(tmpText, font3);
+    vStep = h + 4;
     //
     if (lo_a > lo_f) {
-        // ---- realna slika
-        gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", lo_gxS + 8, lo_gyS - 2 * h - 9 - 18);
-        gText("REALNA", font3, "indigo", lo_gxS + 8, lo_gyS - h - 9 - 4);
-        gText(tmpText, font3, "indigo", lo_gxS + 8, lo_gyS - 9);
+        //======== REALNA SLIKA ========
+        // ---- 1) tekst pri sliki
+        x = lo_gxS + 8;
+        yBottom = lo_gyS - 4;
+        if (yBottom > gpBottom) { yBottom = gpBottom };
+        y = yBottom; gText("SLIKA", font3, "indigo", x, y);
+        y -= vStep; gText("REALNA", font3, "indigo", x, y);
+        y -= (vStep + 3); gText("obrnjena, " + lo_povecavaSlikeStr, font3, "indigo", x, y);
+        y -= 2 * vStep; gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", x, y);
+        // ---- 2) slika
         if (lo_ghS > arrowHeight) {
             if (lo_gyS<gpBottom) {
+                // ---- pobarvan pravokotnik za sliko
                 gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS - arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
                 // ---- puščica na vrhu slike 
                 ctx.beginPath()
@@ -3309,17 +3323,25 @@ function paint_eLeca_Slika() {
                 ctx.fillStyle = "indigo";
                 ctx.fill();
             } else {
+                // ---- pobarvan pravokotnik za sliko                
                 gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, gpBottom - lo_gyO, 0, 0, "indigo", 0, "", "", 0, 0, false);
             };
 
         } else {
+            // ---- pobarvan pravokotnik za sliko            
             gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS, 0, 0, "indigo", 0, "", "", 0, 0, false);
         };
     } else {
-        // ---- navidezna slika
-        gText("NAVIDEZNA", font3, "indigo", lo_gxS + 7, lo_gyS + 9 - h - 4);
-        gText(tmpText, font3, "indigo", lo_gxS + 7, lo_gyS + 9);     
-        gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", lo_gxS + 7, lo_gyS + h + 9 + 18);
+        //======== NAVIDEZNA SLIKA ========
+        // ---- 1) tekst pri sliki
+        x = lo_gxS + 8;
+        yTop = lo_gyS + 4;
+        if (yTop < gpTop) { yTop = gpTop };
+        y = yTop; gText("pokon" + scTchLow + "na, " + lo_povecavaSlikeStr, font3, "indigo", x, y);
+        y += (vStep + 4); gText("NAVIDEZNA", font3, "indigo", x, y);
+        y += (vStep); gText("SLIKA", font3, "indigo", x, y);     
+        y += (2 * vStep); gText("S=" + lo_Sstr + lo_unitStr, font3, "indigo", x, y);
+        // ---- 2) slika
         if (Math.abs(lo_ghS) > arrowHeight) {
             gBannerRect(lo_gxS - lo_gwPS / 2, lo_gyO, lo_gwPS, lo_ghS + arrowHeight, 0, 0, "indigo", 0, "", "", 0, 0, false);
             // ---- puščica na vrhu slike 
