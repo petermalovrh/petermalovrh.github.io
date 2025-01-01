@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v0.7"
+const gl_versionNr = "v0.8"
 const gl_versionDate = "1.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1862,34 +1862,16 @@ function cLog4(var1str, var1, var2str, var2, var3str, var3, var4str, var4) {
 
 const cv_f_min = 1; const cv_f_max = 199;
 const cv_P_min = 1; const cv_P_max = 199;
-const cv_kriterij12min = 10; const cv_kriterij12max = 70;
-const cv_kriterij23min = 20; const cv_kriterij23max = 80;
-const cv_kriterij34min = 40; const cv_kriterij34max = 95;
-const cv_kriterij45min = 60; const cv_kriterij45max = 99;
 
-var lo_useHalfPoint = false;
 var lo_fStep = 1;
 var lo_pStep = 1;
 var lo_aStep = 1;
 var lo_f = 25;  // f25 a60 P30
-var lo_kriterij12 = 50;
-var lo_kriterij23 = 65;
-var lo_kriterij34 = 80;
-var lo_kriterij45 = 90;
-var tblKriteriji = [lo_kriterij12, lo_kriterij23, lo_kriterij34, lo_kriterij45];
-var lo_validOcena2, lo_validOcena3, lo_validOcena4;
-
-var lo_tock5t, lo_tock5b;
-var lo_tock4t, lo_tock4b;
-var lo_tock3t, lo_tock3b;
-var lo_tock2t, lo_tock2b;
-var lo_tock1t, lo_tock1b;
 
 const cv_xNrF_min = 2.5; const cv_xNrF_max = 30;
 var lo_stepXnrF = 0.1;
 //const cv_aRel_min = 0.05; const cv_aRel_max = 20;
 const cv_a_min = 1; const cv_a_max = 199;
-var lo_stepArel = 0.05;
 
 const cv_unit_cm = 1;
 const cv_unit_mm = 2;
@@ -1898,7 +1880,6 @@ var lo_unitCm = false;
 var lo_unitMm = true;
 var lo_unitStr = "mm";
 
-var lo_enabledUseHalfPoint = true; //4.4.2024
 var lo_enabledintChooserF = true;
 var lo_enabledintChooserA = true;
 var lo_enabledintChooserP = true;
@@ -1906,27 +1887,6 @@ var lo_enabledUnitCm = true;
 var lo_enabledUnitMm = true;
 var lo_enabledRuler = true;
 var lo_enabledLegend = true;
-var lo_enabledIntChooserKriterij12 = true;
-var lo_enabledIntChooserKriterij23 = true;
-var lo_enabledIntChooserKriterij34 = true;
-var lo_enabledIntChooserKriterij45 = true;
-
-var lo_drawTabelaOcen = true;
-var lo_drawTabelaOcenLines = true;
-var lo_drawTabelaOcenRects = true;
-var lo_drawVTocke = true;
-var lo_drawListSimple = true;
-var lo_drawListSimpleNoPercent = true; //8.4.2024
-var lo_drawGraphicalH = true; //9.4.2024
-var lo_enabledKriteriji = true;
-
-const cv_naborKriterijev_1 = 1;
-const cv_naborKriterijev_2 = 2;
-const cv_naborKriterijev_min = 1;
-const cv_naborKriterijev_max = 2;
-var lo_naborKriterijev = cv_naborKriterijev_1;
-
-var lo_tockovnik = "";
 
 const cv_printLevelMax = 7;
 const cv_printLevelMin = 0;
@@ -1952,19 +1912,12 @@ var gl_configChanged = true; // 19.12.2023
 
 
 //---- mode aplikacije
-const cv_mode_timeAvgTempSingle = 1;
-const cv_mode_timeAvgTempMultiPlace = 2;
-const cv_mode_timeAvgTempMultiTimeSlice = 3;
-const cv_mode_vaccExcessDeath = 4;
-const cv_mode_vaccExcessDeathMulti = 5;
+//const cv_mode_timeAvgTempSingle = 1;
 const cv_minMode = 1;
 const cv_maxMode = 3;
-var gl_mode = cv_mode_timeAvgTempSingle;
-var gl_modeLast = gl_mode; // 19.12.2023
+//var gl_mode = cv_mode_timeAvgTempSingle;
+//var gl_modeLast = gl_mode; // 19.12.2023
                    // 28.12.2023
-var nrToolTips = 0;             // 25.12.2023
-const arrToolTipY = [];         // 25.12.2023
-//arrToolTipMonth[1] = 890; arrToolTipY[1] = 500; nrToolTips = 1;
 
 var lo_keyDownF = false;
 var lo_keyDownP = false;
@@ -1972,14 +1925,8 @@ var lo_keyDownA = false;
 var lo_keyDownX = false;
 var lo_keyDownC = false;
 var lo_keyDownM = false;
-
-var lo_keyDown2 = false;
-var lo_keyDown3 = false;
-var lo_keyDown4 = false;
-var lo_keyDown5 = false;
 var lo_keyDownT = false; // to bo pri lečah za nivo printinga
 
-var lo_keyDown0 = false; //2.2.2023 v1.11
 //---- spreminjanje zgornje in spodnje meje grafa po Y (6.12.2023)
 var lo_keyDownU = false;      //6.12.2023
 var lo_keyDownD = false;      //6.12.2023
@@ -1996,12 +1943,7 @@ var gl_changeByMouseWheel_A = false;
 var gl_changeByMouseWheel_P = false;   
 var gl_changeByMouseWheel_xNrF = false; 
 var gl_changeByMouseWheel_XP = false;  
-
 var gl_changeByMouseWheel_printLevel = false;   //4.1.2024
-var gl_changeByMouseWheel_kriterij12 = false;   //4.1.2024
-var gl_changeByMouseWheel_kriterij23 = false;   //4.1.2024
-var gl_changeByMouseWheel_kriterij34 = false;   //4.1.2024
-var gl_changeByMouseWheel_kriterij45 = false;   //4.1.2024
 
 //---- grafične meje med razredi
 var gpMarginTop, gpMarginBottom, gpMarginLeft, gpMarginRight
@@ -2034,14 +1976,6 @@ var lo_selectedA = false;
 var lo_selectedF = false;
 var lo_selectedPredmet = false;
 //----
-var lo_selectedOcena1 = false; //4.4.2024
-var lo_selectedOcena2 = false;
-var lo_selectedOcena3 = false;
-var lo_selectedOcena4 = false;
-var lo_selectedOcena5 = false;
-//----
-var lo_selectedTock = -1; //4.4.2024
-//----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
 var lo_addMarkWidth = 0; //13.12.2023
@@ -2052,8 +1986,8 @@ const cv_addRightMarginMult = 10; //15.12.2023
 var lo_addRightMargin = 0;        //15.12.2023
 
 var lo_showGUI = true
-var lo_showHelpTips = false;  //true;
-var lo_showStations = false
+var lo_showHelpTips = true;
+//var lo_showStations = false
 
 var lo_showToolTips = true
 
@@ -2098,14 +2032,7 @@ switch (lo_GUI_layout) {
     case cv_guiLayoutB:
         guiPanelLeft = 8; guiPanelTop = 8; guiPanelWidth = 500; guiPanelHeight = 80;
         //var buttonMode = new button(guiPanelLeft, guiPanelTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
-        //var intChooserNrMonthsAvg = new intChooser(guiPanelLeft, guiPanelTop + 16, 180, cv_nrMonthsAvgMax - cv_nrMonthsAvgMin + 1, lo_nrMonthsAvg, cv_nrMonthsAvgMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij12, disabledControlLineColor, disabledControlTextColor, true, "Averaging period", "A(+mWheel)");
-        //var checkBoxNrMonthsAvgAll = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "all", "gray", "normal 10pt verdana", 4, "above-middle", lo_nrMonthsAvgAll, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Use all data for averaging", "S");
-        //var checkBoxDeltaT = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, scDelta + "T", "gray", "normal 10pt verdana", 4, "above-middle", gl_deltaT, "burlyWood", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Calculate differences over 10 years", "L");
-        var checkBoxHalfPoint = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "na 0,5 to" + scTchLow + "ke", "gray", "normal 10pt verdana", 4, "right-middle", lo_useHalfPoint, "gray", "white", "pero", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "To" + scTchLow + "kovanje na pol to" + scTchLow + "ke", "P");  //String.fromCharCode(0x0110));
-        //var intChooserSmoothYears = new intChooser(guiPanelLeft, guiPanelTop + 16, 80, cv_nrSmoothYearsMax - cv_nrSmoothYearsMin + 1, lo_nrSmoothYears, cv_nrSmoothYearsMin, 1, true, "burlyWood", "white", "orangeRed", "crimson", 7, 5, 4, 7, "", "normal 10pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserSmoothYears, disabledControlLineColor, disabledControlTextColor, false, "Smoothing period", "O(+mWheel)");
-        //var sliderTailMonths = new slider(guiPanelLeft, guiPanelTop + 42, 500, nrMonthsAll, gl_tailMonths, 0, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         //var sliderMonthEnd = new slider2(guiPanelLeft, guiPanelTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
-        //var buttonPlay = new buttonPlayPauseStop(sliderMonthEnd.right + 10, guiPanelTop + 6, 23, 24, "play", 1, "gray", "darkSlateGray", "honeydew", 2, "lightGray", 2, 2, false, true, disabledControlBackColor, true);
         //var placePanelToggle = new placePanel(ctxW - pickPlaceLeftDiff - 41, pickPlaceTop, ctxW, pickPlaceHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
         var intChooserF = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_f, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserF, disabledControlLineColor, disabledControlTextColor, true, "Gori" + scSchLow + scTchLow + "na razdalja (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var intChooserA = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_a, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserA, disabledControlLineColor, disabledControlTextColor, true, "Oddaljenost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
@@ -2114,11 +2041,6 @@ switch (lo_GUI_layout) {
         var checkBoxUnitMm = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "mm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitMm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v milimetrih", "M");  //String.fromCharCode(0x0110));
         var checkBoxRuler = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         var checkBoxLegend = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
-        //----
-        var intChooserKriterij12 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij12, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij12, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 1 in 2 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserKriterij23 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij23, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij23, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 2 in 3 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserKriterij34 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij34, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij34, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 3 in 4 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserKriterij45 = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_kriterij45, "%", 0, 1, 3, 9, 17, 3, "burlyWood", "black", "white", "orangeRed", "", "bold 12pt verdana", 4, "above-left", "gray", 5, lo_enabledIntChooserKriterij45, disabledControlLineColor, disabledControlTextColor, true, "Meja med ocenama 4 in 5 (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
 }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2136,9 +2058,6 @@ var ctx = elMyCanvas.getContext("2d");
 //const bckgColor = "#F4F8F8";
 const bckgColor = "white"; //10.4.2024
 
-const cv_displayMode_landscape = 1
-const  cv_displayMode_portrait = 2
-var lo_displayMode = cv_displayMode_landscape
 var elem = document.documentElement; //23.12.2022 https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_fullscreen2
 
 //---- 3.1.2023 v1.16 font family
@@ -2707,20 +2626,10 @@ window.addEventListener("keydown", (event) => {
             //console.log("L pressed");
             lf_changeShowLegend(!lo_showLegend, true);
             break;         
-        case 'Digit2':
-            lo_keyDown2 = true; break;
-        case 'Digit3':
-            lo_keyDown3 = true; break;
-        case 'Digit4':
-            lo_keyDown4 = true; break;
-        case 'Digit5':
-            lo_keyDown5 = true; break;
         case 'KeyO':
             lo_keyDownO = true; break;
         case 'KeyT':
             lo_keyDownT = true; break;
-        case 'Digit0':
-            lo_keyDown0 = true; break;
         case 'KeyU':
             lo_keyDownU = true; break;
         case 'KeyD':
@@ -2746,12 +2655,6 @@ window.addEventListener("keydown", (event) => {
             lf_changeShowHelpTips(!lo_showHelpTips, true); break;
         case 'KeyI':
             lf_changeShowToolTips(!lo_showToolTips, true); break;
-        case 'KeyH':
-            //console.log("P pressed");
-            lf_changeUseHalfPoint(!lo_useHalfPoint, true); break;
-        case 'KeyK':
-            //console.log("K pressed");
-            if (lo_keyDownShiftLeft) { lf_changeNaborKriterijev(lo_naborKriterijev - 1, true) } else { lf_changeNaborKriterijev(lo_naborKriterijev + 1, true); }; break;
         case 'KeyY': case 'KeyZ': //24.10.2023
         //console.log("Y pressed");
         //lf_changeSameScaleY(!gl_sameScaleY, true); break;
@@ -3061,23 +2964,6 @@ function paint() {
 }
 
 function paint_eLeca() {
-    //---------------------------------------------
-    // a) Grafična tabela ocen in točk s seznamom ocen/točk/procentov ali poenostavljeno samo v enostaven tekstovni seznam ocen/točk/procentov
-    // b) Grafična predstavitev ocen/kriterijev
-    //---------------------------------------------
-
-    if (lo_drawGraphicalH) {
-        paint_eLeca_graphicalH(); //9.4.2024
-        return;
-    } 
-
-    paint_eLeca_tabelaOcen();
-
-}
-
-function paint_eLeca_tabelaOcen() {
-
-    //---- printLevel: 4-vse, 3-manjka checkBox, 2-manjka checkBox in posivitve tabele, 1-manjka checkBox in posivitve tabele in črte vmes, 0-manjkajo checkBox / posivitve tabele / črte vmes / točke / kriteriji
 
     //---- dimenzije grafične tabele ocen
     paint_eLeca_calculate();
@@ -3161,6 +3047,7 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     let font4 = "11pt verdana";
     let font5 = "bold 11pt verdana";
     let w, h, x, y, w1;
+    let colorLeca = "#E4EBF4FF";  //"aliceBlue";  //"lightCyan"; // "lightCyan"="rgb(211, 211, 211)"="#D3D3D3FF"
 
     // ======== LEČA
     //---- pravokoten sredinski del leče
@@ -3170,7 +3057,7 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     let lecaLeft = lo_gxO - lo_gdLece;
     let lecaWidth = 2 * lo_gdLece;
     let lecaRight = lecaLeft + lecaWidth;
-    gBannerRect(lecaLeft, lecaTop, lecaWidth, lecaHeight, 0, 0, "rgb(212, 212, 212)", 0, "", "", 0, 0, false);
+    gBannerRect(lecaLeft, lecaTop, lecaWidth, lecaHeight, 0, 0, colorLeca, 0, "", "", 0, 0, false);
     //---- priprava podatkov za risanje zaobljenosti leče na levi in desni
     let lecaDWidth = 30; // za toliko se na obeh straneh izboči na kontrolnih točkah (na sredi se bo še nekoliko bolj!)
     
@@ -3195,13 +3082,13 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     ctx.beginPath();
     ctx.moveTo(lecaLeft, lecaTop);
     ctx.bezierCurveTo(lecaLeftCurv, lecaYcurv1, lecaLeftCurv, lecaYcurv2, lecaLeft, lecaBottom);
-    ctx.fillStyle = "lightGray";
+    ctx.fillStyle = colorLeca;
     ctx.fill();
     //---- zaobljenost leče na desni
     ctx.beginPath();
     ctx.moveTo(lecaRight, lecaTop);
     ctx.bezierCurveTo(lecaRightCurv, lecaYcurv1, lecaRightCurv, lecaYcurv2, lecaRight, lecaBottom);
-    ctx.fillStyle = "lightGray";
+    ctx.fillStyle = colorLeca;
     ctx.fill();
 
     // ======== OS LEČE
@@ -3454,7 +3341,6 @@ function paint_eLeca_Slika() {
 function paint_eLeca_Rulers() {
 
     if (lo_showRuler && lo_drawRulerH) { paint_eLeca_rulerH() };
-    if (lo_showRuler && lo_drawRulerV) { paint_eLeca_rulerV() };
 
 }
 
@@ -3564,495 +3450,6 @@ function paint_eLeca_rulerH() {
     }
 }
 
-function paint_eLeca_rulerV() {
-
-}
-
-function paint_eLeca_tabelaOcen_linijePovezaveNaKriterije() {
-    
-    //---- tanke linije za povezavo kriterijev z mejami v razpredelnici
-    if (lo_drawTabelaOcenLines) {
-        let x0, y0, x1, y1;
-        let x00, y00, x10, y10;
-        let color;
-        x1 = gpLeft - 10; x10 = x1;
-        let drift1 = 5; let drift5 = 5;
-        //---- posivljen pas za oceno 4
-        x00 = intChooserKriterij45.left + intChooserKriterij45.width + 7;
-        y00 = intChooserKriterij45.top + intChooserKriterij45.height / 2; y10 = lo_xF1l;
-        x0 = intChooserKriterij34.left + intChooserKriterij34.width + 7;
-        y0 = intChooserKriterij34.top + intChooserKriterij34.height / 2; y1 = lo_xF2d;
-        if (y00 < lo_xF1l) { drift5 = 0 };
-        //---- pobarvam področje proti oceni 4 v tabeli
-        color = "#F6F6F6FF"; //"#FAFAFAFF";
-        ctx.beginPath();
-        ctx.moveTo(x00 - drift5, y00)
-        ctx.lineTo(x10, y10)
-        ctx.lineTo(x1, y1)
-        ctx.lineTo(x0, y0)
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
-        //return
-        //---- pobarvam desno naravnost proti tabeli
-        ctx.beginPath()
-        ctx.moveTo(x10, y10);
-        ctx.lineTo(gpLeft - 0, y10);
-        ctx.lineTo(gpLeft - 0, y1);
-        ctx.lineTo(x1, y1);
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!  
-        //---- pobarvam levo pod kriteriji
-        ctx.beginPath();
-        ctx.moveTo(intChooserKriterij45.left - 15, y00);
-        ctx.lineTo(x00 - drift5, y00);
-        ctx.lineTo(x00, y0);
-        ctx.lineTo(intChooserKriterij45.left - 15, y0);
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
-        //---- črtici levo med ocenami
-        gLine(intChooserKriterij45.left - 15, y00, x00 - drift5, y00, 1, "darkGray", [2, 2]);
-        gLine(intChooserKriterij45.left - 15, y0, x00, y0, 1, "darkGray", [2, 2]);
-        //---- meja med 4 in 5
-        gLine(x00 - drift5, y00, x10, y10, 1, "darkGray", [2, 4]);
-        //gEllipse(x00, y00, 2, 2, 0, "darkGray", 0, ""); gEllipse(x10, y10, 2, 2, 0, "darkGray", 0, "");
-        //---- meja med 3 in 4        
-        gLine(x0, y0, x1, y1, 1, "darkGray", [2, 4]);
-        //gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
-   
-        //---- posivljen pas za oceno 2
-        color = "#F4F4F4FF";
-        x00 = intChooserKriterij23.left + intChooserKriterij23.width + 7;
-        y00 = intChooserKriterij23.top + intChooserKriterij23.height / 2; y10 = lo_xF1d;
-        x0 = intChooserKriterij12.left + intChooserKriterij12.width + 7;
-        y0 = intChooserKriterij12.top + intChooserKriterij12.height / 2; y1 = lo_f;
-        if (y0 > lo_f) { drift1 = 0 };
-        //---- pobarvam področje proti oceni 2 v tabeli
-        ctx.beginPath()
-        ctx.moveTo(x00, y00)
-        ctx.lineTo(x10, y10)
-        ctx.lineTo(x1, y1)
-        ctx.lineTo(x0 - drift1, y0)
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!
-        //---- pobarvam desno naravnost proti tabeli
-        ctx.beginPath()
-        ctx.moveTo(x10, y10);
-        ctx.lineTo(gpLeft - 0, y10);
-        ctx.lineTo(gpLeft - 0, y1);
-        ctx.lineTo(x1, y1);
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!!  
-        //---- pobarvam levo pod kriteriji
-        ctx.beginPath()
-        ctx.moveTo(intChooserKriterij45.left - 15, y00);
-        ctx.lineTo(x00, y00);
-        ctx.lineTo(x00, y0);
-        ctx.lineTo(intChooserKriterij45.left - 15, y0);
-        ctx.closePath();  //ctx.lineTo(x00, y00) ... zadnjo ni treba vleči črte, ampak samo zapreš pot  
-        ctx.fillStyle = color; //"lightGray";
-        ctx.fill(); //sedaj pa jo nafilaj tako, oklepaja tukaj obvezna!!! 
-        //---- črtici levo med ocenami
-        gLine(intChooserKriterij45.left - 15, y00, x00, y00, 1, "darkGray", [2, 2]);
-        gLine(intChooserKriterij45.left - 15, y0, x00 - 5, y0, 1, "darkGray", [2, 2]);
-        //---- meja med 2 in 3        
-        gLine(x00, y00, x10, y10, 1, "darkGray", [2, 4]);
-        //gEllipse(x00, y00, 2, 2, 0, "darkGray", 0, ""); gEllipse(x10, y10, 2, 2, 0, "darkGray", 0, "");
-        //---- meja med 1 in 2        
-        gLine(x0 - drift1, y0, x1, y1, 1, "darkGray", [2, 4]);
-        //gEllipse(x0, y0, 2, 2, 0, "darkGray", 0, ""); gEllipse(x1, y1, 2, 2, 0, "darkGray", 0, "");
-    }
-}
-
-function paint_eLeca_tabelaOcen_tockeGraficno() {
-    
-    //---- Grafična predstavitev točk v pasovih ocen
-    let tmpX, tmpYt, tmpYb;
-    const cv_xDiff = 0;
-    const myColor = "maroon";
-    const myColor2 = "gray";
-    let tmpFont = "9pt serif";
-    const vDiffTop = 5; const vDiffBottom = 2;
-    const lineWidth = 3; let r; const r2 = 3;
-    var pixPerStepTock = gpHeight / (lo_f / lo_fStep); //toliko pikslov pride na en orak pri številu točk na testu
-    if (pixPerStepTock < 7) { r = 3; } else { r = 4; };
-    if (pixPerStepTock > 10) { tmpFont = "bold 10pt verdana"; };
-    if (lo_drawVTocke) {
-        //---- ocena 5
-        tmpX = gpRight + 10;
-        if (lo_tock5b < lo_f) {
-            tmpYb = lo_gxO - (lo_tock5b / lo_f) * gpHeight;
-            gLine(tmpX, lo_xF2l, tmpX, tmpYb, lineWidth, myColor2, []);
-            gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-            if (lo_tock5b !== lo_selectedTock) {
-                gText(lo_tock5b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
-            }
-            if (pixPerStepTock > 8) {
-                for (i = 1; i <= ((lo_tock5t - lo_tock5b) / lo_fStep - 1); i++) {
-                    tmpYb = lo_gxO - ((lo_tock5b + i * lo_fStep) / lo_f) * gpHeight;
-                    gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
-                }
-            }
-        }
-        gEllipse(tmpX, lo_xF2l, r, r, 0, myColor, 0, "");
-        if (lo_f !== lo_selectedTock) {
-            gText(lo_f.toString(), tmpFont, myColor2, tmpX + r + 2, lo_xF2l + vDiffTop);
-        }
-        //---- ocena 4
-        tmpX += cv_xDiff;
-        if (lo_validOcena4) {
-            tmpYt = lo_gxO - (lo_tock4t / lo_f) * gpHeight;
-            if (lo_tock4b < lo_tock4t) {
-                tmpYb = lo_gxO - (lo_tock4b / lo_f) * gpHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
-                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                if (lo_tock4b !== lo_selectedTock) {
-                    gText(lo_tock4b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
-                }
-                if (pixPerStepTock > 8) {
-                    for (i = 1; i <= ((lo_tock4t - lo_tock4b) / lo_fStep - 1); i++) {
-                        tmpYb = lo_gxO - ((lo_tock4b + i * lo_fStep) / lo_f) * gpHeight;
-                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
-                    }
-                }
-            }
-            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            if (lo_tock4t !== lo_selectedTock) {
-                gText(lo_tock4t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
-            }
-        }
-        //---- ocena 3
-        tmpX -= cv_xDiff;
-        if (lo_validOcena3) {
-            tmpYt = lo_gxO - (lo_tock3t / lo_f) * gpHeight;
-            if (lo_tock3b < lo_tock3t) {
-                tmpYb = lo_gxO - (lo_tock3b / lo_f) * gpHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
-                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                if (lo_tock3b !== lo_selectedTock) {
-                    gText(lo_tock3b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
-                }
-                if (pixPerStepTock > 8) {
-                    for (i = 1; i <= ((lo_tock3t - lo_tock3b) / lo_fStep - 1); i++) {
-                        tmpYb = lo_gxO - ((lo_tock3b + i * lo_fStep) / lo_f) * gpHeight;
-                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
-                    }
-                }
-            }
-            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            if (lo_tock3t !== lo_selectedTock) {
-                gText(lo_tock3t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
-            }
-        }
-        //---- ocena 2
-        tmpX += cv_xDiff;
-        if (lo_validOcena2) {
-            tmpYt = lo_gxO - (lo_tock2t / lo_f) * gpHeight;
-            if (lo_tock2b < lo_tock2t) {
-                tmpYb = lo_gxO - (lo_tock2b / lo_f) * gpHeight;
-                gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
-                gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-                if (lo_tock2b !== lo_selectedTock) {
-                    gText(lo_tock2b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
-                }
-                if (pixPerStepTock > 8) {
-                    for (i = 1; i <= ((lo_tock2t - lo_tock2b) / lo_fStep - 1); i++) {
-                        tmpYb = lo_gxO - ((lo_tock2b + i * lo_fStep) / lo_f) * gpHeight;
-                        gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
-                    }
-                }
-            }
-            gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-            if (lo_tock2t !== lo_selectedTock) {
-                gText(lo_tock2t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
-            }
-        }
-        //---- ocena 1
-        tmpX -= cv_xDiff;
-        tmpYt = lo_gxO - (lo_tock1t / lo_f) * gpHeight;
-        if (lo_tock1b < lo_tock1t) {
-            tmpYb = lo_gxO - (lo_tock1b / lo_f) * gpHeight;
-            gLine(tmpX, tmpYt, tmpX, tmpYb, lineWidth, myColor2, []);
-            gEllipse(tmpX, tmpYb, r, r, 0, myColor, 0, "");
-            if (lo_tock1b !== lo_selectedTock) {
-                gText(lo_tock1b.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYb + vDiffBottom);
-            }
-            if (pixPerStepTock > 8) {
-                for (i = 1; i <= ((lo_tock1t - lo_tock1b) / lo_fStep - 1); i++) {
-                    tmpYb = lo_gxO - ((lo_tock1b + i * lo_fStep) / lo_f) * gpHeight;
-                    gEllipse(tmpX, tmpYb, r2, r2, 0, myColor2, 0, "");
-                }
-            }
-        }
-        gEllipse(tmpX, tmpYt, r, r, 0, myColor, 0, "");
-        if (lo_tock1t !== lo_selectedTock) {
-            gText(lo_tock1t.toString(), tmpFont, myColor2, tmpX + r + 2, tmpYt + vDiffTop);
-        }
-
-        //---- št. točk pod miško? 4.4.2024
-        if (lo_selectedTock >= 0 && lo_selectedTock <= lo_f) {
-            let tmpY = lo_gxO - (lo_selectedTock / lo_f) * gpHeight;
-            gEllipse(tmpX, tmpY, 8, 8, 0, "", 5, "blue");
-            gText(lo_selectedTock.toString() + lf_textTock(lo_selectedTock) + " (" + (lo_selectedTock / lo_f * 100).toFixed(2) + "%)", "bold 11pt verdana", "blue", tmpX + 14, tmpY + 7);
-        }
-    }
-}
-
-function paint_eLeca_tabelaOcen_text() {
-    //-----------------------------------
-    // Ocena, točke, procenti znotraj grafične tabele ocen
-    //-----------------------------------
-
-    let font = "bold 15pt verdana";
-    let fontOcenaSel = "bold 40pt verdana";
-    let tmpText;
-    let font2 = "bold 10pt verdana";
-    let bw = 15; let bh = 14;
-    let bwSel = 40; let bhSel = 40;
-    let ddx = 7; let ddy = 7;
-    let cv_col3 = 215;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { cv_col3 = 18 };
-    let cv_col4 = cv_col3 + 35;
-    const cv_kriterijiStepV = 40;
-    const hAdd = 8; const tAdd = 13;
-        
-    let y;
-    const hAddLinear = 35;
-    lo_tockovnik = "";
-    
-    //---- ocena 5
-    y = (lo_xF2l + lo_xF1l) / 2 - hAdd;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop };
-    if (lo_selectedOcena5) {
-        //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "5", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
-    } else {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
-    };
-    tmpText = lo_tock5b.toString() + lf_addTextTock(lo_tock5b) + lf_addTextPercent(lo_tock5b);
-    if (lo_tock5b !== lo_tock5t) { tmpText += " - " + lo_tock5t.toString() + lf_addTextTock(lo_tock5t) + lf_addTextPercent(lo_tock5t) };
-    if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock5t) };
-    gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-    lo_tockovnik += "odl(5): " + tmpText;
-    
-    //---- ocena 4
-    y = (lo_xF1l + lo_xF2d) / 2 - hAdd;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 1 * hAddLinear };
-    if (lo_validOcena4) {
-        if (lo_selectedOcena4) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "4", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
-        };
-        tmpText = lo_tock4b.toString() + lf_addTextTock(lo_tock4b) + lf_addTextPercent(lo_tock4b);
-        if (lo_tock4b !== lo_tock4t) { tmpText += " - " + lo_tock4t.toString() + lf_addTextTock(lo_tock4t) + lf_addTextPercent(lo_tock4t) };
-        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock4t) };
-        gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\npdb(4): " + tmpText;
-    } else {
-        if (lo_selectedOcena4) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "4", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#D0D0D040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
-        };
-        lo_tockovnik += "\npdb(4): ";
-    }
-    
-    //---- ocena 3
-    y = (lo_xF2d + lo_xF1d) / 2 - hAdd;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 2 * hAddLinear };
-    if (lo_validOcena3) {
-        if (lo_selectedOcena3) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "3", ddx, ddy, 25, "gold", 1, "dimGray", "#C0C0C040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
-        };
-        tmpText = lo_tock3b.toString() + lf_addTextTock(lo_tock3b) + lf_addTextPercent(lo_tock3b);
-        if (lo_tock3b !== lo_tock3t) { tmpText += " - " + lo_tock3t.toString() + lf_addTextTock(lo_tock3t) + lf_addTextPercent(lo_tock3t) };
-        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock3t) };
-        gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\n db(3): " + tmpText;
-    } else {
-        if (lo_selectedOcena3) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "3", ddx, ddy, 25, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
-        };
-        lo_tockovnik += "\n db(3): ";
-    }
-    
-    //---- ocena 2
-    y = (lo_xF1d + lo_f) / 2 - hAdd;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 3 * hAddLinear };
-    if (lo_validOcena2) {
-        if (lo_selectedOcena2) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "2", ddx, ddy, 25, "gold", 1, "gray", "#A0A0A040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
-        };
-        tmpText = lo_tock2b.toString() + lf_addTextTock(lo_tock2b) + lf_addTextPercent(lo_tock2b);
-        if (lo_tock2b !== lo_tock2t) { tmpText += " - " + lo_tock2t.toString() + lf_addTextTock(lo_tock2t) + lf_addTextPercent(lo_tock2t) };
-        if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock2t) };
-        gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-        lo_tockovnik += "\n zd(2): " + tmpText;
-    } else {
-        if (lo_selectedOcena2) {
-            //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "2", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#A0A0A040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
-        };
-        lo_tockovnik += "\n zd(2): ";
-    }
-    
-    //---- ocena 1
-    y = (lo_f + lo_gxO) / 2 - hAdd;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 4 * hAddLinear };
-    if (lo_selectedOcena1) {
-        //gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
-    } else {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
-    };
-    tmpText = "0" + lf_addTextTock(lo_tock1b) + lf_addTextPercent(lo_tock1b) + " - " + lo_tock1t.toString() + lf_addTextTock(lo_tock1t) + lf_addTextPercent(lo_tock1t);
-    if (lo_drawListSimpleNoPercent) { tmpText += lf_textTock(lo_tock1t) };
-    gText(tmpText, font2, "darkSlateGray", cv_col4, y + tAdd);
-    lo_tockovnik += "\nnzd(1): " + tmpText;
-        
-    //---- Selektirana ocena naj se izpiše na vrhu!
-    if (lo_selectedOcena5) {
-        y = (lo_xF2l + lo_xF1l) / 2 - hAdd;
-        gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "5", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
-    }
-    else if (lo_selectedOcena4) {
-        y = (lo_xF1l + lo_xF2d) / 2 - hAdd;
-        if (lo_validOcena4) {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "4", ddx, ddy, 25, "gold", 1, "gray", "#D0D0D040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "4", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#D0D0D040", 6, 6, false);
-        }
-    }
-    else if (lo_selectedOcena3) {
-        y = (lo_xF2d + lo_xF1d) / 2 - hAdd;
-        if (lo_validOcena3) {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "3", ddx, ddy, 25, "gold", 1, "dimGray", "#C0C0C040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "3", ddx, ddy, 25, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 6, 6, false);
-        }
-    }
-    else if (lo_selectedOcena2) {
-        y = (lo_xF1d + lo_f) / 2 - hAdd;
-        if (lo_validOcena2) {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "indigo", "2", ddx, ddy, 25, "gold", 1, "gray", "#A0A0A040", 6, 6, false);
-        } else {
-            gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gray", "2", ddx, ddy, 25, "#EAD5A0FF", 1, "gray", "#A0A0A040", 6, 6, false);
-        }
-    }
-    else if (lo_selectedOcena1) {
-        y = (lo_f + lo_gxO) / 2 - hAdd;
-        gBannerRoundRectWithText(cv_col3 - 15, y - 15, bwSel, bhSel, fontOcenaSel, "gainsboro", "1", ddx, ddy, 25, "dimGray", 1, "gray", "#80808040", 6, 6, false)
-    }
-    
-}
-
-function paint_eLeca_oceneLevo() {
-    //-----------------------------------
-    // Ocena, točke, procenti znotraj grafične tabele ocen
-    //-----------------------------------
-
-    let font = "bold 13pt verdana";
-    let fontOcenaSel = "bold 40pt verdana";
-    let tmpText;
-    let font2 = "bold 10pt verdana";
-    let bw = 13; let bh = 13;
-    let bwSel = 40; let bhSel = 40;
-    let ddx = 7; let ddy = 7;
-    let cv_col3 = intChooserKriterij45.left - 20;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { cv_col3 = 18 };
-    let cv_col4 = cv_col3 + 35;
-    const cv_kriterijiStepV = intChooserKriterij34.top - intChooserKriterij45.top;
-    const hAdd = 8; const tAdd = 13;
-        
-    let y;
-    const hAddLinear = 35;
-    lo_tockovnik = "";
-    
-    //---- ocena 5
-    y = intChooserKriterij45.top - 14;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "5", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
-    
-    //---- ocena 4
-    y += cv_kriterijiStepV;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 1 * hAddLinear };
-    //if (lo_validOcena4) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "4", ddx, ddy, 14, "gold", 1, "gray", "#D0D0D040", 4, 4, false);
-    //} else {
-    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "4", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#D0D0D040", 4, 4, false);
-    //}
-    
-    //---- ocena 3
-    y += cv_kriterijiStepV;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 2 * hAddLinear };
-    //if (lo_validOcena3) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "3", ddx, ddy, 14, "gold", 1, "dimGray", "#C0C0C040", 4, 4, false);
-    //} else {
-    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "3", ddx, ddy, 14, "#EAD5A0FF", 1, "dimGray", "#C0C0C040", 4, 4, false);
-    //}
-    
-    //---- ocena 2
-    y += cv_kriterijiStepV;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 3 * hAddLinear };
-    //if (lo_validOcena2) {
-        gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "indigo", "2", ddx, ddy, 14, "gold", 1, "gray", "#A0A0A040", 4, 4, false);
-    //} else {
-    //    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gray", "2", ddx, ddy, 14, "#EAD5A0FF", 1, "gray", "#A0A0A040", 4, 4, false);
-    //}
-    
-    //---- ocena 1
-    y += cv_kriterijiStepV;
-    if (lo_drawListSimple || lo_drawListSimpleNoPercent) { y = gpTop + 4 * hAddLinear };
-    gBannerRoundRectWithText(cv_col3, y, bw, bh, font, "gainsboro", "1", ddx, ddy, 14, "dimGray", 1, "gray", "#80808040", 4, 4, false)
-    
-}
-
-function paint_eLeca_graphicalH() {
-    //-----------------------------------
-    // 9.4.2024
-    //-----------------------------------
-
-    let posTop = 5;
-    let posLeft = 10; let posRight = 465;
-    let tableWidth = posRight - posLeft;
-    let ocenaRadij = 9;
-    let ocenaColWidth = (tableWidth - 2 * ocenaRadij) / 4;
-    let fontOcena = "bold 18pt verdana";
-
-    let w, h;
-    let tmpText;
-    let fontKriterij = "bold 12pt verdana";
-    let bw = 16; let bh = 17;
-    let bwSel = 40; let bhSel = 40;
-    let ddx = 7; let ddy = 7;
-
-    let ocena, x, y;
-    //gLine(posLeft + 5, posTop + 22, posRight - 5, posTop + 22, 7, "#C8C8C8FF", []);
-    gLine(posLeft + 5, posTop + 22, posRight - 5, posTop + 22, 7, "gold", []);
-    y = posTop + 15;
-    for (ocena = 1; ocena <= 5; ocena++) {
-        x = posLeft + ocenaRadij + (ocena - 1) * ocenaColWidth; //na sredini markerja tekoče ocene
-        gBannerRoundRectWithText(x, y, bw, bh, fontOcena, "indigo", ocena.toString(), ddx, ddy, ocenaRadij, "gold", 1, "gray", "#80808040", 3, 3, false);
-        if (ocena < 5) {
-            tmpText = tblKriteriji[ocena - 1].toString() + "%";
-            ;[w, h] = gMeasureText(tmpText, fontKriterij);
-            x += ocenaColWidth / 2 - w / 2 + 8;
-            gBannerRectWithText3(tmpText, x, y + 2, fontKriterij, 2, 5, 5, 5, 5, bckgColor, 0, "", "black", "", 0, 0);
-        }
-    }
-    
-}
-
 function lf_fixProcent(vp_nrStr) {
 
     if (vp_nrStr.endsWith(".00")) {
@@ -4123,68 +3520,6 @@ function lf_textTock(vp_tock) {
             break;
     }
     return addText;
-
-}
-
-function lf_calculateMejeTock() {
-
-    //---- defaukt nastavim, da bo za vsako od teh ocen prišlo nekaj točk, da torej ocena ne bo "prazna"
-    lo_validOcena4 = true;
-    lo_validOcena3 = true;
-    lo_validOcena2 = true;
-
-    let tmpTock;
-    
-    //---- Ocena 5
-    lo_tock5t = lo_f;
-    tmpTock = lo_f * lo_kriterij45 / 100; // to je potrebno zaokrožiti navzgor na prvo celo ali polovično točko!
-    lo_tock5b = lf_calculatePrveTockeNad(tmpTock);
-    
-    //---- Ocena 4
-    lo_tock4t = lo_tock5b - lo_fStep;
-    tmpTock = lo_f * lo_kriterij34 / 100; // to je potrebno zaokrožiti navzgor na prvo celo ali polovično točko!
-    if (tmpTock > lo_tock4t) { lo_tock4b = lo_tock4t } else { lo_tock4b = lf_calculatePrveTockeNad(tmpTock) };
-    
-    //---- Ocena 3
-    if (lo_tock4t < lo_f * lo_kriterij34 / 100) {
-        lo_tock3t = lo_tock4t
-        lo_validOcena4 = false; //Ocena 4 je prazna, ker so kriteriji zanjo tako ozki in ocene padejo v 5 in 3
-    } else {
-        lo_tock3t = lo_tock4b - lo_fStep;
-    };
-    tmpTock = lo_f * lo_kriterij23 / 100; // to je potrebno zaokrožiti navzgor na prvo celo ali polovično točko!
-    if (tmpTock > lo_tock3t) { lo_tock3b = lo_tock3t } else { lo_tock3b = lf_calculatePrveTockeNad(tmpTock) };
-    
-    //---- Ocena 2
-    if (lo_tock3t < lo_f * lo_kriterij23 / 100) {
-        lo_tock2t = lo_tock3t
-        lo_validOcena3 = false; //Ocena 3 je prazna, ker so kriteriji zanjo tako ozki in ocene padejo v 4 in 2
-    } else {
-        lo_tock2t = lo_tock3b - lo_fStep;
-    };
-    tmpTock = lo_f * lo_kriterij12 / 100; // to je potrebno zaokrožiti navzgor na prvo celo ali polovično točko!
-    if (tmpTock > lo_tock2t) { lo_tock2b = lo_tock2t } else { lo_tock2b = lf_calculatePrveTockeNad(tmpTock) };
-    
-    //---- Ocena 1
-    if (lo_tock2t < lo_f * lo_kriterij12 / 100) {
-        lo_tock1t = lo_tock2t
-        lo_validOcena2 = false; //Ocena 2 je prazna, ker so kriteriji zanjo tako ozki in ocene padejo v 3 in 1
-    } else {
-        lo_tock1t = lo_tock2b - lo_fStep;
-    };
-    lo_tock1b = 0;
-    //----
-    
-}
-
-function lf_calculatePrveTockeNad(vp_tock) {
-
-    let tmpTock = Math.trunc(vp_tock - 1);
-    tmpTock += lo_fStep; if (tmpTock >= vp_tock) { return tmpTock };
-    tmpTock += lo_fStep; if (tmpTock >= vp_tock) { return tmpTock };
-    tmpTock += lo_fStep; if (tmpTock >= vp_tock) { return tmpTock };
-    tmpTock += lo_fStep; if (tmpTock >= vp_tock) { return tmpTock };
-    tmpTock += lo_fStep; if (tmpTock >= vp_tock) { return tmpTock };
 
 }
 
@@ -4406,7 +3741,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 15;
+            let nrTipRows = 13;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -4421,7 +3756,7 @@ function paint_tips() {
             //
             y += vStep;
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni " + scSchLow + "tevilo to" + scTchLow + "k ali kriterije (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("... spremeni f, a ali P (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
@@ -4429,48 +3764,43 @@ function paint_tips() {
             gBannerRectWithText2("... hitrej" + scSchLow + "e spreminjanje ob pritisnjenem SHIFT", x1 + 20, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //   
             y += vStep;
-            gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni " + scSchLow + "tevilo to" + scTchLow + "k na testu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni kriterij (%) za oceno 2", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("3", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni kriterij (%) za oceno 3", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("4", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni kriterij (%) za oceno 4", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("5", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni kriterij (%) za oceno 5", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... vklop/izklop to" + scTchLow + "kovanja na pol to" + scTchLow + "ke", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("K", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... preklapljanje med tipi" + scTchLow + "nimi nabori kriterijev", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("... spremeni gori" + scSchLow + scTchLow + "no razdaljo le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni nivo prikaza za prenos slike", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("... spremeni velikost predmeta", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("A", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... spremeni oddaljenost predmeta od le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("X", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... ZOOM +/- (ve" + scTchLow + "je/manj" + scSchLow + "e podro" + scTchLow + "je po x-u)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            y += vStep;
+            gBannerRectWithText2("M, C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... izberi enote, lahko so milimetri ali centimetri", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("R", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i ravnilo", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            y += vStep;
+            gBannerRectWithText2("L", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i legendo", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
+            //y += vStep;
+            //gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            //gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... spremeni nivo prikaza za prenos slike", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("G", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4480,9 +3810,9 @@ function paint_tips() {
             gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //     
-            y += vStep;
-            gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... shrani to" + scTchLow + "kovnik na odlo" + scZhLow + "i" + scSchLow + scTchLow + "e (clipboard)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //y += vStep;
+            //gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... shrani to" + scTchLow + "kovnik na odlo" + scZhLow + "i" + scSchLow + scTchLow + "e (clipboard)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4679,88 +4009,6 @@ function paint_GUI_layoutB() {
 
 }
 
-function lf_changeDeltaT(vp_newValue, vp_paint) {
-
-    gl_deltaT = vp_newValue;
-
-    checkBoxDeltaT.value = gl_deltaT;
-    lo_enabledIntChooserSmoothYears = gl_deltaT;
-    intChooserSmoothYears.enabled = gl_deltaT;
-    intChooserSmoothYears.visible = gl_deltaT;
-    lo_GUIlayoutHasChanged = true;
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeValueKriterij(vp_typeKriterij, vp_diff) {
-
-    let newValue;
-
-    switch (vp_typeKriterij) {
-        case "12": {
-            newValue = lo_kriterij12 - vp_diff;
-            if (newValue < cv_kriterij12min) { newValue = cv_kriterij12min };
-            if (newValue > cv_kriterij12max) { newValue = cv_kriterij12max };
-            if (newValue >= lo_kriterij23) { newValue = lo_kriterij23 - 1 };
-            break;
-        };
-        case "23": {
-            newValue = lo_kriterij23 - vp_diff;
-            if (newValue < cv_kriterij23min) { newValue = cv_kriterij23min };
-            if (newValue > cv_kriterij23max) { newValue = cv_kriterij23max };
-            if (newValue <= lo_kriterij12) { newValue = lo_kriterij12 + 1 };
-            if (newValue >= lo_kriterij34) { newValue = lo_kriterij34 - 1 };
-            break;
-        };
-        case "34": {
-            newValue = lo_kriterij34 - vp_diff;
-            if (newValue < cv_kriterij34min) { newValue = cv_kriterij34min };
-            if (newValue > cv_kriterij34max) { newValue = cv_kriterij34max };
-            if (newValue <= lo_kriterij23) { newValue = lo_kriterij23 + 1 };
-            if (newValue >= lo_kriterij45) { newValue = lo_kriterij45 - 1 };
-            break;
-        };
-        case "45": {
-            newValue = lo_kriterij45 - vp_diff;
-            if (newValue < cv_kriterij45min) { newValue = cv_kriterij45min };
-            if (newValue > cv_kriterij45max) { newValue = cv_kriterij45max };
-            if (newValue <= lo_kriterij34) { newValue = lo_kriterij34 + 1 };
-            break;
-        };            
-    }
-
-    return newValue;
-
-}
-
-function lf_changeKriterij(vp_typeKriterij, vp_newValue, vp_paint) {
-
-    switch (vp_typeKriterij) {
-        case "12": {
-            lo_kriterij12 = vp_newValue; tblKriteriji[0] = vp_newValue;
-            intChooserKriterij12.value = lo_kriterij12; break;
-        };
-        case "23": {
-            lo_kriterij23 = vp_newValue; tblKriteriji[1] = vp_newValue;
-            intChooserKriterij23.value = lo_kriterij23; break;
-        };
-        case "34": {
-            lo_kriterij34 = vp_newValue; tblKriteriji[2] = vp_newValue;
-            intChooserKriterij34.value = lo_kriterij34; break;
-        };
-        case "45": {
-            lo_kriterij45 = vp_newValue; tblKriteriji[3] = vp_newValue;
-            intChooserKriterij45.value = lo_kriterij45; break;
-        };            
-    }
-
-    lf_calculateMejeTock();
-
-    if (vp_paint) { paint() }
-
-}
-
 function lf_changeValueF(vp_diff) {
 
     let newValue;
@@ -4920,20 +4168,6 @@ function lf_setPrintLevel(vp_paint) {
 
 }
 
-function lf_changeUseHalfPoint(vp_newValue, vp_paint) {
-
-    lo_useHalfPoint = vp_newValue;
-    checkBoxHalfPoint.value = lo_useHalfPoint;
-
-    if (lo_useHalfPoint) { lo_fStep = 0.5; } else { lo_fStep = 1; };
-    intChooserF.step = lo_fStep;
-
-    lf_calculateMejeTock();
-
-    if (vp_paint) { paint() }
-
-}
-
 function lf_changeUnitCm(vp_newValue, vp_paint) {
 
     lo_unitCm = vp_newValue;
@@ -4992,40 +4226,6 @@ function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 
     lo_showHelpTips = vp_newValue;
     if (vp_paint) { paint() }
-}
-
-function lf_changeNaborKriterijev(vp_newValue, vp_paint) {
-
-    lo_naborKriterijev = vp_newValue;
-
-    if (lo_naborKriterijev < cv_naborKriterijev_min) { lo_naborKriterijev = cv_naborKriterijev_max };
-    if (lo_naborKriterijev > cv_naborKriterijev_max) { lo_naborKriterijev = cv_naborKriterijev_min };
-    
-    switch (lo_naborKriterijev) {
-        case cv_naborKriterijev_1:
-            lo_kriterij12 = 50;
-            lo_kriterij23 = 65;
-            lo_kriterij34 = 80;
-            lo_kriterij45 = 90;
-            break;
-        case cv_naborKriterijev_2:
-            lo_kriterij12 = 50;
-            lo_kriterij23 = 60;
-            lo_kriterij34 = 75;
-            lo_kriterij45 = 90;
-            break;
-    }
-    tblKriteriji[0] = lo_kriterij12; tblKriteriji[1] = lo_kriterij23; tblKriteriji[2] = lo_kriterij34; tblKriteriji[3] = lo_kriterij45; //9.4.2024
-    //----
-    intChooserKriterij12.value = lo_kriterij12;
-    intChooserKriterij23.value = lo_kriterij23;
-    intChooserKriterij34.value = lo_kriterij34;
-    intChooserKriterij45.value = lo_kriterij45;
-
-    lf_calculateMejeTock();
-
-    if (vp_paint) { paint() }
-
 }
 
 function lf_changeShowToolTips(vp_newValue, vp_paint) {
