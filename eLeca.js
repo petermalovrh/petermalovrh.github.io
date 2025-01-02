@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.1"
+const gl_versionNr = "v1.2"
 const gl_versionDate = "2.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -3111,6 +3111,15 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     ;[w, h] = gMeasureText(tmpText, font1);
     gText(tmpText, font1, "darkSlateGray", gpRight - w, lo_gyO - 7);
 
+    // ======== GORIŠČNA RAVNINA
+    //gLine(lo_gxF1d, gpTop + 0.15 * gpHeight, lo_gxF1d, gpBottom - 0.15 * gpHeight, 3, "gray", [15, 15]);
+    //gLine(lo_gxF1d, gpTop + 0.15 * gpHeight, lo_gxF1d, gpBottom - 0.15 * gpHeight, 3, "lightGray", []);
+    gLine(lo_gxF1d, gpTop + 0.15 * gpHeight, lo_gxF1d, gpBottom - 0.15 * gpHeight, 4, "lightGray", [9, 9]);
+    tmpText = "GORI" + scSch + scTch + "NA";
+    ;[w, h] = gMeasureText(tmpText, font4);
+    gText(tmpText, font4, "darkSlateGray", lo_gxF1d + 4, gpTop + 0.15 * gpHeight - h);
+    gText("RAVNINA", font4, "darkSlateGray", lo_gxF1d + 4, gpTop + 0.15 * gpHeight + 5);
+    
     // ======== GORIŠČE (+ mnogokratniki goriščne razdalje na obeh straneh leče)
     let tmpAddY = 4;
     let tAdd = 20;
