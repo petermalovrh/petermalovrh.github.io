@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.2"
+const gl_versionNr = "v1.3"
 const gl_versionDate = "2.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1863,9 +1863,14 @@ function cLog4(var1str, var1, var2str, var2, var3str, var3, var4str, var4) {
 const cv_f_min = 1; const cv_f_max = 199;
 const cv_P_min = 1; const cv_P_max = 199;
 
+var lo_n = 1.6;
+const cv_n_min = 1.5; const cv_n_max = 1.9; // 2.1.2025
+var lo_lensR;
+
 var lo_fStep = 1;
 var lo_pStep = 1;
 var lo_aStep = 1;
+var lo_nStep = 0.01; // 2.1.2025
 var lo_f = 25;  // f25 a60 P30
 
 const cv_xNrF_min = 2.5; const cv_xNrF_max = 30;
@@ -1883,10 +1888,12 @@ var lo_unitStr = "mm";
 var lo_enabledintChooserF = true;
 var lo_enabledintChooserA = true;
 var lo_enabledintChooserP = true;
+var lo_enabledintChooserN = true;
 var lo_enabledUnitCm = true;
 var lo_enabledUnitMm = true;
 var lo_enabledRuler = true;
 var lo_enabledLegend = true;
+var lo_enabledRealLens = true; // 3.1.2025
 
 const cv_printLevelMax = 7;
 const cv_printLevelMin = 0;
@@ -1926,6 +1933,7 @@ var lo_keyDownX = false;
 var lo_keyDownC = false;
 var lo_keyDownM = false;
 var lo_keyDownT = false; // to bo pri lečah za nivo printinga
+var lo_keyDownDigit0 = false; // 2.1.2025
 
 //---- spreminjanje zgornje in spodnje meje grafa po Y (6.12.2023)
 var lo_keyDownU = false;      //6.12.2023
@@ -1941,6 +1949,7 @@ var lo_addTempMarginDown = 0; //6.12.2023
 var gl_changeByMouseWheel_F = false;   
 var gl_changeByMouseWheel_A = false;      
 var gl_changeByMouseWheel_P = false;   
+var gl_changeByMouseWheel_N = false; // 2.1.2025
 var gl_changeByMouseWheel_xNrF = false; 
 var gl_changeByMouseWheel_XP = false;  
 var gl_changeByMouseWheel_printLevel = false;   //4.1.2024
@@ -1973,10 +1982,12 @@ var lo_showRuler = true; // 31.12.2024
 var lo_rulerTop, lo_rulerBottom, lo_rulerHeight;
 //----
 var lo_showLegend = true; // 31.12.2024
+var lo_showRealLens = false;  //true; // 3.1.2025
 //----
 var lo_selectedA = false;
 var lo_selectedF = false;
 var lo_selectedPredmet = false;
+var lo_selectedLeca = false; // 2.1.2025
 //----
 const cv_addMarkWidthMin = -1; //13.12.2023
 const cv_addMarkWidthMax = 3; //13.12.2023
@@ -2039,10 +2050,12 @@ switch (lo_GUI_layout) {
         var intChooserF = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_f, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserF, disabledControlLineColor, disabledControlTextColor, true, "Gori" + scSchLow + scTchLow + "na razdalja (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var intChooserA = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_a, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserA, disabledControlLineColor, disabledControlTextColor, true, "Oddaljenost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var intChooserP = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_P, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserP, disabledControlLineColor, disabledControlTextColor, true, "Velikost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        var intChooserN = new intChooser2H(guiPanelLeft, guiPanelTop + 160, 46, lo_n, "", 1.5, 0.01, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserN, disabledControlLineColor, disabledControlTextColor, true, "Lomni količnik (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
         var checkBoxUnitCm = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "cm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitCm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v centimetrih", "C");  //String.fromCharCode(0x0110));
         var checkBoxUnitMm = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "mm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitMm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v milimetrih", "M");  //String.fromCharCode(0x0110));
         var checkBoxRuler = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         var checkBoxLegend = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
+        var checkBoxRealLens = new checkBox(guiPanelLeft + 194, guiPanelTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
 }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2353,6 +2366,16 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         };
     }
+    //---- Lomni količnik n
+    if (!vl_end && lo_showGUI && lo_enabledintChooserN) {
+        rslt = intChooserN.eventClick(e.offsetX, e.offsetY)
+        //console.log("click(): rslt=" + rslt.toString())
+        if (!(rslt == false)) {
+            fixForRange(rslt, cv_n_min, cv_n_max);
+            lf_changeN(rslt, true);
+            vl_end = true
+        };
+    }    
     //---- enote v centimetrih
     if (!vl_end && lo_showGUI && lo_enabledUnitCm && !lo_unitCm) {
         boolRslt = checkBoxUnitCm.eventClick(e.offsetX, e.offsetY);
@@ -2384,6 +2407,14 @@ elMyCanvas.addEventListener('click', (e) => {
         boolRslt = checkBoxLegend.eventClick(e.offsetX, e.offsetY);
         if (boolRslt != lo_showLegend) {
             lf_changeShowLegend(boolRslt, true)
+            vl_end = true
+        }
+    } 
+    //---- prikaz realne leče
+    if (!vl_end && lo_showGUI && lo_enabledRealLens) {
+        boolRslt = checkBoxRealLens.eventClick(e.offsetX, e.offsetY);
+        if (boolRslt != lo_showRealLens) {
+            lf_changeShowRealLens(boolRslt, true)
             vl_end = true
         }
     } 
@@ -2443,6 +2474,8 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             document.body.style.cursor = "pointer"
         } else if (intChooserP.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
             document.body.style.cursor = "pointer"
+        } else if (intChooserN.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
+            document.body.style.cursor = "pointer"
         } else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
@@ -2465,9 +2498,10 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gpLeft, lo_gyO - 40, lo_gxO - 1, lo_gyO + 40)) { lo_selectedA = true; }
     else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxO + 1, lo_gyO - 40, lo_gxF1d + 10, lo_gyO + 40)) { lo_selectedF = true; }
     else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxP - 20, lo_gyP - 20, lo_gxP + 20, lo_gyO + 20)) { lo_selectedPredmet = true; }
-    else if (lo_enabledintChooserP && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
-    else if (lo_enabledintChooserP && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedF = true; }
+    else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
+    else if (lo_enabledintChooserF && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedF = true; }
     else if (lo_enabledintChooserP && intChooserP.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedPredmet = true; }
+    else if (lo_enabledintChooserN && intChooserN.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedLeca = true; }
     //}
 
     paint_delay() //da na oseh označi koordinate miške
@@ -2513,6 +2547,18 @@ window.addEventListener("wheel", event => {
         gl_changeByMouseWheel_A = true; 
         lo_selectedA = true; // 1.1.2024
         lf_changeA(newValue, true);
+        //}
+        return; //konec prverjanja, ker je s pritisnjeno tipko A povedal, da hoče točno to in nič drugega
+    }
+    //---- če vrti kolešček miške ob pritisnjeni tipki 0, s tem spreminja lomni količnik leče (3.1.2025)
+    if (lo_keyDownDigit0) {
+        //if (lo_enabledintChooserN) {
+        change = delta * lo_nStep;
+        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+        newValue = lf_changeValueN(change);
+        gl_changeByMouseWheel_N = true; 
+        lo_selectedLeca = true; // 1.1.2024
+        lf_changeN(newValue, true);
         //}
         return; //konec prverjanja, ker je s pritisnjeno tipko A povedal, da hoče točno to in nič drugega
     }      
@@ -2561,7 +2607,15 @@ window.addEventListener("wheel", event => {
         gl_changeByMouseWheel_A = true; // 4.1.2024
         lf_changeA(newValue, true);
     }
-    
+    //---- če si nad intChooserjem za lomni količnik materiala leče lahko z vrtenjem koleščka miške spreminjaš n
+    else if (lo_enabledintChooserN && intChooserN.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+        change = delta * lo_nStep;
+        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+        newValue = lf_changeValueN(change);
+        gl_changeByMouseWheel_N = true; // 4.1.2024
+        lf_changeN(newValue, true);
+    }
+
     //---- ... sicer (2) spreminja ...?  
     //---- če je v bližini optične osi lahko z vrtenjem koleščka miške premikaš predmet levo-desno (spreminjaš a)
     else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX < lo_gxO)) {
@@ -2587,6 +2641,14 @@ window.addEventListener("wheel", event => {
         gl_changeByMouseWheel_P = true;
         lf_changeP(newValue, true);
     } 
+    //---- če je v bližini leče lahko z vrtenjem koleščka miške spreminjaš lomni količnik materiala leče (n)
+    else if ((Math.abs(lo_mouseMoveX - lo_gxO) < 100) && (lo_mouseMoveY >= gpTop) && (lo_mouseMoveY <= gpBottom)) {
+        change = delta * lo_nStep;
+        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+        newValue = lf_changeValueN(change);
+        gl_changeByMouseWheel_N = true;
+        lf_changeN(newValue, true);
+    } 
 
 });
 
@@ -2604,6 +2666,8 @@ window.addEventListener("keydown", (event) => {
             lo_keyDownP = true; lo_selectedPredmet = true; paint(); break;
         case 'KeyA':
             lo_keyDownA = true; lo_selectedA = true; paint(); break;
+        case 'Digit0':
+            lo_keyDownDigit0 = true; lo_selectedLeca = true; paint(); break;
         case 'KeyX':
             lo_keyDownX = true; break;
         case 'KeyC':
@@ -2627,6 +2691,11 @@ window.addEventListener("keydown", (event) => {
             //lo_keyDownL = true; break;
             //console.log("L pressed");
             lf_changeShowLegend(!lo_showLegend, true);
+            break;   
+        case 'KeyE':
+            //lo_keyDownE = true; break;
+            //console.log("E pressed");
+            lf_changeShowRealLens(!lo_showRealLens, true);
             break;         
         case 'KeyO':
             lo_keyDownO = true; break;
@@ -2742,6 +2811,23 @@ window.addEventListener("keyup", (event) => {
             gl_changeByMouseWheel_A = false;
             //console.log("UP: false"); console.log("----");
             break;
+        case 'Digit0':
+            lo_keyDownDigit0 = false;
+            // 1.4.2024 Ali spreminja vrednost lo_n samo s pomočjo tipke 0 brez vrtenja koleščka miške?
+            if (!gl_changeByMouseWheel_N) {
+                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: Če med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
+                //console.log("UP: process keyPress(T)");
+                change = lo_nStep;
+                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
+                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
+                newValue = lf_changeValueN(-change);
+                lf_changeN(newValue, false);
+            }
+            lo_selectedLeca = false;
+            paint();
+            gl_changeByMouseWheel_N = false;
+            //console.log("UP: false"); console.log("----");
+            break;
         case 'KeyX':
             lo_keyDownX = false;
             // 1.4.2024 Ali spreminja vrednost lo_xNrF samo s pomočjo tipke X brez vrtenja koleščka miške?
@@ -2772,53 +2858,6 @@ window.addEventListener("keyup", (event) => {
             gl_changeByMouseWheel_kriterij12 = false;
             //console.log("UP: false"); console.log("----");
             break;
-        case 'Digit3':
-            lo_keyDown3 = false;
-            // 1.4.2024 Ali spreminja vrednost lo_kriterij23 samo s pomočjo tipke 3 brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_kriterij23) {
-                // 21.12.2023 tole je primer spreminjanja lo_kriterij23 samo s pomočjo tipke 2  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij23
-                //console.log("UP: process keyPress(T)");
-                change = 1;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueKriterij("23", -change);
-                lf_changeKriterij("23", newValue, true);
-            }
-            gl_changeByMouseWheel_kriterij23 = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'Digit4':
-            lo_keyDown4 = false;
-            // 1.4.2024 Ali spreminja vrednost lo_kriterij34 samo s pomočjo tipke 4 brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_kriterij34) {
-                // 21.12.2023 tole je primer spreminjanja lo_kriterij34 samo s pomočjo tipke 4  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij34
-                //console.log("UP: process keyPress(T)");
-                change = 1;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueKriterij("34", -change);
-                lf_changeKriterij("34", newValue, true);
-            }
-            gl_changeByMouseWheel_kriterij34 = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'Digit5':
-            lo_keyDown5 = false;
-            // 1.4.2024 Ali spreminja vrednost lo_kriterij45 samo s pomočjo tipke 5 brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_kriterij45) {
-                // 21.12.2023 tole je primer spreminjanja lo_kriterij45 samo s pomočjo tipke 5  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij45
-                //console.log("UP: process keyPress(T)");
-                change = 1;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueKriterij("45", -change);
-                lf_changeKriterij("45", newValue, true);
-            }
-            gl_changeByMouseWheel_kriterij45 = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'Digit0':
-            lo_keyDown0 = false; break;
         case 'KeyU':
             lo_keyDownU = false; break;
         case 'KeyD':
@@ -2972,9 +3011,15 @@ function paint_eLeca() {
     
     //---- ocena in tekstovno točke/procenti znotraj grafične tabele ocen
     paint_eLeca_Rulers();
+
+    //---- različno posivljena področja ocen
+    paint_eLeca_LecaOsLece();
     
     //---- različno posivljena področja ocen
-    paint_eLeca_LecaOsLeceOpticnaOs();
+    paint_eLeca_OpticnaOsGorisce();
+
+    //---- različno posivljena področja ocen
+    paint_eLeca_Predmet();
     
     //---- črtkane meje med posivljenimi področji ocen
     paint_eLeca_Zarki();
@@ -3044,17 +3089,30 @@ function paint_eLeca_calculate() {
     else { lo_bStr = lo_b.toString() };
 }
 
-function paint_eLeca_LecaOsLeceOpticnaOs() {
+function paint_eLeca_LecaOsLece() {
    
-    //let font = "bold 15pt verdana";
-    //let fontOcenaSel = "bold 40pt verdana";
     let tmpText;
     let font1 = "12pt verdana";
-    let font2 = "bold 12pt verdana";
-    let font3 = "bold 10pt verdana";
-    let font4 = "11pt verdana";
-    let font5 = "bold 11pt verdana";
-    let w, h, x, y, w1;
+    let w, h;
+
+    // ======== LEČA
+    if (lo_showRealLens) {
+        paint_eLeca_LecaOsLeceOpticnaOs_Leca02();
+    } else {
+        paint_eLeca_LecaOsLeceOpticnaOs_Leca01();
+    };
+
+
+    // ======== OS LEČE
+    gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
+    tmpText = "os le" + scTchLow + "e";
+    ;[w, h] = gMeasureText(tmpText, font1);
+    gText(tmpText, font1, "darkSlateGray", lo_gxO + 3, gpTop + h);
+
+}
+
+function paint_eLeca_LecaOsLeceOpticnaOs_Leca01() {
+   
     let colorLeca = "#E4EBF4FF";  //"aliceBlue";  //"lightCyan"; // "lightCyan"="rgb(211, 211, 211)"="#D3D3D3FF"
 
     // ======== LEČA
@@ -3075,7 +3133,7 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     const cv_lecaDWidth_max = 60;
     let cv_lecaDWidth_max2 = 0.5 * lo_gf;
     if (cv_lecaDWidth_max2 > cv_lecaDWidth_max) {
-        cv_lecaDWidth_max2=cv_lecaDWidth_max
+        cv_lecaDWidth_max2 = cv_lecaDWidth_max
     }
     if (lo_f > 100) {
         lecaDWidth = cv_lecaDWidth_min;
@@ -3099,11 +3157,113 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
     ctx.fillStyle = colorLeca;
     ctx.fill();
 
-    // ======== OS LEČE
-    gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
-    tmpText = "os le" + scTchLow + "e";
-    ;[w, h] = gMeasureText(tmpText, font1);
-    gText(tmpText, font1, "darkSlateGray", lo_gxO + 3, gpTop + h);
+}
+
+function paint_eLeca_LecaOsLeceOpticnaOs_Leca02() {
+   
+    let x, y;
+
+    let colorLeca = "#E4EBF4AF";  //"aliceBlue";  //"lightCyan"; // "lightCyan"="rgb(211, 211, 211)"="#D3D3D3FF"
+
+    // ======== LEČA
+
+    //---- pravokoten sredinski del leče
+    const cv_lecaMarginFactor = 0.05;
+    let lecaTop = gpTop + cv_lecaMarginFactor * gpHeight;
+    let lecaBottom = gpBottom - cv_lecaMarginFactor * gpHeight;
+    let lecaHeight = lecaBottom - lecaTop;
+    let lecaHeightHalf = lecaHeight / 2;
+
+    //---- LENS MAKERS FORMULA: 1/f=(n-1)*(1/R1-1/R2)
+    //                          pri običajnih lečah je R1 pozitiven, R2 pa negativen
+    //                          če sta obe strani leče z enako ukrivljenostjo, potem je R2=-R1 in R=2*(n-1)*f
+    //                          refractive indeks za navadno ali neko hudo steklo optikov je med 1.5 in 1.9, tipično za očala okoli 1.6
+    //let n = 1.6; // refractive index of the lens material
+    let R = 2 * (lo_n - 1) * lo_gf; // radij kroga ki ustreza ukrivljenosti leče
+    lo_lensR = R / kx; // 3.1.2025
+
+
+    //gEllipse(lo_gxO - R + 150, lo_gyO, R, R, 0, "", 1, "gray");
+    //gEllipse(lo_gxO + R - 150, lo_gyO, R, R, 0, "", 1, "gray");
+
+    // Če je polovica višine leče nekoliko manjša od polmera kroga, potem skozi vrh in dno leče potegnemo oba kroga in
+    // sicer tako, da groga levo-desno premaknemo tako, da gresta krožnici skozi omenjeni točki
+    // Če to ne gre, potem je treba lečo vertikalno pomanjšati, da bo zgornja polovica leče spet velika ravno nekaj manj od polmera kroga
+    const factorR = 0.95;
+    if (lecaHeightHalf > factorR * R) {
+        // leča je previsoka in jo je treba zmanjšati!!
+        lecaHeightHalf = factorR * R;
+        lecaHeight = 2 * lecaHeightHalf;
+        lecaTop = lo_gyO - lecaHeightHalf;
+        lecaBottom = lo_gyO + lecaHeightHalf;
+    }
+
+    // Zdaj skozi vrh in dno leče potegnemo krožnici in presek pobarvamo kot lečo
+    let gdx = Math.sqrt(R * R - lecaHeightHalf * lecaHeightHalf);
+    let gxcl = lo_gxO - gdx;
+    let gxcd = lo_gxO + gdx;
+    gEllipse(gxcl, lo_gyO, 4, 4, 0, "peru", 1, "gray");
+    gEllipse(gxcd, lo_gyO, 4, 4, 0, "peru", 1, "gray");
+    //
+    let lecaLeft = gxcd - R;
+    let lecaRight = gxcl + R;
+    let lecaWidth = lecaRight - lecaLeft;
+    gdx = lo_gxO + 0.6 * (lecaRight - lo_gxO) - gxcl;
+    let gdy = Math.sqrt(R * R - gdx * gdx);
+    //----
+    //gEllipse(gxcl, lo_gyO, R, R, 0, "", 1, "red");
+    //gEllipse(gxcd, lo_gyO, R, R, 0, "", 1, "red");
+
+    let fi = Math.atan(lecaHeightHalf / (lo_gxO - gxcl));
+    ctx.beginPath();
+    ctx.arc(gxcl, lo_gyO, R, -fi, fi);
+    ctx.fillStyle = colorLeca;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(gxcd, lo_gyO, R, Math.PI - fi, Math.PI + fi);
+    ctx.fillStyle = colorLeca;
+    ctx.fill();
+    
+    ctx.fillStyle = bckgColor; // "lightGray";
+    ctx.fillRect(lo_gxO - 50, lecaTop - 1, 100, 10);
+    ctx.fillRect(lo_gxO - 50, lecaBottom -9, 100, 10);
+    
+    return;
+
+    let lecaLeftCurv = lo_gxO - 0.6 * (lo_gxO - lecaLeft);
+    let lecaRightCurv = lo_gxO + 0.6 * (lecaRight - lo_gxO);
+    let lecaYcurv1 = lo_gyO - gdy;
+    let lecaYcurv2 = lo_gyO + gdy;
+    gEllipse(lecaLeftCurv, lecaYcurv1, 4, 4, 0, "blue", 0, "");
+    gEllipse(lecaLeftCurv, lecaYcurv2, 4, 4, 0, "green", 0, "");
+    gEllipse(lecaRightCurv, lecaYcurv1, 4, 4, 0, "red", 0, "");
+    gEllipse(lecaRightCurv, lecaYcurv2, 4, 4, 0, "indigo", 0, "");
+    gEllipse(lo_gxO, lecaTop, 4, 4, 0, "black", 0, "");
+    gEllipse(lo_gxO, lecaBottom, 4, 4, 0, "black", 0, "");
+    //---- zaobljenost leče na levi
+    ctx.beginPath();
+    ctx.moveTo(lo_gxO, lecaTop);
+    ctx.bezierCurveTo(lecaLeftCurv, lecaYcurv1, lecaLeftCurv, lecaYcurv2, lo_gxO, lecaBottom);
+    ctx.fillStyle = colorLeca;
+    ctx.fill();
+    //---- zaobljenost leče na desni
+    ctx.beginPath();
+    ctx.moveTo(lo_gxO, lecaTop);
+    ctx.bezierCurveTo(lecaRightCurv, lecaYcurv1, lecaRightCurv, lecaYcurv2, lo_gxO, lecaBottom);
+    ctx.fillStyle = colorLeca;
+    ctx.fill();
+
+
+
+}
+
+function paint_eLeca_OpticnaOsGorisce() {
+   
+    let tmpText;
+    let font1 = "12pt verdana";
+    let font2 = "bold 12pt verdana";
+    let font4 = "11pt verdana";
+    let w, h;
 
     // ======== OPTIČNA OS
     gLine(gpLeft, lo_gyO, gpRight, lo_gyO, 2, "gray", [4, 4]);
@@ -3136,10 +3296,20 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
         gText(tmpText, font2, "darkSlateGray", lo_gxO + i * lo_gf - w / 2, lo_gyO + tAdd);
         gText(tmpText, font2, "darkSlateGray", lo_gxO - i * lo_gf - w / 2, lo_gyO + tAdd);
     };
-    // še središče leče O
+    
+    // še središče leče O (ponekod uporabljajo "T" kot Teme)
     gLine(lo_gxO, lo_gyO - tmpAddY, lo_gxO, lo_gyO + tmpAddY, 3, "black", []);
     ;[w, h] = gMeasureText("O", font2);
     gText("O", font2, "darkSlateGray", lo_gxO - w + 2, lo_gyO + tAdd - 3);
+
+}
+
+function paint_eLeca_Predmet() {
+   
+    let tmpText;
+    let font3 = "bold 10pt verdana";
+    let font5 = "bold 11pt verdana";
+    let w, h, x, y, w1;
 
     // ======== PREDMET
     let arrowHeight = lo_ghArrowPS;
@@ -3198,7 +3368,7 @@ function paint_eLeca_LecaOsLeceOpticnaOs() {
         gText(tmpText, font5, tmpColor, lo_gxO + lo_gf / 2 - w / 2, lo_gyO + tmpAddY + dy / 2 + h + 4);
     }
 }
- 
+
 function paint_eLeca_Zarki() {
      
     let k;
@@ -3658,6 +3828,7 @@ function paint_GUI() {
     checkBoxUnitMm.paint();
     checkBoxLegend.paint();
     checkBoxRuler.paint();
+    checkBoxRealLens.paint();
     //};
 
     let cv_col1 = rsltPanelLeft + 2; //lo_gxO + 50;
@@ -3733,7 +3904,7 @@ function paint_GUI() {
     //if (lo_enabledintChooserP) {
     gText("Pove" + scTchLow + "ava:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
     gText("f/(a-f)", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
-    gText("x = " + Math.abs(lo_povecava).toFixed(3).toString(), "bold 11pt verdana", "darkSlateGray", cv_col5, y);
+    gText("m = " + Math.abs(lo_povecava).toFixed(3).toString(), "bold 11pt verdana", "darkSlateGray", cv_col5, y);
     intChooserP.paint()
     //}
 
@@ -3752,6 +3923,14 @@ function paint_GUI() {
     gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col5, y);
     intChooserP.paint()
     //}
+
+    //---- lomni količnik materiala leče
+    y = 294;
+    if (lo_enabledintChooserN && lo_showRealLens) {
+        gText("Lomni koli" + scTchLow + "nik stekla:", "bold 10pt verdana", "goldenrod", legendPanelLeft - 10, legendPanelTop + 150);
+        intChooserN.paint()
+        gText("R=" + lo_lensR.toFixed(1) + lo_unitStr, "italic 11pt verdana", "darkSlateGray", intChooserN.left + 85, intChooserN.top + 19);
+    }
     
     if (lo_showLegend) {
         //---- LEGENDA ŽARKOV
@@ -3779,10 +3958,12 @@ function paint_GUI() {
             if (lo_enabledintChooserF) { intChooserF.showToolTip() };
             if (lo_enabledintChooserP) { intChooserP.showToolTip() };
             if (lo_enabledintChooserA) { intChooserA.showToolTip() };
+            if (lo_enabledintChooserN) { intChooserN.showToolTip() };
             if (lo_enabledUnitCm) { checkBoxUnitCm.showToolTip() };
             if (lo_enabledUnitMm) { checkBoxUnitMm.showToolTip() };
             if (lo_enabledLegend) { checkBoxLegend.showToolTip() };
             if (lo_enabledRuler) { checkBoxRuler.showToolTip() };
+            if (lo_enabledRealLens) { checkBoxRealLens.showToolTip() };
         }
     }
 
@@ -4048,6 +4229,16 @@ function paint_GUI_layoutB() {
     y += vStep;
     intChooserP.left = cv_col1;
     intChooserP.top = y;
+
+    //----
+    y = legendPanelTop + 115;
+    checkBoxRealLens.left = legendPanelLeft;
+    checkBoxRealLens.top = y;
+    
+    //----
+    y += 42;
+    intChooserN.left = legendPanelLeft - 10; //1200;
+    intChooserN.top = y;
     
     return;
 
@@ -4111,6 +4302,21 @@ function lf_changeValueP(vp_diff) {
 
 }
 
+function lf_changeValueN(vp_diff) {
+
+    let newValue;
+
+    newValue = lo_n - vp_diff;
+
+    newValue += 0.00001;
+    newValue = Math.trunc(newValue * 100)/100;
+    if (newValue < cv_n_min) { newValue = cv_n_min };
+    if (newValue > cv_n_max) { newValue = cv_n_max };
+
+    return newValue;
+
+}
+
 function lf_changeValueXnrF(vp_diff) {
 
     let newValue;
@@ -4166,6 +4372,18 @@ function lf_changeA(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 
 }
+
+function lf_changeN(vp_newValue, vp_paint) {
+
+    lo_n = vp_newValue;
+    intChooserN.value = lo_n;
+
+    paint_eLeca_calculate();
+
+    if (vp_paint) { paint() }
+
+}
+
 
 function lf_changeValuePrintLevel(vp_change) {
 
@@ -4282,6 +4500,15 @@ function lf_changeShowLegend(vp_newValue, vp_paint) {
 
     lo_showLegend = vp_newValue;
     checkBoxLegend.value = lo_showLegend;
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeShowRealLens(vp_newValue, vp_paint) {
+
+    lo_showRealLens = vp_newValue;
+    lo_enabledintChooserN = vp_newValue;
+    checkBoxRealLens.value = lo_showRealLens;
     if (vp_paint) { paint() }
 
 }
