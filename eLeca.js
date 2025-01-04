@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.5"
-const gl_versionDate = "4.1.2025"
+const gl_versionNr = "v1.6"
+const gl_versionDate = "5.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1985,7 +1985,7 @@ var lo_lensR, lo_gLensR;
 var lo_gxLecaCenterL, lo_gxLecaCenterD; // centra krivin leče
 var lo_gdLece, lo_gdLeceHalf, lo_ghLece, lo_ghLeceHalf, lo_gxLecaLeft, lo_gxLecaRight;
 var lo_gyLecaTop, lo_gyLecaBottom;
-var lo_dLece;
+var lo_dLece, lo_dLeceHalf, lo_hLece, lo_hLeceHalf;
 const cv_lecaHeightMin = 2;
 const cv_lecaHeightMax = 200;
 const cv_lecaWidthMin = 2;
@@ -1994,6 +1994,8 @@ var lo_ghLecaCurentMax = cv_lecaHeightMax;
 const cv_modeCalculate_byF = 1;
 const cv_modeCalculate_byLensSize = 2;
 var lo_modeCalculate = cv_modeCalculate_byF
+var lo_needToSetLensDimensionsAndPoins = false; // 4.1.2025
+var lo_needToSetLensPoins = false;      // 4.1.2025
 //----
 var lo_xNrF = 6; // toliko goriščnih razdalj zaobsega celotna x os, pol F-jev na levi, pol na desni strani leče
 var lo_pixPerUnit = 10; // toliko pikslov na enoto naj bo v začetku. Kasneje lahko to spreminja z "X"+mouseWheel
@@ -2508,7 +2510,9 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                 lo_gyLecaTop = e.offsetY;
                 lo_gyLecaBottom = lo_gyO + (lo_gyO - e.offsetY);
                 lo_ghLece = lo_gyLecaBottom - lo_gyLecaTop; // celotna višina leče 3.1.2025
-                lo_ghLeceHalf = lo_ghLece / 2; // 3.1.2025
+                lo_ghLeceHalf = lo_ghLece / 2;                // 3.1.2025
+                lo_hLece = lo_ghLece / lo_pixPerUnit;         // 4.1.2025
+                lo_hLeceHalf = lo_ghLeceHalf / lo_pixPerUnit; // 4.1.2025
                 lo_modeCalculate = cv_modeCalculate_byLensSize;
             }
         }
@@ -2520,7 +2524,9 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                 lo_gxLecaRight = e.offsetX;
                 lo_gxLecaLeft = lo_gxO - (lo_gxLecaRight - lo_gxO);
                 lo_gdLece = lo_gxLecaRight - lo_gxLecaLeft; // celotna debelina leče 4.1.2025
-                lo_gdLeceHalf = lo_gdLece / 2; // 4.1.2025
+                lo_gdLeceHalf = lo_gdLece / 2;                // 4.1.2025
+                lo_dLece = lo_gdLece / lo_pixPerUnit;         // 4.1.2025
+                lo_dLeceHalf = lo_gdLeceHalf / lo_pixPerUnit; // 4.1.2025
                 lo_modeCalculate = cv_modeCalculate_byLensSize;
             }
         }
@@ -2793,6 +2799,12 @@ window.addEventListener("keydown", (event) => {
             //console.log("E pressed");
             lf_changeShowRealLens(!lo_showRealLens, true);
             break;         
+        case 'KeyB':
+            //console.log("F7 pressed");
+            if (lo_P == 27) {
+                lf_changeDebug(!dbg, true);
+            }
+            break;  
         case 'KeyO':
             lo_keyDownO = true; break;
         case 'KeyT':
@@ -3084,13 +3096,35 @@ function initGraphicalEnvironment() {
 
     if (lo_modeCalculate == cv_modeCalculate_byLensSize) {
         // zaradi premikov koordinatnega sistema so se spremenile tudi koordinate robov in centrov leč, gorišč
-        lo_gxLecaLeft = lo_gxO - lo_gdLeceHalf;
-        lo_gxLecaRight = lo_gxO + lo_gdLeceHalf;
-        lo_gyLecaTop = lo_gyO - lo_ghLeceHalf;
-        lo_gyLecaBottom = lo_gyO + lo_ghLeceHalf;
+        //setLensPoints();
+        lo_needToSetLensPoins = true;
     }
 
 };
+
+function setLensDimensions() {
+
+    // Zaradi ZOOM-a se grafične dimenzije leče in tudi njene grafične koordinate spremenijo in jih je treba na novo postaviti
+    lo_ghLece = lo_hLece * lo_pixPerUnit;
+    lo_ghLeceHalf = lo_ghLece / 2;
+    lo_gdLece = lo_dLece * lo_pixPerUnit;
+    lo_gdLeceHalf = lo_gdLece / 2;
+
+    lo_needToSetLensDimensionsAndPoins = false;
+    
+}
+
+function setLensPoints() {
+
+    // zaradi premikov koordinatnega sistema so se spremenile tudi koordinate robov in centrov leč, gorišč
+    lo_gxLecaLeft = lo_gxO - lo_gdLeceHalf;
+    lo_gxLecaRight = lo_gxO + lo_gdLeceHalf;
+    lo_gyLecaTop = lo_gyO - lo_ghLeceHalf;
+    lo_gyLecaBottom = lo_gyO + lo_ghLeceHalf;
+
+    lo_needToSetLensPoins = false;
+    
+}
 
 function initGraphicalEnvironment_01() {
 
@@ -3222,6 +3256,14 @@ function paint_eLeca_calculate_byF() {
 
 function paint_eLeca_calculate_byLensHeight() {
     
+    if (lo_needToSetLensDimensionsAndPoins) {
+        setLensDimensions();
+        setLensPoints();
+    }
+    if (lo_needToSetLensPoins) {
+        setLensPoints();
+    }
+
     if (dbg) {
         gText(lo_gxO.toFixed(0) + "," + lo_gyLecaTop.toFixed(0), "11pt verdana", "firebrick", lo_gxO + 5, lo_gyLecaTop - 5);
         gText(lo_gxO.toFixed(0) + "," + lo_gyO.toFixed(0), "11pt verdana", "firebrick", lo_gxO - 45, lo_gyO + 30);
@@ -3563,59 +3605,28 @@ function paint_eLeca_LecaOsLece_realLens_fSet() {
     let lecaRight = lo_gxLecaCenterL + R;
     let lecaWidth = lecaRight - lecaLeft;
     //console.log("debelina le" + scTchLow + "e = " + lecaWidth.toFixed(2));
+    
     //---- nafilam globalne spremenljivke leče
     lo_gxLecaLeft = lecaLeft;
     lo_gxLecaRight = lecaRight;
     lo_gyLecaTop = lecaTop;
     lo_gyLecaBottom = lecaBottom;
-    lo_gdLece = lecaWidth;
-    lo_gdLeceHalf = lo_gdLece / 2;
+    // višina leče
     lo_ghLece = lecaHeight; // 3.1.2025
     lo_ghLeceHalf = lo_ghLece / 2; // 3.1.2025
+    lo_hLece = lo_ghLece / lo_pixPerUnit;         // 5.1.2025
+    lo_hLeceHalf = lo_ghLeceHalf / lo_pixPerUnit; // 5.1.2025
+    // debelina leče
+    lo_gdLece = lecaWidth;
+    lo_gdLeceHalf = lo_gdLece / 2;
+    lo_dLece = lo_gdLece / lo_pixPerUnit;         // 5.1.2025
+    lo_dLeceHalf = lo_gdLeceHalf / lo_pixPerUnit; // 5.1.2025
+
     //----
     //gEllipse(lo_gxLecaCenterL, lo_gyO, R, R, 0, "", 1, "red");
     //gEllipse(lo_gxLecaCenterD, lo_gyO, R, R, 0, "", 1, "red");
 
     paint_eLeca_LecaOsLece_realLens_common();
-
-    return;
-
-    let colorLeca = "#E4EBF4AF";  //"aliceBlue";  //"lightCyan"; // "lightCyan"="rgb(211, 211, 211)"="#D3D3D3FF"
-
-    let fi = Math.atan(lecaHeightHalf / (lo_gxO - lo_gxLecaCenterL));
-    // ---- rišem desno polovico leče
-    ctx.beginPath();
-    ctx.arc(lo_gxLecaCenterL, lo_gyO, R, -fi, fi);
-    ctx.fillStyle = colorLeca;
-    ctx.fill();
-    // ---- rišem levo polovico leče
-    ctx.beginPath();
-    ctx.arc(lo_gxLecaCenterD, lo_gyO, R, Math.PI - fi, Math.PI + fi);
-    ctx.fillStyle = colorLeca;
-    ctx.fill();
-    // ---- pobrišem špice na vrhu leč, ker leče ponavadi tega nimajo
-    ctx.fillStyle = bckgColor; // "lightGray";
-    ctx.fillRect(lo_gxO - 50, lecaTop - 1, 100, 10);
-    ctx.fillRect(lo_gxO - 50, lecaBottom -9, 100, 10);
-    // ---- Izrišem rumeno piko na vrhu leče
-    if (lo_selectedVrhLece) {
-        gEllipse(lo_gxO, lecaTop, 8, 8, 0, "", 3, "dodgerBlue");
-    }
-    gEllipse(lo_gxO, lecaTop, 5, 5, 0, "yellow", 1, "gray");
-    // ---- če je z miško nad enim od centrov krivin leče, potem izrišem polmer leče (3.1.2025)
-    if (lo_selectedCenterKrivineLece) {
-        ctx.beginPath();
-        ctx.arc(lo_gxLecaCenterD, lo_gyO, R, Math.PI + fi - 0.15, 3 * Math.PI / 2 + 0.05);
-        ctx.setLineDash([4, 4]);
-        ctx.strokeStyle = "darkGray";
-        ctx.lineWidth = 1;
-        ctx.stroke()
-        //gLine(lo_gxLecaCenterD, lo_gyO, lo_gxO, lecaTop, 1, "lightGray", [4, 4]);
-        gLine(lo_gxLecaCenterD, lo_gyO, lo_gxLecaCenterD, lo_gyO - R, 1, "darkGray", [4, 4]);
-        gLine(lo_gxLecaCenterD - 4, lo_gyO - R + 12, lo_gxLecaCenterD, lo_gyO - R, 1, "darkGray", [1, 1]);
-        gLine(lo_gxLecaCenterD + 4, lo_gyO - R + 12, lo_gxLecaCenterD, lo_gyO - R, 1, "darkGray", [1, 1]);
-        gText("R", "12pt verdana", "gray", lo_gxLecaCenterD + 4, lo_gyO - R + 27);
-    }
 
 }
 
@@ -4835,6 +4846,9 @@ function lf_changePixPerUnit(vp_newValue, vp_paint) {
     lo_pixPerUnit = vp_newValue;
 
     //initGraphicalEnvironment(); // spremenil se je zoom in je treba preračunati kx oziroma po novem lo_pixPerUnit
+    if (lo_modeCalculate == cv_modeCalculate_byLensSize) { // 4.1.2025
+        lo_needToSetLensDimensionsAndPoins = true;
+    }; 
     paint_eLeca_calculate();
 
     if (vp_paint) { paint() }
@@ -4995,6 +5009,12 @@ function lf_changeShowRealLens(vp_newValue, vp_paint) {
 function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 
     lo_showHelpTips = vp_newValue;
+    if (vp_paint) { paint() }
+}
+
+function lf_changeDebug(vp_newValue, vp_paint) {
+
+    dbg = vp_newValue;
     if (vp_paint) { paint() }
 }
 
