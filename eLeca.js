@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.6"
-const gl_versionDate = "5.1.2025"
+const gl_versionNr = "v1.7"
+const gl_versionDate = "7.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1547,7 +1547,11 @@ class intChooser2H {
         if (!this.visible || !this.enabled) { return false; };
         //----
         if (this.eventMouseOverDecrease(mouseX, mouseY, false)) { return this.value - this.step; }
-        else { if (this.eventMouseOverIncrease(mouseX, mouseY, false)) { return this.value + this.step; } };
+        else {
+            if (this.eventMouseOverIncrease(mouseX, mouseY, false)) {
+                return this.value + this.step;
+            }
+        };
         return false;
     }
     eventMouseWithin(mouseX, mouseY) {
@@ -2384,7 +2388,8 @@ elMyCanvas.addEventListener('click', (e) => {
         //console.log("click(): rslt=" + rslt.toString())
         if (!(rslt == false)) { 
             fixForRange(rslt, cv_f_min, cv_f_max);
-            lf_changeF(rslt, true);
+            //lf_changeF(Math.trunc(rslt), true);
+            lf_changeF(Math.trunc(rslt), true); // tudi če je s spreminjanjem dimenzij leče prišel na decimalno vrednost za f, se ob kliku na increase/decrease zadeva naj spremeni v integer
             vl_end = true
         };
     }
@@ -3305,7 +3310,7 @@ function paint_eLeca_calculate_byLensHeight() {
     //let lo_gLensR = 2 * (lo_n - 1) * lo_gf; // radij kroga (v pikslih) ki ustreza ukrivljenosti leče
     lo_gf = lo_gLensR / 2 / (lo_n - 1); // goriščna razdalja take leče v pikslih
     lo_f = lo_gf / lo_pixPerUnit; // goriščna razdalja take leče v izbranih enotah
-    lf_changeF(lo_f.toFixed(1), false);
+    lf_changeF(Number(lo_f.toFixed(1)), false);
     lo_modeCalculate = cv_modeCalculate_byLensSize;
 
     //----
