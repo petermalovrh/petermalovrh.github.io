@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.7"
-const gl_versionDate = "7.1.2025"
+const gl_versionNr = "v1.8"
+const gl_versionDate = "10.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2151,9 +2151,8 @@ const cv_hideTipsTick = cv_hideTipsDuration / cv_hideTipsSteps; // na 700/30 (=2
 const cv_hideTipsStepAlpha = 255 / cv_hideTipsSteps;
 
 //---- 17.6.2024 COMMAND LINE PARAMS
-var cmd_nrTock, cmd_polTocke, cmd_initHelp;
-var cmd_krit12, cmd_krit23, cmd_krit34, cmd_krit45;
-var cmd_krit12val, cmd_krit23val, cmd_krit34val, cmd_krit45val;
+var cmd_unit, cmd_f, cmd_P, cmd_a, cmd_realLens, cmd_n, cmd_ruler, cmd_legend, cmd_initHelp;
+var cmd_aval, cmd_krit23val, cmd_krit34val, cmd_krit45val;
 
 main();
 
@@ -2198,63 +2197,85 @@ function lf_getCommandLineParams() {
 
     //---- VHODNI PARAMETRI (16.6.2024) ... https://www.sitepoint.com/get-url-parameters-with-javascript/
     //---- podprti command line parametri:
-    //       nrTock[cv_f_min .. cv_f_max]
-    //       polTocke[0, 1]
-    //       ----
-    //       krit12[cv_kriterij12min .. cv_kriterij12max]
-    //       krit23[cv_kriterij23min .. cv_kriterij23max]
-    //       krit34[cv_kriterij34min .. cv_kriterij34max]
-    //       krit45[cv_kriterij45min .. cv_kriterij45max]
-    //       ---- ... vsi štirje kriteriji morajo biti sočasno prisotni, sicer se jih ne upošteva!
-    //       initHelp[0, 1]
-    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eOcena.html?nrTock=9&polTocke=0&krit12=10&krit23=50&krit34=70&krit45=90
-    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eOcena.html?nrTock=9&polTocke=0&krit12=10&krit23=50&krit34=70&krit45=90&initHelp=0
+    //       unit     [mm,cm]    
+    //       f        [cv_f_min .. cv_f_max]
+    //       P        [cv_P_min .. cv_P_max]
+    //       a        [cv_a_min .. cv_a_max]
+    //       realLens [0,1]
+    //       n        [cv_n_min .. cv_n_max]
+    //       ruler    [0,1]
+    //       legend   [0,1]
+    //       initHelp [0,1]
+    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eOcena.html?unit=mm&f=26&P=31&a=56&ruler=0&realLens=1&n=1.71&legend=0&initHelp=0
 
     let commandString = window.location.search;
 
     // DEVELOPER DEBUG MODE
-    // commandString=="?nrTock=9&polTocke=0&krit12=10&krit23=50&krit34=70&krit45=90";
-    // commandString = "?nrTock=9&polTocke=0&krit12=52&krit23=63&krit34=77&krit45=93&initHelp=0"
-    //commandString="?initHelp=0"
+    //commandString = "?unit=mm&f=26&P=31&a=56&ruler=0&realLens=1&n=1.71&legend=0&initHelp=0"
 
     console.log("command string: " + commandString);
     const urlParams = new URLSearchParams(commandString);
     
-    //---- število točk na testu
-    tmpParam = "nrTock"; cmd_nrTock = urlParams.get(tmpParam);
-    if (urlParams.has(tmpParam)) { console.log(tmpParam + "  : " + cmd_nrTock); } else { console.log(tmpParam + "  : not present!"); }
-    if (valueBetween(cmd_nrTock * 1, cv_f_min, cv_f_max)) { lf_changeF(cmd_nrTock * 1, false); };
+    //---- enote ("mm" ali "cm")
+    tmpParam = "unit"; cmd_unit = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) {
+        console.log(tmpParam + ": " + cmd_unit);
+        if (cmd_unit == "mm") { lf_changeUnitCm(false, false); lf_changeUnitMm(true, false); };
+        if (cmd_unit == "cm") { lf_changeUnitCm(true, false); lf_changeUnitMm(false, false); };
+    } else {
+        console.log(tmpParam + ": not present!");
+    }
     
-    //---- ocenjevanje na pol točke
-    tmpParam = "polTocke"; cmd_polTocke = urlParams.get(tmpParam);
-    if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_polTocke); } else { console.log(tmpParam + ": not present!"); }
-    if (cmd_polTocke == "0") { lf_changeUseHalfPoint(false, false); };
-    if (cmd_polTocke == "1") { lf_changeUseHalfPoint(true, false); };
+    //---- goriščna razdalja
+    tmpParam = "f"; cmd_f = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) { console.log(tmpParam + "  : " + cmd_f); } else { console.log(tmpParam + "  : not present!"); }
+    if (valueBetween(cmd_f * 1, cv_f_min, cv_f_max)) { lf_changeF(cmd_f * 1, false); };
     
-    //---- kriteriji
-    let hasKrit12, hasKrit23, hasKrit34, hasKrit45;
-    hasKrit12 = hasKrit23 = hasKrit34 = hasKrit45 = false;
-    tmpParam = "krit45"; cmd_krit45 = urlParams.get(tmpParam); cmd_krit45val = parseInt(cmd_krit45);
-    if (urlParams.has(tmpParam)) { hasKrit45 = true; console.log(tmpParam + "  : " + cmd_krit45); } else { console.log(tmpParam + "  : not present!"); }
-    tmpParam = "krit34"; cmd_krit34 = urlParams.get(tmpParam); cmd_krit34val = parseInt(cmd_krit34);
-    if (urlParams.has(tmpParam)) { hasKrit34 = true; console.log(tmpParam + "  : " + cmd_krit34); } else { console.log(tmpParam + "  : not present!"); }
-    tmpParam = "krit23"; cmd_krit23 = urlParams.get(tmpParam); cmd_krit23val = parseInt(cmd_krit23);
-    if (urlParams.has(tmpParam)) { hasKrit23 = true; console.log(tmpParam + "  : " + cmd_krit23); } else { console.log(tmpParam + "  : not present!"); }
-    tmpParam = "krit12"; cmd_krit12 = urlParams.get(tmpParam); cmd_krit12val = parseInt(cmd_krit12);
-    if (urlParams.has(tmpParam)) { hasKrit12 = true; console.log(tmpParam + "  : " + cmd_krit12); } else { console.log(tmpParam + "  : not present!"); }
-    //----
-    if (hasKrit12 & hasKrit23 & hasKrit34 & hasKrit45) { 
-        if (valueBetween(cmd_krit12val, cv_kriterij12min, cv_kriterij12max) & valueBetween(cmd_krit23val, cv_kriterij23min, cv_kriterij23max) & valueBetween(cmd_krit34val, cv_kriterij34min, cv_kriterij34max) & valueBetween(cmd_krit45val, cv_kriterij45min, cv_kriterij45max)) { 
-            if (cmd_krit45val > cmd_krit34val & cmd_krit34val > cmd_krit23val & cmd_krit23val > cmd_krit12val) {
-                // kriteriji so ok, forsiraj!
-                lo_kriterij12 = cmd_krit12val; lo_kriterij23 = cmd_krit23val; lo_kriterij34 = cmd_krit34val; lo_kriterij45 = cmd_krit45val;
-                tblKriteriji = [lo_kriterij12, lo_kriterij23, lo_kriterij34, lo_kriterij45];
-                lf_changeKriterij("12", lo_kriterij12, false);
-                lf_changeKriterij("23", lo_kriterij23, false);
-                lf_changeKriterij("34", lo_kriterij34, false);
-                lf_changeKriterij("45", lo_kriterij45, false);
-            }
-        }
+    //---- velikost predmeta
+    tmpParam = "P"; cmd_P = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_P); } else { console.log(tmpParam + ": not present!"); }
+    //if (cmd_P == "0") { lf_changeUseHalfPoint(false, false); };
+    //if (cmd_P == "1") { lf_changeUseHalfPoint(true, false); };
+    if (valueBetween(cmd_P * 1, cv_P_min, cv_P_max)) { lf_changeP(cmd_P * 1, false); };
+
+    //---- oddaljenost predmeta
+    tmpParam = "a"; cmd_a = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_a); } else { console.log(tmpParam + ": not present!"); }
+    if (valueBetween(cmd_a * 1, cv_a_min, cv_a_max)) { lf_changeA(cmd_a * 1, false); };
+
+    //---- realna leča
+    tmpParam = "realLens"; cmd_realLens = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) {
+        console.log(tmpParam + ": " + cmd_realLens);
+        if (cmd_realLens == "0") { lf_changeShowRealLens(false, false) };
+        if (cmd_realLens == "1") { lf_changeShowRealLens(true, false) };
+    } else {
+        console.log(tmpParam + ": not present!");
+    }
+    
+    //---- lomni količnik leče
+    tmpParam = "n"; cmd_n = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_n); } else { console.log(tmpParam + ": not present!"); }
+    if (valueBetween(cmd_n * 1, cv_n_min, cv_n_max)) { lf_changeN(cmd_n * 1, false); };
+
+    //---- ravnilo
+    tmpParam = "ruler"; cmd_ruler = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) {
+        console.log(tmpParam + ": " + cmd_ruler);
+        if (cmd_ruler == "0") { lf_changeShowRuler(false, false) };
+        if (cmd_ruler == "1") { lf_changeShowRuler(true, false) };
+    } else {
+        console.log(tmpParam + ": not present!");
+    }
+
+    //---- legenda
+    tmpParam = "legend"; cmd_legend = urlParams.get(tmpParam);
+    if (urlParams.has(tmpParam)) {
+        console.log(tmpParam + ": " + cmd_legend);
+        if (cmd_legend == "0") { lf_changeShowLegend(false, false) };
+        if (cmd_legend == "1") { lf_changeShowLegend(true, false) };
+    } else {
+        console.log(tmpParam + ": not present!");
     }
 
     //---- zagonska pomoč
