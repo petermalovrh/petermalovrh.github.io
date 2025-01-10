@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.8"
+const gl_versionNr = "v1.9"
 const gl_versionDate = "10.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -1725,7 +1725,7 @@ class checkBox {
 }
 
 class button {
-    constructor(left, top, width, height, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible) {
+    constructor(left, top, width, height, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible, toolTipText, keyStroke) {
         this.left = left; this.top = top; this.width = width; this.height = height;
         this.text = text; this.font = font; this.textColor = textColor; this.focusedTextColor = focusedTextColor;
         this.lineWidth = lineWidth; this.lineColor = lineColor; this.focusedLineColor = focusedLineColor;
@@ -1736,6 +1736,8 @@ class button {
         this.shaddowColor = shaddowColor; this.xShaddow = xShaddow; this.yShaddow = yShaddow; this.shaddowAll = shaddowAll;
         this.enabled = enabled; this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
         this.visible = visible;
+        this.toolTipText = toolTipText; // 10.1.2025
+        this.keyStroke = keyStroke;     // 10.1.2025
     }
     paint() {
         if (!this.visible) { return };
@@ -1763,6 +1765,15 @@ class button {
         if (this.enabled) { textColor = focused ? this.focusedTextColor : this.textColor; }
         gText(this.text, this.font, textColor, x, y);
     }
+    showToolTip() { // 10.1.2025
+        //---- toolTip
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            if (this.keyStroke != "") {
+                gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
+            }
+        }      
+    } 
     eventClick(mouseX, mouseY) {
         if (!this.visible || !this.enabled) { return false; };
         if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
@@ -1909,6 +1920,8 @@ var lo_enabledUnitMm = true;
 var lo_enabledRuler = true;
 var lo_enabledLegend = true;
 var lo_enabledRealLens = true; // 3.1.2025
+var lo_enabledHelp = true; // 10.1.2025
+var lo_enabledCopyLink = true; // 10.1.2025
 
 const cv_printLevelMax = 7;
 const cv_printLevelMin = 0;
@@ -2094,7 +2107,9 @@ switch (lo_GUI_layout) {
         var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
-}
+        var buttonHelp = new button(gpLeft, gpTop + 10, 52, 20, "Pomo" + scTchLow, "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
+        var buttonCopyLink = new button(gpLeft, gpTop + 10, 68, 20, "Copy link", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiranje bli"+scZhLow+"njice do to"+scTchLow+"no take konfiguracije na clipboard", "");
+    }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
 var lo_hasRepaintRequest  = false
@@ -2206,7 +2221,7 @@ function lf_getCommandLineParams() {
     //       ruler    [0,1]
     //       legend   [0,1]
     //       initHelp [0,1]
-    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eOcena.html?unit=mm&f=26&P=31&a=56&ruler=0&realLens=1&n=1.71&legend=0&initHelp=0
+    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eLeca.html?unit=mm&f=26&P=31&a=56&ruler=0&realLens=1&n=1.71&legend=0&initHelp=0
 
     let commandString = window.location.search;
 
@@ -2216,8 +2231,8 @@ function lf_getCommandLineParams() {
     console.log("command string: " + commandString);
     const urlParams = new URLSearchParams(commandString);
     
-    //---- enote ("mm" ali "cm")
-    tmpParam = "unit"; cmd_unit = urlParams.get(tmpParam);
+    //---- enote ("mm" ali "cm") 10.1.2025
+    tmpParam = "unit"; cmd_unit = urlParams.get(tmpParam); // 10.1.2025
     if (urlParams.has(tmpParam)) {
         console.log(tmpParam + ": " + cmd_unit);
         if (cmd_unit == "mm") { lf_changeUnitCm(false, false); lf_changeUnitMm(true, false); };
@@ -2226,24 +2241,24 @@ function lf_getCommandLineParams() {
         console.log(tmpParam + ": not present!");
     }
     
-    //---- goriščna razdalja
+    //---- goriščna razdalja 10.1.2025
     tmpParam = "f"; cmd_f = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) { console.log(tmpParam + "  : " + cmd_f); } else { console.log(tmpParam + "  : not present!"); }
     if (valueBetween(cmd_f * 1, cv_f_min, cv_f_max)) { lf_changeF(cmd_f * 1, false); };
     
-    //---- velikost predmeta
+    //---- velikost predmeta 10.1.2025
     tmpParam = "P"; cmd_P = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_P); } else { console.log(tmpParam + ": not present!"); }
     //if (cmd_P == "0") { lf_changeUseHalfPoint(false, false); };
     //if (cmd_P == "1") { lf_changeUseHalfPoint(true, false); };
     if (valueBetween(cmd_P * 1, cv_P_min, cv_P_max)) { lf_changeP(cmd_P * 1, false); };
 
-    //---- oddaljenost predmeta
+    //---- oddaljenost predmeta 10.1.2025
     tmpParam = "a"; cmd_a = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_a); } else { console.log(tmpParam + ": not present!"); }
     if (valueBetween(cmd_a * 1, cv_a_min, cv_a_max)) { lf_changeA(cmd_a * 1, false); };
 
-    //---- realna leča
+    //---- realna leča 10.1.2025
     tmpParam = "realLens"; cmd_realLens = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) {
         console.log(tmpParam + ": " + cmd_realLens);
@@ -2253,12 +2268,12 @@ function lf_getCommandLineParams() {
         console.log(tmpParam + ": not present!");
     }
     
-    //---- lomni količnik leče
+    //---- lomni količnik leče 10.1.2025
     tmpParam = "n"; cmd_n = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) { console.log(tmpParam + ": " + cmd_n); } else { console.log(tmpParam + ": not present!"); }
     if (valueBetween(cmd_n * 1, cv_n_min, cv_n_max)) { lf_changeN(cmd_n * 1, false); };
 
-    //---- ravnilo
+    //---- ravnilo 10.1.2025
     tmpParam = "ruler"; cmd_ruler = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) {
         console.log(tmpParam + ": " + cmd_ruler);
@@ -2268,7 +2283,7 @@ function lf_getCommandLineParams() {
         console.log(tmpParam + ": not present!");
     }
 
-    //---- legenda
+    //---- legenda 10.1.2025
     tmpParam = "legend"; cmd_legend = urlParams.get(tmpParam);
     if (urlParams.has(tmpParam)) {
         console.log(tmpParam + ": " + cmd_legend);
@@ -2486,7 +2501,25 @@ elMyCanvas.addEventListener('click', (e) => {
             vl_end = true
         }
     } 
-    
+
+    //---- prikaži pomoč 10.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledHelp) {
+        if (buttonHelp.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            lf_changeShowHelpTips(!lo_showHelpTips, true);
+            vl_end = true
+        }
+    }
+
+    //---- generate clipboard web link 10.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledCopyLink) {
+        if (buttonCopyLink.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            setWebLink();
+            vl_end = true
+        }
+    }
+
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 
 });
@@ -2574,6 +2607,10 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             document.body.style.cursor = "pointer"
         } else if (intChooserN.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
             document.body.style.cursor = "pointer"
+        } else if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
+            document.body.style.cursor = "pointer"    
+        } else if (buttonCopyLink.eventMouseWithin(e.offsetX, e.offsetY)) {
+            document.body.style.cursor = "pointer"              
         } else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
@@ -4467,7 +4504,14 @@ function paint_GUI() {
             if (lo_enabledLegend) { checkBoxLegend.showToolTip() };
             if (lo_enabledRuler) { checkBoxRuler.showToolTip() };
             if (lo_enabledRealLens) { checkBoxRealLens.showToolTip() };
+            if (lo_showGUI && lo_enabledHelp) { buttonHelp.showToolTip() };
+            if (lo_showGUI && lo_enabledCopyLink) { buttonCopyLink.showToolTip() };
         }
+    }
+
+    if (lo_showGUI) { // 10.1.2025
+        buttonHelp.paint();
+        buttonCopyLink.paint();
     }
 
     //---- on-screen namigi/pomoč
@@ -4490,7 +4534,7 @@ function paint_tips() {
         case cv_guiLayoutB:
             
             let x0 = 20; let x1 = x0 + 160;
-            let y0 = 33; let vStep = 25; let y = y0 - vStep;
+            let y0 = 43; let vStep = 25; let y = y0 - vStep;
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
@@ -4747,6 +4791,14 @@ function paint_GUI_layoutB() {
     intChooserN.left = legendPanelLeft - 10; //1200;
     intChooserN.top = y;
 
+    //---- 10.1.2025
+    buttonHelp.left = 2;
+    buttonHelp.top = 2;
+
+    //---- 10.1.2025
+    buttonCopyLink.left = buttonHelp.left + buttonHelp.width + 4;
+    buttonCopyLink.top = 2;
+    
 }
 
 function lf_changeValueF(vp_diff, vp_trunc) {
@@ -5242,5 +5294,29 @@ function tmPaintDelay_tick() {
         paint()
     }
     //console.log(lo_mouseMoveX)
+
+}
+
+function setWebLink() {
+    // 10.1.2025
+    // primer uporabe: https://freeweb.t-2.net/pmalovrh/eLeca.html?unit=mm&f=26&P=31&a=56&ruler=0&realLens=1&n=1.71&legend=0&initHelp=0
+    
+    let webLink = "";
+    
+    //---- generirm web link
+    webLink = "https://freeweb.t-2.net/pmalovrh/eLeca.html";
+    webLink += "?unit=" + lo_unitStr;
+    webLink += "&f=" + Number(intChooserF.value);
+    webLink += "&P=" + Number(intChooserP.value);
+    webLink += "&a=" + Number(intChooserA.value);
+    webLink += "&ruler=" + (lo_showRuler ? "1" : "0");
+    webLink += "&realLens=" + (lo_showRealLens ? "1" : "0");
+    webLink += "&n=" + Number(intChooserN.value);
+    webLink += "&legend=" + (lo_showLegend ? "1" : "0");
+    webLink += "&initHelp=1";
+    console.log("webLink=" + webLink);
+    
+    //---- link na clipboard
+    navigator.clipboard.writeText(webLink);
 
 }
