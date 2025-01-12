@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 27.12.2024
-const gl_versionNr = "v1.9"
-const gl_versionDate = "10.1.2025"
+const gl_versionNr = "v1.10"
+const gl_versionDate = "12.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2033,6 +2033,7 @@ var lo_rulerTop, lo_rulerBottom, lo_rulerHeight;
 var lo_showLegend = true; // 31.12.2024
 var lo_showRealLens = false;  //true; // 3.1.2025
 var lo_lensTooHigh = false; // 3.1.2025
+var lo_realniLom = true; // 11.1.2025
 //----
 var lo_selectedA = false;
 var lo_selectedF = false;
@@ -2877,7 +2878,11 @@ window.addEventListener("keydown", (event) => {
         case 'KeyD':
             lo_keyDownD = true; break;
         case 'KeyW':
-            lo_keyDownW = true; break;
+            //lo_keyDownW = true; break;
+            //paint_realenLom();
+            lo_realniLom = !lo_realniLom;
+            paint();
+            break;
         case 'KeyE':
             lo_keyDownE = true; break;
         case 'ArrowRight':
@@ -3276,6 +3281,10 @@ function paint_eLeca() {
     //---- risanje slike za lečo
     paint_eLeca_Slika();
 
+    //---- 11.1.2025
+    if (lo_showRealLens && lo_realniLom) {
+        paint_realenLom();
+    };
 }
 
 function paint_eLeca_calculate() {
@@ -3548,13 +3557,14 @@ function paint_eLeca_LecaOsLece() {
         paint_eLeca_LecaOsLece_realLens();
     } else {
         paint_eLeca_LecaOsLece_staticLens();
+        // ======== OS LEČE
+        gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
+        tmpText = "os le" + scTchLow + "e";
+        ;[w, h] = gMeasureText(tmpText, font1);
+        gText(tmpText, font1, "darkSlateGray", lo_gxO + 3, gpTop + h);
     };
 
-    // ======== OS LEČE
-    gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
-    tmpText = "os le" + scTchLow + "e";
-    ;[w, h] = gMeasureText(tmpText, font1);
-    gText(tmpText, font1, "darkSlateGray", lo_gxO + 3, gpTop + h);
+
 
 }
 
@@ -3726,6 +3736,10 @@ function paint_eLeca_LecaOsLece_realLens_common() {
     let colorB = Math.trunc(colorCenterB - kn * colorRazponB);
     colorLeca = colorFromARGB(175, colorR, colorG, colorB);
     
+    let tmpText;
+    let font1 = "12pt verdana";
+    let w, h;
+
     //gEllipse(lo_gxO - R + 150, lo_gyO, R, R, 0, "", 1, "gray");
     //gEllipse(lo_gxO + R - 150, lo_gyO, R, R, 0, "", 1, "gray");
 
@@ -3751,6 +3765,19 @@ function paint_eLeca_LecaOsLece_realLens_common() {
     const tmpW = 150; const tmpH = 10;
     ctx.fillRect(lo_gxO - tmpW / 2, lo_gyLecaTop - 1, tmpW, tmpH);
     ctx.fillRect(lo_gxO - tmpW / 2, lo_gyLecaBottom - tmpH + 1, tmpW, tmpH);
+
+    // ======== OS LEČE
+    gLine(lo_gxO, gpTop, lo_gxO, gpBottom, 1, "gray", [3, 3]);
+    tmpText = "os le" + scTchLow + "e";
+    ;[w, h] = gMeasureText(tmpText, font1);
+    gText(tmpText, font1, "darkSlateGray", lo_gxO + 3, gpTop + h);
+    ctx.setLineDash([]);
+
+    // ---- izpis lomnega količnika v leči
+    tmpText = "n=" + Number(intChooserN.value);
+    ;[w, h] = gMeasureText(tmpText, font1);
+    gBannerRect(lo_gxO - 23, lo_gyO - 54, w + 4, h + 5, 6, 6, "#FFFFFFB0", 0, "", "", 0, 0, false);
+    gText(tmpText, font1, "LightSteelBlue", lo_gxO - 20, lo_gyO - 40);
 
     // označim centra krivin leče na levi in desni
     gEllipse(lo_gxLecaCenterL, lo_gyO, 4, 4, 0, "peru", 1, "gray");
@@ -4538,7 +4565,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 14;
+            let nrTipRows = 15;
             let backHeight = nrTipRows * vStep + 15;
 
             //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
@@ -4583,7 +4610,10 @@ function paint_tips() {
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... spremeni lomni koli" + scTchLow + "nik le" + scTchLow + "e (izbrana realna le" + scTchLow + "a)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
+            //  
+            y += vStep;
+            gBannerRectWithText2("W", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i realno pot " + scZhLow + "arka pri realni le" + scTchLow + "i", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("X", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
@@ -5319,4 +5349,185 @@ function setWebLink() {
     //---- link na clipboard
     navigator.clipboard.writeText(webLink);
 
+}
+
+function paint_realenLom() {
+
+    // 11.1.2025
+
+    let x, y, dx, dy, k, k2, k3, n, n2, n3, a, b, c, D;
+    let tlx, tly, tdx, tdy;
+    let tmpk;
+    let x0, x1, y0, y1;
+    let dx1, dy1, dx2, dy2;
+    let cosFi, fi, fiDeg, sinFi2, fi2, fi2Deg, alfa, alfaDeg, tmpFi, tmpFiDeg, kVpadniceL;
+    let cosFiD, fiD, fiDegD, sinFi2D, fi2D, fi2DegD, alfaD, alfaDegD, tmpFiD, kVpadniceD;
+    let tmpX, tmpY, d1, d2, tmx, tmy;
+
+    //---- zadeve rišem samo, če je z miško nad lečo
+    tmpX = lo_mouseMoveX; tmpY = lo_mouseMoveY;
+    dy = lo_gyO - tmpY;
+    dx = lo_gxLecaCenterL - tmpX;
+    d1 = Math.sqrt(dx * dx + dy * dy);
+    dx = lo_gxLecaCenterD - tmpX;
+    d2 = Math.sqrt(dx * dx + dy * dy);
+    if (d1 > lo_gLensR || d2 > lo_gLensR) {
+        return;
+    }
+    //---- Za začetek recimo, da rišem žarek od vrha predmeta do tiste točke na levi strani leče, ki ima Y od trenutne pozicije miške
+    tly = lo_mouseMoveY;
+    dy = lo_gyO - lo_mouseMoveY; // toliko je med miško in optično osjo po Y-u
+    tlx = lo_gxLecaCenterD - Math.sqrt(lo_gLensR * lo_gLensR - dy * dy);
+    gLine(lo_gxP, lo_gyP, tlx, tly, 1, "cornFlowerBlue", [3, 3]);
+    gEllipse(tlx, tly, 5, 5, 0, "cornFlowerBlue", 0, "");
+    //---- Premica od vrha predmeta do točke na levem robu leče
+    dx = Math.abs(tlx - lo_gxP);
+    dy = lo_gyP - lo_mouseMoveY;
+    k = dy / dx;
+    n = lo_gyP - k * lo_gxP; // vstavim P(lo_gxP,lo_gyP) da dobim n premice
+    
+    //---- leva pravokotna vpadnica
+    tmpk = (50 + lo_gLensR) / lo_gLensR;
+    x0 = lo_gxLecaCenterD - tmpk * (lo_gxLecaCenterD - tlx);
+    y0 = lo_gyO - tmpk * (lo_gyO - tly);
+    tmpk = (lo_gLensR - 50) / lo_gLensR;
+    x1 = lo_gxLecaCenterD - tmpk * (lo_gxLecaCenterD - tlx);
+    y1 = lo_gyO - tmpk * (lo_gyO - tly);
+    kVpadniceL = (y0 - y1) / (x1 - x0);
+    gLine(x0, y0, x1, y1, 1, "indianRed", [3, 3]);
+    //---- kot alfa leve pravokotne vpadnice
+    alfa = Math.atan((lo_gyO - tly) / (lo_gxLecaCenterD - tlx));
+    alfaDeg = alfa * 180 / Math.PI;
+    
+    //---- kot med vpadnim žarkom in levo pravokotno vpadnico
+    dx1 = tlx - lo_gxP;
+    dy1 = lo_gyP - tly;
+    dx2 = x1 - x0;
+    dy2 = y0 - y1;
+    cosFi = (dx1 * dx2 + dy1 * dy2) / Math.sqrt(dx1 * dx1 + dy1 * dy1) / Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    fi = Math.acos(cosFi);
+    fiDeg = fi * 180 / Math.PI;
+    gText(fiDeg.toFixed(1) + scStopinj, "italic 10pt verdana", "darkBlue", tlx - 55, tly);
+    
+    //---- lomni kot glede na levo pravokotno vpadnico
+    sinFi2 = 1 / lo_n * Math.sin(fi);
+    fi2 = Math.asin(sinFi2);
+    fi2Deg = fi2 * 180 / Math.PI;
+    gText(fi2Deg.toFixed(1) + scStopinj, "italic 10pt verdana", "darkBlue", tlx + 15, tly + 12);
+    gText("lom", "italic pt verdana", "darkBlue", tlx - 13, tly + 20);
+
+    //---- izračun premice skozi lečo
+    if (kVpadniceL > k) {
+        tmpFi = (Math.PI / 2 - alfa) - fi2; // kot levo zgoraj, ki zajame komplementaren kot od alfe in zraven prišteje lomni kot
+    } else {
+        tmpFi = (Math.PI / 2 - alfa) + fi2; // kot levo zgoraj, ki zajame komplementaren kot od alfe in zraven prišteje lomni kot
+    };
+
+    tmpFi = Math.PI / 2 - tmpFi;       // kot ob optični osi, ki gre do vstopne točke Tl na levem robu leče
+    k2 = -Math.tan(tmpFi);
+    n2 = (lo_gyO - tly) - k2 * (tlx - lo_gxO); // vstavim Tl(tlx,tly) da dobim n premice
+
+    //---- koeficienti kvadratne enačbe za X desnega presečišča z mejo leče
+    a = 1 + k2 * k2;
+    dx = lo_gxLecaCenterL - lo_gxO;
+    b = 2 * (n2 * k2 - dx);
+    c = dx * dx + n2 * n2 - lo_gLensR * lo_gLensR;
+    //----
+    D = b * b - 4 * a * c;
+    if (D < 0) {
+        return;
+    }
+    x = (-b + Math.sqrt(D)) / 2 / a;
+    y = k2 * x + n2;
+    tdx = x + lo_gxO;
+    tdy = lo_gyO - y;
+    //console.log("Td(" + tdx.toFixed(0) + "," + tdy.toFixed(0) + ")");
+    gLine(tlx, tly, tdx, tdy, 1, "cornFlowerBlue", [3, 3]);
+    gEllipse(tdx, tdy, 5, 5, 0, "cornFlowerBlue", 0, "");
+
+    //---- desna pravokotna vpadnica
+    tmpk = (lo_gLensR - 50) / lo_gLensR;
+    x0 = lo_gxLecaCenterL + tmpk * (tdx - lo_gxLecaCenterL);
+    y0 = lo_gyO + tmpk * (tdy - lo_gyO);
+    tmpk = (50 + lo_gLensR) / lo_gLensR;
+    x1 = lo_gxLecaCenterL + tmpk * (tdx - lo_gxLecaCenterL);
+    y1 = lo_gyO + tmpk * (tdy - lo_gyO);
+    kVpadniceD = -(y1 - y0) / (x1 - x0);
+    gLine(x0, y0, x1, y1, 1, "indianRed", [3, 3]);
+    //---- kot alfa desne pravokotne vpadnice
+    //alfa = Math.atan((lo_gyO - tly) / (lo_gxLecaCenterD - tlx));
+    alfaD = Math.atan(kVpadniceD);
+    console.log("alfaD=" + alfaD.toString());
+    alfaDegD = alfaD * 180 / Math.PI;
+    //gText(alfaDegD.toFixed(1) + scStopinj, "italic 10pt verdana", "crimson", tdx + 35, tdy - 15);
+
+    //---- kot med žarkom skozi lečo in desno pravokotno vpadnico
+    dx1 = tdx - tlx;
+    dy1 = tly - tdy;
+    dx2 = x1 - x0;
+    dy2 = y0 - y1;
+    cosFiD = (dx1 * dx2 + dy1 * dy2) / Math.sqrt(dx1 * dx1 + dy1 * dy1) / Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    console.log("cosFiD=" + cosFiD.toString());
+    fiD = Math.acos(cosFiD);
+    fiDegD = fiD * 180 / Math.PI;
+    gText(fiDegD.toFixed(1) + scStopinj, "italic 10pt verdana", "darkBlue", tdx - 55, tdy);
+    
+    //---- desni lomni kot glede na desno pravokotno vpadnico
+    sinFi2D = lo_n * Math.sin(fiD);
+    if (sinFi2D > 1 || sinFi2D < -1) {
+        sinFi2D = sinFi2D;
+    }
+    fi2D = Math.asin(sinFi2D);
+    fi2DegD = fi2D * 180 / Math.PI;
+    
+    //---- izračun premice od desnega roba leče naprej ven v desno
+    if (kVpadniceD > k2) {
+        tmpFi = alfaD - fi2D; // kot desno zgoraj, ki od središčnega kota alfa odšteje lomni kot fi2D
+        //console.log("kVpadniceD=" + kVpadniceD.toFixed(3) + " k2=" + k2.toFixed(3) + "  kVpadniceD > k2");
+    } else {
+        tmpFi = alfaD + fi2D; // kot desno zgoraj, ki od središčnega kota alfa odšteje lomni kot fi2D
+        //console.log("kVpadniceD=" + kVpadniceD.toFixed(3) + " k2=" + k2.toFixed(3) + "  kVpadniceD <= k2");
+    };
+    tmpFiDeg = tmpFi * 180 / Math.PI;
+    if (tmpFiDeg == "NaN") {
+        tmpFiDeg = tmpFiDeg;
+    }
+    //console.log("tmpFiDeg=" + tmpFiDeg.toFixed(1));
+    k3 = Math.tan(tmpFi);
+    n3 = (lo_gyO - tdy) - k3 * (tdx - lo_gxO); // vstavim Td(tdx,tdy) da dobim n premice izhodnega žarka iz leče
+    //console.log("k3=" + k3.toFixed(2) + " n3=" + n3.toFixed(0));
+    // točka na desni pri izhodu žarka ven iz okna T(tmx,tmy)
+    dx = 1000;
+    tmx = tdx + dx;
+    tmy = tdy - k3 * dx;
+    gLine(tdx, tdy, tmx, tmy, 1, "cornFlowerBlue", [3, 3]);
+
+    // imamo lom ali pa morda popolni odboj?!
+    if (Math.abs(sinFi2D) > 1) { // ==== POPOLNI ODBOJ ====
+
+        // izračun pravokotnice na desno vpadnico skozi Tl
+        n = (lo_gyO - tly) + 1 / kVpadniceD * (tlx - lo_gxO); // vstavim Tl(tlx,tly) da dobim n premice
+
+        // izračun desne vpadnice
+        let nD = (lo_gyO - tdy) - kVpadniceD * (tdx - lo_gxO); // vstavim Tl(tlx,tly) da dobim n premice
+
+        // kje je presečišče desne vpadnice in pravokotnice nanjo skozi Tl?
+        x = (n - nD) / (kVpadniceD + 1 / kVpadniceD);
+        y = kVpadniceD * x + nD;
+        // to je bilo pri izhodišču v centru leče, zdaj je treba preslikati v realne grafične koordinate
+        x0 = lo_gxO + x;
+        y0 = lo_gyO - y;
+        // gEllipse(x0, y0, 5, 5, 0, "red", 0, ""); // označitev presečišča desne vpadnice in pravokotnice nanjo skozi Tl
+        dx = x0 - tlx;
+        dy = y0 - tly;
+        x = tlx + 2 * dx;
+        y = tly + 2 * dy;
+        gLine(tdx, tdy, x, y, 1, "cornFlowerBlue", [3, 3]);
+        gText("popolni", "italic pt verdana", "darkBlue", tdx + 12, tdy);
+        gText("odboj", "italic pt verdana", "darkBlue", tdx + 12, tdy + 12);
+    } else { // ==== LOM ====
+        gText(fi2DegD.toFixed(1) + scStopinj, "italic 10pt verdana", "darkBlue", tdx + 15, tdy + 4);
+        gText("lom", "italic pt verdana", "darkBlue", tdx - 13, tdy + 20);
+    }
+    
 }
