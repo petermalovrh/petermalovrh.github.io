@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.0"
-const gl_versionDate = "21.1.2025"
+const gl_versionNr = "v1.1"
+const gl_versionDate = "23.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2007,6 +2007,8 @@ const letnikStr = [];
 var lo_nrLetnikov = 0;
 var lo_letnik;
 
+const rsltColor = ["darkBlue", "darkRed", "darkOrchid", "darkSlateGray", "darkGoldenrod", "darkGreen", "maroon", "purple", "darkCyan", "peru"];
+
 const ocenaCifra = [];
 const ocenaCifraNr = [];
 const ocenaUcenecId = [];
@@ -2028,35 +2030,45 @@ colorOcena[3] = "lightSlateGray";
 colorOcena[4] = "darkCyan";
 colorOcena[5] = "limeGreen";
 
+var nrOcen = [];
+var avgOcena = [];
+var avgTock = [];
+var avgPercent = [];
+var maxTock = [];
+var lowTock = [];
+var topTock = [];
+var arrOcene = [];
+var arrOcenePercent = [];
+var arrArrOceneCount = [];
+var arrArrOceneCountPercent = [];
+var arrMaxOcenaCount = [];
+var maxOcenaCount = 0;
+var arrArrRezultatiImePriimek = []; // 21.1.2025
+var arrArrRezultatiTock = [];       // 21.1.2025
+var arrArrRezultatiPercent = [];    // 21.1.2025
+var arrArrRezultatiOcena = [];      // 22.1.2025
+var arrKriteriji = [50, 63, 76, 90];
+var arrQ1 = []; // 21.1.2025
+var arrQ2 = []; // 21.1.2025
+var arrQ3 = []; // 21.1.2025
+
 const cv_schrink_min = 0;
 const cv_schrink_max = 3;
 var lo_schrink = 1;
 
 var lo_zaokrozujNaCeleProcente = true;
 
-
-const cv_f_min = 1; const cv_f_max = 199;
-const cv_P_min = 1; const cv_P_max = 199;
-
-var lo_fStep = 1;
-var lo_pStep = 1;
-var lo_aStep = 1;
-var lo_nStep = 0.01; // 2.1.2025
-var lo_f = 25;  // f25 a60 P30
-
-const cv_xNrF_min = 2.5; const cv_xNrF_max = 30;
-var lo_stepXnrF = 0.1;
-const cv_pixPerUnit_min = 2.5; const cv_pixPerUnit_max = 300;
-var lo_stepPixPerUnit = 0.1; // 3.1.2025
-//const cv_aRel_min = 0.05; const cv_aRel_max = 20;
-const cv_a_min = 1; const cv_a_max = 199;
-
-const cv_unit_cm = 1;
-const cv_unit_mm = 2;
-var lo_unit = cv_unit_mm;
-var lo_unitCm = false;
-var lo_unitMm = true;
-var lo_unitStr = "mm";
+var spChartX = [];
+var spChartY = [];
+var spChartW = [];
+var spChartH = [];
+var spChartX1 = [];
+var spChartY1 = [];
+var spChartKy = [];
+var spChartKyp = [];
+var spChartSelected = [];
+var lo_spChartSelectedId = 0;
+var lo_testSelected = 0;
 
 var lo_enabledintChooserF = true;
 var lo_enabledintChooserA = true;
@@ -2246,17 +2258,17 @@ switch (lo_GUI_layout) {
         //var buttonMode = new button(gpLeft, gpTop + 10, 60, 28, "Mode", "bold 10pt verdana", "gray", "darkSlateGray", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true);
         //var sliderMonthEnd = new slider2(gpLeft, gpTop + 90, 500, nrMonthsAll, gl_monthStart, true, gl_monthEnd, 1, 1, true, "burlyWood", "lightGray", 7, 13, 12, "gray", "", "normal 10pt verdana", 6, "above-left", "gray", disabledControlTextColor, "bold 9pt cambria", "gray", 6, 0, 0, true);
         //var placePanelToggle = new placePanel(ctxW - pickPlaceLeftDiff - 41, pickPlaceTop, ctxW, pickPlaceHeight, true, "darkGray", "bold 10pt verdana", "white", 1, "lightGray", "gray", 2, 2, "#E0E0E0FF", true);
-        var intChooserF = new intChooser2H(gpLeft, gpTop + 160, 46, lo_f, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserF, disabledControlLineColor, disabledControlTextColor, true, "Gori" + scSchLow + scTchLow + "na razdalja (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserA = new intChooser2H(gpLeft, gpTop + 160, 46, lo_a, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserA, disabledControlLineColor, disabledControlTextColor, true, "Oddaljenost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserP = new intChooser2H(gpLeft, gpTop + 160, 46, lo_P, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserP, disabledControlLineColor, disabledControlTextColor, true, "Velikost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var intChooserN = new intChooser2H(gpLeft, gpTop + 160, 46, lo_n, "", 1.5, 0.01, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserN, disabledControlLineColor, disabledControlTextColor, true, "Lomni količnik (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
-        var checkBoxUnitCm = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "cm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitCm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v centimetrih", "C");  //String.fromCharCode(0x0110));
-        var checkBoxUnitMm = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "mm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitMm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v milimetrih", "M");  //String.fromCharCode(0x0110));
-        var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
-        var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
-        var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
-        var buttonHelp = new button(gpLeft, gpTop + 10, 52, 20, "Pomo" + scTchLow, "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
-        var buttonCopyLink = new button(gpLeft, gpTop + 10, 68, 20, "Copy link", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiranje bli"+scZhLow+"njice do to"+scTchLow+"no take konfiguracije na clipboard", "");
+        //var intChooserF = new intChooser2H(gpLeft, gpTop + 160, 46, lo_f, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserF, disabledControlLineColor, disabledControlTextColor, true, "Gori" + scSchLow + scTchLow + "na razdalja (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        //var intChooserA = new intChooser2H(gpLeft, gpTop + 160, 46, lo_a, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserA, disabledControlLineColor, disabledControlTextColor, true, "Oddaljenost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        //var intChooserP = new intChooser2H(gpLeft, gpTop + 160, 46, lo_P, "", 0, 1, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserP, disabledControlLineColor, disabledControlTextColor, true, "Velikost predmeta (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        //var intChooserN = new intChooser2H(gpLeft, gpTop + 160, 46, lo_n, "", 1.5, 0.01, 3, 9, 17, 3, "blue", "black", "white", "orangeRed", "", "bold 13pt verdana", 4, "above-left", "gray", 5, lo_enabledintChooserN, disabledControlLineColor, disabledControlTextColor, true, "Lomni količnik (spremeni z vrtenjem mi" + scSchLow + "ke)", "kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke(+SHIFT)");
+        //var checkBoxUnitCm = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "cm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitCm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v centimetrih", "C");  //String.fromCharCode(0x0110));
+        //var checkBoxUnitMm = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "mm", "gray", "normal 10pt verdana", 4, "right-middle", lo_unitMm, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Vse enote v milimetrih", "M");  //String.fromCharCode(0x0110));
+        //var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
+        //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
+        //var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
+        //var buttonHelp = new button(gpLeft, gpTop + 10, 52, 20, "Pomo" + scTchLow, "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
+        //var buttonCopyLink = new button(gpLeft, gpTop + 10, 68, 20, "Copy link", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiranje bli"+scZhLow+"njice do to"+scTchLow+"no take konfiguracije na clipboard", "");
     }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2583,6 +2595,8 @@ elMyCanvas.addEventListener('mouseout', (e) => {
 
 elMyCanvas.addEventListener('click', (e) => {
 
+    return;
+
     //console.log("click(): dragMonthEndActive=" + lo_dragMonthEndActive)
     let rslt = 0; let boolRslt = false; let rslt2 = [0, 0];
     let vl_end = false;
@@ -2770,19 +2784,13 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
     if (lo_showGUI) {
-        if (intChooserF.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-            document.body.style.cursor = "pointer"
-        } else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-            document.body.style.cursor = "pointer"
-        } else if (intChooserP.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-            document.body.style.cursor = "pointer"
-        } else if (intChooserN.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-            document.body.style.cursor = "pointer"
-        } else if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
-            document.body.style.cursor = "pointer"    
-        } else if (buttonCopyLink.eventMouseWithin(e.offsetX, e.offsetY)) {
-            document.body.style.cursor = "pointer"              
-        } else { document.body.style.cursor = "default" };
+        //if (intChooserF.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
+        //    document.body.style.cursor = "pointer"
+        //} else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
+        //    document.body.style.cursor = "pointer"
+        //} else if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
+        //    document.body.style.cursor = "pointer"                 
+        //} else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
     //če se miška v resnici ni premaknila ne naredim nič
@@ -2797,30 +2805,78 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     lo_mouseMoveY = e.offsetY
     //console.log(e.offsetX + "-" + e.offsetY)
 
+    ////---- Preverjanje, ali je z miško nad določenim elementom 
+    //let oldSelectedVrhLece = lo_selectedVrhLece; let oldSelectedTemeLece = lo_selectedTemeLece;
+    //lo_selectedA = false; lo_selectedF = false; lo_selectedPredmet = false; lo_selectedLeca = false;
+    //lo_selectedCenterKrivineLece = false; lo_selectedVrhLece = false; lo_selectedTemeLece = false;
+    //if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, lo_gxO, lo_gyLecaTop, 20)) { lo_selectedVrhLece = true; } 
+    //else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxP - 20, lo_gyP - 20, lo_gxP + 20, lo_gyO + 20)) { lo_selectedPredmet = true; }
+    //else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
+
     //---- Preverjanje, ali je z miško nad določenim elementom 
-    let oldSelectedVrhLece = lo_selectedVrhLece; let oldSelectedTemeLece = lo_selectedTemeLece;
-    lo_selectedA = false; lo_selectedF = false; lo_selectedPredmet = false; lo_selectedLeca = false;
-    lo_selectedCenterKrivineLece = false; lo_selectedVrhLece = false; lo_selectedTemeLece = false;
-    //if (lo_drawTabelaOcen) { //5.4.2024
-    //if (Math.abs(lo_mouseMoveY - lo_gyO) < 50) { lo_selectedA = true; }
-    if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, lo_gxO, lo_gyLecaTop, 20)) { lo_selectedVrhLece = true; }
-    else if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaRight, lo_gyO, 20)) { lo_selectedTemeLece = true; }  
-    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, gpLeft, lo_gyO - 40, lo_gxO - 1, lo_gyO + 40)) { lo_selectedA = true; }
-    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxO + 1, lo_gyO - 40, lo_gxF1d + 10, lo_gyO + 40)) { lo_selectedF = true; }
-    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxP - 20, lo_gyP - 20, lo_gxP + 20, lo_gyO + 20)) { lo_selectedPredmet = true; }
-    else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
-    else if (lo_enabledintChooserF && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedF = true; }
-    else if (lo_enabledintChooserP && intChooserP.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedPredmet = true; }
-    else if (lo_enabledintChooserN && intChooserN.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedLeca = true; }
-    //}
+    let oldSpChartSelected = spChartSelected.slice(0);
+    let oldSpChartSelectedId = lo_spChartSelectedId;
+    let oldTestSelected = lo_testSelected;
+    let chartSelected = false;
+    lo_spChartSelectedId = 0;
+    let x, y;
+    for (let razredId = 1; razredId <= lo_nrRazredov; razredId++) { spChartSelected[razredId] = false; };
+    //---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
+    for (let razredId = 1; razredId <= lo_nrRazredov; razredId++) {
+        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[razredId], spChartY[razredId], spChartX1[razredId], spChartY1[razredId])) {
+            chartSelected = true;
+            spChartSelected[razredId] = true;
+            lo_spChartSelectedId = razredId;
+            // ---- Je pod miško kateri od testov v scatter plot chartu?
+            lo_testSelected = 0;
+            for (let tmpTest = 1; tmpTest <= (arrArrRezultatiTock[razredId].length - 1); tmpTest++) {
+                x = Math.round(spChartX[razredId] + tmpTest);
+                y = Math.round(spChartY1[razredId] - spChartKy[razredId] * arrArrRezultatiTock[razredId][tmpTest]);
+                if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
+                    lo_testSelected = tmpTest;
+                    break
+                }
+            }
+            if (lo_testSelected <= 0) {
+                for (let tmpTest = 1; tmpTest <= (arrArrRezultatiTock[razredId].length - 1); tmpTest++) {
+                    x = Math.round(spChartX[razredId] + tmpTest);
+                    y = Math.round(spChartY1[razredId] - spChartKy[razredId] * arrArrRezultatiTock[razredId][tmpTest]);
+                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x-1, y-1, x+1, y+1)) {
+                        lo_testSelected = tmpTest;
+                        break
+                    }
+                }
+            }
+            if (lo_testSelected <= 0) {
+                for (let tmpTest = 1; tmpTest <= (arrArrRezultatiTock[razredId].length - 1); tmpTest++) {
+                    x = Math.round(spChartX[razredId] + tmpTest);
+                    y = Math.round(spChartY1[razredId] - spChartKy[razredId] * arrArrRezultatiTock[razredId][tmpTest]);
+                    if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
+                        lo_testSelected = tmpTest;
+                        break
+                    }
+                }
+            }
+            break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
+        }
+    };
+    // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
+    if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }
 
-  
-    // poleg prej preverjenega, kjer je lahko hkrati selektirana samo ena zadeva, je lahko paralelno selektiran tudi center krivine leče
-    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterL - 30, lo_gyO - 30, lo_gxLecaCenterL + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
-    else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterD - 30, lo_gyO - 30, lo_gxLecaCenterD + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
+    // če ni spremembe, chart pa je selected, potem ne gledam drugih stvari glede selektiranosti in nič ne rišem ker ni potrebe (->return())
+    if (lo_spChartSelectedId > 0) { return };
 
-    if (lo_mouseDown && oldSelectedVrhLece) { lo_selectedVrhLece = true; } // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
-    else if (lo_mouseDown && oldSelectedTemeLece) { lo_selectedTemeLece = true; }; // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
+    // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
+
+
+    // tudi nič drugega ni selektiranega, zato izhod brez potrebe po ponovnem risanju!
+    return;
+    //// poleg prej preverjenega, kjer je lahko hkrati selektirana samo ena zadeva, je lahko paralelno selektiran tudi center krivine leče
+    //if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterL - 30, lo_gyO - 30, lo_gxLecaCenterL + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
+    //else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterD - 30, lo_gyO - 30, lo_gxLecaCenterD + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
+
+    //if (lo_mouseDown && oldSelectedVrhLece) { lo_selectedVrhLece = true; } // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
+    //else if (lo_mouseDown && oldSelectedTemeLece) { lo_selectedTemeLece = true; }; // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
 
     paint_delay() //da na oseh označi koordinate miške
     //console.log("mouse_move exit")
@@ -3438,53 +3494,50 @@ function paint() {
 
 }
 
-function paint_eRazred() {
-
-    //---- najprej preračunamo zadeve (dimenzije leče, goriščna razdalja, ...)
-    //paint_eRazred_calculate();
-    
-    //---- risanje ravnila (opcijsko)
-    paint_eRazred_graf1();
-
-
-}
-
-function paint_eRazred_graf1() {
+function prepareDataStructures() {
 
     let valid = []
-    let nrOcen = [];
-    let avgOcena = [];
-    let avgTock = [];
-    let avgPercent = [];
-    let maxTock = [];
-    let lowTock = [];
-    let topTock = [];
-    let arrOcene = [];
-    let arrOcenePercent = [];
-    let arrArrOcene = [];
-    let arrArrOcenePercent = [];
-    let arrMaxOcenaCount = [];
-    let arrArrRezultatiImePriimek = []; // 21.1.2025
-    let arrArrRezultatiTock = [];       // 21.1.2025
-    let arrArrRezultatiPercent = [];    // 21.1.2025
-    let arrKriteriji = [50, 63, 76, 90];
-    let arrQ1 = []; // 21.1.2025
-    let arrQ2 = []; // 21.1.2025
-    let arrQ3 = []; // 21.1.2025
-    //----
-    let maxOcenaCount = 0;
-    let tmpRazredId;
+    nrOcen.length = 0;
+    avgOcena.length = 0;
+    avgTock.length = 0;
+    avgPercent.length = 0;
+    maxTock.length = 0;
+    lowTock.length = 0;
+    topTock.length = 0;
+    arrOcene.length = 0;
+    arrOcenePercent.length = 0;
+    arrArrOceneCount.length = 0;
+    arrArrOceneCountPercent.length = 0;
+    arrMaxOcenaCount.length = 0;
+    maxOcenaCount = 0;
+    arrArrRezultatiImePriimek.length = 0; // 21.1.2025
+    arrArrRezultatiTock.length = 0;       // 21.1.2025
+    arrArrRezultatiPercent.length = 0;    // 21.1.2025
+    arrArrRezultatiOcena.length = 0;      // 21.1.2025
+    arrKriteriji = [50, 63, 76, 90];
+    arrQ1.length = 0; // 21.1.2025
+    arrQ2.length = 0; // 21.1.2025
+    arrQ3.length = 0; // 21.1.2025
+
+    //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
+    spChartX.length = 0;
+    spChartY.length = 0;
+    spChartW.length = 0;
+    spChartH.length = 0;
+    spChartX1.length = 0;
+    spChartY1.length = 0;
+    spChartKy.length = 0;
+    spChartKyp.length = 0;
+    spChartSelected.length = 0;
 
     // ============ NABIRANJE PODATKOV  ============
-          
-    //console.log("8A == ", valid, nrOcen, avgOcena.toFixed(2), avgTock.toFixed(2), avgPercent.toFixed(2) + "%", maxTock, lowTock, topTock, nr1, nr2, nr3, nr4, nr5, nr1percent.toFixed(2) + "%", nr2percent.toFixed(2) + "%", nr3percent.toFixed(2) + "%", nr4percent.toFixed(2) + "%", nr5percent.toFixed(2) + "%");
 
-    maxOcenaCount = 0;
+    let tmpRazredId;
     for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
         // za tekoči razred naberem vso statistiko na svoje mesto v polju rezultatov
         ;[valid[tmpRazredId], nrOcen[tmpRazredId], avgOcena[tmpRazredId], avgTock[tmpRazredId], avgPercent[tmpRazredId],
-        maxTock[tmpRazredId], lowTock[tmpRazredId], topTock[tmpRazredId], arrArrOcene[tmpRazredId], arrArrOcenePercent[tmpRazredId], arrMaxOcenaCount[tmpRazredId],
-        arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId]]
+        maxTock[tmpRazredId], lowTock[tmpRazredId], topTock[tmpRazredId], arrArrOceneCount[tmpRazredId], arrArrOceneCountPercent[tmpRazredId], arrMaxOcenaCount[tmpRazredId],
+        arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId], arrArrRezultatiOcena[tmpRazredId]]
             = calculate_avg_test("2425", "FIZIKA", razredLetnik[tmpRazredId], razredCrka[tmpRazredId], "P1");
         // iščem največje število testov z isto oceno čez vse razrede, da bom lahko določil Y merilo za bar charte
         if (arrMaxOcenaCount[tmpRazredId] > maxOcenaCount) {
@@ -3494,8 +3547,21 @@ function paint_eRazred_graf1() {
         [arrQ1[tmpRazredId], arrQ2[tmpRazredId], arrQ3[tmpRazredId]] =
             calculate_kvartili(nrOcen[tmpRazredId], arrArrRezultatiTock[tmpRazredId]); // prvi kvartil za rezultate tega razreda
     }
+}
+
+function paint_eRazred() {
+
+    //---- najprej preračunamo zadeve (dimenzije leče, goriščna razdalja, ...)
+    //paint_eRazred_calculate();
     
-    // ============ ŠTEVILO TESTOV PO OCENAH - BAR CHARTS  ============
+    //---- risanje ravnila (opcijsko)
+    paint_eRazred_graf1();
+
+}
+
+function paint_eRazred_graf1() {
+        
+    // ============ (1) ŠTEVILO TESTOV PO OCENAH - BAR CHARTS  ============
 
     let chartMargin = 20;
     let chartGapX = 30; let chartGapY = 30;
@@ -3516,14 +3582,14 @@ function paint_eRazred_graf1() {
     if (drawChart) {
         for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
             // za tekoči razred narišem graf
-            paint_barChart_byOcena(x0 + (tmpRazredId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, arrArrOcene[tmpRazredId], maxOcenaCount, razredIme[tmpRazredId]);
+            paint_barChart_byOcena(x0 + (tmpRazredId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, arrArrOceneCount[tmpRazredId], maxOcenaCount, razredIme[tmpRazredId]);
         }
     }
 
-    // ============ DELEŽ TESTOV PO OCENAH - PIE CHARTS  ============
+    // ============ (2) DELEŽ TESTOV PO OCENAH - PIE CHARTS  ============
 
     chartGapY = 30;
-    let y1 = y0;
+    y1 = y0;
     if (drawChart) {
         y1 += chartHeight + chartGapY; // vrh področja za pie chart graph
     }
@@ -3536,15 +3602,15 @@ function paint_eRazred_graf1() {
     }
     if (drawChart) {
         nrItems = lo_nrRazredov;
-        let x1 = 20;
+        x1 = 20;
         // Za vse razrede nariši pie-chart-e
         for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
             // za tekoči razred narišem pie chart
-            paint_barChart_byOcenaShare(x1 + (tmpRazredId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, arrArrOcene[tmpRazredId], nrOcen[tmpRazredId]);
+            paint_pieChart_byOcenaShare(x1 + (tmpRazredId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, arrArrOceneCount[tmpRazredId], nrOcen[tmpRazredId]);
         }
     }
 
-    // ============ RAZPRŠENOST REZULTATOV IN POVPREČJA  ============
+    // ============ (3) RAZPRŠENOST REZULTATOV IN POVPREČJA  ============
 
     chartGapY = 30;
     let y2 = y1; // vrh področja za ta graf
@@ -3562,14 +3628,40 @@ function paint_eRazred_graf1() {
     // Za vse razrede nariši pie-chart-e
     for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
         // za tekoči razred narišem pie chart
-        paint_barChart_byRazprsenost(x1 + (tmpRazredId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
-            arrArrOcene[tmpRazredId], nrOcen[tmpRazredId],
+        paint_scatterPlotChart_byRazprsenost(x1 + (tmpRazredId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
+            tmpRazredId,
+            arrArrOceneCount[tmpRazredId], nrOcen[tmpRazredId],
             maxTock[tmpRazredId], lowTock[tmpRazredId], topTock[tmpRazredId],
             avgTock[tmpRazredId], avgPercent[tmpRazredId],
-            arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId], arrKriteriji,
+            arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId], arrArrRezultatiOcena[tmpRazredId], arrKriteriji,
             arrQ1[tmpRazredId], arrQ2[tmpRazredId], arrQ3[tmpRazredId]);
     }
     
+    // ---- MOUSE OVER TIPS 22.1.2025
+    let tmpText, w, h;
+    if (lo_spChartSelectedId > 0) {
+        if (lo_testSelected>0) {
+            // ---- odebeljen krogec okoli testa
+            x = spChartX[lo_spChartSelectedId] + lo_testSelected;
+            y = spChartY1[lo_spChartSelectedId] - spChartKy[lo_spChartSelectedId] * arrArrRezultatiTock[lo_spChartSelectedId][lo_testSelected];
+            let colorId = lo_testSelected - 10 * (Math.trunc((lo_testSelected - 1) / 10)) - 1;
+            gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
+            // ---- mouse over tip
+            tmpText = "(" + arrArrRezultatiOcena[lo_spChartSelectedId][lo_testSelected] + ")";
+            tmpText += " " + arrArrRezultatiImePriimek[lo_spChartSelectedId][lo_testSelected];
+            tmpText += ", " + arrArrRezultatiTock[lo_spChartSelectedId][lo_testSelected].toString() + "t";
+            tmpText += ", " + arrArrRezultatiPercent[lo_spChartSelectedId][lo_testSelected].toFixed(1) + "%";
+            let tipFont = "bold italic 12pt verdana";
+            ;[w, h] = gMeasureText(tmpText, tipFont);
+            x1 = lo_mouseMoveX + 24; y1 = lo_mouseMoveY + 6;
+            if ((x1 + w + 15) > ctxW) {
+                x1 = ctxW - w - 7;
+                y1 = lo_mouseMoveY + 24;
+            }
+            gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, "papayaWhip", 1, "lightGray", "darkBlue", "", 0, 0);
+        }
+    }
+
 }
 
 function lf_fixProcent(vp_nrStr) {
@@ -4107,6 +4199,8 @@ function paint_tips() {
 }
 
 function paint_GUI_layoutB() {
+
+    return;
 
     //---- prikaz legende
     checkBoxLegend.left = legendPanelLeft; // + 74;
@@ -4726,6 +4820,10 @@ function clipboard_load() {
             // Očitno to so podatki o razredih in ocenah, treba je sparsati
             console.log("PARSE -->");
             clipboard_parse(clipText);
+
+            // Inicializacija potrebnih struktur za risanje grafov
+            prepareDataStructures(); // 23.1.2025
+
         })
 }
 
@@ -5031,12 +5129,13 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     let rezultatiImePriimek = []; // 21.1.2025 tabela učencev za vse v tekočem razredu, ki so imeli to preverjanje
     let rezultatiTock = [];       // 21.1.2025 tabela doseženih točk za vse v tekočem razredu
     let rezultatiPercent = [];    // 21.1.2025 tabela doseženih procentov za vse v tekočem razredu
+    let rezultatiOcena = [];      // 22.1.2025 tabela ocen za vse v tekočem razredu pri tem preverjanju
     let ocenaId, ocenaId0, search, passed, found;
     let myLetnik = getLetnikId(vp_letnik);
     let myPredmet = getPredmetId(vp_predmet);
     let myRazred = getRazredId(vp_razredNr, vp_razredCrka);
     if (myLetnik < 0 || myPredmet < 0 || myRazred < 0) {
-        return [false, 0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent]; // result not valid
+        return [false, 0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid
     }
     // ---- Najprej poiščem prvo pravo oceno v tabeli vseh ocen
     //search = true;
@@ -5048,7 +5147,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         }
     }
     if (!found) {
-        return [0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent]; // result not valid - not found!
+        return [0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - not found!
     }
 
     let ucenecId, ocena, nrOcen, sumOcen, tock, sumTock;
@@ -5089,12 +5188,13 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         rezultatiImePriimek[nrOcen] = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId]; // 21.1.2025 ta je dosegel toliko točk
         rezultatiTock[nrOcen] = tock;                    // 21.1.2025 ta je dosegel toliko točk
         rezultatiPercent[nrOcen] = tock / maxTock * 100; // 21.1.2025 ta je dosegel toliko točk
+        rezultatiOcena[nrOcen] = ocena;                  // 22.1.2025 ta je dosegel toliko točk
         
     };
     
     // ---- Smo nabrali kakšne ocene?
     if (nrOcen<=0) {
-        return [0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, maxOcenaCount, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent]; // result not valid - ni ocen!
+        return [0, 0, 0, 0, 0, 0, 0, ocenaCount, ocenaCountPercent, maxOcenaCount, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - ni ocen!
     }
 
     // ---- Imamo ocene - izračunaj povprečja in ostalo
@@ -5108,7 +5208,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     ocenaCountPercent[4] = ocenaCount[4] / nrOcen * 100;
     ocenaCountPercent[5] = ocenaCount[5] / nrOcen * 100;
 
-    return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiTock, rezultatiPercent]; // valid result
+    return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // valid result
 
 };
 
@@ -5275,12 +5375,16 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, arrOcene, maxOcenaCount,
     ;[w, h] = gMeasureText(tmpText, fontTitle);
     x = vp_x + vp_w / 2 - w / 2;
     y = vp_y + h + 4;
+    if (lo_showGUI && y < 60 && x > (ctxW - 245)) {
+        y = 60;
+        if (x > (ctxW - 160)) { x = ctxW - 160; }
+    };
     gText(tmpText, fontTitle, "lightSteelBlue", x + 2, y + 2);
     gText(tmpText, fontTitle, "darkSlateGray", x, y);
 
 };
 
-function paint_barChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, arrOcene, vp_nrOcen) {
+function paint_pieChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, arrOcene, vp_nrOcen) {
     
     const marginChart = 10;
     let maxDim = Math.min(vp_w, vp_h);
@@ -5325,10 +5429,11 @@ function paint_barChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, arrOcene, vp_nrOcen
 
 };
 
-function paint_barChart_byRazprsenost(
+function paint_scatterPlotChart_byRazprsenost(
     vp_x, vp_y, vp_w, vp_h,
+    vp_razredId,
     arrOcene, vp_nrOcen, vp_maxTock, vp_lowTock, vp_topTock, vp_avgTock, vp_avgPercent,
-    arrImePriimek, arrTock, arrPercent, arrKriteriji,
+    arrImePriimek, arrTock, arrPercent, arrOcena, arrKriteriji,
     Q1, Q2, Q3) {
     
     let marginChartH = 10;
@@ -5349,6 +5454,19 @@ function paint_barChart_byRazprsenost(
     const wChart = 30;
     let x1 = x0 + wChart;
     let xRight = x1 + gapChartR;
+
+    //---- shrani lastnosti digrama za mouseOver() event (22.1.2025)
+    spChartX[vp_razredId] = x0;
+    spChartY[vp_razredId] = yTop;
+    spChartW[vp_razredId] = wChart;
+    spChartH[vp_razredId] = yRange;
+    spChartX1[vp_razredId] = x1;
+    spChartY1[vp_razredId] = yXos;
+    spChartKy[vp_razredId] = ky;
+    spChartKyp[vp_razredId] = kyp;
+    spChartSelected[vp_razredId] = false;
+
+    //----
     let i, tmpText, w, h, x, y;
     let tmpTock;
     let fontOcena = "bold 12pt verdana";
@@ -5357,7 +5475,6 @@ function paint_barChart_byRazprsenost(
     if (vp_w > 350 && vp_h > 350) { fontOcena = "bold 15pt verdana"; };
     let fontAxisText = "10pt verdana";
     let fontAxisTextBold = "bold 10pt verdana";
-    const rsltColor = ["darkBlue", "darkRed", "darkOrchid", "darkSlateGray", "darkGoldenrod", "darkGreen", "maroon", "purple", "darkCyan", "peru"];
     
     let y0, y1, y4;
     let useKritPercent = true;
@@ -5394,8 +5511,6 @@ function paint_barChart_byRazprsenost(
     //---- pravokotnik, v katerega se riše markerje rezultatov
     gBannerRect(xYos, yTop, xRight - xYos, yXos - yTop, 3, 3, "azure", 1, "lightGray", "", 0, 0, false);
 
-
-
     
     // ---- OZNAKE MAX IN MIN TOČK/%
     tmpText = vp_maxTock.toString();
@@ -5415,7 +5530,7 @@ function paint_barChart_byRazprsenost(
 
 
     //---- Zanka po vseh ocenjenih preverjanjih pri tem konkretnem razredu
-    x = x0;
+    x = x0 + 1;
     let colorId;
     for (i = 1; i <= vp_nrOcen; i++) {
 
@@ -5457,7 +5572,7 @@ function paint_barChart_byRazprsenost(
     let yQ3 = yXos - ky * Q3;
     let yQtop = yXos - ky * vp_topTock;
     //---- škatla
-    gBannerRect(x, yQ3, wSkatla, yQ1 - yQ3, 0, 0, "#B0B0B040", 0, "", "", 0, 0, false);
+    gBannerRect(x, yQ3, wSkatla, yQ1 - yQ3, 0, 0, "#A0A0A040", 0, "", "", 0, 0, false);
     //----
     gLine(x, yQlow, x + wSkatla, yQlow, 1, "darkSlategray", []);
     gLine(x, yQ1, x + wSkatla, yQ1, 1, "darkSlategray", []);
