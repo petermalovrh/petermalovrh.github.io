@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.2"
+const gl_versionNr = "v1.3"
 const gl_versionDate = "24.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2072,7 +2072,7 @@ var spChartX1 = [];
 var spChartY1 = [];
 var spChartKy = [];
 var spChartKyp = [];
-var spChartSelected = [];
+//var spChartSelected = [];
 var lo_spChartSelectedId = 0;
 var lo_testSelected = 0;
 
@@ -2081,9 +2081,16 @@ var pcChartCx = [];
 var pcChartCy = [];
 var pcChartFi = [];
 var pcChartRadij = [];
-var pcChartSelected = [];
+//var pcChartSelected = [];
 var lo_pcChartSelectedId = 0;
 var lo_ocenaSelected = 0;
+
+//---- 24.1.2025
+var bcChartX = [];
+var bcChartY = [];
+var bcChartX1 = [];
+var bcChartY1 = [];
+var lo_bcChartSelectedId = 0;
 
 var lo_enabledintChooserF = true;
 var lo_enabledintChooserA = true;
@@ -2829,21 +2836,22 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     //else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
 
     //---- Preverjanje, ali je z miško nad določenim elementom 
-    let oldSpChartSelected = spChartSelected.slice(0);
+    //let oldSpChartSelected = spChartSelected.slice(0);
     let oldSpChartSelectedId = lo_spChartSelectedId;
     let oldTestSelected = lo_testSelected;
     let oldPcChartSelectedId = lo_pcChartSelectedId; // 23.1.2025
+    let oldBcChartSelectedId = lo_bcChartSelectedId; // 24.1.2025
     let oldOcenaSelected = lo_ocenaSelected;
     let chartSelected = false;
-    lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0;
+    lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0; lo_bcChartSelectedId = 0;
     let x, y;
     let razredId, tmpTest, tmpOcena, fiMouse;
-    for (razredId = 1; razredId <= lo_nrRazredov; razredId++) { spChartSelected[razredId] = false; };
+    //for (razredId = 1; razredId <= lo_nrRazredov; razredId++) { spChartSelected[razredId] = false; };
     //---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
     for (razredId = 1; razredId <= lo_nrRazredov; razredId++) {
         if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[razredId], spChartY[razredId], spChartX1[razredId], spChartY1[razredId])) {
             chartSelected = true;
-            spChartSelected[razredId] = true;
+            //spChartSelected[razredId] = true;
             lo_spChartSelectedId = razredId;
             // ---- Je pod miško kateri od testov v scatter plot chartu?
             lo_testSelected = 0;
@@ -2877,11 +2885,20 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             }
             break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
         }
+        // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
+        for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
+            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[razredId][tmpOcena], bcChartY[razredId][tmpOcena], bcChartX1[razredId][tmpOcena], bcChartY1[razredId][tmpOcena])) {
+                chartSelected = true;
+                lo_bcChartSelectedId = razredId; // miška je nad tem razredom
+                lo_ocenaSelected = tmpOcena;     // miška je nad barom te ocene
+                break; // ven iz pregledovanja selektiranosti chartov/ocen, ker selekcijo že imamo
+            } 
+        }
         // ---- Je pod miško katera od ocen v pie chartu? 23.1.2025
         if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[razredId], pcChartCy[razredId], pcChartRadij[razredId])) {
             chartSelected = true;
-            pcChartSelected[razredId] = true;
-            lo_pcChartSelectedId = razredId;
+            //pcChartSelected[razredId] = true;
+            lo_pcChartSelectedId = razredId;  // miška je nad tem razredom
             // ---- Katera ocena je pod miško?
             lo_ocenaSelected = 0;
             fiMouse = Math.atan((pcChartCy[razredId] - lo_mouseMoveY) / (lo_mouseMoveX - pcChartCx[razredId]));
@@ -2889,7 +2906,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             else if (fiMouse < 0) { fiMouse += 2 * Math.PI; }
             for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
                 if (valueBetween(fiMouse, pcChartFi[razredId][tmpOcena - 1], pcChartFi[razredId][tmpOcena])) {
-                    lo_ocenaSelected = tmpOcena;
+                    lo_ocenaSelected = tmpOcena; // miška je nad pie kosom te ocene
                     break;
                 }
             }
@@ -2899,13 +2916,14 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
     if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }   // 22.1.2025
     if (!(lo_pcChartSelectedId == oldPcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 23.1.2025
+    if (!(lo_bcChartSelectedId == oldBcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 24.1.2025
 
     // če ni spremembe, chart pa je selected, potem ne gledam drugih stvari glede selektiranosti in nič ne rišem ker ni potrebe (->return())
     if (lo_spChartSelectedId > 0) { return }; // 22.1.2025
     if (lo_pcChartSelectedId > 0) { return }; // 23.1.2025
+    if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
 
     // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
-
 
     // tudi nič drugega ni selektiranega, zato izhod brez potrebe po ponovnem risanju!
     return;
@@ -3571,13 +3589,18 @@ function prepareDataStructures() {
     spChartY1.length = 0;
     spChartKy.length = 0;
     spChartKyp.length = 0;
-    spChartSelected.length = 0;
+    //spChartSelected.length = 0;
     //----
     pcChartCx.length = 0;
     pcChartCy.length = 0;
     pcChartFi.length = 0;
     pcChartRadij.length = 0;
-    pcChartSelected.length = 0;
+    //pcChartSelected.length = 0;
+    //----
+    bcChartX.length = 0;
+    bcChartY.length = 0;
+    bcChartX1.length = 0;
+    bcChartY1.length = 0;
 
     // ============ NABIRANJE PODATKOV  ============
 
@@ -3633,13 +3656,14 @@ function paint_eRazred_graf1() {
     if (drawChart) {
         for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
             // za tekoči razred narišem graf
-            paint_barChart_byOcena(x0 + (tmpRazredId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, arrArrOceneCount[tmpRazredId], maxOcenaCount, razredIme[tmpRazredId]);
+            paint_barChart_byOcena(x0 + (tmpRazredId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpRazredId, arrArrOceneCount[tmpRazredId], maxOcenaCount, razredIme[tmpRazredId]);
         }
     }
 
     // ============ (2) DELEŽ TESTOV PO OCENAH - PIE CHARTS  ============
 
     chartGapY = 30;
+    // .... Kje bo vrh pie chartov (y1)
     y1 = y0;
     if (drawChart) {
         y1 += chartHeight + chartGapY; // vrh področja za pie chart graph
@@ -3651,6 +3675,7 @@ function paint_eRazred_graf1() {
         case 2: chartHeight = 0.6 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
         case 3: chartHeight = 0; drawChart = false; break;
     }
+    if (chartHeight > chartWidth) { chartHeight = chartWidth }; // 24.1.2025
     if (drawChart) {
         nrItems = lo_nrRazredov;
         x1 = 20;
@@ -3664,14 +3689,18 @@ function paint_eRazred_graf1() {
     // ============ (3) RAZPRŠENOST REZULTATOV IN POVPREČJA  ============
 
     chartGapY = 30;
+    // .... Kje bo vrh scatter plot chartov (y2)
     let y2 = y1; // vrh področja za ta graf
     if (drawChart) {
-        y2 += chartHeight + chartGapY; // vrh področja za pie chart graph
+        y2 += chartHeight + chartGapY; // vrh področja za scatter plot chart graph
     }
     switch (lo_schrink) {
-        case 0: chartHeight = 1.2 * ctxH / 2.9 - chartMargin; break;
-        case 1: chartHeight = 1.5 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
-        case 2: chartHeight = 1.8 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
+        case 0: case 1: case 2:
+            chartHeight = ctxH - y2 - chartGapY / 2 - chartMargin;
+            break;
+        //case 0: chartHeight = 1.2 * ctxH / 2.9 - chartMargin; break;
+        //case 1: chartHeight = 1.5 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
+        //case 2: chartHeight = 1.8 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
         case 3: chartHeight = ctxH - 2 * chartMargin; break;
     }
     nrItems = lo_nrRazredov;
@@ -3713,35 +3742,38 @@ function paint_eRazred_graf1() {
         }
     }
     // ---- MOUSE OVER TIPS - PIE CHART 25.1.2025
-    tmpRazredId = lo_pcChartSelectedId;
-    if (lo_pcChartSelectedId > 0) {
-        if (lo_ocenaSelected > 0) {
-            // ---- odebeljen krogec okoli testa
-            //x = pcChartX[lo_pcChartSelectedId] + lo_testSelected;
-            //y = pcChartY1[lo_pcChartSelectedId] - pcChartKy[lo_pcChartSelectedId] * arrArrRezultatiTock[lo_pcChartSelectedId][lo_testSelected];
-            //gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
-            let moveText = false;
-            for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
-                // ---- mouse over tip
-                tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
-                tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
-                tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
-                ;[w, h] = gMeasureText(tmpText, tipFont);
-                if ((lo_mouseMoveX + w + 39) > ctxW) { moveText = true; break; };
-            }
-            for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
-                // ---- mouse over tip
-                tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
-                tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
-                tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
-                ;[w, h] = gMeasureText(tmpText, tipFont);
-                x1 = lo_mouseMoveX + 24;
-                y1 = lo_mouseMoveY + 16 + (i - 1) * 21;
-                if (moveText) { x1 = ctxW - w - 7; y1 += 18; };
-                gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", "", 0, 0);
-            }            
+    let printList = false;
+    if (lo_ocenaSelected > 0) {
+        if (lo_pcChartSelectedId > 0) { tmpRazredId = lo_pcChartSelectedId; printList = true }
+        else if (lo_bcChartSelectedId > 0) { tmpRazredId = lo_bcChartSelectedId; printList = true };
+    }
+    if (printList) {
+        // ---- odebeljen krogec okoli testa
+        //x = pcChartX[lo_pcChartSelectedId] + lo_testSelected;
+        //y = pcChartY1[lo_pcChartSelectedId] - pcChartKy[lo_pcChartSelectedId] * arrArrRezultatiTock[lo_pcChartSelectedId][lo_testSelected];
+        //gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
+        let moveText = false;
+        for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
+            // ---- mouse over tip
+            tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
+            tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
+            tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
+            ;[w, h] = gMeasureText(tmpText, tipFont);
+            if ((lo_mouseMoveX + w + 39) > ctxW) { moveText = true; break; };
+        }
+        for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
+            // ---- mouse over tip
+            tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
+            tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
+            tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
+            ;[w, h] = gMeasureText(tmpText, tipFont);
+            x1 = lo_mouseMoveX + 24;
+            y1 = lo_mouseMoveY + 16 + (i - 1) * 21;
+            if (moveText) { x1 = ctxW - w - 7; y1 += 18; };
+            gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", "", 0, 0);
         }
     }
+
 }
 
 function lf_fixProcent(vp_nrStr) {
@@ -5420,45 +5452,69 @@ function test_avg_all() {
     test_avg_9B();
 }
 
-function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, arrOcene, maxOcenaCount, vp_title) {
+function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_razredId, arrOcene, maxOcenaCount, vp_title) {
     
     const marginChart = 10;
     const gapChart = 5;
     const gapBar = 4;
     const wBar = (vp_w - 2 * marginChart - 2 * gapChart) / 5;
     let y0 = vp_y + vp_h - marginChart;
-    
     let ky = (vp_h - 65) / maxOcenaCount; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
+    let xm = vp_x + marginChart + gapChart + wBar / 2; // sredina prvega bara
+    let wBarFinal = wBar - 2 * gapBar;
 
-    let x = vp_x + marginChart + gapChart + wBar / 2; // sredina prvega bara
+    //---- shrani lastnosti digrama za mouseOver() event (24.1.2025)
+    bcChartX[vp_razredId] = [];
+    bcChartY[vp_razredId] = [];
+    bcChartX1[vp_razredId] = [];
+    bcChartY1[vp_razredId] = [];
     
-    let i, tmpHeight, tmpText, w, h, y;
+    let i, tmpHeight, tmpText, w, h, y, x1, y1, barColor, countOcenColor;
     let fontOcena = "bold 12pt verdana";
     if (vp_w > 150 && vp_h > 150) { fontOcena = "bold 13pt verdana"; };
     if (vp_w > 250 && vp_h > 250) { fontOcena = "bold 14pt verdana"; };
     if (vp_w > 350 && vp_h > 350) { fontOcena = "bold 15pt verdana"; };
     let fontNr = "10pt verdana";
     let fontTitle = "bold 16pt verdana";
+    // ---- Grem po vrsti čez vse ocene od 1 do 5
+    
     for (i = 1; i <= 5; i++) {
         
-
+        //---- shrani lastnosti digrama za mouseOver() event (24.1.2025)
+        bcChartX[vp_razredId][i] = 0;
+        bcChartY[vp_razredId][i] = 0;
+        bcChartX1[vp_razredId][i] = 0;
+        bcChartY1[vp_razredId][i] = 0;
+        
         if (arrOcene[i] > 0) {
 
             // ---- BAR
-            //gBannerRoundRect(x - wBar / 2 + gapBar, y0 - 13, wBar - 2 * gapBar, backHeight, 8, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
+            x = xm - wBar / 2 + gapBar;
             tmpHeight = ky * arrOcene[i];
-            gBannerRoundRect2(x - wBar / 2 + gapBar, y0 - tmpHeight - 1, wBar - 2 * gapBar, tmpHeight, 6, colorOcena[i], 1, "silver", "#DCDCDCC0", 3, 3, false, true, true, false, false);
+            y = y0 - tmpHeight - 1;
+            //gBannerRoundRect(x, y0 - 13, wBarFinal, backHeight, 8, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
+            barColor = colorOcena[i]; countOcenColor = "darkSlateGray";
+            if (lo_bcChartSelectedId == vp_razredId && lo_ocenaSelected != i) { // 24.1.2025
+                barColor = gf_alphaColor(255 - i * 40, "lightGray");
+                countOcenColor = "lightGray"; // 24.1.2025
+            }
+            gBannerRoundRect2(x, y, wBarFinal, tmpHeight, 6, barColor, 1, "silver", "#DCDCDCC0", 3, 3, false, true, true, false, false);
+            //---- shrani lastnosti digrama za mouseOver() event (24.1.2025)
+            bcChartX[vp_razredId][i] = x;
+            bcChartY[vp_razredId][i] = y;
+            bcChartX1[vp_razredId][i] = x + wBarFinal;
+            bcChartY1[vp_razredId][i] = y0;
 
             // ---- TABLETEK OCENE
             tmpText = Number(i);
             ;[w, h] = gMeasureText(tmpText, fontOcena);
-            gBannerRoundRectWithText(x - w / 2 - 1, y0 - h - 6, w, h, fontOcena, colorOcena[i], tmpText, 2, 2, 7, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
+            gBannerRoundRectWithText(xm - w / 2 - 1, y0 - h - 6, w, h, fontOcena, barColor, tmpText, 2, 2, 7, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
     
             // ---- ŠTEVILO OCEN
             tmpText = Number(arrOcene[i]);
             ;[w, h] = gMeasureText(tmpText, fontNr);
-            gText(tmpText, fontNr, "darkSlateGray", x - w / 2 - 1, y0 - tmpHeight - 4);
-            x += wBar;
+            gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, y0 - tmpHeight - 4);
+            xm += wBar;
         }
     }
 
@@ -5492,7 +5548,6 @@ function paint_pieChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, vp_razredId, arrOce
     pcChartCy[vp_razredId] = cy;
     pcChartRadij[vp_razredId] = radij;
     pcChartFi[vp_razredId] = [];
-    pcChartSelected[vp_razredId] = false;
     
     let i, tmpText, w, h, x, y, pieColor;
     let fontOcena = "bold 12pt verdana";
@@ -5575,7 +5630,7 @@ function paint_scatterPlotChart_byRazprsenost(
     spChartY1[vp_razredId] = yXos;
     spChartKy[vp_razredId] = ky;
     spChartKyp[vp_razredId] = kyp;
-    spChartSelected[vp_razredId] = false;
+    //spChartSelected[vp_razredId] = false;
 
     //----
     let i, tmpText, w, h, x, y;
