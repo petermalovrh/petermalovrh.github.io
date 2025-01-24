@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.3"
+const gl_versionNr = "v1.4"
 const gl_versionDate = "24.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2041,6 +2041,7 @@ var topTock = [];
 var arrRazredArrOceneArrRezultatiImePriimek = [];
 var arrRazredArrOceneArrRezultatiTock = [];
 var arrRazredArrOceneArrRezultatiPercent = [];
+var arrRazredArrOceneArrRezultatiOcenaIdVRazredu = []; // 24.1.2025
 //----
 var arrOcene = [];
 var arrOcenePercent = [];
@@ -3564,6 +3565,7 @@ function prepareDataStructures() {
     arrRazredArrOceneArrRezultatiImePriimek.length = 0;
     arrRazredArrOceneArrRezultatiTock.length = 0;
     arrRazredArrOceneArrRezultatiPercent.length = 0;
+    arrRazredArrOceneArrRezultatiOcenaIdVRazredu.length = 0; // 24.1.2025
     //----
     arrOcene.length = 0;
     arrOcenePercent.length = 0;
@@ -3609,7 +3611,7 @@ function prepareDataStructures() {
         // za tekoči razred naberem vso statistiko na svoje mesto v polju rezultatov
         ;[valid[tmpRazredId], nrOcen[tmpRazredId], avgOcena[tmpRazredId], avgTock[tmpRazredId], avgPercent[tmpRazredId],
         maxTock[tmpRazredId], lowTock[tmpRazredId], topTock[tmpRazredId],
-        arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId], arrRazredArrOceneArrRezultatiTock[tmpRazredId], arrRazredArrOceneArrRezultatiPercent[tmpRazredId],
+        arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId], arrRazredArrOceneArrRezultatiTock[tmpRazredId], arrRazredArrOceneArrRezultatiPercent[tmpRazredId], arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpRazredId],
         arrArrOceneCount[tmpRazredId], arrArrOceneCountPercent[tmpRazredId], arrMaxOcenaCount[tmpRazredId],
         arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId], arrArrRezultatiOcena[tmpRazredId]]
             = calculate_avg_test("2425", "FIZIKA", razredLetnik[tmpRazredId], razredCrka[tmpRazredId], "P1");
@@ -3634,7 +3636,10 @@ function paint_eRazred() {
 }
 
 function paint_eRazred_graf1() {
-        
+     
+    let tmpRazredId;
+
+
     // ============ (1) ŠTEVILO TESTOV PO OCENAH - BAR CHARTS  ============
 
     let chartMargin = 20;
@@ -3643,6 +3648,12 @@ function paint_eRazred_graf1() {
     let chartWidth = (ctxW - 2 * chartMargin - (nrItems - 1) * chartGapX) / nrItems;
     let chartHeight = 0.8 * ctxH / 2.9 - chartMargin - chartGapY / 2;
     let x0 = 20; let y0 = 20;
+
+    // ---- Za vsak razred narišem svoj panel čez celo višino ekrana
+    for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
+        gBannerRect(x0 + (tmpRazredId - 1) * (chartWidth + chartGapX) - 8, y0 - 10, chartWidth + 16, ctxH - 2 * chartMargin + 15, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
+    }
+    
     let drawChart = true;
     switch (lo_schrink) {
         case 0: chartHeight = 0.8 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
@@ -3650,8 +3661,7 @@ function paint_eRazred_graf1() {
         case 2: chartHeight = 0.5 * ctxH / 2.9 - chartMargin - chartGapY / 2; break;
         case 3: chartHeight = 0; drawChart = false; break;
     }
-    let tmpRazredId;
-    
+
     // Za vse razrede nariši graf
     if (drawChart) {
         for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
@@ -3741,36 +3751,48 @@ function paint_eRazred_graf1() {
             gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, "papayaWhip", 1, "lightGray", "darkBlue", "", 0, 0);
         }
     }
-    // ---- MOUSE OVER TIPS - PIE CHART 25.1.2025
+    // ---- MOUSE OVER TIPS - BAR/PIE CHART 24.1.2025
     let printList = false;
     if (lo_ocenaSelected > 0) {
         if (lo_pcChartSelectedId > 0) { tmpRazredId = lo_pcChartSelectedId; printList = true }
         else if (lo_bcChartSelectedId > 0) { tmpRazredId = lo_bcChartSelectedId; printList = true };
     }
     if (printList) {
-        // ---- odebeljen krogec okoli testa
-        //x = pcChartX[lo_pcChartSelectedId] + lo_testSelected;
-        //y = pcChartY1[lo_pcChartSelectedId] - pcChartKy[lo_pcChartSelectedId] * arrArrRezultatiTock[lo_pcChartSelectedId][lo_testSelected];
-        //gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
-        let moveText = false;
+        // ---- nabiranje teksta za prikaz toolTip-a
+        let textExceed = false;
+        let arrTipText = [];
+        let ocenaIdVRazredu;
         for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
+            ocenaIdVRazredu = arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpRazredId][lo_ocenaSelected][i];
+            colorId = ocenaIdVRazredu - 10 * (Math.trunc((ocenaIdVRazredu - 1) / 10)) - 1;
             // ---- mouse over tip
-            tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
+            tmpText = arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t#";
+            tmpText += colorId.toString() + "t#";
+            tmpText += arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
             tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
             tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
-            ;[w, h] = gMeasureText(tmpText, tipFont);
-            if ((lo_mouseMoveX + w + 39) > ctxW) { moveText = true; break; };
+            arrTipText[i - 1] = tmpText; // zaradi kasnejšega sortiranja si zapise zapisujem od indeksa 0 vključno naprej
+            // ---- če še noben text ni pogledal ven iz ekrana, potem to preverim za tekoči tekst
+            if (!textExceed) {
+                ;[w, h] = gMeasureText(tmpText.split("t#")[2], tipFont);
+                if ((lo_mouseMoveX + w + 30) > ctxW) {
+                    textExceed = true;
+                };
+            }
         }
-        for (i = 1; i <= arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
+        // ---- tekst za toolTip je nabran in tudi vemo, ali ga je treba prestaviti bolj levo, da ne bo gledal ven iz ekrana
+        //      zdaj bi bilo dobro presortirati nabrane učence glede na dosežene točke oziroma procente
+        arrTipText.sort(function(a, b){return a.split("t#")[0] - b.split("t#")[0]});
+        for (i = 0; i < arrArrOceneCount[tmpRazredId][lo_ocenaSelected]; i++) {
             // ---- mouse over tip
-            tmpText = arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId][lo_ocenaSelected][i];
-            tmpText += ", " + arrRazredArrOceneArrRezultatiTock[tmpRazredId][lo_ocenaSelected][i].toString() + "t";
-            tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpRazredId][lo_ocenaSelected][i].toFixed(1) + "%";
+            tmpText = arrTipText[i].split("t#")[2];
             ;[w, h] = gMeasureText(tmpText, tipFont);
             x1 = lo_mouseMoveX + 24;
-            y1 = lo_mouseMoveY + 16 + (i - 1) * 21;
-            if (moveText) { x1 = ctxW - w - 7; y1 += 18; };
-            gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", "", 0, 0);
+            y1 = lo_mouseMoveY + 16 + i * 21;
+            if (textExceed) { x1 = ctxW - w - 7; y1 += 18; };
+            //gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", gf_alphaColor(208, "lightGray"), 5, 5);
+            colorId = Number(arrTipText[i].split("t#")[1]);
+            gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", rsltColor[colorId], "", 0, 0); // prej so bili vsi izpisani v darkBlue barvi!
         }
     }
 
@@ -5246,11 +5268,12 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     let ocenaRezultatiImePriimek = []; // 23.1.2025 tabela učencev po ocenah za vse v tekočem razredu, ki so imeli to preverjanje
     let ocenaRezultatiTock = [];       // 23.1.2025 tabela doseženih točk po ocenah za vse v tekočem razredu
     let ocenaRezultatiPercent = [];    // 23.1.2025 tabela doseženih točk po ocenah za vse v tekočem razredu
+    let ocenaRezultatiOcenaIdVRazredu = []
     //----
     let ocenaId;
     for (ocenaId = 1; ocenaId <= 5; ocenaId++) { // 24.1.2025
         ocenaCount[ocenaId] = 0;
-        ocenaRezultatiImePriimek[ocenaId] = []; ocenaRezultatiTock[ocenaId] = []; ocenaRezultatiPercent[ocenaId] = [];
+        ocenaRezultatiImePriimek[ocenaId] = []; ocenaRezultatiTock[ocenaId] = []; ocenaRezultatiPercent[ocenaId] = []; ocenaRezultatiOcenaIdVRazredu[ocenaId] = [];
     }
 
     let ocenaId0, search, passed, found;
@@ -5258,7 +5281,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     let myPredmet = getPredmetId(vp_predmet);
     let myRazred = getRazredId(vp_razredNr, vp_razredCrka);
     if (myLetnik < 0 || myPredmet < 0 || myRazred < 0) {
-        return [false, 0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid
+        return [false, 0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid
     }
     // ---- Najprej poiščem prvo pravo oceno v tabeli vseh ocen
     //search = true;
@@ -5270,7 +5293,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         }
     }
     if (!found) {
-        return [0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - not found!
+        return [0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - not found!
     }
 
     let ucenecId, ocena, nrOcen, sumOcen, tock, imePriimek, sumTock;
@@ -5312,6 +5335,8 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         sumOcen += ocena;
         sumTock += tock;
         //----
+        ocenaRezultatiOcenaIdVRazredu[ocena][ocenaCount[ocena]] = nrOcen; // 24.1.2025
+        //---- Znotraj razreda polja: (1) polje vseh imen in priimkov, (2) polje zbranih točk, (3) polje doseženih procentov, (4) polje ocen
         rezultatiImePriimek[nrOcen] = imePriimek;        // 21.1.2025 ta je dosegel toliko točk
         rezultatiTock[nrOcen] = tock;                    // 21.1.2025 ta je dosegel toliko točk
         rezultatiPercent[nrOcen] = tock / maxTock * 100; // 21.1.2025 ta je dosegel toliko točk
@@ -5321,7 +5346,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     
     // ---- Smo nabrali kakšne ocene?
     if (nrOcen<=0) {
-        return [0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaCount, ocenaCountPercent, maxOcenaCount, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - ni ocen!
+        return [0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, maxOcenaCount, 0, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - ni ocen!
     }
 
     // ---- Imamo ocene - izračunaj povprečja in ostalo
@@ -5335,7 +5360,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     ocenaCountPercent[4] = ocenaCount[4] / nrOcen * 100;
     ocenaCountPercent[5] = ocenaCount[5] / nrOcen * 100;
 
-    return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // valid result
+    return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaRezultatiImePriimek, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiTock, rezultatiPercent, rezultatiOcena]; // valid result
 
 };
 
@@ -5705,6 +5730,10 @@ function paint_scatterPlotChart_byRazprsenost(
         y = yXos - ky * tmpTock;
         colorId = i - 10 * (Math.trunc((i - 1) / 10)) - 1;
         gEllipse(x, y, 2, 3, 0, rsltColor[colorId], 0, "");
+        //----
+        if (lo_ocenaSelected == arrOcena[i] && (lo_bcChartSelectedId == vp_razredId || lo_pcChartSelectedId == vp_razredId)) {
+            gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
+        }
         //----
         x += 1;
     }
