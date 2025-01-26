@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.5"
-const gl_versionDate = "25.1.2025"
+const gl_versionNr = "v1.6"
+const gl_versionDate = "26.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2014,6 +2014,9 @@ const letnikStr = [];
 var lo_nrLetnikov = 0;
 var lo_letnik;
 
+var lo_nrPredmetPisnihTestov = []; // max številka pisnega testa znotraj posameznega predmeta
+var lo_pisniTestNr = 1; // 26.1.2025
+
 const rsltColor = ["darkBlue", "darkRed", "darkOrchid", "darkSlateGray", "darkGoldenrod", "darkGreen", "maroon", "purple", "darkCyan", "peru"];
 
 const ocenaCifra = [];
@@ -2068,7 +2071,7 @@ var arrQ2 = []; // 21.1.2025
 var arrQ3 = []; // 21.1.2025
 
 const cv_schrink_min = 0;
-const cv_schrink_max = 4;
+const cv_schrink_max = 5;
 var lo_schrink = 1;
 
 var lo_zaokrozujNaCeleProcente = true;
@@ -2076,6 +2079,7 @@ var addKritPercent = 0;
 
 var lo_byRazredGen = false;  true; // 25.1.2025
 
+var drawCommonChartTitle = true; // 26.1.2025
 var drawBarChart = true;
 var drawPieChart = true;
 var drawSpChart = true;
@@ -2133,6 +2137,102 @@ console.clear;
 //                                          =
 //===========================================
 
+var demoText = [];
+addDemoText("#L2425 #PFIZIKA #R8.D");
+addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
+addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|60|81, ");
+addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
+addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
+addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
+addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
+addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
+addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
+addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
+addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
+addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
+addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
+addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
+addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
+addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
+addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
+addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
+addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
+addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
+addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
+addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
+addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
+//----
+addDemoText("#L2425 #PFIZIKA #R8.E");
+addDemoText("Sin Skok,               2|U|5-10-24,  4|U|17-12-24,           3|P1|15-1-25|53.5|81, ");
+addDemoText("Madalina Breskvar,      5|U|7-10-24,  3|P1|15-1-25|52|81, ");
+addDemoText("Aron Kron,              4|U|9-10-24,  3|P1|20-1-25|60.5|81,  4|P2|25-4-25|51|61,");
+addDemoText("Zija Firbec,            4|U|7-10-24,  3|P1|15-1-25|58|81, ");
+addDemoText("Zara Motorka,           4|U|9-10-24,  2|P1|20-1-25|49|81");
+addDemoText("Mira Mar,               1|U|4-10-24,  1|P1|15-1-25|31.5|81, ");
+addDemoText("Jerka Kubic             5|U|8-10-24,  3|U|16-12-24,           3|P1|13-1-25|55|81, ");
+addDemoText("Birma Firmska,          3|U|9-10-24,  3|P1|15-1-25|51|81, ");
+addDemoText("Seka Sekun,             5|U|7-10-24,  2|P1|15-1-25|47.5|81, ");
+addDemoText("Mirza Delija,           5|U|4-10-24,  2|P1|18-1-25|43|81, ");
+addDemoText("Adi Dasler,             5|U|7-10-24,  2|P1|15-1-25|44.5|81, 2|P2|25-4-25|35|61,");
+addDemoText("Veter Velkaverh,        4|U|12-10-24, 1|P1|17-1-25|29|81, ");
+addDemoText("Ken Reed,               3|U|7-10-24,  1|P1|12-1-25|35|81, ");
+addDemoText("Ari Peka,               4|U|15-10-24, 4|P1|15-1-25|65|81, ");
+addDemoText("Luki Krasi,             5|U|7-10-24,  4|P1|15-1-25|68.5|81, ");
+addDemoText("Porko Smeh,             4|U|7-10-24,  1|U|4-12-24,             4|U|12-12-24,            1|P1|11-1-25|38.5|81, ");
+addDemoText("Matona Pomagi,          3|U|14-10-24, 2|P1|15-1-25|40.5|81, ");
+addDemoText("Fjara Kiselj,           2|U|7-10-24,  1|P1|15-1-25|30.5|81, ");
+addDemoText("Karina Enesu,           5|U|2-10-24,  5|U|4-12-24,             5|P1|15-1-25|76|81, ");
+addDemoText("Kelia Kolas,            3|U|9-10-24,  4|P1|14-1-25|70.5|81, ");
+addDemoText("Dona Podbreg,           5|U|8-10-24,  4|P1|15-1-25|65.5|81, ");
+addDemoText("Gera Presek,            5|U|9-10-24,  1|P1|12-1-25|27|81, ");
+addDemoText("Zevs Novak,             4|U|14-10-24, 1|P1|11-1-25|25|81, ");
+//----
+addDemoText("#L2425 #PFIZIKA #R9.D");
+addDemoText("Zera Bison,         3|U|16-10-24,  5|U|29-11-24,               4|P1|20-1-25|57.5|75, 4|P2|25-4-25|52|68,");
+addDemoText("Emma Celje,         5|U|16-10-24,  4|P1|15-1-25|61|75, ");
+addDemoText("Krasna Gorec,       5|U|12-10-24,  5|P1|12-1-25|69.5|75,");
+addDemoText("Preja Volan,        5|U|22-10-24,  5|P1|15-1-25|72|75, ");
+addDemoText("Kravl Vodnik,       5|U|15-10-24,  3|P1|19-1-25|48.5|75,");
+addDemoText("Voda Popit,         4|U|20-10-24,  1|P1|18-1-25|27|75, ");
+addDemoText("Nos Smerk,          5|U|18-10-24,  4|U|4-12-24,               4|P1|12-1-25|59|75, ");
+addDemoText("Fina Smrekoc,       3|U|11-10-24,  1|P1|11-1-25|16|75, ");
+addDemoText("Heron Delon,        3|U|14-10-24,  1|P1|13-1-25|33|75, 1|P2|25-4-25|30|68,");
+addDemoText("Mirk Novicki,       3|U|6-10-24,   2|P1|15-1-25|41|75, ");
+addDemoText("Karim Kozoleb,      5|U|20-10-24,  4|P1|16-1-25|64.5|75, ");
+addDemoText("Sneja Pacifik,      5|U|12-10-24,  3|P1|20-1-25|51.5|75,");
+addDemoText("Lunea Lolibruc,     4|U|19-10-24,  2|P1|15-1-25|45|75, ");
+addDemoText("Missi Sas,          5|U|9-10-24,   5|P1|19-1-25|70.5|75, 2|P2|25-4-25|38|68,");
+addDemoText("Spona Okov,         4|U|12-10-24,   ");
+addDemoText("Mons Titan,         5|U|4-10-24,   5|P1|12-1-25|73.5|75, ");
+//----
+addDemoText("#L2425 #PFIZIKA #R9.E");
+addDemoText("Priska Fris,         4|U|21-10-24,  4|P1|15-1-25|61.5|75,            ");
+addDemoText("Tor Bariton,         4|U|21-10-24,  3|P1|15-1-25|50|75, ");
+addDemoText("Sjor Bergerud,       5|U|9-10-24,   4|P1|15-1-25|66|75, 4|P2|25-4-25|55|68,");
+addDemoText("Luis Armkil,         3|U|16-10-24,  3|P1|15-1-25|47|75, ");
+addDemoText("Disk Hardi,          4|U|14-10-24,  4|P1|20-1-25|63|75,");
+addDemoText("Fravz Pic,           2|U|21-10-24,  2|P1|15-1-25|38|75, ");
+addDemoText("Jena Alidvak,        5|U|21-10-24,  4|P1|15-1-25|65|75,   ");
+addDemoText("Zimija Zmilican,     5|U|23-10-24,  4|P1|15-1-25|61|75, ");
+addDemoText("Krol Bojanec,        4|U|23-10-24,  3|P1|15-1-25|55|75, 3|P2|25-4-25|44|68,");
+addDemoText("Kljuk Book,          4|U|14-10-24,    ");
+addDemoText("Raven Kodila,        5|U|16-10-24,  2|P1|15-1-25|41.5|75, ");
+addDemoText("Mix Musikmen,        2|U|21-10-24,  1|P1|15-1-25|28|75");
+addDemoText("Vrh Triglava,        5|U|14-10-24,  5|P1|15-1-25|72.5|75, ");
+addDemoText("Petina Zmaga,        5|U|21-10-24,  3|P1|15-1-25|53|75, ");
+addDemoText("Krizantema Vrt,      5|U|14-10-24,  5|P1|15-1-25|74.5|75, ");
+addDemoText("Burak Osman,         5|U|16-10-24,  2|P1|22-1-25|45|75,");
+addDemoText("Mladen Starina,      2|U|23-10-24,  1|P1|15-1-25|22|75, ");
+addDemoText("Bindo Farina,        5|U|9-10-24,   3|P1|15-1-25|54.5|75, ");
+addDemoText("Pikica Slon,         5|U|23-10-24,  5|P1|15-1-25|69|75, ");
+
+function addDemoText(vp_textLine) {
+
+    let arrLen = demoText.length;
+    demoText[arrLen] = vp_textLine;
+
+}
+    
 
 
 //===========================================
@@ -2306,7 +2406,7 @@ switch (lo_GUI_layout) {
         //var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
-        //var buttonHelp = new button(gpLeft, gpTop + 10, 52, 20, "Pomo" + scTchLow, "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
+        var buttonHelp = new button(gpLeft, gpTop + 10, 16, 20, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
         //var buttonCopyLink = new button(gpLeft, gpTop + 10, 68, 20, "Copy link", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiranje bli"+scZhLow+"njice do to"+scTchLow+"no take konfiguracije na clipboard", "");
     }
 var lo_GUIlayoutHasChanged = true;
@@ -2396,6 +2496,7 @@ function main() {
     //        console.log('clipboard contents', clipText)
     //    })
     
+    demo_load();
     paint();
     
     if (lo_showHelpTips) { // 3.1.2025
@@ -2634,112 +2735,17 @@ elMyCanvas.addEventListener('mouseout', (e) => {
 
 elMyCanvas.addEventListener('click', (e) => {
 
-    return;
-
     //console.log("click(): dragMonthEndActive=" + lo_dragMonthEndActive)
     let rslt = 0; let boolRslt = false; let rslt2 = [0, 0];
     let vl_end = false;
 
     if (lo_showHelpTips && lo_initHelpTips) { lf_changeShowHelpTips(false, true); }; // 3.1.2025
 
-    //---- Goriščna razdalja f
-    if (!vl_end && lo_showGUI && lo_enabledintChooserF) {
-        rslt = intChooserF.eventClick(e.offsetX, e.offsetY)
-        //console.log("click(): rslt=" + rslt.toString())
-        if (!(rslt == false)) { 
-            fixForRange(rslt, cv_f_min, cv_f_max);
-            //lf_changeF(Math.trunc(rslt), true);
-            lf_changeF(Math.trunc(rslt), true); // tudi če je s spreminjanjem dimenzij leče prišel na decimalno vrednost za f, se ob kliku na increase/decrease zadeva naj spremeni v integer
-            vl_end = true
-        };
-    }
-    //---- Oddaljenost predmeta a
-    if (!vl_end && lo_showGUI && lo_enabledintChooserA) {
-        rslt = intChooserA.eventClick(e.offsetX, e.offsetY)
-        //console.log("click(): rslt=" + rslt.toString())
-        if (!(rslt == false)) { 
-            fixForRange(rslt, cv_a_min, cv_a_max);
-            lf_changeA(rslt, true);
-            vl_end = true
-        };
-    }
-    //---- Velikost predmeta P
-    if (!vl_end && lo_showGUI && lo_enabledintChooserP) {
-        rslt = intChooserP.eventClick(e.offsetX, e.offsetY)
-        //console.log("click(): rslt=" + rslt.toString())
-        if (!(rslt == false)) {
-            fixForRange(rslt, cv_P_min, cv_P_max);
-            lf_changeP(rslt, true);
-            vl_end = true
-        };
-    }
-    //---- Lomni količnik n
-    if (!vl_end && lo_showGUI && lo_enabledintChooserN) {
-        rslt = intChooserN.eventClick(e.offsetX, e.offsetY)
-        //console.log("click(): rslt=" + rslt.toString())
-        if (!(rslt == false)) {
-            fixForRange(rslt, cv_n_min, cv_n_max);
-            lf_changeN(rslt, true);
-            vl_end = true
-        };
-    }    
-    //---- enote v centimetrih
-    if (!vl_end && lo_showGUI && lo_enabledUnitCm && !lo_unitCm) {
-        boolRslt = checkBoxUnitCm.eventClick(e.offsetX, e.offsetY);
-        if (boolRslt != lo_unitCm) {
-            lf_changeUnitCm(boolRslt, true)
-            lf_changeUnitMm(!boolRslt, true)
-            vl_end = true
-        }
-    }        
-    //---- enote v milimetrih
-    if (!vl_end && lo_showGUI && lo_enabledUnitCm && !lo_unitMm) {
-        boolRslt = checkBoxUnitMm.eventClick(e.offsetX, e.offsetY);
-        if (boolRslt != lo_unitMm) {
-            lf_changeUnitMm(boolRslt, true)
-            lf_changeUnitCm(!boolRslt, true)
-            vl_end = true
-        }
-    }  
-    //---- prikaz ravnila
-    if (!vl_end && lo_showGUI && lo_enabledRuler) {
-        boolRslt = checkBoxRuler.eventClick(e.offsetX, e.offsetY);
-        if (boolRslt != lo_showRuler) {
-            lf_changeShowRuler(boolRslt, true)
-            vl_end = true
-        }
-    } 
-    //---- prikaz legende
-    if (!vl_end && lo_showGUI && lo_enabledLegend) {
-        boolRslt = checkBoxLegend.eventClick(e.offsetX, e.offsetY);
-        if (boolRslt != lo_showLegend) {
-            lf_changeShowLegend(boolRslt, true)
-            vl_end = true
-        }
-    } 
-    //---- prikaz realne leče
-    if (!vl_end && lo_showGUI && lo_enabledRealLens) {
-        boolRslt = checkBoxRealLens.eventClick(e.offsetX, e.offsetY);
-        if (boolRslt != lo_showRealLens) {
-            lf_changeShowRealLens(boolRslt, true)
-            vl_end = true
-        }
-    } 
-
     //---- prikaži pomoč 10.1.2025
     if (!vl_end && lo_showGUI && lo_enabledHelp) {
         if (buttonHelp.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lf_changeShowHelpTips(!lo_showHelpTips, true);
-            vl_end = true
-        }
-    }
-
-    //---- generate clipboard web link 10.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledCopyLink) {
-        if (buttonCopyLink.eventClick(e.offsetX, e.offsetY)) {
-            //console.log("click(): rslt=" + rslt.toString())
-            setWebLink();
             vl_end = true
         }
     }
@@ -2823,13 +2829,11 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
     if (lo_showGUI) {
-        //if (intChooserF.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-        //    document.body.style.cursor = "pointer"
+        if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
+            document.body.style.cursor = "pointer"
         //} else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-        //    document.body.style.cursor = "pointer"
-        //} else if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
-        //    document.body.style.cursor = "pointer"                 
-        //} else { document.body.style.cursor = "default" };
+        //    document.body.style.cursor = "pointer"              
+        } else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
     //če se miška v resnici ni premaknila ne naredim nič
@@ -3143,14 +3147,6 @@ window.addEventListener("keydown", (event) => {
         case 'ControlLeft':
             // CTRL+mouseWheel = ZOOM v browserju !!!
             lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;        
-        case 'KeyF':
-            lo_keyDownF = true; lo_selectedF = true; paint(); break;
-        case 'KeyP':
-            lo_keyDownP = true; lo_selectedPredmet = true; paint(); break;
-        case 'KeyA':
-            lo_keyDownA = true; lo_selectedA = true; paint(); break;
-        case 'Digit0':
-            lo_keyDownDigit0 = true; lo_selectedLeca = true; paint(); break;
         case 'KeyX':
             lo_keyDownX = true; break;
         case 'KeyM':
@@ -3163,6 +3159,16 @@ window.addEventListener("keydown", (event) => {
             //lo_keyDownR = true; break;
             //console.log("R pressed");
             lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
+            prepareDataStructures();
+            paint();
+            break;
+        case 'KeyT': // sprememba zaporedne številke testa pri istem predmetu
+            //console.log("T pressed");
+            if (event.shiftKey) { // 26.1.2025
+                lf_changePisniTestNr(lo_pisniTestNr - 1, false); // 26.1.2025
+            } else {
+                lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
+            }
             prepareDataStructures();
             paint();
             break;
@@ -3184,8 +3190,6 @@ window.addEventListener("keydown", (event) => {
             break;
         case 'KeyO':
             lo_keyDownO = true; break;
-        case 'KeyT':
-            lo_keyDownT = true; break;
         case 'KeyU':
             lo_keyDownU = true; break;
         case 'KeyD':
@@ -3239,18 +3243,6 @@ window.addEventListener("keyup", (event) => {
     let change, newValue;
 
     switch (event.code) {
-        case 'KeyT':
-            lo_keyDownT = false;
-            // 21.12.2023 Ali spreminja vrednost lo_printLevel samo s pomočjo tipke T brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_printLevel) {
-                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke P  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
-                //console.log("UP: process keyPress(T)");
-                if (event.shiftKey) { lf_changeValuePrintLevel(-1) } else { lf_changeValuePrintLevel(1) };
-                lf_setPrintLevel(true);
-            }
-            gl_changeByMouseWheel_printLevel = false;
-            //console.log("UP: false"); console.log("----");
-            break;
         case 'KeyF':
             lo_keyDownF = false;
             if (lo_keyDownControlLeft && !event.ctrlKey) { // 4.1.2025
@@ -3272,23 +3264,6 @@ window.addEventListener("keyup", (event) => {
             lo_selectedF = false;
             paint();
             gl_changeByMouseWheel_F = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'KeyP':
-            lo_keyDownP = false;
-            // 1.4.2024 Ali spreminja vrednost lo_f samo s pomočjo tipke P brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_P) {
-                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
-                //console.log("UP: process keyPress(T)");
-                change = lo_pStep;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueP(-change);
-                lf_changeP(newValue, false);
-            }
-            lo_selectedPredmet = false; paint();
-            paint();
-            gl_changeByMouseWheel_P = false;
             //console.log("UP: false"); console.log("----");
             break;
         case 'KeyA':
@@ -3556,7 +3531,7 @@ function paint() {
     }
     
     paint_eRazred();
-    //paint_GUI()
+    paint_GUI()
     
     if (lo_showGUI) {
         paint_author();
@@ -3632,20 +3607,21 @@ function prepareDataStructures() {
 
     // ============ NABIRANJE PODATKOV  ============
 
-    let tmpItemId, tmpRazredLetnikStr, tmpRazredCrka;
+    let tmpItemId, tmpRazredLetnikStr, tmpRazredCrka, tmpTipTestNr;
     let nrItems = lo_nrRazredov;
     if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
         // za tekoči razred/generacijo razredov naberem vso statistiko na svoje mesto v polju rezultatov
         tmpRazredLetnikStr = razredLetnik[tmpItemId]; if (lo_byRazredGen) { tmpRazredLetnikStr = razredGen[tmpItemId].toString() };
         tmpRazredCrka = razredCrka[tmpItemId]; if (lo_byRazredGen) { tmpRazredCrka = "" };
+        tmpTipTestNr = "P" + lo_pisniTestNr.toString();
         //----
         ;[valid[tmpItemId], nrOcen[tmpItemId], avgOcena[tmpItemId], avgTock[tmpItemId], avgPercent[tmpItemId],
         maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
         arrRazredArrOceneArrRezultatiImePriimek[tmpItemId], arrRazredArrOceneArrRezultatiRazred[tmpItemId], arrRazredArrOceneArrRezultatiTock[tmpItemId], arrRazredArrOceneArrRezultatiPercent[tmpItemId], arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpItemId],
         arrArrOceneCount[tmpItemId], arrArrOceneCountPercent[tmpItemId], arrMaxOcenaCount[tmpItemId],
         arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiRazred[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId]]
-            = calculate_avg_test("2425", "FIZIKA", tmpRazredLetnikStr, tmpRazredCrka, "P1");
+            = calculate_avg_test("2425", "FIZIKA", tmpRazredLetnikStr, tmpRazredCrka, tmpTipTestNr);
         // iščem največje število testov z isto oceno čez vse razrede, da bom lahko določil Y merilo za bar charte
         if (arrMaxOcenaCount[tmpItemId] > maxOcenaCount) {
             maxOcenaCount = arrMaxOcenaCount[tmpItemId];
@@ -3659,82 +3635,6 @@ function prepareDataStructures() {
         lo_dataPrepared = true; // 25.1.2025 
     }
 
-}
-
-function prepareDataStructures_old() {
-
-    let valid = []
-    nrOcen.length = 0;
-    avgOcena.length = 0;
-    avgTock.length = 0;
-    avgPercent.length = 0;
-    maxTock.length = 0;
-    lowTock.length = 0;
-    topTock.length = 0;
-    //---- 23.1.2025
-    arrRazredArrOceneArrRezultatiImePriimek.length = 0;
-    arrRazredArrOceneArrRezultatiImeRazred.length = 0;
-    arrRazredArrOceneArrRezultatiTock.length = 0;
-    arrRazredArrOceneArrRezultatiPercent.length = 0;
-    arrRazredArrOceneArrRezultatiOcenaIdVRazredu.length = 0; // 24.1.2025
-    //----
-    arrOcene.length = 0;
-    arrOcenePercent.length = 0;
-    arrArrOceneCount.length = 0;
-    arrArrOceneCountPercent.length = 0;
-    arrMaxOcenaCount.length = 0;
-    maxOcenaCount = 0;
-    arrArrRezultatiImePriimek.length = 0; // 21.1.2025
-    arrArrRezultatiTock.length = 0;       // 21.1.2025
-    arrArrRezultatiPercent.length = 0;    // 21.1.2025
-    arrArrRezultatiOcena.length = 0;      // 21.1.2025
-    arrKriteriji = [50, 63, 76, 90];
-    arrQ1.length = 0; // 21.1.2025
-    arrQ2.length = 0; // 21.1.2025
-    arrQ3.length = 0; // 21.1.2025
-
-    //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
-    spChartX.length = 0;
-    spChartY.length = 0;
-    spChartW.length = 0;
-    spChartH.length = 0;
-    spChartX1.length = 0;
-    spChartY1.length = 0;
-    spChartKy.length = 0;
-    spChartKyp.length = 0;
-    //spChartSelected.length = 0;
-    //----
-    pcChartCx.length = 0;
-    pcChartCy.length = 0;
-    pcChartFi.length = 0;
-    pcChartRadij.length = 0;
-    //pcChartSelected.length = 0;
-    //----
-    bcChartX.length = 0;
-    bcChartY.length = 0;
-    bcChartX1.length = 0;
-    bcChartY1.length = 0;
-
-    // ============ NABIRANJE PODATKOV  ============
-
-    let tmpRazredId;
-    for (tmpRazredId = 1; tmpRazredId <= lo_nrRazredov; tmpRazredId++) {
-        // za tekoči razred naberem vso statistiko na svoje mesto v polju rezultatov
-        ;[valid[tmpRazredId], nrOcen[tmpRazredId], avgOcena[tmpRazredId], avgTock[tmpRazredId], avgPercent[tmpRazredId],
-        maxTock[tmpRazredId], lowTock[tmpRazredId], topTock[tmpRazredId],
-        arrRazredArrOceneArrRezultatiImePriimek[tmpRazredId], arrRazredArrOceneArrRezultatiTock[tmpRazredId], arrRazredArrOceneArrRezultatiPercent[tmpRazredId], arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpRazredId],
-        arrArrOceneCount[tmpRazredId], arrArrOceneCountPercent[tmpRazredId], arrMaxOcenaCount[tmpRazredId],
-        arrArrRezultatiImePriimek[tmpRazredId], arrArrRezultatiTock[tmpRazredId], arrArrRezultatiPercent[tmpRazredId], arrArrRezultatiOcena[tmpRazredId]]
-            = calculate_avg_test("2425", "FIZIKA", razredLetnik[tmpRazredId], razredCrka[tmpRazredId], "P1");
-        // iščem največje število testov z isto oceno čez vse razrede, da bom lahko določil Y merilo za bar charte
-        if (arrMaxOcenaCount[tmpRazredId] > maxOcenaCount) {
-            maxOcenaCount = arrMaxOcenaCount[tmpRazredId];
-        }
-        //---- določanje kvartilov za rezultate v razredu
-        [arrQ1[tmpRazredId], arrQ2[tmpRazredId], arrQ3[tmpRazredId]] =
-            calculate_kvartili(nrOcen[tmpRazredId], arrArrRezultatiTock[tmpRazredId]); // prvi kvartil za rezultate tega razreda
-    }
-    
 }
 
 function paint_eRazred() {
@@ -3756,12 +3656,34 @@ function paint_eRazred_graf1() {
     let nrItems = lo_nrRazredov;
     if (lo_byRazredGen) { nrItems = lo_nrRazredGen }; // 25.1.2025
     let chartWidth = (ctxW - 2 * chartMargin - (nrItems - 1) * chartGapX) / nrItems;
-    let x0 = 20; let y0 = 20;
+    let x0 = 20; let y0;
+    let tmpText, w, h, colorId;
+    let titleFont = "bold 18pt verdana";
+
+    // ---- Common title panel
+    drawCommonChartTitle = true;
+    titlePanelHeight = 34;
+    switch (lo_schrink) {
+        case 5: titlePanelHeight = 0; drawCommonChartTitle = false; break;
+    }
+    if (drawCommonChartTitle) {
+        yTitleTop = 8;
+        let titlePanelLeft = x0 - 8;
+        let titlePanelWidth = ctxW - 2 * chartMargin + 4;
+        if (lo_showGUI) { titlePanelWidth -= 198 };
+        //tmpText = "FIZIKA - 1. pisni test";
+        tmpText = predmetIme[lo_predmet] + " - " + lo_pisniTestNr.toString() + ". pisni test";
+        ;[w, h] = gMeasureText(tmpText, titleFont);
+        gBannerRect(titlePanelLeft, yTitleTop, titlePanelLeft + titlePanelWidth, 34, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
+        gText(tmpText, titleFont, "darkSlateGray", titlePanelLeft + titlePanelWidth / 2 - w / 2, yTitleTop + h + 7);
+    }
+    
+    y0 = yTitleTop + titlePanelHeight + 18;
 
     // ---- Za vsak razred narišem svoj panel čez celo višino ekrana
     let tmpItemId;
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-        gBannerRect(x0 + (tmpItemId - 1) * (chartWidth + chartGapX) - 8, y0 - 10, chartWidth + 16, ctxH - 2 * chartMargin + 15, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
+        gBannerRect(x0 + (tmpItemId - 1) * (chartWidth + chartGapX) - 8, y0 - 10, chartWidth + 16, ctxH - 2 * chartMargin + 15 - titlePanelHeight, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
     }
     
     // ============ (1) ŠTEVILO TESTOV PO OCENAH - BAR CHARTS  ============
@@ -3772,7 +3694,7 @@ function paint_eRazred_graf1() {
         case 1: chartHeight = 0.22 * ctxH - chartMargin - chartGapY / 2; break;
         case 2: chartHeight = 0.17 * ctxH - chartMargin - chartGapY / 2; break;
         case 3: chartHeight = 0.14 * ctxH - chartMargin - chartGapY / 2; break;
-        case 4: chartHeight = 0; drawBarChart = false; break;
+        case 4: case 5: chartHeight = 0; drawBarChart = false; break;
     }
 
     // Za vse razrede nariši graf
@@ -3798,7 +3720,7 @@ function paint_eRazred_graf1() {
         case 1: chartHeight = 0.26 * ctxH - chartMargin - chartGapY / 2; break;
         case 2: chartHeight = 0.2 * ctxH - chartMargin - chartGapY / 2; break;
         case 3: chartHeight = 0.17 * ctxH - chartMargin - chartGapY / 2; break;
-        case 4: chartHeight = 0; drawPieChart = false; break;
+        case 4: case 5: chartHeight = 0; drawPieChart = false; break;
     }
     if (chartHeight > chartWidth) { chartHeight = chartWidth }; // 24.1.2025
     if (drawPieChart) {
@@ -3823,7 +3745,8 @@ function paint_eRazred_graf1() {
         case 0: case 1: case 2: case 3:
             chartHeight = ctxH - y2 - chartGapY / 2 - chartMargin;
             break;
-        case 4: chartHeight = ctxH - 2 * chartMargin; break;
+        case 4: chartHeight = ctxH - 2 * chartMargin - titlePanelHeight; break;
+        case 5: chartHeight = ctxH - 2 * chartMargin; break;
     }
     x1 = 20;
     // Za vse razrede nariši pie-chart-e
@@ -3840,7 +3763,6 @@ function paint_eRazred_graf1() {
     
     // ---- MOUSE OVER TIPS - SCATTER PLOT CHART 22.1.2025
 
-    let tmpText, w, h, colorId;
     let tipFont = "bold italic 12pt verdana";
     if (lo_spChartSelectedId > 0) {
         if (lo_testSelected > 0) {
@@ -4058,164 +3980,9 @@ function paint_GUI() {
         //if (lo_showStations) { paint_stations() };
         //return
     };
-    
-    //---- enote
-    //if (lo_enabledUseHalfPoint) {
-    checkBoxUnitCm.paint();
-    checkBoxUnitMm.paint();
-    checkBoxLegend.paint();
-    checkBoxRuler.paint();
-    checkBoxRealLens.paint();
-    //};
-
-    let cv_col1 = rsltPanelLeft + 2; //lo_gxO + 50;
-    let cv_col2 = cv_col1 + 174; //lo_gxO + 214;
-    let cv_col3 = cv_col1 + 95;  //lo_gxO + 135;
-    let cv_col4 = cv_col2 + 15;
-    let cv_col5 = cv_col4 + 50; // 2.1.2025
-    let vStep = 25;
-    let tmpText = "";
-
-    y = rsltPanelTop + 42; // gpTop + 70;
-
-    //---- goriščna razdalja
-    if (lo_enabledintChooserF) {
-        gText("Gori" + scSchLow + scTchLow + "na razdalja", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-        gText("f", "bold 11pt verdana", "darkSlateGray", cv_col2, y);
-        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "darkSlateGray", cv_col4, y);
-        intChooserF.paint()
-    }
-
-    //---- oddaljenost predmeta
-    y += vStep;
-    if (lo_enabledintChooserA) {
-        gText("Oddaljenost predmeta", "bold 10pt verdana", "blue", cv_col1, y);
-        gText("a", "bold 11pt verdana", "blue", cv_col2, y);
-        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "blue", cv_col4, y);
-        intChooserA.paint()
-    }
-    
-    //---- velikost predmeta
-    y += vStep;
-    if (lo_enabledintChooserP) {
-        gText("Velikost predmeta", "bold 10pt verdana", "blue", cv_col1, y);
-        gText("P", "bold 11pt verdana", "blue", cv_col2, y);
-        gText("[" + lo_unitStr + "]:", "bold 10pt verdana", "blue", cv_col4, y);
-        intChooserP.paint()
-    }
-    
-    y += 16;
-    gLine(cv_col1, y, cv_col1 + 300, y, 2, "darkSlateGray", [3, 3]);
-
-    //---- oddaljenost slike
-    y += vStep - 3;
-    //if (lo_enabledintChooserA) {
-    gText("Oddaljenost slike:", "bold 10pt verdana", "purple", cv_col1, y);
-    if (Math.abs(lo_b) >= 100) { tmpText = "b = " + lo_b.toFixed(0).toString() }
-    else if (Math.abs(lo_b) >= 10) { tmpText = "b = " + lo_b.toFixed(1).toString() }
-    else if (Math.abs(lo_b) >= 1) { tmpText = "b = " + lo_b.toFixed(2).toString() }
-    else if (Math.abs(lo_b) >= 0.1) { tmpText = "b = " + lo_b.toFixed(3).toString() }
-    else { tmpText = "b = " + lo_b.toString() };
-    //gText(tmpText + " " + lo_unitStr, "bold 11pt verdana", "purple", cv_col2, y);
-    tmpText = "b = " + lo_bStr + " " + lo_unitStr;
-    gText(tmpText, "bold 11pt verdana", "purple", cv_col2, y);
-    intChooserA.paint()
-    //}
-        
-    //---- velikost slike
-    y += vStep;
-    //if (lo_enabledintChooserP) {
-    gText("Velikost slike:", "bold 10pt verdana", "purple", cv_col1, y);
-    //if (Math.abs(lo_S) >= 100) { tmpText = "S = " + lo_S.toFixed(0).toString() }
-    //else if (Math.abs(lo_S) >= 10) { tmpText = "S = " + lo_S.toFixed(1).toString() }
-    //else if (Math.abs(lo_S) >= 1) { tmpText = "S = " + lo_S.toFixed(2).toString() }
-    //else if (Math.abs(lo_S) >= 0.1) { tmpText = "S = " + lo_S.toFixed(3).toString() }
-    //else { tmpText = "S = " + lo_S.toString() };
-    tmpText = "S = " + lo_Sstr + " " + lo_unitStr;
-    gText(tmpText, "bold 11pt verdana", "purple", cv_col2, y);
-    intChooserP.paint()
-    //}
-    
-    //---- povečava
-    y += vStep;
-    //if (lo_enabledintChooserP) {
-    gText("Pove" + scTchLow + "ava:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-    gText("f/(a-f)", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
-    gText("m = " + Math.abs(lo_povecava).toFixed(3).toString(), "bold 11pt verdana", "darkSlateGray", cv_col5, y);
-    intChooserP.paint()
-    //}
-
-    //---- dioptrija
-    y += vStep;
-    //if (lo_enabledintChooserP) {
-    gText("Dioptrija:", "bold 10pt verdana", "darkSlateGray", cv_col1, y);
-    //gText("1/f", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y);
-    gText("D=1/f=1/a+1/b", "bold italic 10pt verdana", "darkSlateGray", cv_col3, y); // 2.1.2024
-    if (Math.abs(lo_dioptrija) >= 100) { tmpText = "D = " + lo_dioptrija.toFixed(0).toString() }
-    else if (Math.abs(lo_dioptrija) >= 10) { tmpText = "D = " + lo_dioptrija.toFixed(1).toString() }
-    else if (Math.abs(lo_dioptrija) >= 1) { tmpText = "D = " + lo_dioptrija.toFixed(2).toString() }
-    else if (Math.abs(lo_dioptrija) >= 0.1) { tmpText = "D = " + lo_dioptrija.toFixed(3).toString() }
-    else { tmpText = "D = " + lo_dioptrija.toString() };
-    //gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col2, y);
-    gText(tmpText, "bold 11pt verdana", "darkSlateGray", cv_col5, y);
-    intChooserP.paint()
-    //}
-
-    //---- lomni količnik materiala leče
-    y = 294;
-    if (lo_enabledintChooserN && lo_showRealLens) {
-        gText("Lomni koli" + scTchLow + "nik stekla:", "bold 10pt verdana", "goldenrod", legendPanelLeft - 10, legendPanelTop + 150);
-        intChooserN.paint()
-        gText("R=" + lo_lensR.toFixed(1) + lo_unitStr, "italic 11pt verdana", "darkSlateGray", intChooserN.left + 84, intChooserN.top + 19);
-        gText("d=" + (lo_gdLece/lo_pixPerUnit).toFixed(1) + lo_unitStr, "italic 11pt verdana", "darkSlateGray", lo_gxO - 100, gpTop + 12);
-        gText("h=" + (lo_ghLece/lo_pixPerUnit).toFixed(1) + lo_unitStr, "italic 11pt verdana", "darkSlateGray", lo_gxO - 100, gpTop + 27);
-        //
-        if (lo_lensTooHigh) { // 3.1.2025
-            gText("R majhen zato", "italic 10pt verdana", "indianRed", intChooserN.left + 71, intChooserN.top + intChooserN.height + 12);
-            gText("zni" + scZhLow + "ana le" + scTchLow + "a!", "italic 10pt verdana", "indianRed", intChooserN.left + 82, intChooserN.top + intChooserN.height + 25);
-        }
-    }
-    
-    if (lo_showLegend) {
-        //---- LEGENDA ŽARKOV
-        cv_col1 = legendPanelLeft + 2; //lo_gxO + 50;
-        cv_col2 = cv_col1 + 50;
-        vStep = 22;
-        let dy = 5;
-        let dx = 8;
-        y = legendPanelTop + 2;
-        gText("ZNA" + scTch + "ILNI " + scZh + "ARKI:", "bold 11pt verdana", "darkSlateGray", cv_col1, y);
-        y += vStep;
-        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "green", [4, 4]);
-        gText("Vodoravni", "bold 11pt verdana", "green", cv_col2, y);
-        y += vStep;
-        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "red", [4, 4]);
-        gText("Sredi" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "red", cv_col2, y);
-        y += vStep;
-        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "purple", [4, 4]);
-        gText("Gori" + scSchLow + scTchLow + "ni", "bold 11pt verdana", "purple", cv_col2, y);
-        y += vStep;
-        gLine(cv_col1, y - dy, cv_col2 - dx, y - dy, 3, "deepSkyBlue", [4, 4]);
-        gText("Osni", "bold 11pt verdana", "deepSkyBlue", cv_col2, y);
-    
-        if (lo_showToolTips) { //1.4.2024
-            if (lo_enabledintChooserF) { intChooserF.showToolTip() };
-            if (lo_enabledintChooserP) { intChooserP.showToolTip() };
-            if (lo_enabledintChooserA) { intChooserA.showToolTip() };
-            if (lo_enabledintChooserN) { intChooserN.showToolTip() };
-            if (lo_enabledUnitCm) { checkBoxUnitCm.showToolTip() };
-            if (lo_enabledUnitMm) { checkBoxUnitMm.showToolTip() };
-            if (lo_enabledLegend) { checkBoxLegend.showToolTip() };
-            if (lo_enabledRuler) { checkBoxRuler.showToolTip() };
-            if (lo_enabledRealLens) { checkBoxRealLens.showToolTip() };
-            if (lo_showGUI && lo_enabledHelp) { buttonHelp.showToolTip() };
-            if (lo_showGUI && lo_enabledCopyLink) { buttonCopyLink.showToolTip() };
-        }
-    }
 
     if (lo_showGUI) { // 10.1.2025
         buttonHelp.paint();
-        buttonCopyLink.paint();
     }
 
     //---- on-screen namigi/pomoč
@@ -4225,7 +3992,7 @@ function paint_GUI() {
     if (dbg) {
         vStep = 15;
         x = 4; y = 15;
-        if (lo_modeCalculate == cv_modeCalculate_byF) { gText("lo_modeCalculate = -byF-", "10pt verdana", "black", x, y) } else { gText("lo_modeCalculate = -byLensSize-", "10pt verdana", "black", x, y) };
+        //if (lo_modeCalculate == cv_modeCalculate_byF) { gText("lo_modeCalculate = -byF-", "10pt verdana", "black", x, y) } else { gText("lo_modeCalculate = -byLensSize-", "10pt verdana", "black", x, y) };
     }
 }
 
@@ -4237,17 +4004,15 @@ function paint_tips() {
         
         case cv_guiLayoutB:
             
-            let x0 = 20; let x1 = x0 + 160;
+            let x0 = 20; let x1 = x0 + 130;
             let y0 = 43; let vStep = 25; let y = y0 - vStep;
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 15;
+            let nrTipRows = 6;
             let backHeight = nrTipRows * vStep + 15;
 
-            //gBannerRect(x0 - 15, y0 - 13, 415, backHeight, 4, 4, gf_alphaColor(160, "white"), 1, "silver", "#ECECECC0", 5, 5, true);
-            //gBannerRoundRect(x0 - 15, y0 - 13, 415, backHeight, 20, gf_alphaColor(160, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true);
-            gBannerRoundRect(x0 - 15, y0 - 13, 530, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
+            gBannerRoundRect(x0 - 15, y0 - 13, 510, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             //
             y += vStep;
             gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4255,78 +4020,47 @@ function paint_tips() {
             gBannerRectWithText2("N", x0 + 41, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i to pomo" + scTchLow, x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
-            y += vStep;
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni f, a ali P (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("SHIFT", x0 + 50, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... hitrej" + scSchLow + "e spreminjanje ob pritisnjenem SHIFT", x1 + 20, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //   
-            y += vStep;
-            gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni gori" + scSchLow + scTchLow + "no razdaljo le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni velikost predmeta", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("A", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni oddaljenost predmeta od le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("0", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... spremeni lomni koli" + scTchLow + "nik le" + scTchLow + "e (izbrana realna le" + scTchLow + "a)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //  
-            y += vStep;
-            gBannerRectWithText2("W", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... skrij/prika" + scZhLow + "i realno pot " + scZhLow + "arka pri realni le" + scTchLow + "i", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            y += vStep;
-            gBannerRectWithText2("X", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... ZOOM +/- (ve" + scTchLow + "je/manj" + scSchLow + "e podro" + scTchLow + "je po x-u)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            y += vStep;
-            gBannerRectWithText2("M, C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... izberi enote, lahko so milimetri ali centimetri", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("R", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... skrij/prika" + scZhLow + "i ravnilo", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            y += vStep;
-            gBannerRectWithText2("L", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... skrij/prika" + scZhLow + "i legendo", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
             //y += vStep;
-            //gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... spremeni f, a ali P (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+
+            //   
+            //y += vStep;
+            //gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             //gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             //gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... spremeni nivo prikaza za prenos slike", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //gBannerRectWithText2("... spremeni gori" + scSchLow + scTchLow + "no razdaljo le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
-            gBannerRectWithText2("G", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... skrij/prika" + scZhLow + "i avtorja in sistemske meritve", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
+            gBannerRectWithText2("D", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... nalo" + scZhLow + "i kopirane podatke ocen iz clipboarda", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
-            gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("R", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... preklop pregleda med razredi posamezno ali skupno", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);      
+            y += vStep;
+            gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("SHIFT", x0 + 50, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... ZOOM +/- prikaza razpr" + scSchLow + "enosti rezultatov", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            y += vStep;
+            gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... naslednji/prej" + scSchLow + "nji pisni test pri istem predmetu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            //y += vStep;
+            //gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            //gBannerRectWithText2("SHIFT", x0 + 50, y, font, 3, 3, 1, 1, "red", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... hitrej" + scSchLow + "e spreminjanje ob pritisnjenem SHIFT", x1 + 20, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
+            y += vStep;
+            gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i luknje v kriterijih to" + scTchLow + "kovnika", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            //y += vStep;
+            //gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //     
             //y += vStep;
-            //gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... shrani to" + scTchLow + "kovnik na odlo" + scZhLow + "i" + scSchLow + scTchLow + "e (clipboard)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            //gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //            
             break;
             
@@ -4454,59 +4188,9 @@ function paint_tips() {
 
 function paint_GUI_layoutB() {
 
-    return;
-
-    //---- prikaz legende
-    checkBoxLegend.left = legendPanelLeft; // + 74;
-    checkBoxLegend.top = legendPanelTop - 50;
-
-    //---- prikaz ravnila
-    checkBoxRuler.left = legendPanelLeft; // + 74;
-    checkBoxRuler.top = legendPanelTop - 74;
-    
-    //---- enote v centimetrih
-    checkBoxUnitCm.left = rsltPanelLeft + 2; // rsltPanelLeft + 194; // lo_gxO + 232;
-    checkBoxUnitCm.top = rsltPanelTop + 2;   // gpTop + 30;
-
-    //---- enote v centimetrih
-    checkBoxUnitMm.left = checkBoxUnitCm.left + checkBoxUnitCm.width + 40;
-    checkBoxUnitMm.top = checkBoxUnitCm.top;
-    
-    const cv_col1 = rsltPanelLeft + 240; // lo_gxO + 282;
-    let vStep = 25;
-    let y = rsltPanelTop + 24;  // gpTop + 52;
-
-    //----
-    intChooserF.left = cv_col1;
-    intChooserF.top = y;
-
-    //----
-    y += vStep;
-    intChooserA.left = cv_col1;
-    intChooserA.top = y;
-    
-    //----
-    y += vStep;
-    intChooserP.left = cv_col1;
-    intChooserP.top = y;
-
-    //----
-    y = legendPanelTop + 115;
-    checkBoxRealLens.left = legendPanelLeft;
-    checkBoxRealLens.top = y;
-    
-    //----
-    y += 42;
-    intChooserN.left = legendPanelLeft - 10; //1200;
-    intChooserN.top = y;
-
     //---- 10.1.2025
     buttonHelp.left = 2;
     buttonHelp.top = 2;
-
-    //---- 10.1.2025
-    buttonCopyLink.left = buttonHelp.left + buttonHelp.width + 4;
-    buttonCopyLink.top = 2;
     
 }
 
@@ -4809,6 +4493,17 @@ function lf_changeByRazredGen(vp_newValue, vp_paint) {
 
 }
 
+function lf_changePisniTestNr(vp_newValue, vp_paint) {
+
+    lo_pisniTestNr = vp_newValue;
+
+    if (lo_pisniTestNr > lo_nrPredmetPisnihTestov[lo_predmet]) { lo_pisniTestNr = 1 };
+    if (lo_pisniTestNr < 1) { lo_pisniTestNr = lo_nrPredmetPisnihTestov[lo_predmet] };
+
+    if (vp_paint) { paint() }
+
+}
+
 function lf_changeShowRealLens(vp_newValue, vp_paint) {
 
     lo_showRealLens = vp_newValue;
@@ -5083,9 +4778,34 @@ function clipboard_load() {
             clipboard_parse(clipText);
 
             // Inicializacija potrebnih struktur za risanje grafov
+            lo_predmet = 1; // FIZIKA
+            lo_pisniTestNr = 1; // P1
             prepareDataStructures(); // 23.1.2025
 
         })
+}
+
+function demo_load() {
+        
+    // Inicializacija podatkovnih struktur
+    intDataStructures();
+
+    let i;
+    let demoTextStr = "";
+    for (i = 0; i < demoText.length; i++) {
+        if (i > 0) { demoTextStr += "\n" };
+        demoTextStr += demoText[i];
+    }
+
+    // Očitno to so podatki o razredih in ocenah, treba je sparsati
+    console.log("DEMO PARSE -->");
+    clipboard_parse(demoTextStr);
+
+    // Inicializacija potrebnih struktur za risanje grafov
+    lo_predmet = 1; // FIZIKA
+    lo_pisniTestNr = 1; // P1
+    prepareDataStructures(); // 23.1.2025
+
 }
 
 function clipboard_check(clipText) {
@@ -5127,6 +4847,7 @@ function intDataStructures() {
     predmetIme.length = 0;
     predmetKratica.length = 0;
     lo_nrPredmetov = 0;
+    lo_nrPredmetPisnihTestov.length = 0;
     lo_predmet = 0;
 
     letnikStr.length = 0;
@@ -5232,6 +4953,7 @@ function clipboard_parse_novRazred(lineStr) {
         // nov doslej neznan predmet
         lo_nrPredmetov += 1;
         lo_predmet = lo_nrPredmetov;
+        lo_nrPredmetPisnihTestov[lo_predmet] = 0; // 26.1.2025
         predmetIme[lo_nrPredmetov] = tmpPredmetStr;
         switch (tmpPredmetStr) {
             case "FIZIKA":
@@ -5269,7 +4991,7 @@ function clipboard_parse_ucenec(lineStr) {
     //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
     //console.log(tmpStr + "    U: " + lineStr);
 
-    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpOcenaCifra, tmpOcenaTip, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
+    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
     const itemList = lineStr.split(",");
     if (itemList.length < 1) {
         return false;
@@ -5318,7 +5040,14 @@ function clipboard_parse_ucenec(lineStr) {
         } else {
             tmpPisnaOcena = false;
         };
-
+        // zaporedna številka pisnega ocenjevanja pri tem predmetu (26.1.2025)
+        if (tmpPisnaOcena) {
+            tmpPisnaOcenaNr = Number(tmpOcenaTip.substr(1, 1));
+            if (tmpPisnaOcenaNr > lo_nrPredmetPisnihTestov[lo_predmet]) {
+                lo_nrPredmetPisnihTestov[lo_predmet] += 1;
+            }
+        }
+        
         // ---- DATUM OCENE
         tmpOcenaDatum = ocenaDataList[2].trim();
 
@@ -5668,6 +5397,8 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
         bcChartX1[vp_itemId][i] = 0;
         bcChartY1[vp_itemId][i] = 0;
         
+
+
         if (arrOcene[i] > 0) {
 
             // ---- BAR
@@ -5696,8 +5427,8 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
             tmpText = Number(arrOcene[i]);
             ;[w, h] = gMeasureText(tmpText, fontNr);
             gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, y0 - tmpHeight - 4);
-            xm += wBar;
         }
+        xm += wBar; // tale pomik mora biti v vsakem primeru, pa če bom risal bar ali ne (26.1.2025)
     }
 
     // ---- VODORAVNA ČRTA KOT OSNOVA GRAFA
@@ -5712,7 +5443,8 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
         y = 60;
         if (x > (ctxW - 160)) { x = ctxW - 160; }
     };
-    gText(tmpText, fontTitle, "lightSteelBlue", x + 2, y + 2);
+    gText(tmpText, fontTitle, "darkGray", x + 3, y + 3);
+    gText(tmpText, fontTitle, "powderBlue", x + 2, y + 2);
     gText(tmpText, fontTitle, "darkSlateGray", x, y);
 
 };
