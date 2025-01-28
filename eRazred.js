@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.8"
+const gl_versionNr = "v1.9"
 const gl_versionDate = "28.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2009,6 +2009,13 @@ const predmetIme = [];
 const predmetKratica = [];
 var lo_nrPredmetov = 0;
 var lo_predmet;
+var lo_havePredmetInHeader = false;
+
+// 28.1.2025
+const katalogPredmetovIme = [];
+const katalogPredmetovKratica3 = [];
+const katalogPredmetovKratica1 = [];
+var lo_nrKatalogPredmetov = 0;
 
 const letnikStr = [];
 var lo_nrLetnikov = 0;
@@ -2139,117 +2146,7 @@ console.clear;
 //===========================================
 
 var demoText = [];
-addDemoText("#L2425 #PFIZIKA #R8.D");
-addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
-addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|60|81, ");
-addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
-addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
-addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
-addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
-addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
-addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
-addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
-addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
-addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
-addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
-addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
-addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
-addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
-addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
-addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
-addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
-addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
-addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
-addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
-addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
-//----
-addDemoText("#L2425 #PFIZIKA #R8.E");
-addDemoText("Sin Skok,               2|U|5-10-24,  4|U|17-12-24,           3|P1|15-1-25|53.5|81, ");
-addDemoText("Madalina Breskvar,      5|U|7-10-24,  3|P1|15-1-25|52|81, ");
-addDemoText("Aron Kron,              4|U|9-10-24,  3|P1|20-1-25|60.5|81,  4|P2|25-4-25|51|61,");
-addDemoText("Zija Firbec,            4|U|7-10-24,  3|P1|15-1-25|58|81, ");
-addDemoText("Zara Motorka,           4|U|9-10-24,  2|P1|20-1-25|49|81");
-addDemoText("Mira Mar,               1|U|4-10-24,  1|P1|15-1-25|31.5|81, ");
-addDemoText("Jerka Kubic             5|U|8-10-24,  3|U|16-12-24,           3|P1|13-1-25|55|81, ");
-addDemoText("Birma Firmska,          3|U|9-10-24,  3|P1|15-1-25|51|81, ");
-addDemoText("Seka Sekun,             5|U|7-10-24,  2|P1|15-1-25|47.5|81, ");
-addDemoText("Mirza Delija,           5|U|4-10-24,  2|P1|18-1-25|43|81, ");
-addDemoText("Adi Dasler,             5|U|7-10-24,  2|P1|15-1-25|44.5|81, 2|P2|25-4-25|35|61,");
-addDemoText("Veter Velkaverh,        4|U|12-10-24, 1|P1|17-1-25|29|81, ");
-addDemoText("Ken Reed,               3|U|7-10-24,  1|P1|12-1-25|35|81, ");
-addDemoText("Ari Peka,               4|U|15-10-24, 4|P1|15-1-25|65|81, ");
-addDemoText("Luki Krasi,             5|U|7-10-24,  4|P1|15-1-25|68.5|81, ");
-addDemoText("Porko Smeh,             4|U|7-10-24,  1|U|4-12-24,             4|U|12-12-24,            1|P1|11-1-25|38.5|81, ");
-addDemoText("Matona Pomagi,          3|U|14-10-24, 2|P1|15-1-25|40.5|81, ");
-addDemoText("Fjara Kiselj,           2|U|7-10-24,  1|P1|15-1-25|30.5|81, ");
-addDemoText("Karina Enesu,           5|U|2-10-24,  5|U|4-12-24,             5|P1|15-1-25|76|81, ");
-addDemoText("Kelia Kolas,            3|U|9-10-24,  4|P1|14-1-25|70.5|81, ");
-addDemoText("Dona Podbreg,           5|U|8-10-24,  4|P1|15-1-25|65.5|81, ");
-addDemoText("Gera Presek,            5|U|9-10-24,  1|P1|12-1-25|27|81, ");
-addDemoText("Zevs Novak,             4|U|14-10-24, 1|P1|11-1-25|25|81, ");
-//----
-addDemoText("#L2425 #PFIZIKA #R9.D");
-addDemoText("Zera Bison,         3|U|16-10-24,  5|U|29-11-24,               4|P1|20-1-25|57.5|75, ");
-addDemoText("Emma Celje,         5|U|16-10-24,  4|P1|15-1-25|61|75, ");
-addDemoText("Krasna Gorec,       5|U|12-10-24,  5|P1|12-1-25|69.5|75,");
-addDemoText("Preja Volan,        5|U|22-10-24,  5|P1|15-1-25|72|75, ");
-addDemoText("Kravl Vodnik,       5|U|15-10-24,  3|P1|19-1-25|48.5|75,");
-addDemoText("Voda Popit,         4|U|20-10-24,  1|P1|18-1-25|27|75, ");
-addDemoText("Nos Smerk,          5|U|18-10-24,  4|U|4-12-24,               4|P1|12-1-25|59|75, ");
-addDemoText("Fina Smrekoc,       3|U|11-10-24,  1|P1|11-1-25|16|75, ");
-addDemoText("Heron Delon,        3|U|14-10-24,  1|P1|13-1-25|33|75, ");
-addDemoText("Mirk Novicki,       3|U|6-10-24,   2|P1|15-1-25|41|75, ");
-addDemoText("Karim Kozoleb,      5|U|20-10-24,  4|P1|16-1-25|64.5|75, ");
-addDemoText("Sneja Pacifik,      5|U|12-10-24,  3|P1|20-1-25|51.5|75,");
-addDemoText("Lunea Lolibruc,     4|U|19-10-24,  2|P1|15-1-25|45|75, ");
-addDemoText("Missi Sas,          5|U|9-10-24,   5|P1|19-1-25|70.5|75, ");
-addDemoText("Spona Okov,         4|U|12-10-24,   ");
-addDemoText("Mons Titan,         5|U|4-10-24,   5|P1|12-1-25|73.5|75, ");
-//----
-addDemoText("#L2425 #PFIZIKA #R9.E");
-addDemoText("Priska Fris,         4|U|21-10-24,  4|P1|15-1-25|61.5|75,            ");
-addDemoText("Tor Bariton,         4|U|21-10-24,  3|P1|15-1-25|50|75, ");
-addDemoText("Sjor Bergerud,       5|U|9-10-24,   4|P1|15-1-25|66|75, 4|P2|25-4-25|55|68,");
-addDemoText("Luis Armkil,         3|U|16-10-24,  3|P1|15-1-25|47|75, ");
-addDemoText("Disk Hardi,          4|U|14-10-24,  4|P1|20-1-25|63|75,");
-addDemoText("Fravz Pic,           2|U|21-10-24,  2|P1|15-1-25|38|75, ");
-addDemoText("Jena Alidvak,        5|U|21-10-24,  4|P1|15-1-25|65|75,   ");
-addDemoText("Zimija Zmilican,     5|U|23-10-24,  4|P1|15-1-25|61|75, ");
-addDemoText("Krol Bojanec,        4|U|23-10-24,  3|P1|15-1-25|55|75, 3|P2|25-4-25|44|68,");
-addDemoText("Kljuk Book,          4|U|14-10-24,    ");
-addDemoText("Raven Kodila,        5|U|16-10-24,  2|P1|15-1-25|41.5|75, ");
-addDemoText("Mix Musikmen,        2|U|21-10-24,  1|P1|15-1-25|28|75");
-addDemoText("Vrh Triglava,        5|U|14-10-24,  5|P1|15-1-25|72.5|75, ");
-addDemoText("Petina Zmaga,        5|U|21-10-24,  3|P1|15-1-25|53|75, ");
-addDemoText("Krizantema Vrt,      5|U|14-10-24,  5|P1|15-1-25|74.5|75, ");
-addDemoText("Burak Osman,         5|U|16-10-24,  2|P1|22-1-25|45|75,");
-addDemoText("Mladen Starina,      2|U|23-10-24,  1|P1|15-1-25|22|75, ");
-addDemoText("Bindo Farina,        5|U|9-10-24,   3|P1|15-1-25|54.5|75, ");
-addDemoText("Pikica Slon,         5|U|23-10-24,  5|P1|15-1-25|69|75, ");
-//----
-addDemoText("#L2425 #PKEMIJA #R8.D");
-//addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
-addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|81|81, ");
-addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
-//addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
-//addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
-addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
-addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
-addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
-addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
-addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
-addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
-addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
-//addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
-addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
-addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
-addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
-addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
-addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
-addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
-addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
-addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
-addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
+load_demoText2();
 
 function addDemoText(vp_textLine) {
 
@@ -2786,7 +2683,7 @@ elMyCanvas.addEventListener('click', (e) => {
             } else {
                 lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
             }
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             vl_end = true
         }
@@ -2801,7 +2698,7 @@ elMyCanvas.addEventListener('click', (e) => {
             } else {
                 lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
             }
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             vl_end = true
         }
@@ -2812,7 +2709,7 @@ elMyCanvas.addEventListener('click', (e) => {
         if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lf_changeByRazredGen(!lo_byRazredGen, false); //
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             vl_end = true
         }
@@ -3092,42 +2989,7 @@ window.addEventListener("wheel", event => {
         //}
         return; //konec prverjanja, ker je s pritisnjeno tipko F povedal, da hoče točno to in nič drugega
     }
-    //---- če vrti kolešček miške ob pritisnjeni tipki P, s tem spreminja velikost predmeta P
-    if (lo_keyDownP) {
-        //if (lo_enabledintChooserP) {
-        change = delta * lo_pStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueP(change);
-        gl_changeByMouseWheel_P = true; 
-        lo_selectedPredmet = true; // 1.1.2024
-        lf_changeP(newValue, true);
-        //}
-        return; //konec prverjanja, ker je s pritisnjeno tipko P povedal, da hoče točno to in nič drugega
-    }    
-    //---- če vrti kolešček miške ob pritisnjeni tipki A, s tem spreminja oddaljenost premeta a
-    if (lo_keyDownA) {
-        //if (lo_enabledintChooserA) {
-        change = delta * lo_aStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueA(change);
-        gl_changeByMouseWheel_A = true; 
-        lo_selectedA = true; // 1.1.2024
-        lf_changeA(newValue, true);
-        //}
-        return; //konec prverjanja, ker je s pritisnjeno tipko A povedal, da hoče točno to in nič drugega
-    }
-    //---- če vrti kolešček miške ob pritisnjeni tipki 0, s tem spreminja lomni količnik leče (3.1.2025)
-    if (lo_keyDownDigit0) {
-        //if (lo_enabledintChooserN) {
-        change = delta * lo_nStep;
-        if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueN(change);
-        gl_changeByMouseWheel_N = true; 
-        lo_selectedLeca = true; // 1.1.2024
-        lf_changeN(newValue, true);
-        //}
-        return; //konec prverjanja, ker je s pritisnjeno tipko A povedal, da hoče točno to in nič drugega
-    }      
+    
     ////---- če vrti kolešček miške ob pritisnjeni tipki X, s tem spreminja skupno število goriščnih razdalj na X osi
     //if (lo_keyDownX) {
     //    //if (lo_enabledintChooserF) {
@@ -3148,88 +3010,30 @@ window.addEventListener("wheel", event => {
         lf_changePixPerUnit(newValue, true);
         return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
     }
-    //---- če vrti kolešček miške ob pritisnjeni tipki T, s tem spreminja nivo prikaza za kopiranje slike
-    else if (lo_keyDownT) {
-        lf_changeValuePrintLevel(-delta);
-        gl_changeByMouseWheel_printLevel = true; // 21.12.2023
-        //console.log("WHEEL: true");
-        lf_setPrintLevel(true);
-        return; //konec prverjanja, ker je s pritisnjeno tipko P povedal, da hoče točno to in nič drugega
-    }
-        
-    //---- ... sicer spreminja ...?        
-    //---- če si nad intChooserjem za goriščno razdaljo f lahko z vrtenjem koleščka miške spreminjaš f
-    else if (lo_enabledintChooserF && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-        change = delta * lo_fStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        //newValue = lf_changeValueF(change);
-        //if (change > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { change -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
-        //newValue = Math.trunc(lf_changeValueF(change)); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
-        newValue = lf_changeValueF(change, true);
-        gl_changeByMouseWheel_F = true; // 4.1.2024
-        lf_changeF(newValue, true);
-    }
-    //---- če si nad intChooserjem za velikost predmeta P lahko z vrtenjem koleščka miške spreminjaš P
-    else if (lo_enabledintChooserP && intChooserP.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-        change = delta * lo_pStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueP(change);
-        gl_changeByMouseWheel_P = true; // 4.1.2024
-        lf_changeP(newValue, true);
-    }
-    //---- če si nad intChooserjem za oddaljenost predmeta a lahko z vrtenjem koleščka miške spreminjaš a
-    else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-        change = delta * lo_aStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueA(change);
-        gl_changeByMouseWheel_A = true; // 4.1.2024
-        lf_changeA(newValue, true);
-    }
-    //---- če si nad intChooserjem za lomni količnik materiala leče lahko z vrtenjem koleščka miške spreminjaš n
-    else if (lo_enabledintChooserN && intChooserN.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-        change = delta * lo_nStep;
-        if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueN(change);
-        gl_changeByMouseWheel_N = true; // 4.1.2024
-        lf_changeN(newValue, true);
-    }
+  
+    ////---- ... sicer spreminja ...?        
+    ////---- če si nad intChooserjem za goriščno razdaljo f lahko z vrtenjem koleščka miške spreminjaš f
+    //else if (lo_enabledintChooserF && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
+    //    change = delta * lo_fStep;
+    //    if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+    //    //newValue = lf_changeValueF(change);
+    //    //if (change > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { change -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
+    //    //newValue = Math.trunc(lf_changeValueF(change)); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
+    //    newValue = lf_changeValueF(change, true);
+    //    gl_changeByMouseWheel_F = true; // 4.1.2024
+    //    lf_changeF(newValue, true);
+    //}
 
     //---- ... sicer (2) spreminja ...?  
-    //---- če je v bližini optične osi lahko z vrtenjem koleščka miške premikaš predmet levo-desno (spreminjaš a)
-    else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX < lo_gxO)) {
-        change = delta * lo_aStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueA(change);
-        gl_changeByMouseWheel_A = true; // 4.1.2024
-        lf_changeA(newValue, true);
-    }
-    //---- če je v bližini optične osi med O in F lahko z vrtenjem koleščka miške spreminjaš goriščno razdaljo f
-    else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX > lo_gxO) && (lo_mouseMoveX < (lo_gxF1d + 10))) {
-        change = delta * lo_aStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        //newValue = lf_changeValueF(change);
-        //if (change > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { change -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
-        //newValue = Math.trunc(lf_changeValueF(change)); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
-        newValue = lf_changeValueF(change, true);
-        gl_changeByMouseWheel_F = true;
-        lf_changeF(newValue, true);
-    }
-    //---- če je v bližini predmeta lahko z vrtenjem koleščka miške spreminjaš velikost predmeta (P)
-    else if ((Math.abs(lo_mouseMoveX - lo_gxP) < 40) && (lo_mouseMoveY <= lo_gyO)) {
-        change = delta * lo_pStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValueP(change);
-        gl_changeByMouseWheel_P = true;
-        lf_changeP(newValue, true);
-    } 
-    //---- če je v bližini leče lahko z vrtenjem koleščka miške spreminjaš lomni količnik materiala leče (n)
-    else if (lo_showRealLens && (Math.abs(lo_mouseMoveX - lo_gxO) < 100) && (lo_mouseMoveY >= gpTop) && (lo_mouseMoveY <= gpBottom)) {
-        change = delta * lo_nStep;
-        if (lo_keyDownShiftLeft) { change *= 5 };
-        newValue = lf_changeValueN(change);
-        gl_changeByMouseWheel_N = true;
-        lf_changeN(newValue, true);
-    } 
+    ////---- če je v bližini optične osi lahko z vrtenjem koleščka miške premikaš predmet levo-desno (spreminjaš a)
+    //else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX < lo_gxO)) {
+    //    change = delta * lo_aStep;
+    //    if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
+    //    newValue = lf_changeValueA(change);
+    //    gl_changeByMouseWheel_A = true; // 4.1.2024
+    //    lf_changeA(newValue, true);
+    //}
+
 
 });
 
@@ -3267,7 +3071,7 @@ window.addEventListener("keydown", (event) => {
             //lo_keyDownR = true; break;
             //console.log("R pressed");
             lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             break;
         case 'KeyP': // sprememba predmeta 28.1.2025
@@ -3277,7 +3081,7 @@ window.addEventListener("keydown", (event) => {
             } else {
                 lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
             }
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             break;
         case 'KeyT': // sprememba zaporedne številke testa pri istem predmetu
@@ -3287,7 +3091,7 @@ window.addEventListener("keydown", (event) => {
             } else {
                 lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
             }
-            prepareDataStructures();
+            data_prepareStructures();
             paint();
             break;
         case 'KeyL':
@@ -3666,7 +3470,7 @@ function paint() {
 
 }
 
-function prepareDataStructures() {
+function data_prepareStructures() {
 
     lo_dataPrepared = false; // 25.1.2025
 
@@ -4821,12 +4625,12 @@ function clipboard_load() {
 
             // Očitno to so podatki o razredih in ocenah, treba je sparsati
             console.log("PARSE -->");
-            clipboard_parse(clipText);
+            data_parse(clipText);
 
             // Inicializacija potrebnih struktur za risanje grafov
             lo_predmet = 1; // FIZIKA
             lo_pisniTestNr = 1; // P1
-            prepareDataStructures(); // 23.1.2025
+            data_prepareStructures(); // 23.1.2025
 
         })
 }
@@ -4845,12 +4649,12 @@ function demo_load() {
 
     // Očitno to so podatki o razredih in ocenah, treba je sparsati
     console.log("DEMO PARSE -->");
-    clipboard_parse(demoTextStr);
+    data_parse(demoTextStr);
 
     // Inicializacija potrebnih struktur za risanje grafov
     lo_predmet = 1; // FIZIKA
     lo_pisniTestNr = 1; // P1
-    prepareDataStructures(); // 23.1.2025
+    data_prepareStructures(); // 23.1.2025
 
 }
 
@@ -4896,6 +4700,12 @@ function intDataStructures() {
     lo_nrPredmetPisnihTestov.length = 0;
     lo_predmet = 0;
 
+    // 28.1.2025
+    katalogPredmetovIme.length = 0;
+    katalogPredmetovKratica3.length = 0;
+    katalogPredmetovKratica1.length = 0;
+    lo_nrKatalogPredmetov = 0;
+
     letnikStr.length = 0;
     lo_nrLetnikov = 0;
     lo_letnik = 0;
@@ -4918,7 +4728,7 @@ function intDataStructures() {
 
 };
 
-function clipboard_parse(clipText) {
+function data_parse(clipText) {
 
     let pos, pos1, lineStr, searchStr;
     let haveLines = true;
@@ -4939,7 +4749,7 @@ function clipboard_parse(clipText) {
             };
             if (lineStr.indexOf(",") > 0 && (lineStr.indexOf("|U|") > 0 || lineStr.indexOf("|P") > 0)) {
                 // imamo še zadnjega učenca z ocenami - obdelaj ga
-                clipboard_parse_ucenec(lineStr);
+                data_parse_ucenec(lineStr);
             }
             break; // ven iz FOR zanke
         }
@@ -4953,10 +4763,17 @@ function clipboard_parse(clipText) {
         };
         if (lineStr.indexOf(",") > 0 && (lineStr.indexOf("|U|") > 0 || lineStr.indexOf("|P") > 0)) {
             // imamo naslednjega učenca z ocenami - obdelaj ga
-            clipboard_parse_ucenec(lineStr);
-        } else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#P") > 0 && lineStr.indexOf("#R") >= 0) {
+            data_parse_ucenec(lineStr);
+        } else if (lineStr.indexOf("#PIK!") >= 0 ) {
+            // imamo imena in kratice predmetov ...
+            rslt = data_parse_imenaKraticePredmetov(lineStr);
+            if (!rslt) {
+                break; // konec branja vrstic zaradi napake v podatkih ali česa drugega
+            }
+        //} else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#P") > 0 && lineStr.indexOf("#R") >= 0) {
+        } else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#R") >= 0) {
             // imamo začetek novega razreda ...
-            rslt = clipboard_parse_novRazred(lineStr);
+            rslt = data_parse_novRazred(lineStr);
             if (!rslt) {
                 break; // konec branja vrstic zaradi napake v podatkih ali česa drugega
             }
@@ -4969,7 +4786,7 @@ function clipboard_parse(clipText) {
     console.log("     parsed ... " + "letnikov: " + lo_nrLetnikov.toString() + ", predmetov: " + lo_nrPredmetov.toString() + ", razredov: " + lo_nrRazredov.toString() + ", u" + scTchLow + "encev: " + lo_nrUcencev.toString() + ", ocen: " + lo_nrOcen.toString());
 }
 
-function clipboard_parse_novRazred(lineStr) {
+function data_parse_novRazred(lineStr) {
     //console.log("---- " + lineStr);
     let tmpStr;
     const itemList = lineStr.split("#");
@@ -4979,6 +4796,8 @@ function clipboard_parse_novRazred(lineStr) {
     //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
     //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
     //console.log(tmpStr);
+
+    let nrParams = 0;
 
     // ---- LETNIK
     let tmpLetnikStr = itemList[1].trim().slice(1);
@@ -4990,29 +4809,42 @@ function clipboard_parse_novRazred(lineStr) {
         lo_letnik = lo_nrLetnikov;
         letnikStr[lo_nrLetnikov] = tmpLetnikStr;
     } 
-    
-    // ---- PREDMET
-    let tmpPredmetStr = itemList[2].trim().slice(1).toUpperCase();
-    // pogledamo, če ta predmet že obstaja med predmeti?
-    lo_predmet = getPredmetId(tmpPredmetStr);
-    if (lo_predmet <= 0) {
-        // nov doslej neznan predmet
-        lo_nrPredmetov += 1;
-        lo_predmet = lo_nrPredmetov;
-        lo_nrPredmetPisnihTestov[lo_predmet] = 0; // 26.1.2025
-        predmetIme[lo_nrPredmetov] = tmpPredmetStr;
-        switch (tmpPredmetStr) {
-            case "FIZIKA":
-                predmetKratica[lo_nrPredmetov] = "FIZ";
-                break;
-            case "KEMIJA":
-                predmetKratica[lo_nrPredmetov] = "KEM";
-                break;
-        }
+    nrParams += 1;
+
+    // ---- PREDMET ... po novem ga lahko tudi ni na tem mestu, če bojo kratice predmetov pri vsaki oceni
+    let tmpPredmetStr = itemList[nrParams + 1].trim().toUpperCase();
+    if (tmpPredmetStr.length < 2) {
+        return false;
+    }
+    lo_havePredmetInHeader = false; // 28.1.2025
+    if (tmpPredmetStr.substr(0, 1) == "P") {
+        lo_havePredmetInHeader = true; // 28.1.2025
+        tmpPredmetStr = tmpPredmetStr.slice(1);
+        // pogledamo, če ta predmet že obstaja med predmeti?
+        lo_predmet = getPredmetId(tmpPredmetStr);
+        if (lo_predmet <= 0) {
+            // nov doslej neznan predmet
+            lo_nrPredmetov += 1;
+            lo_predmet = lo_nrPredmetov;
+            lo_nrPredmetPisnihTestov[lo_predmet] = 0; // 26.1.2025
+            predmetIme[lo_nrPredmetov] = tmpPredmetStr;
+            switch (tmpPredmetStr) {
+                case "FIZIKA":
+                    predmetKratica[lo_nrPredmetov] = "FIZ";
+                    break;
+                case "KEMIJA":
+                    predmetKratica[lo_nrPredmetov] = "KEM";
+                    break;
+            }
+        } 
+        nrParams += 1; // 28.1.2025
+    } else {
+        // predmeti ni podan ... očitno bo kratica predmeta pri vsaki oceni spredaj
+        nrParams += 0; // debug purpose
     }
 
     // ---- RAZRED
-    let tmpRazredStr = itemList[3].trim().slice(1);
+    let tmpRazredStr = itemList[nrParams + 1].trim().slice(1);
     let tmpRazredLetnikStr = tmpRazredStr.substr(0, 1);
     let tmpRazredCrka = tmpRazredStr.substr(1, 1);
     if (tmpRazredCrka==".") {tmpRazredCrka = tmpRazredStr.substr(2, 1);}
@@ -5036,11 +4868,63 @@ function clipboard_parse_novRazred(lineStr) {
     return true;
 }
 
-function clipboard_parse_ucenec(lineStr) {
+function data_parse_imenaKraticePredmetov(lineStr) {
+    //
+    // primer:  "#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|K #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P"
+    //
+    
+
+    //console.log("---- " + lineStr);
+    const itemList = lineStr.split("#");
+    if (itemList.length < 3) { // prvi je prazen pred prvim #, drugi za ključ "PIK!", in vsaj še en predmet(e)
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+
+    let pItemList;
+    let tmpPikStr, i, tmpKatalogPredmetId, predmetIme, predmetKratica3, predmetKratica1;
+    for (i = 2; i < itemList.length; i++) {
+
+        // ---- NASLEDNJI PREDMET Z IMENOM, TRIČRKOVNO IN ENOČRKOVNO KRATICO, primer: "MATEMATIKA|MAT|M "
+        let tmpPikStr = itemList[i].trim(); // zdaj imamo "MATEMATIKA|MAT|M"
+        pItemList = tmpPikStr.split("|");
+        if (pItemList.length < 3) {
+            // ni dovolj podatkov o tekočem predmetu
+            continue;
+        }
+        predmetIme = pItemList[0].trim().toUpperCase();
+        // ---- pogledamo, če ta predmet že obstaja v katalogu predmetov?
+        tmpKatalogPredmetId = getKatalogPredmetId(predmetIme);
+        if (tmpKatalogPredmetId > 0) {
+            // ta predmet imamo že
+            continue;
+        }
+        // ---- nov predmet - preberemo kratice 
+        predmetKratica3 = pItemList[1].trim().toUpperCase();
+        predmetKratica1 = pItemList[2].trim().toUpperCase();
+        // ---- stringi ne smejo biti prazni
+        if (predmetIme.length <= 0 || predmetKratica3.length <= 0 || predmetKratica1.length <= 0) {
+            // ignoriram ta predmet in gledam nadaljnje
+            continue;
+        }
+        // ---- vpišem nov predmet v katalog
+        lo_nrKatalogPredmetov += 1;
+        katalogPredmetovIme[lo_nrKatalogPredmetov] = predmetIme;
+        katalogPredmetovKratica3[lo_nrKatalogPredmetov] = predmetKratica3;
+        katalogPredmetovKratica1[lo_nrKatalogPredmetov] = predmetKratica1;
+        
+    };
+
+    return true;
+}
+
+function data_parse_ucenec(lineStr) {
     //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
     //console.log(tmpStr + "    U: " + lineStr);
 
-    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
+    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpZnak1, tmpPredmetKratica1, tmpPredmetId, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
     const itemList = lineStr.split(",");
     if (itemList.length < 1) {
         return false;
@@ -5069,6 +4953,9 @@ function clipboard_parse_ucenec(lineStr) {
     ucenecSpol[lo_nrUcencev] = "";
     ucenecRazredId[lo_nrUcencev] = lo_razred;
 
+    if (tmpImePriimek == "Franc Gadafi") {
+        tmpImePriimek = tmpImePriimek;
+    }
     // ---- OCENE ENA ZA DRUGO
     for (i = 1; i <= (itemList.length - 1); i++) {
         
@@ -5079,11 +4966,37 @@ function clipboard_parse_ucenec(lineStr) {
             continue; // ignoriram to oceno in grem na naslednje ocene tega istrga učenca
         }
     
+        paramId = 0;
+        // na začetku je lahko številčna ocena, ali pa po novem tudi enočrkovna kratica predmeta!
+        tmpZnak1 = ocenaDataList[0].trim().substr(0, 1);
+        switch (tmpZnak1) {
+            case "1": case "2": case "3": case "4": case "5":
+                // ne naredim nič tule. Treba je prebrati oceno, kratice predmeta spredaj ni bilo.
+                if (!lo_havePredmetInHeader) {
+                    console.log("ERROR: Predmeta ni ne v zaglavju ne pri oceni ... " + tmpImePriimek + " " + tmpOcenaStr);
+                };
+                break;
+            default:
+                // spredaj je enočrkovna kratica predmeta. Za kateri predmet gre?
+                tmpPredmetKratica1 = tmpZnak1;
+                lo_predmet = getPredmetIdByKratica1(tmpPredmetKratica1);
+                if (lo_predmet <= 0) {
+                    // nov doslej neznan predmet
+                    lo_nrPredmetov += 1;
+                    lo_predmet = lo_nrPredmetov;
+                    lo_nrPredmetPisnihTestov[lo_predmet] = 0; // 26.1.2025
+                    [predmetIme[lo_nrPredmetov], predmetKratica[lo_nrPredmetov]] = getPredmetImeKratica3ByKratica1(tmpPredmetKratica1);
+                }
+                paramId = 1;
+                break;
+        }
+
         // ---- ŠTEVILČNA OCENA
-        tmpOcenaCifra = ocenaDataList[0].trim();
+        tmpOcenaCifra = ocenaDataList[paramId].trim();
+        paramId += 1;
 
         // ---- TIP OCENE
-        tmpOcenaTip = ocenaDataList[1].trim();
+        tmpOcenaTip = ocenaDataList[paramId].trim();
         if (tmpOcenaTip.substr(0, 1) == "P") {
             tmpPisnaOcena = true;
         } else {
@@ -5096,9 +5009,11 @@ function clipboard_parse_ucenec(lineStr) {
                 lo_nrPredmetPisnihTestov[lo_predmet] += 1;
             }
         }
-        
+        paramId += 1;
+
         // ---- DATUM OCENE
-        tmpOcenaDatum = ocenaDataList[2].trim();
+        tmpOcenaDatum = ocenaDataList[paramId].trim();
+        paramId += 1;
 
         // VPIS novE OCENE
         lo_nrOcen += 1;
@@ -5121,9 +5036,10 @@ function clipboard_parse_ucenec(lineStr) {
         // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU    
         if (tmpPisnaOcena) {
             // ---- ŠTEVILO DOSEŽENIH TOČK NA PISNEM TESTU
-            tmpOcenaTock = Number(ocenaDataList[3].trim());
+            tmpOcenaTock = Number(ocenaDataList[paramId].trim());
+            paramId += 1;
             // ---- ŠTEVILO MOŽNIH TOČK NA PISNEM TESTU
-            tmpOcenaMaxTock = Number(ocenaDataList[4].trim());
+            tmpOcenaMaxTock = Number(ocenaDataList[paramId].trim());
             // ----
             ocenaTock[lo_nrOcen] = tmpOcenaTock;
             ocenaMaxTock[lo_nrOcen] = tmpOcenaMaxTock;
@@ -5157,6 +5073,48 @@ function getPredmetId(vp_predmet) {
     let i;
     for (i = 1; i <= lo_nrPredmetov; i++) {
         if (predmetIme[i] == vp_predmet) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function getPredmetIdByKratica1(vp_predmetKratica1) {
+    let katalogPredmetId = getKatalogPredmetIdByKratica1(vp_predmetKratica1);
+    if (katalogPredmetId <= 0) { return -1; };
+    // predmet smo našli v katalogu - preberem njegovo ime
+    let predmetIme = katalogPredmetovIme[katalogPredmetId];
+    let predmetId = getPredmetId(predmetIme);
+    if (predmetId > 0) {
+        return predmetId
+    } else {
+        return -1;
+    }
+}
+
+function getPredmetImeKratica3ByKratica1(vp_predmetKratica1) {
+    let katalogPredmetId = getKatalogPredmetIdByKratica1(vp_predmetKratica1);
+    if (katalogPredmetId <= 0) {
+        return ["", ""];
+    };
+    // predmet smo našli v katalogu - vrnem njegovo ime in tročrkovno kratico
+    return [katalogPredmetovIme[katalogPredmetId], katalogPredmetovKratica3[katalogPredmetId]];
+}
+
+function getKatalogPredmetId(vp_imePredmeta) {
+    let i;
+    for (i = 1; i <= lo_nrKatalogPredmetov; i++) {
+        if (katalogPredmetovIme[i] == vp_imePredmeta) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function getKatalogPredmetIdByKratica1(vp_predmetKratica1) {
+    let i;
+    for (i = 1; i <= lo_nrKatalogPredmetov; i++) {
+        if (katalogPredmetovKratica1[i] == vp_predmetKratica1) {
             return i;
         }
     }
@@ -5238,16 +5196,17 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     for (ocenaId = ocenaId0; !passed && ocenaId <= lo_nrOcen; ocenaId++) {
         // Smo že mimo iskanih ocen?
         if (ocenaLetnikId[ocenaId] != myLetnik ||
-            ocenaPredmetId[ocenaId] != myPredmet ||
             (!razredCrkaAll && ocenaRazredId[ocenaId] != myRazred) ||
             (razredCrkaAll && razredLetnik[ocenaRazredId[ocenaId]] != vp_razredNr)) {
-            pass = true;
+            passed = true;
             break;
         };
         // Če se je spremenil samo tip, sem pač vmes na neki oceni drugega tipa, naslednja pa je spet lahko pravega tipa
-        if (ocenaTip[ocenaId] != vp_tip) {
+        // 28.1.2025 iz breakpogoja izvzel tudi čekiranje predmeta, ker imam lahko zdaj predmet ob vsaki oceni in se to znotraj razreda nahaja vse skupaj zavse predmete
+        if (ocenaTip[ocenaId] != vp_tip || ocenaPredmetId[ocenaId] != myPredmet) {
             continue
         };
+
         // Še smo znotraj iskanih ocen
         ucenecId = ocenaUcenecId[ocenaId];
         ocena = ocenaCifraNr[ocenaId];
@@ -5865,4 +5824,316 @@ function tmToolbarStartPeriod_tick() {
     lo_showToolbar = false;
     paint();
 
+}
+
+function load_demoText1() {
+
+    // ---------------------------
+    // Test variante, ko imaš spredaj najprej header, v katerm poveš letnik (#L), predmet (#P) in razred (#R)
+    // Predmet bo pri vseh ocenah ta, ki je zapisan v headerju, zato predmeta pri ocenah učencev ni potrebno označevati in se ga ne označuje.
+    // Nato pa v nadaljevanju seznam vseh učemcev razreda, z vsemi njihovimi ocenami pri predmetu, ki je napisan v headerju.
+    // Spodaj je isti razred "8.D" naštet še enkrat, v headerju pa piše KEMIJA, in pri učencih so potem ocene pri kemiji.
+    // Slabost tega načina podajanja podatkov je ta, da je treba za vsak predmet vse učence ponovno našteti. Ni pa tako dolgih vrstic ocen posameznega učence, ker se gre le za en predmet.
+    //    primer headerja in ene ocene: "#L2425 #PFIZIKA #R8.D" .. "4|P1|15-1-25|70.5|81" ... FIZIKA, ocena 4, prvi pisni test, na dan 15.1.2025, 70.5 točk od 81 točk
+    // Ta varianta podatkov JE PODPRTA !!!
+    // ---------------------------
+
+    addDemoText("#L2425 #PFIZIKA #R8.D");
+    addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|60|81, ");
+    addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
+    addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
+    addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
+    addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
+    addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
+    addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
+    addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
+    addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
+    addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
+    addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
+    addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
+    addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
+    addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
+    addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
+    addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
+    addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
+    addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
+    //----
+    addDemoText("#L2425 #PFIZIKA #R8.E");
+    addDemoText("Sin Skok,               2|U|5-10-24,  4|U|17-12-24,           3|P1|15-1-25|53.5|81, ");
+    addDemoText("Madalina Breskvar,      5|U|7-10-24,  3|P1|15-1-25|52|81, ");
+    addDemoText("Aron Kron,              4|U|9-10-24,  3|P1|20-1-25|60.5|81,  4|P2|25-4-25|51|61,");
+    addDemoText("Zija Firbec,            4|U|7-10-24,  3|P1|15-1-25|58|81, ");
+    addDemoText("Zara Motorka,           4|U|9-10-24,  2|P1|20-1-25|49|81");
+    addDemoText("Mira Mar,               1|U|4-10-24,  1|P1|15-1-25|31.5|81, ");
+    addDemoText("Jerka Kubic             5|U|8-10-24,  3|U|16-12-24,           3|P1|13-1-25|55|81, ");
+    addDemoText("Birma Firmska,          3|U|9-10-24,  3|P1|15-1-25|51|81, ");
+    addDemoText("Seka Sekun,             5|U|7-10-24,  2|P1|15-1-25|47.5|81, ");
+    addDemoText("Mirza Delija,           5|U|4-10-24,  2|P1|18-1-25|43|81, ");
+    addDemoText("Adi Dasler,             5|U|7-10-24,  2|P1|15-1-25|44.5|81, 2|P2|25-4-25|35|61,");
+    addDemoText("Veter Velkaverh,        4|U|12-10-24, 1|P1|17-1-25|29|81, ");
+    addDemoText("Ken Reed,               3|U|7-10-24,  1|P1|12-1-25|35|81, ");
+    addDemoText("Ari Peka,               4|U|15-10-24, 4|P1|15-1-25|65|81, ");
+    addDemoText("Luki Krasi,             5|U|7-10-24,  4|P1|15-1-25|68.5|81, ");
+    addDemoText("Porko Smeh,             4|U|7-10-24,  1|U|4-12-24,             4|U|12-12-24,            1|P1|11-1-25|38.5|81, ");
+    addDemoText("Matona Pomagi,          3|U|14-10-24, 2|P1|15-1-25|40.5|81, ");
+    addDemoText("Fjara Kiselj,           2|U|7-10-24,  1|P1|15-1-25|30.5|81, ");
+    addDemoText("Karina Enesu,           5|U|2-10-24,  5|U|4-12-24,             5|P1|15-1-25|76|81, ");
+    addDemoText("Kelia Kolas,            3|U|9-10-24,  4|P1|14-1-25|70.5|81, ");
+    addDemoText("Dona Podbreg,           5|U|8-10-24,  4|P1|15-1-25|65.5|81, ");
+    addDemoText("Gera Presek,            5|U|9-10-24,  1|P1|12-1-25|27|81, ");
+    addDemoText("Zevs Novak,             4|U|14-10-24, 1|P1|11-1-25|25|81, ");
+    //----
+    addDemoText("#L2425 #PFIZIKA #R9.D");
+    addDemoText("Zera Bison,         3|U|16-10-24,  5|U|29-11-24,               4|P1|20-1-25|57.5|75, ");
+    addDemoText("Emma Celje,         5|U|16-10-24,  4|P1|15-1-25|61|75, ");
+    addDemoText("Krasna Gorec,       5|U|12-10-24,  5|P1|12-1-25|69.5|75,");
+    addDemoText("Preja Volan,        5|U|22-10-24,  5|P1|15-1-25|72|75, ");
+    addDemoText("Kravl Vodnik,       5|U|15-10-24,  3|P1|19-1-25|48.5|75,");
+    addDemoText("Voda Popit,         4|U|20-10-24,  1|P1|18-1-25|27|75, ");
+    addDemoText("Nos Smerk,          5|U|18-10-24,  4|U|4-12-24,               4|P1|12-1-25|59|75, ");
+    addDemoText("Fina Smrekoc,       3|U|11-10-24,  1|P1|11-1-25|16|75, ");
+    addDemoText("Heron Delon,        3|U|14-10-24,  1|P1|13-1-25|33|75, ");
+    addDemoText("Mirk Novicki,       3|U|6-10-24,   2|P1|15-1-25|41|75, ");
+    addDemoText("Karim Kozoleb,      5|U|20-10-24,  4|P1|16-1-25|64.5|75, ");
+    addDemoText("Sneja Pacifik,      5|U|12-10-24,  3|P1|20-1-25|51.5|75,");
+    addDemoText("Lunea Lolibruc,     4|U|19-10-24,  2|P1|15-1-25|45|75, ");
+    addDemoText("Missi Sas,          5|U|9-10-24,   5|P1|19-1-25|70.5|75, ");
+    addDemoText("Spona Okov,         4|U|12-10-24,   ");
+    addDemoText("Mons Titan,         5|U|4-10-24,   5|P1|12-1-25|73.5|75, ");
+    //----
+    addDemoText("#L2425 #PFIZIKA #R9.E");
+    addDemoText("Priska Fris,         4|U|21-10-24,  4|P1|15-1-25|61.5|75,            ");
+    addDemoText("Tor Bariton,         4|U|21-10-24,  3|P1|15-1-25|50|75, ");
+    addDemoText("Sjor Bergerud,       5|U|9-10-24,   4|P1|15-1-25|66|75, 4|P2|25-4-25|55|68,");
+    addDemoText("Luis Armkil,         3|U|16-10-24,  3|P1|15-1-25|47|75, ");
+    addDemoText("Disk Hardi,          4|U|14-10-24,  4|P1|20-1-25|63|75,");
+    addDemoText("Fravz Pic,           2|U|21-10-24,  2|P1|15-1-25|38|75, ");
+    addDemoText("Jena Alidvak,        5|U|21-10-24,  4|P1|15-1-25|65|75,   ");
+    addDemoText("Zimija Zmilican,     5|U|23-10-24,  4|P1|15-1-25|61|75, ");
+    addDemoText("Krol Bojanec,        4|U|23-10-24,  3|P1|15-1-25|55|75, 3|P2|25-4-25|44|68,");
+    addDemoText("Kljuk Book,          4|U|14-10-24,    ");
+    addDemoText("Raven Kodila,        5|U|16-10-24,  2|P1|15-1-25|41.5|75, ");
+    addDemoText("Mix Musikmen,        2|U|21-10-24,  1|P1|15-1-25|28|75");
+    addDemoText("Vrh Triglava,        5|U|14-10-24,  5|P1|15-1-25|72.5|75, ");
+    addDemoText("Petina Zmaga,        5|U|21-10-24,  3|P1|15-1-25|53|75, ");
+    addDemoText("Krizantema Vrt,      5|U|14-10-24,  5|P1|15-1-25|74.5|75, ");
+    addDemoText("Burak Osman,         5|U|16-10-24,  2|P1|22-1-25|45|75,");
+    addDemoText("Mladen Starina,      2|U|23-10-24,  1|P1|15-1-25|22|75, ");
+    addDemoText("Bindo Farina,        5|U|9-10-24,   3|P1|15-1-25|54.5|75, ");
+    addDemoText("Pikica Slon,         5|U|23-10-24,  5|P1|15-1-25|69|75, ");
+    //----
+    addDemoText("#L2425 #PKEMIJA #R8.D");
+    //addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|81|81, ");
+    addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
+    //addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
+    //addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
+    addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
+    addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
+    addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
+    addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
+    addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
+    //addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
+    addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
+    addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
+    addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
+    addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
+    addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
+    addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
+    addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
+    addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
+
+};
+
+function load_demoText2() {
+
+    addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko,     F|2|U|17-10-24, F|4|P1|15-1-25|70.5|81,   F|4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,        F|4|U|5-10-24,  F|3|P1|15-1-25|60|81, ");
+    addDemoText("Janko Bergant,   F|3|U|9-10-24,  F|3|P1|15-1-25|56.5|81, ");
+    addDemoText("Jasmin Brekalo,  F|3|U|11-10-24, F|1|P1|15-1-25|33|81,     F|5|P2|25-4-25|60.5|61,");
+    addDemoText("Franc Gadafi,    F|2|U|12-10-24, F|3|U|16-12-24,           F|1|P1|15-1-25|23|81,     F|4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,    F|5|U|9-10-24,  F|3|U|12-12-24,           F|4|P1|15-1-25|64|81, ");
+    addDemoText("Vanjka Semio,    F|4|U|9-10-24,  F|4|P1|15-1-25|66.5|81, ");
+    addDemoText("Marija Beloder,  F|5|U|11-10-24, F|3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,      F|5|U|8-10-24,  F|2|P1|15-1-25|43.5|81, ");
+    addDemoText("Danka Cuker,     F|4|U|6-10-24,  F|4|P1|15-1-25|72.5|81, ");
+    addDemoText("Kiro Puter,      F|3|U|9-10-24,  F|2|P1|15-1-25|48.5|81, ");
+    addDemoText("Zinka Vodni,     F|2|U|14-10-24, F|5|P1|15-1-25|77.5|81, ");
+    addDemoText("Krava Fik,       F|5|U|11-10-24, F|3|P1|15-1-25|51.5|81,   F|1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,     F|4|U|12-10-24, F|2|P1|15-1-25|44.5|81, ");
+    addDemoText("Anja Banja,      F|4|U|13-10-24, F|2|P1|15-1-25|47|81, ");
+    addDemoText("Roja Finf,       F|5|U|3-10-24,  F|5|P1|15-1-25|81|81, ");
+    addDemoText("Kir Per,         F|5|U|28-9-24,  F|4|U|4-12-24,            F|1|P1|15-1-25|28.5|81, ");
+    addDemoText("Vinko Tvrdi,     F|3|U|4-10-24,  F|4|P1|15-1-25|67|81, ");
+    addDemoText("Zeko Populare,   F|5|U|6-10-24,  F|1|P1|15-1-25|34.5|81, ");
+    addDemoText("Amer Fujsov,     F|5|U|7-10-24,  F|3|P1|15-1-25|59.5|81, ");
+    addDemoText("Pinka Rinka,     F|5|U|3-10-24,  F|5|P1|15-1-25|74.5|81, ");
+    addDemoText("Daren Parlov,    F|3|U|6-10-24,  F|2|P1|15-1-25|46|81, ");
+    //----
+    addDemoText("#L2425 #R8.E");
+    addDemoText("Sin Skok,               F|2|U|5-10-24,  F|4|U|17-12-24,           F|3|P1|15-1-25|53.5|81, ");
+    addDemoText("Madalina Breskvar,      F|5|U|7-10-24,  F|3|P1|15-1-25|52|81, ");
+    addDemoText("Aron Kron,              F|4|U|9-10-24,  F|3|P1|20-1-25|60.5|81,   F|4|P2|25-4-25|51|61,");
+    addDemoText("Zija Firbec,            F|4|U|7-10-24,  F|3|P1|15-1-25|58|81, ");
+    addDemoText("Zara Motorka,           F|4|U|9-10-24,  F|2|P1|20-1-25|49|81");
+    addDemoText("Mira Mar,               F|1|U|4-10-24,  F|1|P1|15-1-25|31.5|81, ");
+    addDemoText("Jerka Kubic             F|5|U|8-10-24,  F|3|U|16-12-24,           F|3|P1|13-1-25|55|81, ");
+    addDemoText("Birma Firmska,          F|3|U|9-10-24,  F|3|P1|15-1-25|51|81, ");
+    addDemoText("Seka Sekun,             F|5|U|7-10-24,  F|2|P1|15-1-25|47.5|81, ");
+    addDemoText("Mirza Delija,           F|5|U|4-10-24,  F|2|P1|18-1-25|43|81, ");
+    addDemoText("Adi Dasler,             F|5|U|7-10-24,  F|2|P1|15-1-25|44.5|81,   F|2|P2|25-4-25|35|61,");
+    addDemoText("Veter Velkaverh,        F|4|U|12-10-24, F|1|P1|17-1-25|29|81, ");
+    addDemoText("Ken Reed,               F|3|U|7-10-24,  F|1|P1|12-1-25|35|81, ");
+    addDemoText("Ari Peka,               F|4|U|15-10-24, F|4|P1|15-1-25|65|81, ");
+    addDemoText("Luki Krasi,             F|5|U|7-10-24,  F|4|P1|15-1-25|68.5|81, ");
+    addDemoText("Porko Smeh,             F|4|U|7-10-24,  F|1|U|4-12-24,             F|4|U|12-12-24,            F|1|P1|11-1-25|38.5|81, ");
+    addDemoText("Matona Pomagi,          F|3|U|14-10-24, F|2|P1|15-1-25|40.5|81, ");
+    addDemoText("Fjara Kiselj,           F|2|U|7-10-24,  F|1|P1|15-1-25|30.5|81, ");
+    addDemoText("Karina Enesu,           F|5|U|2-10-24,  F|5|U|4-12-24,             F|5|P1|15-1-25|76|81, ");
+    addDemoText("Kelia Kolas,            F|3|U|9-10-24,  F|4|P1|14-1-25|70.5|81, ");
+    addDemoText("Dona Podbreg,           F|5|U|8-10-24,  F|4|P1|15-1-25|65.5|81, ");
+    addDemoText("Gera Presek,            F|5|U|9-10-24,  F|1|P1|12-1-25|27|81, ");
+    addDemoText("Zevs Novak,             F|4|U|14-10-24, F|1|P1|11-1-25|25|81, ");
+    //----
+    addDemoText("#L2425 #R9.D");
+    addDemoText("Zera Bison,         F|3|U|16-10-24,  F|5|U|29-11-24,             F|4|P1|20-1-25|57.5|75, ");
+    addDemoText("Emma Celje,         F|5|U|16-10-24,  F|4|P1|15-1-25|61|75, ");
+    addDemoText("Krasna Gorec,       F|5|U|12-10-24,  F|5|P1|12-1-25|69.5|75,");
+    addDemoText("Preja Volan,        F|5|U|22-10-24,  F|5|P1|15-1-25|72|75, ");
+    addDemoText("Kravl Vodnik,       F|5|U|15-10-24,  F|3|P1|19-1-25|48.5|75,");
+    addDemoText("Voda Popit,         F|4|U|20-10-24,  F|1|P1|18-1-25|27|75, ");
+    addDemoText("Nos Smerk,          F|5|U|18-10-24,  F|4|U|4-12-24,               F|4|P1|12-1-25|59|75, ");
+    addDemoText("Fina Smrekoc,       F|3|U|11-10-24,  F|1|P1|11-1-25|16|75, ");
+    addDemoText("Heron Delon,        F|3|U|14-10-24,  F|1|P1|13-1-25|33|75, ");
+    addDemoText("Mirk Novicki,       F|3|U|6-10-24,   F|2|P1|15-1-25|41|75, ");
+    addDemoText("Karim Kozoleb,      F|5|U|20-10-24,  F|4|P1|16-1-25|64.5|75, ");
+    addDemoText("Sneja Pacifik,      F|5|U|12-10-24,  F|3|P1|20-1-25|51.5|75,");
+    addDemoText("Lunea Lolibruc,     F|4|U|19-10-24,  F|2|P1|15-1-25|45|75, ");
+    addDemoText("Missi Sas,          F|5|U|9-10-24,   F|5|P1|19-1-25|70.5|75, ");
+    addDemoText("Spona Okov,         F|4|U|12-10-24,   ");
+    addDemoText("Mons Titan,         F|5|U|4-10-24,   F|5|P1|12-1-25|73.5|75, ");
+    //----
+    addDemoText("#L2425 #R9.E");
+    addDemoText("Priska Fris,         F|4|U|21-10-24,  F|4|P1|15-1-25|61.5|75,            ");
+    addDemoText("Tor Bariton,         F|4|U|21-10-24,  F|3|P1|15-1-25|50|75, ");
+    addDemoText("Sjor Bergerud,       F|5|U|9-10-24,   F|4|P1|15-1-25|66|75,   F|4|P2|25-4-25|55|68,");
+    addDemoText("Luis Armkil,         F|3|U|16-10-24,  F|3|P1|15-1-25|47|75, ");
+    addDemoText("Disk Hardi,          F|4|U|14-10-24,  F|4|P1|20-1-25|63|75,");
+    addDemoText("Fravz Pic,           F|2|U|21-10-24,  F|2|P1|15-1-25|38|75, ");
+    addDemoText("Jena Alidvak,        F|5|U|21-10-24,  F|4|P1|15-1-25|65|75,   ");
+    addDemoText("Zimija Zmilican,     F|5|U|23-10-24,  F|4|P1|15-1-25|61|75, ");
+    addDemoText("Krol Bojanec,        F|4|U|23-10-24,  F|3|P1|15-1-25|55|75,   F|3|P2|25-4-25|44|68,");
+    addDemoText("Kljuk Book,          F|4|U|14-10-24,    ");
+    addDemoText("Raven Kodila,        F|5|U|16-10-24,  F|2|P1|15-1-25|41.5|75, ");
+    addDemoText("Mix Musikmen,        F|2|U|21-10-24,  F|1|P1|15-1-25|28|75");
+    addDemoText("Vrh Triglava,        F|5|U|14-10-24,  F|5|P1|15-1-25|72.5|75, ");
+    addDemoText("Petina Zmaga,        F|5|U|21-10-24,  F|3|P1|15-1-25|53|75, ");
+    addDemoText("Krizantema Vrt,      F|5|U|14-10-24,  F|5|P1|15-1-25|74.5|75, ");
+    addDemoText("Burak Osman,         F|5|U|16-10-24,  F|2|P1|22-1-25|45|75,");
+    addDemoText("Mladen Starina,      F|2|U|23-10-24,  F|1|P1|15-1-25|22|75, ");
+    addDemoText("Bindo Farina,        F|5|U|9-10-24,   F|3|P1|15-1-25|54.5|75, ");
+    addDemoText("Pikica Slon,         F|5|U|23-10-24,  F|5|P1|15-1-25|69|75, ");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko,      K|2|U|17-10-24, K|4|P1|15-1-25|70.5|81, K|4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,         K|4|U|5-10-24,  K|3|P1|15-1-25|81|81, ");
+    addDemoText("Janko Bergant,    K|3|U|9-10-24,  K|3|P1|15-1-25|56.5|81, ");
+    addDemoText("Jasmin Brekalo,   K|3|U|11-10-24, K|1|P1|15-1-25|33|81,   K|5|P2|25-4-25|60.5|61,");
+    addDemoText("Franc Gadafi,     K|2|U|12-10-24, K|3|U|16-12-24,         K|1|P1|15-1-25|23|81,      K|4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,     K|5|U|9-10-24,  K|3|U|12-12-24,         K|4|P1|15-1-25|64|81, ");
+    addDemoText("Vanjka Semio,     K|4|U|9-10-24,  K|4|P1|15-1-25|66.5|81, ");
+    addDemoText("Marija Beloder,   K|5|U|11-10-24, K|3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,       K|5|U|8-10-24,  K|2|P1|15-1-25|43.5|81, ");
+    addDemoText("Danka Cuker,      K|4|U|6-10-24,  K|4|P1|15-1-25|72.5|81, ");
+    addDemoText("Kiro Puter,       K|3|U|9-10-24,  K|2|P1|15-1-25|48.5|81, ");
+    addDemoText("Zinka Vodni,      K|2|U|14-10-24, K|5|P1|15-1-25|77.5|81, ");
+    addDemoText("Krava Fik,        K|5|U|11-10-24, K|3|P1|15-1-25|51.5|81,  K|1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,      K|4|U|12-10-24, K|2|P1|15-1-25|44.5|81, ");
+    addDemoText("Anja Banja,       K|4|U|13-10-24, K|2|P1|15-1-25|47|81, ");
+    addDemoText("Roja Finf,        K|5|U|3-10-24,  K|5|P1|15-1-25|81|81, ");
+    addDemoText("Kir Per,          K|5|U|28-9-24,  K|4|U|4-12-24,            K|1|P1|15-1-25|28.5|81, ");
+    addDemoText("Vinko Tvrdi,      K|3|U|4-10-24,  K|4|P1|15-1-25|67|81, ");
+    addDemoText("Zeko Populare,    K|5|U|6-10-24,  K|1|P1|15-1-25|34.5|81, ");
+    addDemoText("Amer Fujsov,      K|5|U|7-10-24,  K|3|P1|15-1-25|59.5|81, ");
+    addDemoText("Pinka Rinka,      K|5|U|3-10-24,  K|5|P1|15-1-25|74.5|81, ");
+    addDemoText("Daren Parlov,     K|3|U|6-10-24,  K|2|P1|15-1-25|46|81, ");
+
+};
+
+function load_demoText3() {
+
+    addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko,      K|2|U|17-10-24, K|4|P1|15-1-25|70.5|81, K|4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,         K|4|U|5-10-24,  K|3|P1|15-1-25|81|81, ");
+    addDemoText("Janko Bergant,    K|3|U|9-10-24,  K|3|P1|15-1-25|56.5|81, ");
+    addDemoText("Jasmin Brekalo,   K|3|U|11-10-24, K|1|P1|15-1-25|33|81,   K|5|P2|25-4-25|60.5|61,");
+    addDemoText("Franc Gadafi,     K|2|U|12-10-24, K|3|U|16-12-24,         K|1|P1|15-1-25|23|81,      4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,     K|5|U|9-10-24,  K|3|U|12-12-24,         K|4|P1|15-1-25|64|81, ");
+    addDemoText("Vanjka Semio,     K|4|U|9-10-24,  K|4|P1|15-1-25|66.5|81, ");
+    addDemoText("Marija Beloder,   K|5|U|11-10-24, K|3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,       K|5|U|8-10-24,  K|2|P1|15-1-25|43.5|81, ");
+    addDemoText("Danka Cuker,      K|4|U|6-10-24,  K|4|P1|15-1-25|72.5|81, ");
+    addDemoText("Kiro Puter,       K|3|U|9-10-24,  K|2|P1|15-1-25|48.5|81, ");
+    addDemoText("Zinka Vodni,      K|2|U|14-10-24, K|5|P1|15-1-25|77.5|81, ");
+    addDemoText("Krava Fik,        K|5|U|11-10-24, K|3|P1|15-1-25|51.5|81,  K|1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,      K|4|U|12-10-24, K|2|P1|15-1-25|44.5|81, ");
+    addDemoText("Anja Banja,       K|4|U|13-10-24, K|2|P1|15-1-25|47|81, ");
+    addDemoText("Roja Finf,        K|5|U|3-10-24,  K|5|P1|15-1-25|81|81, ");
+    addDemoText("Kir Per,          K|5|U|28-9-24,  K|4|U|4-12-24,            K|1|P1|15-1-25|28.5|81, ");
+    addDemoText("Vinko Tvrdi,      K|3|U|4-10-24,  K|4|P1|15-1-25|67|81, ");
+    addDemoText("Zeko Populare,    K|5|U|6-10-24,  K|1|P1|15-1-25|34.5|81, ");
+    addDemoText("Amer Fujsov,      K|5|U|7-10-24,  K|3|P1|15-1-25|59.5|81, ");
+    addDemoText("Pinka Rinka,      K|5|U|3-10-24,  K|5|P1|15-1-25|74.5|81, ");
+    addDemoText("Daren Parlov,     K|3|U|6-10-24,  K|2|P1|15-1-25|46|81, ");
+    
+}
+
+function load_demoText4() {
+
+    // ---------------------------
+    // Test variante, ko imaš spredaj najprej katalog vseh predmetov z imenom, trimestno kratico in enomestno kratico
+    // Potem v nadaljevanju imaš za vsak razred header vrstico z letnikom (#L) in razredom (#R) ... pozor: predmet tu ni naveden, ker bo enomestna kratica predmeta prisotna pri vseki oceni posebej
+    // Nato pa v nadaljevanju seznam vseh učemcev razreda, z vsemi njihovimi ocenami pri vseh predmetih.
+    //    primer ene ocene: "K|4|P1|15-1-25|70.5|81" ... KEMIJA, ocena 4, prvi pisni test, na dan 15.1.2025, 70.5 točk od 81 točk
+    // Ta varianta podatkov JE PODPRTA !!!
+    // ---------------------------
+
+    addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko,     F|2|U|17-10-24, F|4|P1|15-1-25|70.5|81,   F|4|P2|25-4-25|51|61,  K|2|U|17-10-24, K|4|P1|15-1-25|70.5|81, K|4|P2|25-4-25|51|61,");
+    addDemoText("Mare Car,        F|4|U|5-10-24,  F|3|P1|15-1-25|60|81,     K|4|U|5-10-24,  K|3|P1|15-1-25|81|81, ");
+    addDemoText("Janko Bergant,   F|3|U|9-10-24,  F|3|P1|15-1-25|56.5|81,   K|3|U|9-10-24,  K|3|P1|15-1-25|56.5|81, ");
+    addDemoText("Jasmin Brekalo,  F|3|U|11-10-24, F|1|P1|15-1-25|33|81,     F|5|P2|25-4-25|60.5|61,     K|3|U|11-10-24, K|1|P1|15-1-25|33|81,   K|5|P2|25-4-25|60.5|61,");
+    addDemoText("Franc Gadafi,    F|2|U|12-10-24, F|3|U|16-12-24,           F|1|P1|15-1-25|23|81,     F|4|P2|25-4-25|53|61,   K|2|U|12-10-24, K|3|U|16-12-24,         K|1|P1|15-1-25|23|81,      K|4|P2|25-4-25|53|61,");
+    addDemoText("Dolfe Titler,    F|5|U|9-10-24,  F|3|U|12-12-24,           F|4|P1|15-1-25|64|81,     K|5|U|9-10-24,  K|3|U|12-12-24,         K|4|P1|15-1-25|64|81,");
+    addDemoText("Vanjka Semio,    F|4|U|9-10-24,  F|4|P1|15-1-25|66.5|81,   K|4|U|9-10-24,  K|4|P1|15-1-25|66.5|81,");
+    addDemoText("Marija Beloder,  F|5|U|11-10-24, F|3|P1|15-1-25|56|81,     K|5|U|11-10-24, K|3|P1|15-1-25|56|81, ");
+    addDemoText("Finka Kruh,      F|5|U|8-10-24,  F|2|P1|15-1-25|43.5|81,   K|5|U|8-10-24,  K|2|P1|15-1-25|43.5|81,");
+    addDemoText("Danka Cuker,     F|4|U|6-10-24,  F|4|P1|15-1-25|72.5|81,   K|4|U|6-10-24,  K|4|P1|15-1-25|72.5|81,");
+    addDemoText("Kiro Puter,      F|3|U|9-10-24,  F|2|P1|15-1-25|48.5|81,   K|3|U|9-10-24,  K|2|P1|15-1-25|48.5|81,");
+    addDemoText("Zinka Vodni,     F|2|U|14-10-24, F|5|P1|15-1-25|77.5|81,   K|2|U|14-10-24, K|5|P1|15-1-25|77.5|81,");
+    addDemoText("Krava Fik,       F|5|U|11-10-24, F|3|P1|15-1-25|51.5|81,   F|1|P2|25-4-25|25|61,   K|5|U|11-10-24, K|3|P1|15-1-25|51.5|81,  K|1|P2|25-4-25|25|61,");
+    addDemoText("Tonka Keran,     F|4|U|12-10-24, F|2|P1|15-1-25|44.5|81,   K|4|U|12-10-24, K|2|P1|15-1-25|44.5|81,");
+    addDemoText("Anja Banja,      F|4|U|13-10-24, F|2|P1|15-1-25|47|81,     K|4|U|13-10-24, K|2|P1|15-1-25|47|81,");
+    addDemoText("Roja Finf,       F|5|U|3-10-24,  F|5|P1|15-1-25|81|81,     K|5|U|3-10-24,  K|5|P1|15-1-25|81|81,");
+    addDemoText("Kir Per,         F|5|U|28-9-24,  F|4|U|4-12-24,            F|1|P1|15-1-25|28.5|81, K|5|U|28-9-24,  K|4|U|4-12-24,            K|1|P1|15-1-25|28.5|81,");
+    addDemoText("Vinko Tvrdi,     F|3|U|4-10-24,  F|4|P1|15-1-25|67|81,     K|3|U|4-10-24,  K|4|P1|15-1-25|67|81,");
+    addDemoText("Zeko Populare,   F|5|U|6-10-24,  F|1|P1|15-1-25|34.5|81,   K|5|U|6-10-24,  K|1|P1|15-1-25|34.5|81,");
+    addDemoText("Amer Fujsov,     F|5|U|7-10-24,  F|3|P1|15-1-25|59.5|81,   K|5|U|7-10-24,  K|3|P1|15-1-25|59.5|81,");
+    addDemoText("Pinka Rinka,     F|5|U|3-10-24,  F|5|P1|15-1-25|74.5|81,   K|5|U|3-10-24,  K|5|P1|15-1-25|74.5|81,");
+    addDemoText("Daren Parlov,    F|3|U|6-10-24,  F|2|P1|15-1-25|46|81,     K|3|U|6-10-24,  K|2|P1|15-1-25|46|81,");
+    
 }
