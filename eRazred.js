@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.6"
-const gl_versionDate = "26.1.2025"
+const gl_versionNr = "v1.7"
+const gl_versionDate = "28.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2113,21 +2113,22 @@ var bcChartX1 = [];
 var bcChartY1 = [];
 var lo_bcChartSelectedId = 0;
 
-var lo_enabledintChooserF = true;
-var lo_enabledintChooserA = true;
-var lo_enabledintChooserP = true;
-var lo_enabledintChooserN = true;
-var lo_enabledUnitCm = true;
-var lo_enabledUnitMm = true;
-var lo_enabledRuler = true;
-var lo_enabledLegend = true;
-var lo_enabledRealLens = true; // 3.1.2025
-var lo_enabledHelp = true; // 10.1.2025
-var lo_enabledCopyLink = true; // 10.1.2025
+var lo_enabledHelp = true;       // 10.1.2025
+var lo_enabledPredmet = true;    // 28.1.2025
+var lo_enabledTest = true;       // 27.1.2025
+var lo_enabledRazred = true;     // 27.1.2025
+var lo_enabledSPData = true;     // 27.1.2025
+var lo_enabledKritLuknje = true; // 27.1.2025
+var lo_enabledLoad = true;       // 27.1.2025
 
 const cv_printLevelMax = 7;
 const cv_printLevelMin = 0;
 var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še grafične točke, 2-manjkajo še posivitve tabele, 1-manjkajo še črte vmes, 0-samo vrstični izpis točkovnika
+
+// ---- 27.1.2025
+var lo_toolbarStartPeriod = true;
+var lo_showToolbar = true;
+var tmToolbarStartPeriod;
 
 console.clear;
 
@@ -2188,7 +2189,7 @@ addDemoText("Gera Presek,            5|U|9-10-24,  1|P1|12-1-25|27|81, ");
 addDemoText("Zevs Novak,             4|U|14-10-24, 1|P1|11-1-25|25|81, ");
 //----
 addDemoText("#L2425 #PFIZIKA #R9.D");
-addDemoText("Zera Bison,         3|U|16-10-24,  5|U|29-11-24,               4|P1|20-1-25|57.5|75, 4|P2|25-4-25|52|68,");
+addDemoText("Zera Bison,         3|U|16-10-24,  5|U|29-11-24,               4|P1|20-1-25|57.5|75, ");
 addDemoText("Emma Celje,         5|U|16-10-24,  4|P1|15-1-25|61|75, ");
 addDemoText("Krasna Gorec,       5|U|12-10-24,  5|P1|12-1-25|69.5|75,");
 addDemoText("Preja Volan,        5|U|22-10-24,  5|P1|15-1-25|72|75, ");
@@ -2196,12 +2197,12 @@ addDemoText("Kravl Vodnik,       5|U|15-10-24,  3|P1|19-1-25|48.5|75,");
 addDemoText("Voda Popit,         4|U|20-10-24,  1|P1|18-1-25|27|75, ");
 addDemoText("Nos Smerk,          5|U|18-10-24,  4|U|4-12-24,               4|P1|12-1-25|59|75, ");
 addDemoText("Fina Smrekoc,       3|U|11-10-24,  1|P1|11-1-25|16|75, ");
-addDemoText("Heron Delon,        3|U|14-10-24,  1|P1|13-1-25|33|75, 1|P2|25-4-25|30|68,");
+addDemoText("Heron Delon,        3|U|14-10-24,  1|P1|13-1-25|33|75, ");
 addDemoText("Mirk Novicki,       3|U|6-10-24,   2|P1|15-1-25|41|75, ");
 addDemoText("Karim Kozoleb,      5|U|20-10-24,  4|P1|16-1-25|64.5|75, ");
 addDemoText("Sneja Pacifik,      5|U|12-10-24,  3|P1|20-1-25|51.5|75,");
 addDemoText("Lunea Lolibruc,     4|U|19-10-24,  2|P1|15-1-25|45|75, ");
-addDemoText("Missi Sas,          5|U|9-10-24,   5|P1|19-1-25|70.5|75, 2|P2|25-4-25|38|68,");
+addDemoText("Missi Sas,          5|U|9-10-24,   5|P1|19-1-25|70.5|75, ");
 addDemoText("Spona Okov,         4|U|12-10-24,   ");
 addDemoText("Mons Titan,         5|U|4-10-24,   5|P1|12-1-25|73.5|75, ");
 //----
@@ -2225,6 +2226,30 @@ addDemoText("Burak Osman,         5|U|16-10-24,  2|P1|22-1-25|45|75,");
 addDemoText("Mladen Starina,      2|U|23-10-24,  1|P1|15-1-25|22|75, ");
 addDemoText("Bindo Farina,        5|U|9-10-24,   3|P1|15-1-25|54.5|75, ");
 addDemoText("Pikica Slon,         5|U|23-10-24,  5|P1|15-1-25|69|75, ");
+//----
+addDemoText("#L2425 #PKEMIJA #R8.D");
+addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
+addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|60|81, ");
+addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
+addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
+addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
+addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
+addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
+addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
+addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
+addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
+addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
+addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
+addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
+addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
+addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
+addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
+addDemoText("Kir Per,         5|U|28-9-24,  4|U|4-12-24,            1|P1|15-1-25|28.5|81, ");
+addDemoText("Vinko Tvrdi,     3|U|4-10-24,  4|P1|15-1-25|67|81, ");
+addDemoText("Zeko Populare,   5|U|6-10-24,  1|P1|15-1-25|34.5|81, ");
+addDemoText("Amer Fujsov,     5|U|7-10-24,  3|P1|15-1-25|59.5|81, ");
+addDemoText("Pinka Rinka,     5|U|3-10-24,  5|P1|15-1-25|74.5|81, ");
+addDemoText("Daren Parlov,    3|U|6-10-24,  2|P1|15-1-25|46|81, ");
 
 function addDemoText(vp_textLine) {
 
@@ -2391,6 +2416,7 @@ const pickPlaceTop = 65; const pickPlaceTopText = pickPlaceTop + 5; const pickPl
 const cv_guiLayoutA = 1;
 const cv_guiLayoutB = 2;
 var lo_GUI_layout = cv_guiLayoutB;
+const wBtn = 20; const hBtn = 24;
 switch (lo_GUI_layout) {
     case cv_guiLayoutB:
         gpLeft = 8; gpTop = 8; gpWidth = 500; gpHeight = 80;
@@ -2406,8 +2432,13 @@ switch (lo_GUI_layout) {
         //var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
-        var buttonHelp = new button(gpLeft, gpTop + 10, 16, 20, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
-        //var buttonCopyLink = new button(gpLeft, gpTop + 10, 68, 20, "Copy link", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiranje bli"+scZhLow+"njice do to"+scTchLow+"no take konfiguracije na clipboard", "");
+        var buttonPredmet = new button(gpLeft, gpTop + 10, wBtn, hBtn, "P", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji predmet ...", "P");
+        var buttonTest = new button(gpLeft, gpTop + 10, wBtn, hBtn, "T", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji test ...", "T");
+        var buttonRazred = new button(gpLeft, gpTop + 10, wBtn, hBtn, "R", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Skupen/lo" + scTchLow + "en pogled po razredih", "R");
+        var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S");
+        var buttonKritLuknje = new button(gpLeft, gpTop + 10, wBtn, hBtn, "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
+        var buttonLoad = new button(gpLeft, gpTop + 10, wBtn, hBtn, "D", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "powderBlue", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Nalo" + scZhLow + "i skopirane podatke razredov in ocen iz clipboard-a ...", "D");
+        var buttonHelp = new button(gpLeft, gpTop + 10, wBtn, hBtn, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
     }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2503,14 +2534,9 @@ function main() {
         lo_initHelpTips = true;
         tmHideTipsId = setTimeout(tmHideTips_tick, 5000); //po 5 sekundah naj se tipsi sami postopoma ugasnejo
     }
-
-    // var elMainDate = document.getElementById("mainDate");
-// elMainDate.width = 300     //
-// elMainDate.height = 30 //
-// elMainDate.style.left = "30px";             //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
-// elMainDate.style.top = "1px";              //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
-// elMainDate.style.position = "absolute"     //tole je treba imeti v narekovajih!!! To bi sicer pasalo v CSS
     
+    tmToolbarStartPeriod = setTimeout(tmToolbarStartPeriod_tick, 30000); //po 10 sekundah naj se toolbar sam skrije. Prikazal se bo potem spet, ko se mu boš približal z miško
+
     tmMouseOutOfWindowId = setInterval(tmMouseOutOfWindow_tick, 500); //na pol sekunde čekiram, če je miška izven okna
     
 }
@@ -2750,6 +2776,79 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
 
+    
+    //---- preklop na naslednji predmet 28.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledPredmet) {
+        if (buttonPredmet.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            if (e.shiftKey) { // 26.1.2025
+                lf_changePredmet(lo_predmet - 1, false); // 26.1.2025
+            } else {
+                lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
+            }
+            prepareDataStructures();
+            paint();
+            vl_end = true
+        }
+    }
+    
+    //---- analiza naslednjega testa 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledTest) {
+        if (buttonTest.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            if (e.shiftKey) { // 26.1.2025
+                lf_changePisniTestNr(lo_pisniTestNr - 1, false); // 26.1.2025
+            } else {
+                lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
+            }
+            prepareDataStructures();
+            paint();
+            vl_end = true
+        }
+    }
+
+    //---- ločen/skupen pregled po razredih 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+        if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            lf_changeByRazredGen(!lo_byRazredGen, false); //
+            prepareDataStructures();
+            paint();
+            vl_end = true
+        }
+    }
+    
+    //---- Zoom scatter plot charta za analizo podatkov testa 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledSPData) {
+        if (buttonSPData.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            if (e.shiftKey) {
+                lf_changeSchrink(lo_schrink - 1, true);
+            } else {
+                lf_changeSchrink(lo_schrink + 1, true);
+            }
+            vl_end = true
+        }
+    }
+    
+    //---- prikaz lukenj med kriteriji ocen 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledKritLuknje) {
+        if (buttonKritLuknje.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
+            vl_end = true
+        }
+    }
+
+    //---- naloži podatke razredov in ocen iz clipboard-a 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledLoad) {
+        if (buttonLoad.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            clipboard_load();
+            vl_end = true
+        }
+    }
+    
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 
 });
@@ -2829,11 +2928,18 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
     if (lo_showGUI) {
-        if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) {
-            document.body.style.cursor = "pointer"
-        //} else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-        //    document.body.style.cursor = "pointer"              
-        } else { document.body.style.cursor = "default" };
+        if (lo_showToolbar) {
+            if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonLoad.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            //} else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
+            //    document.body.style.cursor = "pointer"              
+            else { document.body.style.cursor = "default" };
+        }
     } else { document.body.style.cursor = "default" };
     
     //če se miška v resnici ni premaknila ne naredim nič
@@ -2848,13 +2954,15 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     lo_mouseMoveY = e.offsetY
     //console.log(e.offsetX + "-" + e.offsetY)
 
-    ////---- Preverjanje, ali je z miško nad določenim elementom 
-    //let oldSelectedVrhLece = lo_selectedVrhLece; let oldSelectedTemeLece = lo_selectedTemeLece;
-    //lo_selectedA = false; lo_selectedF = false; lo_selectedPredmet = false; lo_selectedLeca = false;
-    //lo_selectedCenterKrivineLece = false; lo_selectedVrhLece = false; lo_selectedTemeLece = false;
-    //if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, lo_gxO, lo_gyLecaTop, 20)) { lo_selectedVrhLece = true; } 
-    //else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxP - 20, lo_gyP - 20, lo_gxP + 20, lo_gyO + 20)) { lo_selectedPredmet = true; }
-    //else if (lo_enabledintChooserA && intChooserA.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) { lo_selectedA = true; }
+    //---- če je toolbar skrit, in je z miško prišel v bližino (ali pa na levi rob ekrana), potem naj se toolbar prikaže
+    //     če pa je toolbar prikazan, se preveri, ali je miška šla daleč stran in v tem primeru se ga skrije
+    const dist = 100;
+    if (lo_mouseMoveX < 20 ||
+        mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, buttonRazred.left - dist, buttonRazred.top - dist, buttonHelp.left + buttonHelp.width + 1.5 * dist, buttonHelp.top + buttonHelp.height + dist)) {
+        lo_showToolbar = true;
+    } else {
+        if (!lo_toolbarStartPeriod) { lo_showToolbar = false; }
+    };
 
     //---- Preverjanje, ali je z miško nad določenim elementom 
     //let oldSpChartSelected = spChartSelected.slice(0);
@@ -2871,7 +2979,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
         // ---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
-        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
+        if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
             chartSelected = true;
             lo_spChartSelectedId = tmpItemId;
             // ---- Je pod miško kateri od testov v scatter plot chartu?
@@ -2881,7 +2989,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                 y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
                 if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
                     lo_testSelected = tmpTest;
-                    break
+                    break;
                 }
             }
             if (lo_testSelected <= 0) {
@@ -2890,7 +2998,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                     y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
                     if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x-1, y-1, x+1, y+1)) {
                         lo_testSelected = tmpTest;
-                        break
+                        break;
                     }
                 }
             }
@@ -2900,7 +3008,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                     y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
                     if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
                         lo_testSelected = tmpTest;
-                        break
+                        break;
                     }
                 }
             }
@@ -2909,7 +3017,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
         if (drawBarChart) { 
             for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
-                if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[tmpItemId][tmpOcena], bcChartY[tmpItemId][tmpOcena], bcChartX1[tmpItemId][tmpOcena], bcChartY1[tmpItemId][tmpOcena])) {
+                if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[tmpItemId][tmpOcena], bcChartY[tmpItemId][tmpOcena], bcChartX1[tmpItemId][tmpOcena], bcChartY1[tmpItemId][tmpOcena])) {
                     chartSelected = true;
                     lo_bcChartSelectedId = tmpItemId; // miška je nad tem razredom
                     lo_ocenaSelected = tmpOcena;     // miška je nad barom te ocene
@@ -2919,7 +3027,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         }
         // ---- Je pod miško katera od ocen v pie chartu? 23.1.2025
         if (drawPieChart) {
-            if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[tmpItemId], pcChartCy[tmpItemId], pcChartRadij[tmpItemId])) {
+            if (nrOcen[tmpItemId] && mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[tmpItemId], pcChartCy[tmpItemId], pcChartRadij[tmpItemId])) {
                 chartSelected = true;
                 //pcChartSelected[tmpItemId] = true;
                 lo_pcChartSelectedId = tmpItemId;  // miška je nad tem razredom
@@ -2951,7 +3059,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
 
     // tudi nič drugega ni selektiranega, zato izhod brez potrebe po ponovnem risanju!
-    return;
+
     //// poleg prej preverjenega, kjer je lahko hkrati selektirana samo ena zadeva, je lahko paralelno selektiran tudi center krivine leče
     //if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterL - 30, lo_gyO - 30, lo_gxLecaCenterL + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
     //else if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, lo_gxLecaCenterD - 30, lo_gyO - 30, lo_gxLecaCenterD + 30, lo_gyO + 30)) { lo_selectedCenterKrivineLece = true; }
@@ -3159,6 +3267,16 @@ window.addEventListener("keydown", (event) => {
             //lo_keyDownR = true; break;
             //console.log("R pressed");
             lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
+            prepareDataStructures();
+            paint();
+            break;
+        case 'KeyP': // sprememba predmeta 28.1.2025
+            //console.log("T pressed");
+            if (event.shiftKey) { // 26.1.2025
+                lf_changePredmet(lo_predmet - 1, false); // 26.1.2025
+            } else {
+                lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
+            }
             prepareDataStructures();
             paint();
             break;
@@ -3700,9 +3818,11 @@ function paint_eRazred_graf1() {
     // Za vse razrede nariši graf
     if (drawBarChart) {
         for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-            // za tekočo generacijo razredov narišem graf
-            let vl_chartTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
-            paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], maxOcenaCount, vl_chartTitle);
+            // za tekoči razred ali tekočo generacijo razredov narišem graf
+            if (nrOcen[tmpItemId] > 0) {
+                let vl_chartTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
+                paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], maxOcenaCount, vl_chartTitle);
+            }
         }
     }
 
@@ -3727,8 +3847,10 @@ function paint_eRazred_graf1() {
         x1 = 20;
         // Za vse razrede nariši pie-chart-e
         for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-            // za tekoči razred narišem pie chart
-            paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], nrOcen[tmpItemId]);
+            if (nrOcen[tmpItemId] > 0) {
+                // za tekoči razred narišem pie chart
+                paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], nrOcen[tmpItemId]);
+            }
         }
     }
 
@@ -3752,13 +3874,15 @@ function paint_eRazred_graf1() {
     // Za vse razrede nariši pie-chart-e
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
         // za tekoči razred narišem pie chart
-        paint_scatterPlotChart_byRazprsenost(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
-            tmpItemId,
-            arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
-            maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
-            avgTock[tmpItemId], avgPercent[tmpItemId],
-            arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
-            arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
+        if (nrOcen[tmpItemId] > 0) {
+            paint_scatterPlotChart_byRazprsenost(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
+                tmpItemId,
+                arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
+                maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
+                avgTock[tmpItemId], avgPercent[tmpItemId],
+                arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
+                arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
+        }
     }
     
     // ---- MOUSE OVER TIPS - SCATTER PLOT CHART 22.1.2025
@@ -3977,17 +4101,29 @@ function paint_GUI() {
     if (!lo_showGUI) {
         //---- on-screen namigi/pomoč
         if (lo_showHelpTips) { paint_tips() };
-        //if (lo_showStations) { paint_stations() };
         //return
     };
 
-    if (lo_showGUI) { // 10.1.2025
-        buttonHelp.paint();
+    if (lo_showToolTips) { //1.4.2024
+        if (lo_showGUI) {
+            if (lo_enabledHelp) { // 27.1.2025
+                buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonRazred.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+            };
+        };
+    };
+
+    if (lo_showGUI && lo_showToolbar) { 
+        buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+        y = buttonRazred.top;
+        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+        x = buttonLoad.left + buttonLoad.width + 4.5;
+        y = buttonRazred.top;
+        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
     }
 
     //---- on-screen namigi/pomoč
     if (lo_showHelpTips) { paint_tips() };
-    //if (lo_showStations) { paint_stations() };
 
     if (dbg) {
         vStep = 15;
@@ -4005,14 +4141,15 @@ function paint_tips() {
         case cv_guiLayoutB:
             
             let x0 = 20; let x1 = x0 + 130;
-            let y0 = 43; let vStep = 25; let y = y0 - vStep;
+            let y0 = 48; let vStep = 25; let y = y0 - vStep;
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 6;
+            let nrTipRows = 9;
             let backHeight = nrTipRows * vStep + 15;
+            const bannerWidth = 510;
 
-            gBannerRoundRect(x0 - 15, y0 - 13, 510, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
+            gBannerRoundRect(x0 - 15, y0 - 13, bannerWidth, backHeight, 20, gf_alphaColor(232, "ivory"), 1, "silver", "#ECECECC0", 5, 5, true); //zdaj treba manj transparentno, ker senčenje od v1.16 deluje samo okoli bannerja, ne pa tudi pod njim
             //
             y += vStep;
             gBannerRectWithText2("F2", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4020,27 +4157,17 @@ function paint_tips() {
             gBannerRectWithText2("N", x0 + 41, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i to pomo" + scTchLow, x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
-            //y += vStep;
-            //gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... spremeni f, a ali P (polje pod mi" + scSchLow + "ko)", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-
-            //   
-            //y += vStep;
-            //gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            //gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... spremeni gori" + scSchLow + scTchLow + "no razdaljo le" + scTchLow + "e", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
             y += vStep;
             gBannerRectWithText2("D", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... nalo" + scZhLow + "i kopirane podatke ocen iz clipboarda", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("R", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... preklop pregleda med razredi posamezno ali skupno", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);      
+            gBannerRectWithText2("... preklop pregleda med razredi posamezno ali skupno", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 35, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("SHIFT", x0 + 50, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("(+", x0 + 25, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("SHIFT", x0 + 45, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2(")", x0 + 98, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
             gBannerRectWithText2("... ZOOM +/- prikaza razpr" + scSchLow + "enosti rezultatov", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -4054,144 +4181,48 @@ function paint_tips() {
             gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i luknje v kriterijih to" + scTchLow + "kovnika", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
-            //y += vStep;
-            //gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //     
-            //y += vStep;
-            //gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            //gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            break;
-            
-            
-            
-            
-            //
             y += vStep;
-            gBannerRectWithText2("0", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 15, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 32, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... select start month", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("Home", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("End", x0 + 49, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("left", x0 + 85, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("right", x0 + 116, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... change month", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("P", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... play/stop", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("T", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... display for all/month/season", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
-            //
-            y += vStep;
-            gBannerRectWithText2("A", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... change averaging period", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... all time average", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("L", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... " + scDelta + "T(t) diagram", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            y += vStep;
-            gBannerRectWithText2("O", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 18, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 35, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... " + scDelta + "T(t) smoothing", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //   
-            y += vStep;
-            gBannerRectWithText2(String.fromCharCode(0x0110), x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... all station average", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //                
-            y += vStep;
-            gBannerRectWithText2("U", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("D", x0 +22, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 40, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 57, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... change Y scale", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("Y", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... normalize Y scale", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("V", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... show exact values/lines too", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("B", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... change station name length", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("E", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 17, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 34, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... move the end of data region", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            y += vStep;
-            gBannerRectWithText2("W", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("+", x0 + 22, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("mouseWheel", x0 + 39, y, font, 4, 3, 2, 2, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... change marker size", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            y += vStep;
-            gBannerRectWithText2("+", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("/", x0 + 19, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("ALT+", x0 + 33, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... add/delete/all markers on graph", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gLine(x0 - 4, y - 0.27 * vStep, x0 + bannerWidth - 30, y - 0.27 * vStep, 1, lo_tipsColor, [4, 4]);
+            gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i pomo" + scTchLow + " nad GUI kontrolerji", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("G", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... hide/show GUI controls", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
+            //     
             y += vStep;
-            gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("/", x0 + 21, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("dblClick", x0 + 35, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... select/unselect all places", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("H", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... high altitude stations selection", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            y += vStep;
-            gBannerRectWithText2("F9", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... list of weather stations", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("F8", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... weather stations on the map", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //            
-            y += vStep;
-            gBannerRectWithText2("I", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... hide/show tool tips", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            y += vStep;
-            gBannerRectWithText2("F11", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... full screen mode on/off", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-            //
-            break;
+            gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+                      
     }
 }
 
 function paint_GUI_layoutB() {
 
-    //---- 10.1.2025
-    buttonHelp.left = 2;
-    buttonHelp.top = 2;
-    
+    const wSep = 4;
+    let x;
+    let yTop = 2;
+
+    //---- 27.1.2025
+    buttonPredmet.left = 2;
+    buttonPredmet.top = yTop;
+    buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonTest.top = buttonPredmet.top;
+    buttonRazred.left = buttonTest.left + buttonTest.width + wSep;
+    buttonRazred.top = buttonPredmet.top;
+    buttonSPData.left = buttonRazred.left + buttonRazred.width + wSep;
+    buttonSPData.top = buttonPredmet.top;
+    buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
+    buttonKritLuknje.top = buttonPredmet.top;
+    //----
+    x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
+    buttonLoad.left = x + wSep;
+    buttonLoad.top = buttonPredmet.top;
+    //----
+    x = buttonLoad.left + buttonLoad.width + wSep;
+    buttonHelp.left = x + wSep;
+    buttonHelp.top = buttonPredmet.top;
+
 }
 
 function lf_changeValueF(vp_diff, vp_trunc) {
@@ -4499,6 +4530,17 @@ function lf_changePisniTestNr(vp_newValue, vp_paint) {
 
     if (lo_pisniTestNr > lo_nrPredmetPisnihTestov[lo_predmet]) { lo_pisniTestNr = 1 };
     if (lo_pisniTestNr < 1) { lo_pisniTestNr = lo_nrPredmetPisnihTestov[lo_predmet] };
+
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changePredmet(vp_newValue, vp_paint) {
+
+    lo_predmet = vp_newValue;
+
+    if (lo_predmet > lo_nrPredmetov) { lo_predmet = 1 };
+    if (lo_predmet < 1) { lo_predmet = lo_nrPredmetov };
 
     if (vp_paint) { paint() }
 
@@ -4959,8 +5001,11 @@ function clipboard_parse_novRazred(lineStr) {
             case "FIZIKA":
                 predmetKratica[lo_nrPredmetov] = "FIZ";
                 break;
+            case "KEMIJA":
+                predmetKratica[lo_nrPredmetov] = "KEM";
+                break;
         }
-    } 
+    }
 
     // ---- RAZRED
     let tmpRazredStr = itemList[3].trim().slice(1);
@@ -5164,7 +5209,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         return [false, 0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiRazred, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiRazred, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid
     }
     // ---- Najprej poiščem prvo pravo oceno v tabeli vseh ocen
-    found = false;
+    found = false; // če najdem ustrezno oceno, se found postavi na true in FOR zanka skoči ven
     for (ocenaId = 1; !found; ocenaId++) {
         if (ocenaLetnikId[ocenaId] == myLetnik &&
             ocenaPredmetId[ocenaId] == myPredmet &&
@@ -5172,6 +5217,8 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
             ocenaTip[ocenaId] == vp_tip) {
             ocenaId0 = ocenaId;
             found = true;
+        } else { // če ocena ni ustrezna, se preveri, ali nisem morda že čez celo tabelo ocen. Če sem, skočim ven iz zanke z found==false
+            if (ocenaId >= (ocenaTip.length - 1)) { break; };
         }
     }
     if (!found) {
@@ -5396,8 +5443,6 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
         bcChartY[vp_itemId][i] = 0;
         bcChartX1[vp_itemId][i] = 0;
         bcChartY1[vp_itemId][i] = 0;
-        
-
 
         if (arrOcene[i] > 0) {
 
@@ -5807,5 +5852,13 @@ function getKriterijiOcene(vp_ocena) {
     }
 
     return [krit0, krit1];
+
+}
+
+function tmToolbarStartPeriod_tick() {
+
+    lo_toolbarStartPeriod = false;
+    lo_showToolbar = false;
+    paint();
 
 }
