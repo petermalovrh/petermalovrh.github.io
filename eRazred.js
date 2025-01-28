@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.7"
+const gl_versionNr = "v1.8"
 const gl_versionDate = "28.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2228,11 +2228,11 @@ addDemoText("Bindo Farina,        5|U|9-10-24,   3|P1|15-1-25|54.5|75, ");
 addDemoText("Pikica Slon,         5|U|23-10-24,  5|P1|15-1-25|69|75, ");
 //----
 addDemoText("#L2425 #PKEMIJA #R8.D");
-addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
-addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|60|81, ");
+//addDemoText("Neja Franko,     2|U|17-10-24, 4|P1|15-1-25|70.5|81, 4|P2|25-4-25|51|61,");
+addDemoText("Mare Car,        4|U|5-10-24,  3|P1|15-1-25|81|81, ");
 addDemoText("Janko Bergant,   3|U|9-10-24,  3|P1|15-1-25|56.5|81, ");
-addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
-addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
+//addDemoText("Jasmin Brekalo,  3|U|11-10-24, 1|P1|15-1-25|33|81, 5|P2|25-4-25|60.5|61,");
+//addDemoText("Franc Gadafi,    2|U|12-10-24, 3|U|16-12-24,           1|P1|15-1-25|23|81, 4|P2|25-4-25|53|61,");
 addDemoText("Dolfe Titler,    5|U|9-10-24,  3|U|12-12-24,           4|P1|15-1-25|64|81, ");
 addDemoText("Vanjka Semio,    4|U|9-10-24,  4|P1|15-1-25|66.5|81, ");
 addDemoText("Marija Beloder,  5|U|11-10-24, 3|P1|15-1-25|56|81, ");
@@ -2240,7 +2240,7 @@ addDemoText("Finka Kruh,      5|U|8-10-24,  2|P1|15-1-25|43.5|81, ");
 addDemoText("Danka Cuker,     4|U|6-10-24,  4|P1|15-1-25|72.5|81, ");
 addDemoText("Kiro Puter,      3|U|9-10-24,  2|P1|15-1-25|48.5|81, ");
 addDemoText("Zinka Vodni,     2|U|14-10-24, 5|P1|15-1-25|77.5|81, ");
-addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
+//addDemoText("Krava Fik,       5|U|11-10-24, 3|P1|15-1-25|51.5|81, 1|P2|25-4-25|25|61,");
 addDemoText("Tonka Keran,     4|U|12-10-24, 2|P1|15-1-25|44.5|81, ");
 addDemoText("Anja Banja,      4|U|13-10-24, 2|P1|15-1-25|47|81, ");
 addDemoText("Roja Finf,       5|U|3-10-24,  5|P1|15-1-25|81|81, ");
@@ -3739,7 +3739,7 @@ function prepareDataStructures() {
         arrRazredArrOceneArrRezultatiImePriimek[tmpItemId], arrRazredArrOceneArrRezultatiRazred[tmpItemId], arrRazredArrOceneArrRezultatiTock[tmpItemId], arrRazredArrOceneArrRezultatiPercent[tmpItemId], arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpItemId],
         arrArrOceneCount[tmpItemId], arrArrOceneCountPercent[tmpItemId], arrMaxOcenaCount[tmpItemId],
         arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiRazred[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId]]
-            = calculate_avg_test("2425", "FIZIKA", tmpRazredLetnikStr, tmpRazredCrka, tmpTipTestNr);
+            = calculate_avg_test("2425", predmetIme[lo_predmet], tmpRazredLetnikStr, tmpRazredCrka, tmpTipTestNr);
         // iščem največje število testov z isto oceno čez vse razrede, da bom lahko določil Y merilo za bar charte
         if (arrMaxOcenaCount[tmpItemId] > maxOcenaCount) {
             maxOcenaCount = arrMaxOcenaCount[tmpItemId];
@@ -4537,10 +4537,14 @@ function lf_changePisniTestNr(vp_newValue, vp_paint) {
 
 function lf_changePredmet(vp_newValue, vp_paint) {
 
+    let oldPredmet = lo_predmet;
+
     lo_predmet = vp_newValue;
 
     if (lo_predmet > lo_nrPredmetov) { lo_predmet = 1 };
     if (lo_predmet < 1) { lo_predmet = lo_nrPredmetov };
+
+    if (lo_predmet != oldPredmet) { lo_pisniTestNr = 1 }; // 28.1.2025
 
     if (vp_paint) { paint() }
 
