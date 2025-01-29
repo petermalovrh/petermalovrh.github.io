@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.9"
-const gl_versionDate = "28.1.2025"
+const gl_versionNr = "v1.10"
+const gl_versionDate = "29.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -511,6 +511,26 @@ function gLine(x0, y0, x1, y1, width, color, dash) {
     ctx.lineTo(x1, y1);
     ctx.stroke();
     ctx.closePath();
+}
+
+function gLik(x0, y0, dx, dy, fillColor, strokeWidth, strokeColor, strokeDash) {
+    //ctx.setLineDash([5, 5]); //dashed    ctx.setLineDash([]); //solid  //https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    for (let i = 0; i < dx.length; i++) {
+        ctx.lineTo(x0 + dx[i], y0 + dy[i]);
+    }
+    ctx.closePath();
+    if (fillColor != "") {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+    }
+    if (strokeWidth > 0) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.setLineDash(strokeDash);
+        ctx.stroke();
+    }
 }
 
 function gText(text, font, color, x, y) {
@@ -5018,22 +5038,24 @@ function data_parse_ucenec(lineStr) {
         // VPIS novE OCENE
         lo_nrOcen += 1;
         lo_ocena = lo_nrOcen;
-        // ----
+        
+        // ---- LINKI OCENE NA LETNIK, RAZRED, PREDMET IN NA UČENCA
         ocenaLetnikId[lo_nrOcen] = lo_letnik;
         ocenaPredmetId[lo_nrOcen] = lo_predmet;
         ocenaRazredId[lo_nrOcen] = lo_razred;
         ocenaUcenecId[lo_nrOcen] = lo_ucenec;
-        // ----
+        
+        // ---- PODATKI SAME OCENE
         ocenaCifra[lo_nrOcen] = tmpOcenaCifra;
         ocenaCifraNr[lo_nrOcen] = Number(tmpOcenaCifra);
         ocenaTip[lo_nrOcen] = tmpOcenaTip;
         ocenaTipSerialNr[lo_nrOcen] = 0;
         ocenaDatumStr[lo_nrOcen] = tmpOcenaDatum;
+        // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU    
         // ---- default število točk
         ocenaTock[lo_nrOcen] = -1;
         ocenaMaxTock[lo_nrOcen] = -1;
-
-        // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU    
+        // ---- zdaj pa pogledamo konkretno ...
         if (tmpPisnaOcena) {
             // ---- ŠTEVILO DOSEŽENIH TOČK NA PISNEM TESTU
             tmpOcenaTock = Number(ocenaDataList[paramId].trim());
@@ -5041,8 +5063,8 @@ function data_parse_ucenec(lineStr) {
             // ---- ŠTEVILO MOŽNIH TOČK NA PISNEM TESTU
             tmpOcenaMaxTock = Number(ocenaDataList[paramId].trim());
             // ----
-            ocenaTock[lo_nrOcen] = tmpOcenaTock;
-            ocenaMaxTock[lo_nrOcen] = tmpOcenaMaxTock;
+            ocenaTock[lo_nrOcen] = tmpOcenaTock;       // koliko točk je bilo doseženih pri tej oceni
+            ocenaMaxTock[lo_nrOcen] = tmpOcenaMaxTock; // koliko je lahko na tstu največ točk
         }
     }
     
@@ -5381,7 +5403,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     const wBar = (vp_w - 2 * marginChart - 2 * gapChart) / 5;
     let y0 = vp_y + vp_h - marginChart;
     let ky = (vp_h - 65) / maxOcenaCount; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
-    let xm = vp_x + marginChart + gapChart + wBar / 2; // sredina prvega bara
+    let xm1 = vp_x + marginChart + gapChart + wBar / 2; // sredina prvega bara
     let wBarFinal = wBar - 2 * gapBar;
 
     //---- shrani lastnosti digrama za mouseOver() event (24.1.2025)
@@ -5390,7 +5412,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     bcChartX1[vp_itemId] = [];
     bcChartY1[vp_itemId] = [];
     
-    let i, tmpHeight, tmpText, w, h, y, x1, y1, barColor, countOcenColor;
+    let i, tmpHeight, tmpText, w, h, y, x1, y1, barColor, countOcenColor, yTabletTop, yTextBase;
     let fontOcena = "bold 12pt verdana";
     if (vp_w > 150 && vp_h > 150) { fontOcena = "bold 13pt verdana"; };
     if (vp_w > 250 && vp_h > 250) { fontOcena = "bold 14pt verdana"; };
@@ -5399,6 +5421,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     let fontTitle = "bold 16pt verdana";
     // ---- Grem po vrsti čez vse ocene od 1 do 5
     
+    let xm = xm1;
     for (i = 1; i <= 5; i++) {
         
         //---- shrani lastnosti digrama za mouseOver() event (24.1.2025)
@@ -5429,18 +5452,40 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
             // ---- TABLETEK OCENE
             tmpText = Number(i);
             ;[w, h] = gMeasureText(tmpText, fontOcena);
-            gBannerRoundRectWithText(xm - w / 2 - 1, y0 - h - 6, w, h, fontOcena, barColor, tmpText, 2, 2, 7, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
+            yTabletTop = y0 - h - 6;
+            gBannerRoundRectWithText(xm - w / 2 - 1, yTabletTop, w, h, fontOcena, barColor, tmpText, 2, 2, 7, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
     
             // ---- ŠTEVILO OCEN
             tmpText = Number(arrOcene[i]);
             ;[w, h] = gMeasureText(tmpText, fontNr);
-            gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, y0 - tmpHeight - 4);
+            yTextBase = y0 - tmpHeight - 4;
+            if (yTextBase < (yTabletTop - 2)) {
+                gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, yTextBase);
+            } else {
+                gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1 + 12, yTextBase);
+            }
+            
         }
         xm += wBar; // tale pomik mora biti v vsakem primeru, pa če bom risal bar ali ne (26.1.2025)
     }
 
     // ---- VODORAVNA ČRTA KOT OSNOVA GRAFA
     gLine(vp_x + marginChart, y0, vp_x + vp_w - marginChart, y0, 1, "darkSlateGray", []);
+
+    // ---- POVPREČNA OCENA
+    x = xm1 - wBar;
+    x += avgOcena[vp_itemId] * wBar;
+    //gBannerRect(x - 1, y0, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
+    //gBannerRect(x - 1, y0 + 7, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
+    //gBannerRect(x - 1, y0 + 14, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
+    w = 4; h = 7;
+    //ctx.beginPath(); ctx.moveTo(x, y0 + 3); ctx.lineTo(x + w, y0 + 3 + h); ctx.lineTo(x, y0 + 3 + 2 * h); ctx.lineTo(x - w, y0 + 3 + h); ctx.closePath();
+    //ctx.strokeStyle = "darkSlateGray"; ctx.lineWidth = 2; ctx.stroke();
+    //ctx.fillStyle = "darkTurquoise"; ctx.fill();
+    //gLik(x, y0 + 3, [w, 0, -w], [h, 2 * h, h], "darkTurquoise", 1, "darkSlateGray", []); // diamond
+    gLik(x, y0 + 3, [w, w, -w, -w], [h, 2 * h - 2, 2 * h - 2, h], "darkTurquoise", 1, "darkSlateGray", []); // vPointer
+    gText("avg", "9pt verdana", "darkSlateGray", x - 29, y0 + 14);
+    gText(avgOcena[vp_itemId].toFixed(2), "9pt verdana", "darkSlateGray", x + 7, y0 + 14);
 
     // ---- NASLOV GRAFA
     tmpText = vp_title;
