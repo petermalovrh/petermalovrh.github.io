@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.10"
-const gl_versionDate = "29.1.2025"
+const gl_versionNr = "v1.11"
+const gl_versionDate = "30.1.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -4012,7 +4012,7 @@ function paint_tips() {
             //
             y += vStep;
             gBannerRectWithText2("G", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... hide/show GUI controls", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            gBannerRectWithText2("... skrij/prika" + scZhLow + "i gumbe, avtorja, " + scTchLow + "ase", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //     
             y += vStep;
             gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
@@ -5462,7 +5462,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
             if (yTextBase < (yTabletTop - 2)) {
                 gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, yTextBase);
             } else {
-                gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1 + 12, yTextBase);
+                gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1 + 13, yTextBase);
             }
             
         }
@@ -5478,7 +5478,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     //gBannerRect(x - 1, y0, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
     //gBannerRect(x - 1, y0 + 7, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
     //gBannerRect(x - 1, y0 + 14, 3, 4, 0, 0, "cyan", 1, "darkSlateGray", "", 0, 0, false);
-    w = 4; h = 7;
+    w = 3; h = 7;
     //ctx.beginPath(); ctx.moveTo(x, y0 + 3); ctx.lineTo(x + w, y0 + 3 + h); ctx.lineTo(x, y0 + 3 + 2 * h); ctx.lineTo(x - w, y0 + 3 + h); ctx.closePath();
     //ctx.strokeStyle = "darkSlateGray"; ctx.lineWidth = 2; ctx.stroke();
     //ctx.fillStyle = "darkTurquoise"; ctx.fill();
@@ -5695,21 +5695,22 @@ function paint_scatterPlotChart_byRazprsenost(
     //---- AVG
     x = x1 - 10;
     y = yXos - ky * vp_avgTock;
-    gLine(xYos - 8, y, xRight + 39, y, 2, "darkSlategray", [3, 3]);
+    let yAvg = y;
+    gLine(xYos - 8, yAvg, xRight + 59, yAvg, 2, "darkSlategray", [3, 3]);
     // ---- AVG točk
     tmpText = "avg.";
     ;[w, h] = gMeasureText(tmpText, fontAxisText);
     x = xYos - w - 5;
     //gText(tmpText, fontAxisText, "darkSlateGray", x, y - 4);
-    //gText(tmpText, fontAxisText, "darkSlateGray", xRight + 10, y - 4);
+    //gText(tmpText, fontAxisText, "darkSlateGray", xRight + 10, yAvg - 4);
     tmpText = vp_avgTock.toFixed(1);
     ;[w, h] = gMeasureText(tmpText, fontAxisText);
     x = xYos - w - 10;
-    gText(tmpText, fontAxisText, "darkSlateGray", x, y + h / 2 - 1);
-    gText("avg.", fontAxisText, "darkSlateGray", x, y - h - 2);
+    gText(tmpText, fontAxisText, "darkSlateGray", x, yAvg + h / 2 - 1);
+    gText("avg.", fontAxisText, "darkSlateGray", x, yAvg - h - 2);
     // ---- AVG %
     tmpText = vp_avgPercent.toFixed(1) + "%";
-    gText(tmpText, fontAxisTextBold, "darkSlateGray", xRight + 40, y + h / 2 - 1);
+    gText(tmpText, fontAxisTextBold, "darkSlateGray", xRight + 60, yAvg + h / 2 - 1);
 
     //---- Q1
     const wSkatla = 16;
@@ -5734,7 +5735,13 @@ function paint_scatterPlotChart_byRazprsenost(
     gLine(x + wSkatlaHalf, yQlow, x + wSkatlaHalf, yQ1, 1, "darkSlategray", []);
     gLine(x + wSkatlaHalf, yQ3, x + wSkatlaHalf, yQtop, 1, "darkSlategray", []);
 
-    //---- MEDIANA
+    // ---- IZPIS "Me" desno od črtice mediane. A če se mediana preveč približa Avg-ju, izpis "Me" malce spustim ali zvišam, da se ne prekriva s črto za Avg. (30.1.2025)
+    y = yQ2 + h / 2 - 1;
+    if (yQ2 <= yAvg && y > (yAvg - 1)) { y = yAvg - 2; }
+    else if (yQ2 > yAvg && (y - h) < (yAvg + 1)) { y = yAvg + h + 3; };
+    gText("Me", fontAxisTextBold, "darkSlateGray", xRight + 32, y);
+
+    //---- Q3, MEDIANA, Q1
     x += wSkatla + 5;
     //----
     tmpText = "Q3: " + Q3.toString() + "/" + (Q3 / vp_maxTock * 100).toFixed(1) + "%";
@@ -5746,12 +5753,12 @@ function paint_scatterPlotChart_byRazprsenost(
     //----
     tmpText = "Q1: " + Q1.toString() + "/" + (Q1 / vp_maxTock * 100).toFixed(1) + "%";
     gText(tmpText, fontAxisText, "darkSlateGray", x, yQ3 + 5 * h / 2 + 6);
-    //---- TOP RESULT
+    //---- TOPMOST RESULT
     if (vp_topTock < vp_maxTock) {
         tmpText = "top: " + vp_topTock.toString() + "/" + (vp_topTock / vp_maxTock * 100).toFixed(1) + "%";
         gText(tmpText, fontAxisText, "darkSlateGray", x, yQtop + h / 2 - 1);
     }
-    //---- LOW RESULT
+    //---- LOWEST RESULT
     if (vp_lowTock > 0) {
         tmpText = "low: " + vp_lowTock.toString() + "/" + (vp_lowTock / vp_maxTock * 100).toFixed(1) + "%";
         gText(tmpText, fontAxisText, "darkSlateGray", x, yQlow + h / 2 - 1);
