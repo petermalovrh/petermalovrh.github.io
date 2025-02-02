@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.11"
-const gl_versionDate = "30.1.2025"
+const gl_versionNr = "v1.12"
+const gl_versionDate = "2.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -960,7 +960,7 @@ function gBannerRoundRectWithText(left, top, width, height, font, fontColor, tex
     }
 }
 
-function gBannerRoundRectWithText3(left, top, width, height, font, fontColor, text, xGap, yGapTop, yGapBottom, ddx, ddy, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+function gBannerRoundRectWithText3(left, top, width, height, font, fontColor, text, ddx, ddyTop, ddyBottom, radius,  fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll) {
     //-------------------------------
     // funkcija nariše pobarvan (opcija), osenčen (opcija), obkrožen (opcija), in zaobljen (nastavljiv radius) okvir s tekstom (opcija)
     // left, top, width, height ... virtualni okvir teksta
@@ -977,7 +977,7 @@ function gBannerRoundRectWithText3(left, top, width, height, font, fontColor, te
     //-------------------------------
 
     //---- banner
-    gBannerRoundRect(left - ddx, top - ddy, width + 2 * ddx, height + 2 * ddy, radius, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll);
+    gBannerRoundRect(left - ddx, top - ddyTop, width + 2 * ddx, height + ddyTop + ddyBottom, radius, fillColor, strokeWidth, strokeColor, shaddowColor, xShaddow, yShaddow, shaddowAll);
     //---- text
     if (text != "") {
         gText(text, font, fontColor, left, top + height)
@@ -2030,6 +2030,7 @@ const predmetKratica = [];
 var lo_nrPredmetov = 0;
 var lo_predmet;
 var lo_havePredmetInHeader = false;
+var lo_allPredmet = false; // 1.2.2025
 
 // 28.1.2025
 const katalogPredmetovIme = [];
@@ -2053,6 +2054,7 @@ const ocenaRazredId = [];
 const ocenaPredmetId = [];
 const ocenaLetnikId = [];
 const ocenaDatumStr = [];    // "14-10-2024"
+const ocenaDatumMs = [];     // 1.2.2025 v številčne milisekunde pretvorjen datum oziroma razlika v ms od 1.1.1970 (to je JS base datum)
 const ocenaTip = [];         // "U" (ustna) ali "P" (pisna)
 const ocenaTipSerialNr = []; // "P1" pomeni prvi pisni test
 const ocenaTock = [];        // "P1" pomeni prvi pisni test
@@ -2097,6 +2099,24 @@ var arrQ1 = []; // 21.1.2025
 var arrQ2 = []; // 21.1.2025
 var arrQ3 = []; // 21.1.2025
 
+//---- 31.1.2025
+var ucenecOcenaId = [];        // polje linkov na ocene za vsakega učenca posebej
+var ucenecAvgOcena = [];  
+var ucenecNrOcen = [];  
+var ucenecPrvaOcenaDatum = [];
+var ucenecZadnjaOcenaDatum = [];  
+//----
+var ucenciPrvaOcenaDatum = 1e15;
+var ucenciZadnjaOcenaDatum = 0;
+var ucenciOceneRazponDni = 0;
+//----
+var ucenecPredmetOcenaId = []; // polje linkov na ocene za vsakega učenca posebej pri vsakem predmetu posebej
+var ucenecPredmetAvgOcena = [];
+var ucenecPredmetNrOcen = [];
+//----
+var razredNrUcencev = []; // 1.2.2025
+var razredUcenecId = [];  // 1.2.2025
+
 const cv_schrink_min = 0;
 const cv_schrink_max = 5;
 var lo_schrink = 1;
@@ -2140,7 +2160,20 @@ var bcChartX1 = [];
 var bcChartY1 = [];
 var lo_bcChartSelectedId = 0;
 
+//---- 31.1.2025
+var ucChartX = [];
+var ucChartY = [];
+var ucChartX1 = [];
+var ucChartY1 = [];
+var ucChartX0 = [];
+var ucChartY0 = [];
+var ucChartKx = [];
+var ucChartKy = [];
+var lo_ucChartSelectedId = 0;
+var lo_focusUcenec = 0; // 1.2.2025
+
 var lo_enabledHelp = true;       // 10.1.2025
+var lo_enabledMode = true;       // 2.2.2025
 var lo_enabledPredmet = true;    // 28.1.2025
 var lo_enabledTest = true;       // 27.1.2025
 var lo_enabledRazred = true;     // 27.1.2025
@@ -2187,12 +2220,13 @@ var gl_configChanged = true; // 19.12.2023
 var dbg = false; //true;
 
 //---- mode aplikacije
-//const cv_mode_timeAvgTempSingle = 1;
+const cv_mode_razredTest = 1;
+const cv_mode_ucenec = 2;
 const cv_minMode = 1;
-const cv_maxMode = 3;
-//var gl_mode = cv_mode_timeAvgTempSingle;
-//var gl_modeLast = gl_mode; // 19.12.2023
-                   // 28.12.2023
+const cv_maxMode = 2;
+var gl_mode = cv_mode_razredTest;
+var gl_modeLast = gl_mode; 
+                   
 
 var lo_keyDownF = false;
 var lo_keyDownP = false;
@@ -2349,10 +2383,11 @@ switch (lo_GUI_layout) {
         //var checkBoxRuler = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Ravnilo", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRuler, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz ravnila", "R");  //String.fromCharCode(0x0110));
         //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
+        var buttonMode = new button(gpLeft, gpTop + 10, wBtn, hBtn, "M", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "salmon", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji pogled ...", "M");
         var buttonPredmet = new button(gpLeft, gpTop + 10, wBtn, hBtn, "P", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji predmet ...", "P");
         var buttonTest = new button(gpLeft, gpTop + 10, wBtn, hBtn, "T", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji test ...", "T");
         var buttonRazred = new button(gpLeft, gpTop + 10, wBtn, hBtn, "R", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Skupen/lo" + scTchLow + "en pogled po razredih", "R");
-        var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S");
+        var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S (+SHIFT)");
         var buttonKritLuknje = new button(gpLeft, gpTop + 10, wBtn, hBtn, "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
         var buttonLoad = new button(gpLeft, gpTop + 10, wBtn, hBtn, "D", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "powderBlue", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Nalo" + scZhLow + "i skopirane podatke razredov in ocen iz clipboard-a ...", "D");
         var buttonHelp = new button(gpLeft, gpTop + 10, wBtn, hBtn, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
@@ -2693,7 +2728,19 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
 
-    
+    //---- preklop mode 2.2.2025
+    if (!vl_end && lo_showGUI && lo_enabledMode) {
+        if (buttonMode.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            if (e.shiftKey) { // 26.1.2025
+                lf_changeMode(gl_mode - 1, true); // 2.2.2025
+            } else {
+                lf_changeMode(gl_mode + 1, true); // 2.2.2025
+            }
+            vl_end = true
+        }
+    }
+
     //---- preklop na naslednji predmet 28.1.2025
     if (!vl_end && lo_showGUI && lo_enabledPredmet) {
         if (buttonPredmet.eventClick(e.offsetX, e.offsetY)) {
@@ -2703,12 +2750,18 @@ elMyCanvas.addEventListener('click', (e) => {
             } else {
                 lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
             }
-            data_prepareStructures();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    data_prepareStructures_byRazredTest();                   
+                    break;
+                case cv_mode_ucenec:
+                    break;                
+            }
             paint();
             vl_end = true
         }
-    }
-    
+    };
+
     //---- analiza naslednjega testa 27.1.2025
     if (!vl_end && lo_showGUI && lo_enabledTest) {
         if (buttonTest.eventClick(e.offsetX, e.offsetY)) {
@@ -2718,7 +2771,13 @@ elMyCanvas.addEventListener('click', (e) => {
             } else {
                 lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
             }
-            data_prepareStructures();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    data_prepareStructures_byRazredTest();                   
+                    break;
+                case cv_mode_ucenec:
+                    break;                
+            }              
             paint();
             vl_end = true
         }
@@ -2728,9 +2787,17 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI && lo_enabledRazred) {
         if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
-            lf_changeByRazredGen(!lo_byRazredGen, false); //
-            data_prepareStructures();
-            paint();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
+                    data_prepareStructures_byRazredTest();
+                    paint();                    
+                    break;
+                case cv_mode_ucenec:
+                    if (e.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
+                    else { lf_changeRazred(lo_razred + 1, true); };
+                    break;
+            };            
             vl_end = true
         }
     }
@@ -2847,6 +2914,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     if (lo_showGUI) {
         if (lo_showToolbar) {
             if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+            else if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
             else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
             else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
             else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
@@ -3084,15 +3152,23 @@ window.addEventListener("keydown", (event) => {
         case 'KeyM':
             //lo_keyDownM = true; break;
             //console.log("M pressed");
-            lf_changeUnitMm(!lo_unitMm, true);
-            lf_changeUnitCm(!lo_unitCm, true);
+            if (event.shiftKey) { lf_changeMode(gl_mode + 1, true); }
+            else { lf_changeMode(gl_mode - 1, true); }
             break;
         case 'KeyR':
             //lo_keyDownR = true; break;
             //console.log("R pressed");
-            lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
-            data_prepareStructures();
-            paint();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
+                    data_prepareStructures_byRazredTest();
+                    paint();                    
+                    break;
+                case cv_mode_ucenec:
+                    if (event.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
+                    else { lf_changeRazred(lo_razred + 1, true); };
+                    break;
+            };
             break;
         case 'KeyP': // sprememba predmeta 28.1.2025
             //console.log("T pressed");
@@ -3101,7 +3177,13 @@ window.addEventListener("keydown", (event) => {
             } else {
                 lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
             }
-            data_prepareStructures();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    data_prepareStructures_byRazredTest();                   
+                    break;
+                case cv_mode_ucenec:
+                    break;                
+            }            
             paint();
             break;
         case 'KeyT': // sprememba zaporedne številke testa pri istem predmetu
@@ -3111,7 +3193,13 @@ window.addEventListener("keydown", (event) => {
             } else {
                 lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
             }
-            data_prepareStructures();
+            switch (gl_mode) {
+                case cv_mode_razredTest:
+                    data_prepareStructures_byRazredTest();                   
+                    break;
+                case cv_mode_ucenec:
+                    break;                
+            }              
             paint();
             break;
         case 'KeyL':
@@ -3158,7 +3246,7 @@ window.addEventListener("keydown", (event) => {
         case 'End':
         //lf_changeMonthEnd(nrMonthsAll, true); break;
         case 'KeyG': // GUI
-            lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); break;
+            lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); paint(); break;
         case 'KeyN': case 'F2':
             lf_changeShowHelpTips(!lo_showHelpTips, true); break;
         case 'KeyI':
@@ -3490,7 +3578,7 @@ function paint() {
 
 }
 
-function data_prepareStructures() {
+function data_prepareStructures_byRazredTest() {
 
     lo_dataPrepared = false; // 25.1.2025
 
@@ -3524,6 +3612,9 @@ function data_prepareStructures() {
     arrQ1.length = 0; // 21.1.2025
     arrQ2.length = 0; // 21.1.2025
     arrQ3.length = 0; // 21.1.2025
+    //---- 31.1.2025
+    ucenecOcenaId.length = 0;
+    ucenecPredmetOcenaId.length = 0;
 
     //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
     spChartX.length = 0;
@@ -3562,7 +3653,7 @@ function data_prepareStructures() {
         maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
         arrRazredArrOceneArrRezultatiImePriimek[tmpItemId], arrRazredArrOceneArrRezultatiRazred[tmpItemId], arrRazredArrOceneArrRezultatiTock[tmpItemId], arrRazredArrOceneArrRezultatiPercent[tmpItemId], arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpItemId],
         arrArrOceneCount[tmpItemId], arrArrOceneCountPercent[tmpItemId], arrMaxOcenaCount[tmpItemId],
-        arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiRazred[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId]]
+            arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiRazred[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId]]
             = calculate_avg_test("2425", predmetIme[lo_predmet], tmpRazredLetnikStr, tmpRazredCrka, tmpTipTestNr);
         // iščem največje število testov z isto oceno čez vse razrede, da bom lahko določil Y merilo za bar charte
         if (arrMaxOcenaCount[tmpItemId] > maxOcenaCount) {
@@ -3579,17 +3670,84 @@ function data_prepareStructures() {
 
 }
 
-function paint_eRazred() {
+function data_prepareStructures_byUcenec() {
 
-    //---- najprej preračunamo zadeve (dimenzije leče, goriščna razdalja, ...)
-    //paint_eRazred_calculate();
+    lo_dataPrepared = false; // 25.1.2025
+   
+    //---- 31.1.2025
+    ucenecOcenaId.length = 0;
+    ucenecAvgOcena.length = 0;
+    ucenecNrOcen.length = 0;
+    ucenecPrvaOcenaDatum.length = 0;
+    ucenecZadnjaOcenaDatum.length = 0;
+    //----
+    ucenecPredmetOcenaId.length = 0;
+    ucenecPredmetAvgOcena.length = 0;
+    ucenecPredmetNrOcen.length = 0;
+    //----
+    razredNrUcencev.length = 0;
+    razredUcenecId.length = 0;
+
+    //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
+    ucChartX.length = 0;
+    ucChartY.length = 0;
+    ucChartX1.length = 0;
+    ucChartY1.length = 0;
+    ucChartX0.length = 0;
+    ucChartY0.length = 0;
+    ucChartKx.length = 0;
+    ucChartKy.length = 0;
+    //ucChartSelected.length = 0;
+
+    let razredId;
+    for (razredId = 1; razredId <= lo_nrRazredov; razredId++) { razredNrUcencev[razredId] = 0;  razredUcenecId[razredId] = []; };
+
+    // ============ NABIRANJE PODATKOV  ============
+
+    let ucenecId;
+    for (ucenecId = 1; ucenecId <= lo_nrUcencev; ucenecId++) {
+        // za tekočega učenca naberem vso statistiko na svoje mesto v polju rezultatov
+        ;[ucenecOcenaId[ucenecId], ucenecNrOcen[ucenecId], ucenecAvgOcena[ucenecId], ucenecPrvaOcenaDatum[ucenecId], ucenecZadnjaOcenaDatum[ucenecId],
+        ucenecPredmetOcenaId[ucenecId], ucenecPredmetNrOcen[ucenecId], ucenecPredmetAvgOcena[ucenecId]]
+            = calculate_avg_ucenec("2425", ucenecId);
+        
+        // iščem prvi in zadnji datum vseh ocen skupaj, in vmes date rnge
+        if (ucenecPrvaOcenaDatum[ucenecId] < ucenciPrvaOcenaDatum) {
+            ucenciPrvaOcenaDatum = ucenecPrvaOcenaDatum[ucenecId];
+        }
+        if (ucenecZadnjaOcenaDatum[ucenecId] > ucenciZadnjaOcenaDatum) {
+            ucenciZadnjaOcenaDatum = ucenecZadnjaOcenaDatum[ucenecId];
+        }
     
-    //---- risanje ravnila (opcijsko)
-    paint_eRazred_graf1();
+        razredId = ucenecRazredId[ucenecId];
+        razredNrUcencev[razredId] += 1;
+        razredUcenecId[razredId][razredNrUcencev[razredId]] = ucenecId; // 1.2.2025
+    }
+    
+    if (lo_nrOcen > 0 && lo_nrUcencev > 0) {
+        lo_dataPrepared = true;
+    }
+
+    ucenciOceneRazponDni = ucenciZadnjaOcenaDatum - ucenciPrvaOcenaDatum;
+    
+};
+
+function paint_eRazred() {
+    
+    //---- risanje ustreznih prikazov
+    switch (gl_mode) {
+        case cv_mode_razredTest:
+            paint_eRazred_grafRazredTest();
+            break;
+        case cv_mode_ucenec:
+            paint_eRazred_grafUcenec();
+            break;
+    }
+
 
 }
 
-function paint_eRazred_graf1() {
+function paint_eRazred_grafRazredTest() {
      
     if (!lo_dataPrepared) { return; };
 
@@ -3788,6 +3946,187 @@ function paint_eRazred_graf1() {
 
 }
 
+function paint_eRazred_grafUcenec() {
+     
+    if (!lo_dataPrepared) { return; };
+
+    const marginLeft = 8; const marginRight = 8;
+    const marginTop = 8; const marginBottom = 8;
+    let vGap = 10; let hGap = 10;
+    
+    let rows, cols, row, col, x, y, itemWidth, itemHeight, place, ih, iw, k;
+    let fx, fy, fiw, fih, haveFocusGraph;
+
+    //---- razred mora biti izbran
+    if (lo_razred <= 0) { return };
+    //---- kakšnega učenca v izbranem razredu moramo imeti
+    let nrUcencev = razredNrUcencev[lo_razred];
+    if (nrUcencev <= 0) { return };
+
+    //---- dimenzije matrike
+    cols = Math.trunc(Math.sqrt(nrUcencev * 0.7 - 1)) + 1;
+    let ratio = ctxW / (ctxH + 1);
+    if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
+    if (cols > nrUcencev) { cols = nrUcencev };
+    rows = Math.trunc((nrUcencev - 1) / cols) + 1;
+    //----
+    itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
+    itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
+    
+    col = 1; row = 1;
+    k = 0.15; // za ta faktor bo povečan graf učenca v fokusu
+    haveFocusGraph = false;
+    for (i = 1; i <= nrUcencev; i++) {
+        
+        if (lo_razred == 2) {
+            lo_razred = lo_razred;
+        }
+        // ---- najprej ugotovimo pozicijo in dimenzije grafa za tekočega učenca. Upošteva se tudi učenec v fokusu, katerega graf bo večji
+        ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, i, row, col, itemWidth, itemHeight, k)
+        
+        // ---- učenca v fokusu preskočim in ga izrišem na koncu po zanki učencev
+        if (i == lo_focusUcenec) {
+            // ta je fokusiran in si zapomnim podatke zanj, izrisal pa ga bom kasneje
+            ;[fx, fy, fiw, fih] = [x, y, iw, ih];
+            haveFocusGraph = true;
+        } else {
+            // ta ni fokusiran, zato ga normalno izrišem
+            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih)
+        }
+        col += 1;
+        if (col > cols) { col = 1; row += 1 };
+    }
+    
+    // ---- če imam učenca v fokusu, izrišem zdaj preko ostalih še povečan graf zanj
+    if (haveFocusGraph) {
+        paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, fx, fy, fiw, fih)
+    }
+    
+}
+
+function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, ucenec, row, col, itemWidth, itemHeight, k) {
+
+    let x, y, iw, ih, newY, yDiff, x0, y0;
+ 
+    x = marginLeft + (col - 1) * (hGap + itemWidth);
+    y = marginTop + (row - 1) * (vGap + itemHeight);
+    iw = itemWidth; ih = itemHeight;
+        
+    //30.7.2023 lokacijo v fokusu izrišem nekoliko večjo
+    if (cols > 1 && rows > 1) {
+        if (ucenec == lo_focusUcenec) {
+            x0 = x; y0 = y;
+            if (x > (marginLeft + k * iw)) { x -= k * iw; }
+            if (y > (marginTop + k * ih)) { y -= k * ih; }
+            iw += 2 * k * iw; ih += 2 * k * ih;
+            if ((x + iw) > (ctxW - marginRight)) { x = ctxW - marginRight - iw; }
+            if ((y + ih) > (ctxH - marginBottom)) { y = ctxH - marginBottom - ih; }
+        };
+    }
+        
+    if (col == 1 && row == 1 && buttonMode.visible) {
+        newY = 32; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod toolbarom 29.1.2023 v1.6
+    }
+    if (col == cols && row == 1 && lo_showGUI) {
+        newY = 59; yDiff = newY - y;
+        if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod izpisom avtorja:) 29.1.2023 v1.6
+    }
+        
+    return [x, y, iw, ih]
+}
+
+function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft, chartTop, chartWidth, chartHeight) {
+
+    let gapLeft = 16; let gapRight = 8;
+    let gapTop = 8; let gapBottom = 14;
+    // ----
+    let chartRight = chartLeft + chartWidth;
+    let xRight = chartRight - gapRight;
+    let xRightData = xRight - 12;
+    let chartBottom = chartTop + chartHeight;
+    let yTop = chartTop + gapTop;
+    let yTopData = yTop + 25;
+    // ----
+    let xYos = chartLeft + gapLeft;
+    let xLeftData = xYos + 15;
+    let yXos = chartBottom - gapBottom;
+    // ----
+    let yRangeOcene = 4.5; // ocena 1 naj bo na polovici višine ene ocene, potem pa po cele višine naprej gor proti 5
+    let yRangePix = yXos - yTopData;
+    let ky = yRangePix / yRangeOcene;
+    // ----
+    let ucenecId = razredUcenecId[lo_razred][vp_razredUcenecId];
+    let xRangeDate = ucenciOceneRazponDni
+    let xRangePix = xRightData - xLeftData;
+    let kx = xRangePix / xRangeDate;
+    // ----
+    let x, y, w, h, tmpText, tmpColor;
+    let fontSmall = "10pt verdana";
+
+    // ---- okvirček za celo področje chart-a
+    gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 4, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false, true, true, true, true);
+
+    // ---- osi
+    gLine(xLeftData, yXos, xRightData, yXos, 1, "darkSlateGray", []);
+    //gLine(xYos, yTop, xYos, yXos, 1, "darkSlateGray", []);
+
+    // ---- izpis učenca
+    tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId];
+    let fontUcenecImePriimek = "bold 10pt verdana";
+    ;[w, h] = gMeasureText(tmpText, fontUcenecImePriimek);
+    x = chartRight - w - 5;
+    y = chartTop + 4;
+    gBannerRoundRectWithText3(x, y, w, h, fontUcenecImePriimek, "darkSlateGray", tmpText, 2, 2, 2, 2, "azure", 1, "lightGray", "darkGray", 2, 2, false, true, true, true, true);
+
+    // ---- povprečje
+    let avgValue = 0;
+    if (lo_allPredmet) { avgValue = ucenecAvgOcena[ucenecId] }
+    else { avgValue = ucenecPredmetAvgOcena[ucenecId][lo_predmet] };
+    y = yXos - ky * (avgValue - 0.5);
+    tmpColor = "darkGray";
+    if (avgValue == 1.5) { tmpColor = "darkRed"; }
+    else if (avgValue < 1.5) { tmpColor = "red"; };
+    gLine(xLeftData, y, xRightData, y, 2, tmpColor, [3, 3]);
+    tmpText = "avg:";
+    ;[w, h] = gMeasureText(tmpText, fontSmall);   
+    gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y - 4);
+    tmpText = avgValue.toFixed(2);
+    ;[w, h] = gMeasureText(tmpText, fontSmall);   
+    gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y + h + 3);
+
+    // ---- TABLETEK OCENE
+    let fontOcena = "bold 14pt verdana";
+    for (let ocena = 1; ocena <= 5; ocena++) {
+        tmpText = ocena.toString();
+        ;[w, h] = gMeasureText(tmpText, fontOcena);
+        y = yXos - ky * (ocena - 0.5);
+        gBannerRoundRectWithText(xYos - w / 2 - 3, y - h / 2, w, h, fontOcena, colorOcena[ocena], tmpText, 4, 8, 9, "white", 1, "darkGray", "#CACACAC0", 3, 2, false);
+    }
+
+    // ---- OCENE
+    let ocenaId, ocenaNr, datumOceneMs, colorId;
+    let items = ucenecNrOcen[ucenecId];
+    if (!lo_allPredmet) { items = ucenecPredmetNrOcen[ucenecId][lo_predmet]; };
+    for (let i = 1; i <= items; i++) {
+        if (lo_allPredmet) { 
+            ocenaId = ucenecOcenaId[ucenecId][i];
+        } else {
+            ocenaId = ucenecPredmetOcenaId[ucenecId][i];
+        }
+        ocenaNr = ocenaCifraNr[ocenaId];
+        datumOceneMs = ocenaDatumMs[ocenaId];
+        x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
+        y = yXos - ky * (ocenaNr - 0.5);
+        colorId = ocenaId - 10 * (Math.trunc((ocenaId - 1) / 10)) - 1;
+        gEllipse(x, y, 3, 4, 0, rsltColor[colorId], 0, "");
+    }
+    
+
+
+
+}
+
 function lf_fixProcent(vp_nrStr) {
 
     if (vp_nrStr.endsWith(".00")) {
@@ -3863,7 +4202,7 @@ function lf_textTock(vp_tock) {
 
 function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
 
-    lo_focusPlace = cv_placeNone;
+    lo_focusUcenec = cv_placeNone;
     lo_focusMonth = 0;
     
     //---- mora biti raztreseni diagram vacc-excDeaths
@@ -3909,7 +4248,7 @@ function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
             dist = Math.sqrt(dx * dx + dy * dy);
             if (dist <= 5) {
                 //našli smo data point, na katerega kaže miška
-                lo_focusPlace = place;
+                lo_focusUcenec = place;
                 lo_focusMonth = month;
                 return true;
             }
@@ -3931,19 +4270,22 @@ function paint_GUI() {
     if (lo_showToolTips) { //1.4.2024
         if (lo_showGUI) {
             if (lo_enabledHelp) { // 27.1.2025
-                buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonRazred.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+                buttonMode.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonRazred.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
             };
         };
     };
 
     if (lo_showGUI && lo_showToolbar) { 
-        buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        buttonMode.visible = true; buttonPredmet.visible = true; buttonTest.visible = true; buttonRazred.visible = true; buttonSPData.visible = true; buttonKritLuknje.visible = true; buttonLoad.visible = true; buttonHelp.visible = true;
+        buttonMode.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
         x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
         y = buttonRazred.top;
         gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
         x = buttonLoad.left + buttonLoad.width + 4.5;
         y = buttonRazred.top;
         gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+    } else {
+        buttonMode.visible = false; buttonPredmet.visible = false; buttonTest.visible = false; buttonRazred.visible = false; buttonSPData.visible = false; buttonKritLuknje.visible = false; buttonLoad.visible = false; buttonHelp.visible = false;
     }
 
     //---- on-screen namigi/pomoč
@@ -4028,20 +4370,22 @@ function paint_GUI_layoutB() {
     let yTop = 2;
 
     //---- 27.1.2025
-    buttonPredmet.left = 2;
-    buttonPredmet.top = yTop;
+    buttonMode.left = 2;
+    buttonMode.top = yTop;   
+    buttonPredmet.left = buttonMode.left + buttonMode.width + wSep;
+    buttonPredmet.top = buttonMode.top;
     buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
-    buttonTest.top = buttonPredmet.top;
+    buttonTest.top = buttonMode.top;
     buttonRazred.left = buttonTest.left + buttonTest.width + wSep;
-    buttonRazred.top = buttonPredmet.top;
+    buttonRazred.top = buttonMode.top;
     buttonSPData.left = buttonRazred.left + buttonRazred.width + wSep;
-    buttonSPData.top = buttonPredmet.top;
+    buttonSPData.top = buttonMode.top;
     buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
-    buttonKritLuknje.top = buttonPredmet.top;
+    buttonKritLuknje.top = buttonMode.top;
     //----
     x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
     buttonLoad.left = x + wSep;
-    buttonLoad.top = buttonPredmet.top;
+    buttonLoad.top = buttonMode.top;
     //----
     x = buttonLoad.left + buttonLoad.width + wSep;
     buttonHelp.left = x + wSep;
@@ -4374,11 +4718,13 @@ function lf_changePredmet(vp_newValue, vp_paint) {
 
 }
 
-function lf_changeShowRealLens(vp_newValue, vp_paint) {
+function lf_changeRazred(vp_newValue, vp_paint) {
 
-    lo_showRealLens = vp_newValue;
-    lo_enabledintChooserN = vp_newValue;
-    checkBoxRealLens.value = lo_showRealLens;
+    lo_razred = vp_newValue;
+
+    if (lo_razred > lo_nrRazredov) { lo_razred = 1 };
+    if (lo_razred < 1) { lo_razred = lo_nrRazredov };
+
     if (vp_paint) { paint() }
 
 }
@@ -4407,16 +4753,18 @@ function lf_changeShowToolTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
-function lf_changeMode(vp_shift, vp_paint) {
+function lf_changeMode(vp_newValue, vp_paint) {
 
-    if (gl_mode == cv_mode_timeAvgTempMultiTimeSlice) {
-        lo_printLevel = cv_timeSliceAll; // če sem bil multiSlice mode in grem ven iz njega, preklopim iz Month/Season v All
-    }; //11.12.2023
+    //if (gl_mode == cv_mode_timeAvgTempMultiTimeSlice) {
+    //    lo_printLevel = cv_timeSliceAll; // če sem bil multiSlice mode in grem ven iz njega, preklopim iz Month/Season v All
+    //}; //11.12.2023
     //----
-    if (vp_shift) { gl_mode -= 1 } else { gl_mode += 1 };
-    if (gl_mode < cv_minMode) { gl_mode = cv_maxMode };
-    if (gl_mode > cv_maxMode) { gl_mode = cv_minMode };
-    lf_setMode(gl_mode, vp_paint);
+
+    if (vp_newValue < cv_minMode) { vp_newValue = cv_maxMode };
+    if (vp_newValue > cv_maxMode) { vp_newValue = cv_minMode };
+
+    lf_setMode(vp_newValue, vp_paint);
+    
 }
 
 function lf_setMode(vp_mode, vp_paint) {
@@ -4425,44 +4773,32 @@ function lf_setMode(vp_mode, vp_paint) {
 
     //---- prilagoditev GUI (1)
     switch (gl_mode) {
-        case cv_mode_vaccExcessDeath: case cv_mode_vaccExcessDeathMulti:
-            sliderMonthEnd.useValue0 = false;
-            sliderTailMonths.visible = true; break;
-        case cv_mode_timeAvgTempSingle: case cv_mode_timeAvgTempMultiPlace: case cv_mode_timeAvgTempMultiTimeSlice:
-            if (gl_monthEnd < gl_monthStart) { //16.2.2023 v1.17
-                gl_monthEnd = nrMonthsAll;
-                sliderMonthEnd.value = gl_monthEnd;
-            }
-            sliderMonthEnd.useValue0 = true;
-            sliderTailMonths.visible = false; break;
+        case cv_mode_razredTest:
+            data_prepareStructures_byRazredTest();
+            //sliderMonthEnd.useValue0 = false;
+            //sliderTailMonths.visible = true; break;
+        case cv_mode_ucenec:
+            data_prepareStructures_byUcenec();
+            lo_allPredmet = true; // 1.2.2025
+            //sliderMonthEnd.useValue0 = true;
+            //sliderTailMonths.visible = false; break;
     }
-    //---- prilagoditev GUI (2)    
-    switch (gl_mode) { // 24.12.2023
-        case cv_mode_timeAvgTempSingle:
-            checkBoxAvgAllPlace.visible = true;
-            break;
-        case cv_mode_timeAvgTempMultiTimeSlice:
-            checkBoxAvgAllPlace.visible = true;
+    //---- prilagoditev GUI (2)
+    //switch (gl_mode) { // 24.12.2023
+    //    case cv_mode_timeAvgTempSingle:
+    //        checkBoxAvgAllPlace.visible = true;
+    //        break;
+    //    case cv_mode_timeAvgTempMultiTimeSlice:
+    //        checkBoxAvgAllPlace.visible = true;
             //----
-            switch (lo_printLevel) {
-                case cv_timeSliceAll: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11: case 12: case cv_timeSliceMonth:
-                    //return; //ne bom kar pustil praznega okna, ampak raje preklopim v multi prikaz po mesecih
-                    lo_printLevel = cv_timeSliceMonth;  //11.12.2023 //cv_timeSliceMonthMin;           
-                    break;
-                case cv_timeSliceWinter: case cv_timeSliceSpring: case cv_timeSliceSummer: case cv_timeSliceAutumn: case cv_timeSliceSeason:
-                    lo_printLevel = cv_timeSliceSeason;  //11.12.2023
-                    break;
-            }
-            break;
-        case cv_mode_timeAvgTempMultiPlace:
-            checkBoxAvgAllPlace.visible = false;
-            break;
-    }
-    //---- prilagoditev GUI (3)    
-    lf_setMonthIntervalText();
+    //}
+    
+    //---- prilagoditev GUI (3)
+    //lf_setMonthIntervalText();
 
     lo_GUIlayoutHasChanged = true;
     if (vp_paint) { paint() }
+
 }
 
 
@@ -4629,9 +4965,6 @@ function setWebLink() {
 
 function clipboard_load() {
 
-    let clipText;
-    let pos, searchStr;
-
     navigator.clipboard.readText()
         .then((clipText) => {
             
@@ -4640,6 +4973,10 @@ function clipboard_load() {
                 return
             };
         
+            data_initParseAndPrepare(clipText); // 2.2.2025
+
+            return;
+            
             // Inicializacija podatkovnih struktur
             intDataStructures();
 
@@ -4650,22 +4987,27 @@ function clipboard_load() {
             // Inicializacija potrebnih struktur za risanje grafov
             lo_predmet = 1; // FIZIKA
             lo_pisniTestNr = 1; // P1
-            data_prepareStructures(); // 23.1.2025
+            data_prepareStructures_byRazredTest(); // 23.1.2025
+            data_prepareStructures_byUcenec();     // 2.2.2025
 
         })
 }
 
 function demo_load() {
         
-    // Inicializacija podatkovnih struktur
-    intDataStructures();
+    //// Inicializacija podatkovnih struktur
+    //intDataStructures();
 
     let i;
     let demoTextStr = "";
     for (i = 0; i < demoText.length; i++) {
         if (i > 0) { demoTextStr += "\n" };
         demoTextStr += demoText[i];
-    }
+    };
+
+    data_initParseAndPrepare(demoTextStr); // 2.2.2025
+
+    return;
 
     // Očitno to so podatki o razredih in ocenah, treba je sparsati
     console.log("DEMO PARSE -->");
@@ -4674,7 +5016,24 @@ function demo_load() {
     // Inicializacija potrebnih struktur za risanje grafov
     lo_predmet = 1; // FIZIKA
     lo_pisniTestNr = 1; // P1
-    data_prepareStructures(); // 23.1.2025
+    data_prepareStructures_byRazredTest(); // 23.1.2025
+
+}
+
+function data_initParseAndPrepare(textData) {
+
+    // Inicializacija podatkovnih struktur
+    intDataStructures();
+
+    // Očitno to so podatki o razredih in ocenah, treba je sparsati
+    console.log("PARSE -->");
+    data_parse(textData);
+
+    // Inicializacija potrebnih struktur za risanje grafov
+    lo_predmet = 1; // FIZIKA
+    lo_pisniTestNr = 1; // P1
+    data_prepareStructures_byRazredTest(); // 23.1.2025
+    data_prepareStructures_byUcenec();     // 2.2.2025
 
 }
 
@@ -4737,6 +5096,7 @@ function intDataStructures() {
     ocenaPredmetId.length = 0;
     ocenaLetnikId.length = 0;
     ocenaDatumStr.length = 0;    // "14-10-2024"
+    ocenaDatumMs.length = 0;     // 1.2.2025
     ocenaTip.length = 0;         // "U" (ustna) ali "P" (pisna)
     ocenaTipSerialNr.length = 0; // "P1" pomeni prvi pisni test
     ocenaTock.length = 0; 
@@ -4965,17 +5325,28 @@ function data_parse_ucenec(lineStr) {
         ime = tmpImePriimek.substr(0, pos1);
         priimek = tmpImePriimek.slice(pos1 + 1);
     }
-    // nov doslej neznan učenec
-    lo_nrUcencev += 1;
-    lo_ucenec = lo_nrUcencev;
-    ucenecIme[lo_nrUcencev] = ime;
-    ucenecPriimek[lo_nrUcencev] = priimek;
-    ucenecSpol[lo_nrUcencev] = "";
-    ucenecRazredId[lo_nrUcencev] = lo_razred;
 
-    if (tmpImePriimek == "Franc Gadafi") {
+    if (tmpImePriimek == "Neja Franko") { // debug purposes
         tmpImePriimek = tmpImePriimek;
     }
+    
+    // je ta učenec že bil naveden v podatkih v okviru istega razreda in drugega predmeta?
+    lo_ucenec = getUcenecByRazredImePriimek(lo_razred, ime, priimek);
+    if (lo_ucenec <= 0) {
+        // nov doslej neznan učenec
+        lo_nrUcencev += 1;
+        lo_ucenec = lo_nrUcencev;
+        ucenecIme[lo_nrUcencev] = ime;
+        ucenecPriimek[lo_nrUcencev] = priimek;
+        ucenecSpol[lo_nrUcencev] = "";
+        ucenecRazredId[lo_nrUcencev] = lo_razred;
+    }
+
+    // 1.2.2025
+    let datumOcene = new Date();
+    let arrDatumOcene = [];
+    let datumOceneMs;
+
     // ---- OCENE ENA ZA DRUGO
     for (i = 1; i <= (itemList.length - 1); i++) {
         
@@ -5033,6 +5404,13 @@ function data_parse_ucenec(lineStr) {
 
         // ---- DATUM OCENE
         tmpOcenaDatum = ocenaDataList[paramId].trim();
+        arrDatumOcene = tmpOcenaDatum.split("-");
+        if (arrDatumOcene.length != 3) {
+            continue; // ignoriram to oceno s pokvarjenim datumom
+        }
+        datumOcene.setFullYear(Number("20" + arrDatumOcene[2]), Number(arrDatumOcene[1]) - 1, Number(arrDatumOcene[0]));
+        datumOcene.setHours(12, 0, 0, 0);
+        datumOceneMs = Date.parse(datumOcene);        
         paramId += 1;
 
         // VPIS novE OCENE
@@ -5051,6 +5429,7 @@ function data_parse_ucenec(lineStr) {
         ocenaTip[lo_nrOcen] = tmpOcenaTip;
         ocenaTipSerialNr[lo_nrOcen] = 0;
         ocenaDatumStr[lo_nrOcen] = tmpOcenaDatum;
+        ocenaDatumMs[lo_nrOcen] = datumOceneMs; // 1.2.2025
         // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU    
         // ---- default število točk
         ocenaTock[lo_nrOcen] = -1;
@@ -5147,6 +5526,16 @@ function getRazredId(vp_letnik, vp_crka) {
     let i;
     for (i = 1; i <= lo_nrRazredov; i++) {
         if (razredLetnik[i] == vp_letnik && razredCrka[i] == vp_crka) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function getUcenecByRazredImePriimek(vp_razredId, vp_ime, vp_priimek) {
+    let i;
+    for (i = 1; i <= lo_nrUcencev; i++) {
+        if (ucenecRazredId[i] == vp_razredId && ucenecIme[i] == vp_ime && ucenecPriimek[i] == vp_priimek) {
             return i;
         }
     }
@@ -5280,6 +5669,113 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     ocenaCountPercent[5] = ocenaCount[5] / nrOcen * 100;
 
     return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaRezultatiImePriimek, ocenaRezultatiRazred, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiRazred, rezultatiTock, rezultatiPercent, rezultatiOcena]; // valid result
+
+};
+
+function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
+
+    //---- 31.1.2025
+    let arrOcenaId = [];   // polje linkov na ocene za zahtevanega učenca
+    let avgOcena = 0;      // skupna povprečna ocena učenca za vse predmet skupaj
+    let nrOcen = 0;        // število vseh ocen zahtevanega učenca
+    let prvaOcenaDatum = 1e15;  // datum prve ocene učenca
+    let zadnjaOcenaDatum = 0;      // datum zadnje ocene učenca
+    let arrPredmetOcenaId = [];    // povprečna ocena učenca za vsak predmet posebej
+    let arrPredmetAvgOcena = [];  // povprečna ocena učenca za vsak predmet posebej
+    let arrPredmetNrOcen = [];     // število ocen zahtevanega učenca za vsak predmet posebej
+    let predmetSumOcen = [];     // vsota ocen zahtevanega učenca znotraj vsakega predmeta posebej
+
+    //----
+    let ocenaId, ocenaId0, passed, found, myPredmet;
+    let myLetnik = getLetnikId(vp_letnik);
+
+    //---- Če je karkoli od zahtevanega nedefinirano, potem grem ven
+    if (myLetnik <= 0) {
+        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid
+    }
+    
+    // ---- Najprej poiščem prvo pravo oceno v tabeli vseh ocen
+    found = false; // če najdem ustrezno oceno, se found postavi na true in FOR zanka skoči ven
+    for (ocenaId = 1; !found; ocenaId++) {
+        if (ocenaLetnikId[ocenaId] == myLetnik && ocenaUcenecId[ocenaId] == vp_ucenecId) {
+            found = true;
+            ocenaId0 = ocenaId;
+        } else { // če ocena ni ustrezna, se preveri, ali nisem morda že čez celo tabelo ocen. Če sem, skočim ven iz zanke z found==false
+            if (ocenaId >= (ocenaTip.length - 1)) { break; };
+        }
+    }
+    if (!found) {
+        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - not found!
+    }
+
+    let ocena, predmetId, sumOcen;
+    let arrDatumOcene = [];
+    let datumOcene = new Date();
+    let datumOceneMs;
+    
+    // ---- smo na prvi ustrezni oceni
+    passed = false;
+    nrOcen = 0;
+    sumOcen = 0;
+    for (predmetId = 1; predmetId <= lo_nrPredmetov; predmetId++) {
+        arrPredmetOcenaId[predmetId] = []; arrPredmetAvgOcena[predmetId] = 0; arrPredmetNrOcen[predmetId] = 0; predmetSumOcen[predmetId] = 0;
+    }  
+    for (ocenaId = ocenaId0; !passed && ocenaId <= lo_nrOcen; ocenaId++) {
+        // Smo že mimo iskanih ocen?
+        if (ocenaLetnikId[ocenaId] != myLetnik || ocenaUcenecId[ocenaId] != vp_ucenecId) {
+            passed = true;
+            break;
+        };
+
+        // Še smo znotraj iskanih ocen
+        ocena = ocenaCifraNr[ocenaId];
+        predmetId = ocenaPredmetId[ocenaId];
+
+        //imePriimek = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId]; // 24.1.2025
+        //----
+
+        // ---- DATUM OCENE in vse povezano z njim ----
+
+        // naštelam datum na 1.1.1970 12:0:0.0
+        //let datumOcene = new Date();
+        //datumOcene.setFullYear(1970, 0, 1);
+        //datumOcene.setHours(12, 0, 0, 0);
+
+        arrDatumOcene = ocenaDatumStr[ocenaId].split("-");
+        if (arrDatumOcene.length != 3) {
+            continue; // ignoriram to oceno s pokvarjenim datumom
+        }
+        datumOcene.setFullYear(Number("20" + arrDatumOcene[2]), Number(arrDatumOcene[1]) - 1, Number(arrDatumOcene[0]));
+        datumOcene.setHours(12, 0, 0, 0);
+        datumOceneMs = Date.parse(datumOcene);
+        if (datumOceneMs < prvaOcenaDatum) { prvaOcenaDatum = datumOceneMs };
+        if (datumOceneMs > zadnjaOcenaDatum) { zadnjaOcenaDatum = datumOceneMs };
+
+        //----
+        nrOcen += 1;
+        arrOcenaId[nrOcen] = ocenaId;
+        sumOcen += ocena;
+        //----
+        //if (arrPredmetNrOcen[predmetId].length <= 0) { arrPredmetNrOcen[predmetId] = 0 };
+        arrPredmetNrOcen[predmetId] += 1;
+        arrPredmetOcenaId[predmetId][arrPredmetNrOcen[predmetId]] = ocenaId;
+        predmetSumOcen[predmetId] += ocena;
+        
+    };
+    
+    // ---- Smo nabrali kakšne ocene?
+    if (nrOcen <= 0) {
+        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - ni ocen!
+    }
+
+    // ---- Imamo ocene - izračunaj povprečja in ostalo
+    avgOcena = sumOcen / nrOcen;
+    //----
+    for (let predmetId = 1; predmetId <= lo_nrPredmetov; predmetId++) {
+        arrPredmetAvgOcena[predmetId] = (arrPredmetNrOcen[predmetId] <= 0) ? 0 : predmetSumOcen[predmetId] / arrPredmetNrOcen[predmetId];
+    }
+
+    return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena];; // valid result
 
 };
 
@@ -5874,7 +6370,7 @@ function tmToolbarStartPeriod_tick() {
 
     lo_toolbarStartPeriod = false;
     lo_showToolbar = false;
-    paint();
+    paint(); paint(); // 2.2.2025 dvakrat zato, ker pri prvem prehodu najprej riše grafe in šele potem da .visible značko gumbom. Ko riše drugič, pa se to že upošteva in se grafi prilagodijo
 
 }
 
@@ -6039,7 +6535,7 @@ function load_demoText2() {
     addDemoText("Zija Firbec,            F|4|U|7-10-24,  F|3|P1|15-1-25|58|81, ");
     addDemoText("Zara Motorka,           F|4|U|9-10-24,  F|2|P1|20-1-25|49|81");
     addDemoText("Mira Mar,               F|1|U|4-10-24,  F|1|P1|15-1-25|31.5|81, ");
-    addDemoText("Jerka Kubic             F|5|U|8-10-24,  F|3|U|16-12-24,           F|3|P1|13-1-25|55|81, ");
+    addDemoText("Jerka Kubic,            F|5|U|8-10-24,  F|3|U|16-12-24,           F|3|P1|13-1-25|55|81, ");
     addDemoText("Birma Firmska,          F|3|U|9-10-24,  F|3|P1|15-1-25|51|81, ");
     addDemoText("Seka Sekun,             F|5|U|7-10-24,  F|2|P1|15-1-25|47.5|81, ");
     addDemoText("Mirza Delija,           F|5|U|4-10-24,  F|2|P1|18-1-25|43|81, ");
