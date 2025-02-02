@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.12"
-const gl_versionDate = "2.2.2025"
+const gl_versionNr = "v1.13"
+const gl_versionDate = "3.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2069,6 +2069,28 @@ colorOcena[3] = "lightSlateGray";
 colorOcena[4] = "darkCyan";
 colorOcena[5] = "limeGreen";
 
+const colorPredmet = [];
+colorPredmet[1] = "royalBlue";
+colorPredmet[2] = "teal";
+colorPredmet[3] = "goldenrod";
+colorPredmet[4] = "sienna";
+colorPredmet[5] = "purple";
+colorPredmet[6] = "firebrick";
+colorPredmet[7] = "darkOrange";
+colorPredmet[8] = "mediumSeaGreen";
+colorPredmet[9] = "brown";
+colorPredmet[10] = "chocolate";
+colorPredmet[11] = "darkGoldenrod";
+colorPredmet[12] = "darkSlateBlue";
+colorPredmet[13] = "green";
+colorPredmet[14] = "dodgerBlue";
+colorPredmet[15] = "mediumVioletRed";
+colorPredmet[16] = "peru";
+colorPredmet[17] = "salmon";
+colorPredmet[18] = "steelBlue";
+colorPredmet[19] = "yellowGreen";
+colorPredmet[20] = "tomato";
+
 var nrOcen = [];
 var avgOcena = [];
 var avgTock = [];
@@ -2101,6 +2123,7 @@ var arrQ3 = []; // 21.1.2025
 
 //---- 31.1.2025
 var ucenecOcenaId = [];        // polje linkov na ocene za vsakega učenca posebej
+var ucenecRollAvg = [];        // tekoče povprečje za do tedaj nabrane ocene. Iz tega se bo potem risal graf sprotnega spreminjanja dotedanjega povprečja 1.2.2025
 var ucenecAvgOcena = [];  
 var ucenecNrOcen = [];  
 var ucenecPrvaOcenaDatum = [];
@@ -2111,6 +2134,7 @@ var ucenciZadnjaOcenaDatum = 0;
 var ucenciOceneRazponDni = 0;
 //----
 var ucenecPredmetOcenaId = []; // polje linkov na ocene za vsakega učenca posebej pri vsakem predmetu posebej
+var ucenecPredmetRollAvg = []; // tekoče povprečje za do tedaj nabrane ocene pri posameznempredmetu. Iz tega se bo potem risal graf sprotnega spreminjanja dotedanjega povprečja 1.2.2025
 var ucenecPredmetAvgOcena = [];
 var ucenecPredmetNrOcen = [];
 //----
@@ -2199,7 +2223,7 @@ console.clear;
 //===========================================
 
 var demoText = [];
-load_demoText2();
+load_demoText5();
 
 function addDemoText(vp_textLine) {
 
@@ -3614,7 +3638,9 @@ function data_prepareStructures_byRazredTest() {
     arrQ3.length = 0; // 21.1.2025
     //---- 31.1.2025
     ucenecOcenaId.length = 0;
+    ucenecRollAvg.length = 0;
     ucenecPredmetOcenaId.length = 0;
+    ucenecPredmetRollAvg.length = 0;
 
     //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
     spChartX.length = 0;
@@ -3676,18 +3702,24 @@ function data_prepareStructures_byUcenec() {
    
     //---- 31.1.2025
     ucenecOcenaId.length = 0;
+    ucenecRollAvg.length = 0; // 1.2.2025
     ucenecAvgOcena.length = 0;
     ucenecNrOcen.length = 0;
     ucenecPrvaOcenaDatum.length = 0;
     ucenecZadnjaOcenaDatum.length = 0;
     //----
     ucenecPredmetOcenaId.length = 0;
+    ucenecPredmetRollAvg.length = 0; // 1.2.2025
     ucenecPredmetAvgOcena.length = 0;
     ucenecPredmetNrOcen.length = 0;
     //----
     razredNrUcencev.length = 0;
     razredUcenecId.length = 0;
-
+    // ---- 1.2.2025
+    ucenciZadnjaOcenaDatum = 0;
+    ucenciPrvaOcenaDatum = 1e15;
+    ucenciOceneRazponDni = 0;
+    
     //---- resetiram lastnosti grafov - potreboval jih bom za mouseOved() event
     ucChartX.length = 0;
     ucChartY.length = 0;
@@ -3707,8 +3739,8 @@ function data_prepareStructures_byUcenec() {
     let ucenecId;
     for (ucenecId = 1; ucenecId <= lo_nrUcencev; ucenecId++) {
         // za tekočega učenca naberem vso statistiko na svoje mesto v polju rezultatov
-        ;[ucenecOcenaId[ucenecId], ucenecNrOcen[ucenecId], ucenecAvgOcena[ucenecId], ucenecPrvaOcenaDatum[ucenecId], ucenecZadnjaOcenaDatum[ucenecId],
-        ucenecPredmetOcenaId[ucenecId], ucenecPredmetNrOcen[ucenecId], ucenecPredmetAvgOcena[ucenecId]]
+        ;[ucenecOcenaId[ucenecId], ucenecRollAvg[ucenecId], ucenecNrOcen[ucenecId], ucenecAvgOcena[ucenecId], ucenecPrvaOcenaDatum[ucenecId], ucenecZadnjaOcenaDatum[ucenecId],
+        ucenecPredmetOcenaId[ucenecId], ucenecPredmetRollAvg[ucenecId], ucenecPredmetNrOcen[ucenecId], ucenecPredmetAvgOcena[ucenecId]]
             = calculate_avg_ucenec("2425", ucenecId);
         
         // iščem prvi in zadnji datum vseh ocen skupaj, in vmes date rnge
@@ -3954,7 +3986,7 @@ function paint_eRazred_grafUcenec() {
     const marginTop = 8; const marginBottom = 8;
     let vGap = 10; let hGap = 10;
     
-    let rows, cols, row, col, x, y, itemWidth, itemHeight, place, ih, iw, k;
+    let rows, cols, row, col, x, y, itemWidth, itemHeight, ih, iw, k, w, h, tmpText;
     let fx, fy, fiw, fih, haveFocusGraph;
 
     //---- razred mora biti izbran
@@ -3978,9 +4010,10 @@ function paint_eRazred_grafUcenec() {
     haveFocusGraph = false;
     for (i = 1; i <= nrUcencev; i++) {
         
-        if (lo_razred == 2) {
-            lo_razred = lo_razred;
-        }
+        //if (lo_razred == 2) {
+        //    lo_razred = lo_razred;
+        //}
+
         // ---- najprej ugotovimo pozicijo in dimenzije grafa za tekočega učenca. Upošteva se tudi učenec v fokusu, katerega graf bo večji
         ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, i, row, col, itemWidth, itemHeight, k)
         
@@ -4001,6 +4034,15 @@ function paint_eRazred_grafUcenec() {
     if (haveFocusGraph) {
         paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, fx, fy, fiw, fih)
     }
+    
+    // ---- Izpis trenutnega razreda
+    tmpText = razredIme[lo_razred];
+    let fontRazred = "bold 32pt verdana";
+    ;[w, h] = gMeasureText(tmpText, fontRazred);
+    x = ctxW - w - 15;
+    y = ctxH - h - 35;
+    //gText(tmpText, fontRazred, "darkBlue", x, y);
+    gBannerRoundRectWithText3(x, y, w, h, fontRazred, "royalBlue", tmpText, 6, 6, 6, 18, "khaki", 1, "gray", "darkGray", 4, 4, false);
     
 }
 
@@ -4039,7 +4081,7 @@ function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight
 function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft, chartTop, chartWidth, chartHeight) {
 
     let gapLeft = 16; let gapRight = 8;
-    let gapTop = 8; let gapBottom = 14;
+    let gapTop = 8; let gapBottom = 16;
     // ----
     let chartRight = chartLeft + chartWidth;
     let xRight = chartRight - gapRight;
@@ -4071,6 +4113,58 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     gLine(xLeftData, yXos, xRightData, yXos, 1, "darkSlateGray", []);
     //gLine(xYos, yTop, xYos, yXos, 1, "darkSlateGray", []);
 
+    // ---- datumi na datumski X osi
+    // ---- prvi datum ocene
+    let date0 = new Date(ucenciPrvaOcenaDatum);
+    let dan = date0.getDate();
+    let mesec = date0.getMonth();
+    let leto = date0.getFullYear();
+    tmpText = dan.toString() + "." + (mesec + 1).toString() + ".";
+    let fontDatum = "9pt verdana";
+    ;[w, h] = gMeasureText(tmpText, fontDatum);
+    x = xLeftData - w / 2;
+    y = yXos + h + 4;
+    gLine(xLeftData, yXos - 2, xLeftData, yXos + 2, 1, "darkSlateGray", []);
+    gText(tmpText, fontDatum, "darkSlateGray", x, y);
+    // ---- vsak vmesni prvi v mesecu
+    let outOfDateRange = false;
+    mesec += 1; if (mesec > 11) { mesec = 0; leto += 1 };
+    let mesec0 = mesec;
+    let diffPix;
+    for (let i = 1; !outOfDateRange; i++) {
+        if (mesec > 11) { mesec = 0; leto += 1 };
+        let tmpDatum = new Date(leto, mesec, 1, 12);
+        let tmpDatumMs = Date.parse(tmpDatum); 
+        if (tmpDatumMs > ucenciZadnjaOcenaDatum) {
+            outOfDateRange = true;
+            break;
+        }        
+        if (i == 1) {
+            diffPix = kx * (tmpDatumMs - ucenciPrvaOcenaDatum);
+            if (diffPix < w) {
+                mesec += 1; continue;
+            }
+        };
+        x = xLeftData + kx * (tmpDatumMs - ucenciPrvaOcenaDatum);
+        gLine(x, yXos - 2, x, yXos + 2, 1, "darkSlateGray", []);
+        tmpText = "1." + (mesec + 1).toString() + ".";
+        ;[w, h] = gMeasureText(tmpText, fontDatum);
+        gText(tmpText, fontDatum, "darkSlateGray", x - w / 2, y);
+        //
+        mesec += 1;
+    }
+    // ---- zadnji datum ocene
+    date0 = new Date(ucenciZadnjaOcenaDatum);
+    dan = date0.getDate();
+    mesec = date0.getMonth();
+    leto = date0.getFullYear();
+    tmpText = dan.toString() + "." + (mesec + 1).toString() + ".";
+    ;[w, h] = gMeasureText(tmpText, fontDatum);
+    x = xRightData - w / 2;
+    y = yXos + h + 3;
+    gLine(xRightData, yXos - 2, xRightData, yXos + 2, 1, "darkSlateGray", []);
+    gText(tmpText, fontDatum, "darkSlateGray", x, y);    
+
     // ---- izpis učenca
     tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId];
     let fontUcenecImePriimek = "bold 10pt verdana";
@@ -4081,20 +4175,20 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
 
     // ---- povprečje
     let avgValue = 0;
-    if (lo_allPredmet) { avgValue = ucenecAvgOcena[ucenecId] }
-    else { avgValue = ucenecPredmetAvgOcena[ucenecId][lo_predmet] };
-    y = yXos - ky * (avgValue - 0.5);
-    tmpColor = "darkGray";
-    if (avgValue == 1.5) { tmpColor = "darkRed"; }
-    else if (avgValue < 1.5) { tmpColor = "red"; };
-    gLine(xLeftData, y, xRightData, y, 2, tmpColor, [3, 3]);
-    tmpText = "avg:";
-    ;[w, h] = gMeasureText(tmpText, fontSmall);   
-    gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y - 4);
-    tmpText = avgValue.toFixed(2);
-    ;[w, h] = gMeasureText(tmpText, fontSmall);   
-    gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y + h + 3);
-
+    //if (lo_allPredmet) { avgValue = ucenecAvgOcena[ucenecId] }
+    //else { avgValue = ucenecPredmetAvgOcena[ucenecId][lo_predmet] };
+    //y = yXos - ky * (avgValue - 0.5);
+    //tmpColor = "darkGray";
+    //if (avgValue == 1.5) { tmpColor = "darkRed"; }
+    //else if (avgValue < 1.5) { tmpColor = "red"; };
+    //gLine(xLeftData, y, xRightData, y, 2, tmpColor, [3, 3]);
+    //tmpText = "avg:";
+    //;[w, h] = gMeasureText(tmpText, fontSmall);   
+    //gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y - 4);
+    //tmpText = avgValue.toFixed(2);
+    //;[w, h] = gMeasureText(tmpText, fontSmall);   
+    //gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y + h + 3);
+    
     // ---- TABLETEK OCENE
     let fontOcena = "bold 14pt verdana";
     for (let ocena = 1; ocena <= 5; ocena++) {
@@ -4105,25 +4199,50 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     }
 
     // ---- OCENE
-    let ocenaId, ocenaNr, datumOceneMs, colorId;
+    let ocenaId, ocenaNr, datumOceneMs, colorId, x0, yAvg, rollAvg, pisnaOcena, currentPredmetId;
     let items = ucenecNrOcen[ucenecId];
     if (!lo_allPredmet) { items = ucenecPredmetNrOcen[ucenecId][lo_predmet]; };
     for (let i = 1; i <= items; i++) {
         if (lo_allPredmet) { 
             ocenaId = ucenecOcenaId[ucenecId][i];
+            rollAvg = ucenecRollAvg[ucenecId][i]; // 1.2.2025
         } else {
-            ocenaId = ucenecPredmetOcenaId[ucenecId][i];
+            ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i];
+            rollAvg = ucenecPredmetRollAvg[ucenecId][lo_predmet][i]; // 1.2.2025
         }
+        pisnaOcena = ocenaTip[ocenaId].substr(0, 1) == "P" ? true : false;
+        currentPredmetId = ocenaPredmetId[ocenaId];
         ocenaNr = ocenaCifraNr[ocenaId];
         datumOceneMs = ocenaDatumMs[ocenaId];
         x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
+        // ---- podaljšek krivulje tekočega povprečja do tega datuma in tekočega povprečja
+        yAvg = yXos - ky * (rollAvg - 0.5);
+        if (i > 1) {
+            tmpColor = "darkGray";
+            if (rollAvg == 1.5) { tmpColor = "darkRed"; }
+            else if (rollAvg < 1.5) { tmpColor = "red"; };
+            gLine(x0, y0, x, yAvg, 3, tmpColor, [4, 4]);
+        }
+        // ---- marker ocene
         y = yXos - ky * (ocenaNr - 0.5);
+        if (pisnaOcena && (x - x0) <= 2) {
+            y -= 4
+        };
         colorId = ocenaId - 10 * (Math.trunc((ocenaId - 1) / 10)) - 1;
-        gEllipse(x, y, 3, 4, 0, rsltColor[colorId], 0, "");
-    }
-    
-
-
+        //gEllipse(x, y, 3, 4, 0, rsltColor[colorId], 0, "");
+        gEllipse(x, y, 3, 4, 0, colorPredmet[currentPredmetId], 0, "");
+        gText(predmetKratica[ocenaPredmetId[ocenaId]].substr(0, 1), "9pt verdana", colorPredmet[currentPredmetId], x - 4, y + 15);
+        //
+        x0 = x;
+        y0 = yAvg;
+    };
+    tmpText = "avg:";
+    ;[w, h] = gMeasureText(tmpText, fontSmall);   
+    x += 10; if ((x + w) > (chartRight - 2)) { x = chartRight - w - 2 };
+    gText(tmpText, fontSmall, "darkSlateGray", x, yAvg - 4);
+    tmpText = rollAvg.toFixed(2);
+    ;[w, h] = gMeasureText(tmpText, fontSmall);   
+    gText(tmpText, fontSmall, "darkSlateGray", x, yAvg + h + 3);
 
 }
 
@@ -5676,11 +5795,13 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
 
     //---- 31.1.2025
     let arrOcenaId = [];   // polje linkov na ocene za zahtevanega učenca
+    let arrRollAvg = [];   // polje tekočih povprečij ocen za zahtevanega učenca
     let avgOcena = 0;      // skupna povprečna ocena učenca za vse predmet skupaj
     let nrOcen = 0;        // število vseh ocen zahtevanega učenca
     let prvaOcenaDatum = 1e15;  // datum prve ocene učenca
     let zadnjaOcenaDatum = 0;      // datum zadnje ocene učenca
     let arrPredmetOcenaId = [];    // povprečna ocena učenca za vsak predmet posebej
+    let arrPredmetRollAvg = [];    // tekoče povprečje ocena učenca za vsak predmet posebej
     let arrPredmetAvgOcena = [];  // povprečna ocena učenca za vsak predmet posebej
     let arrPredmetNrOcen = [];     // število ocen zahtevanega učenca za vsak predmet posebej
     let predmetSumOcen = [];     // vsota ocen zahtevanega učenca znotraj vsakega predmeta posebej
@@ -5691,7 +5812,7 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
 
     //---- Če je karkoli od zahtevanega nedefinirano, potem grem ven
     if (myLetnik <= 0) {
-        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid
+        return [arrOcenaId, arrRollAvg, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetRollAvg, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid
     }
     
     // ---- Najprej poiščem prvo pravo oceno v tabeli vseh ocen
@@ -5705,7 +5826,7 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
         }
     }
     if (!found) {
-        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - not found!
+        return [arrOcenaId, arrRollAvg, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetRollAvg, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - not found!
     }
 
     let ocena, predmetId, sumOcen;
@@ -5718,7 +5839,7 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
     nrOcen = 0;
     sumOcen = 0;
     for (predmetId = 1; predmetId <= lo_nrPredmetov; predmetId++) {
-        arrPredmetOcenaId[predmetId] = []; arrPredmetAvgOcena[predmetId] = 0; arrPredmetNrOcen[predmetId] = 0; predmetSumOcen[predmetId] = 0;
+        arrPredmetOcenaId[predmetId] = []; arrPredmetRollAvg[predmetId] = []; arrPredmetAvgOcena[predmetId] = 0; arrPredmetNrOcen[predmetId] = 0; predmetSumOcen[predmetId] = 0;
     }  
     for (ocenaId = ocenaId0; !passed && ocenaId <= lo_nrOcen; ocenaId++) {
         // Smo že mimo iskanih ocen?
@@ -5755,17 +5876,19 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
         nrOcen += 1;
         arrOcenaId[nrOcen] = ocenaId;
         sumOcen += ocena;
+        arrRollAvg[nrOcen] = sumOcen / nrOcen; // 1.2.2025
         //----
         //if (arrPredmetNrOcen[predmetId].length <= 0) { arrPredmetNrOcen[predmetId] = 0 };
         arrPredmetNrOcen[predmetId] += 1;
         arrPredmetOcenaId[predmetId][arrPredmetNrOcen[predmetId]] = ocenaId;
         predmetSumOcen[predmetId] += ocena;
-        
+        arrPredmetRollAvg[predmetId][nrOcen] = predmetSumOcen[predmetId] / arrPredmetNrOcen[predmetId]; // 1.2.2025
+
     };
     
     // ---- Smo nabrali kakšne ocene?
     if (nrOcen <= 0) {
-        return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - ni ocen!
+        return [arrOcenaId, arrRollAvg, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetRollAvg, arrPredmetNrOcen, arrPredmetAvgOcena]; // result not valid - ni ocen!
     }
 
     // ---- Imamo ocene - izračunaj povprečja in ostalo
@@ -5775,7 +5898,7 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
         arrPredmetAvgOcena[predmetId] = (arrPredmetNrOcen[predmetId] <= 0) ? 0 : predmetSumOcen[predmetId] / arrPredmetNrOcen[predmetId];
     }
 
-    return [arrOcenaId, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetNrOcen, arrPredmetAvgOcena];; // valid result
+    return [arrOcenaId, arrRollAvg, nrOcen, avgOcena, prvaOcenaDatum, zadnjaOcenaDatum, arrPredmetOcenaId, arrPredmetRollAvg, arrPredmetNrOcen, arrPredmetAvgOcena];; // valid result
 
 };
 
@@ -6374,6 +6497,96 @@ function tmToolbarStartPeriod_tick() {
 
 }
 
+function randomAtoB(a, b) {
+    // 2.2.2025
+
+    let range = b - a + 1;
+    return (a + Math.trunc(range * Math.random()));
+}
+
+function generateDemoUcenecOceneVsiPredmeti(ocenaMin, ocenaMax) {
+    // 2.2.2025
+
+    let mesec, leto, i;
+    let outStr = "";
+
+    // filam ocene za 6 mesecev, začnem s septembrom 2024
+    mesec = 9; leto = 24;
+    for (i = 1; i <= 6; i++) {
+        if (mesec > 12) { mesec = 1; leto = 25; };
+        // FIZ v prvih 9 dnevih (dnevi 1-9), KEM 10-19, MAT 20-28
+        outStr += generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, 1, 9, "F", ocenaMin, ocenaMax);
+        outStr += generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, 10, 19, "K", ocenaMin, ocenaMax);
+        outStr += generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, 20, 28, "M", ocenaMin, ocenaMax);
+        //
+        mesec += 1;
+    }
+    
+    return outStr;
+
+};
+
+function generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, dan0, dan1, kraticaPredmeta, ocenaMin, ocenaMax) {
+    // 2.2.2025
+    
+    let dan, datumStr, ocena, tipStr, maxTock, procent, tockStr;
+    let outStr = "";
+
+    dan = randomAtoB(dan0, dan1);
+    datumStr = dan.toString() + "-" + mesec.toString() + "-" + leto.toString();
+    ocena = randomAtoB(ocenaMin, ocenaMax);
+    switch (mesec) {
+        case 9: case 10: case 12: case 1: case 3: case 4: case 6: // USTNA OCENA
+            tipStr = "U";
+            break;
+        case 11:
+            tipStr = "P1";
+            maxTock = 69;
+            switch (ocena) {
+                case 1: procent = randomAtoB(5, 47); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 2: procent = randomAtoB(50, 59); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 3: procent = randomAtoB(65, 73); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 4: procent = randomAtoB(76, 87); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 5: procent = randomAtoB(90, 100); tockStr = Math.trunc(procent / 100 * maxTock); break;
+            }
+            break;
+        case 2:
+            tipStr = "P2";
+            maxTock = 77;
+            switch (ocena) {
+                case 1: procent = randomAtoB(5, 47); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 2: procent = randomAtoB(50, 59); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 3: procent = randomAtoB(65, 73); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 4: procent = randomAtoB(76, 87); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 5: procent = randomAtoB(90, 100); tockStr = Math.trunc(procent / 100 * maxTock); break;
+            }
+            break;
+        case 5: // PISNI TEST
+            tipStr = "P3";
+            maxTock = 72;
+            switch (ocena) {
+                case 1: procent = randomAtoB(5, 47); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 2: procent = randomAtoB(50, 59); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 3: procent = randomAtoB(65, 73); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 4: procent = randomAtoB(76, 87); tockStr = Math.trunc(procent / 100 * maxTock); break;
+                case 5: procent = randomAtoB(90, 100); tockStr = Math.trunc(procent / 100 * maxTock); break;
+            }
+            break;
+    }
+    outStr += kraticaPredmeta;
+    outStr += "|" + ocena.toString();
+    outStr += "|" + tipStr;
+    outStr += "|" + datumStr;
+    if (tipStr != "U") {
+        outStr += "|" + tockStr;
+        outStr += "|" + maxTock.toString();
+    }
+    outStr += ", ";
+
+    return outStr;
+
+}
+
 function load_demoText1() {
 
     // ---------------------------
@@ -6661,7 +6874,7 @@ function load_demoText4() {
     addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
     //----
     addDemoText("#L2425 #R8.D");
-    addDemoText("Neja Franko,     F|2|U|17-10-24, F|4|P1|15-1-25|70.5|81,   F|4|P2|25-4-25|51|61,  K|2|U|17-10-24, K|4|P1|15-1-25|70.5|81, K|4|P2|25-4-25|51|61,");
+    addDemoText("Neja Franko,     F|2|U|17-10-24, K|2|U|28-10-24,           F|4|P1|15-1-25|70.5|81,   K|4|P1|17-2-25|70.5|81,  M|4|P1|18-2-25|70.5|81, K|4|P2|27-3-25|51|61,  F|4|P2|25-4-25|51|61,");
     addDemoText("Mare Car,        F|4|U|5-10-24,  F|3|P1|15-1-25|60|81,     K|4|U|5-10-24,  K|3|P1|15-1-25|81|81, ");
     addDemoText("Janko Bergant,   F|3|U|9-10-24,  F|3|P1|15-1-25|56.5|81,   K|3|U|9-10-24,  K|3|P1|15-1-25|56.5|81, ");
     addDemoText("Jasmin Brekalo,  F|3|U|11-10-24, F|1|P1|15-1-25|33|81,     F|5|P2|25-4-25|60.5|61,     K|3|U|11-10-24, K|1|P1|15-1-25|33|81,   K|5|P2|25-4-25|60.5|61,");
@@ -6684,4 +6897,106 @@ function load_demoText4() {
     addDemoText("Pinka Rinka,     F|5|U|3-10-24,  F|5|P1|15-1-25|74.5|81,   K|5|U|3-10-24,  K|5|P1|15-1-25|74.5|81,");
     addDemoText("Daren Parlov,    F|3|U|6-10-24,  F|2|P1|15-1-25|46|81,     K|3|U|6-10-24,  K|2|P1|15-1-25|46|81,");
     
+}
+
+function load_demoText5() {
+
+    // ---------------------------
+    // Test variante, ko imaš spredaj najprej katalog vseh predmetov z imenom, trimestno kratico in enomestno kratico
+    // Potem v nadaljevanju imaš za vsak razred header vrstico z letnikom (#L) in razredom (#R) ... pozor: predmet tu ni naveden, ker bo enomestna kratica predmeta prisotna pri vseki oceni posebej
+    // Nato pa v nadaljevanju seznam vseh učemcev razreda, z vsemi njihovimi ocenami pri vseh predmetih.
+    //    primer ene ocene: "K|4|P1|15-1-25|70.5|81" ... KEMIJA, ocena 4, prvi pisni test, na dan 15.1.2025, 70.5 točk od 81 točk
+    // Ta varianta podatkov JE PODPRTA !!!
+    // ---------------------------
+
+    addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Mare Car, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Janko Bergant, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Jasmin Brekalo, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Franc Gadafi, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Dolfe Titler, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Vanjka Semio, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Marija Beloder, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Finka Kruh, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Danka Cuker, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
+    addDemoText("Kiro Puter, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Zinka Vodni, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Krava Fik, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Tonka Keran, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Anja Banja, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Roja Finf, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Kir Per, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Vinko Tvrdi, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    addDemoText("Zeko Populare, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Amer Fujsov, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Pinka Rinka, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Daren Parlov, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    
+    //----
+    addDemoText("#L2425 #R8.E");
+    addDemoText("Sin Skok, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Madalina Breskvar, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Aron Kron, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Zija Firbec, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Zara Motorka, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Mira Mar, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Jerka Kubic, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    addDemoText("Birma Firmska, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Seka Sekun, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
+    addDemoText("Mirza Delija, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
+    addDemoText("Adi Dasler, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Veter Velkaverh, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
+    addDemoText("Ken Reed, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Ari Peka, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Luki Krasi, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Porko Smeh, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Matona Pomagi, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Fjara Kiselj, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
+    addDemoText("Karina Enesu, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Kelia Kolas, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Dona Podbreg, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Gera Presek, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Zevs Novak, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    //----
+    addDemoText("#L2425 #R9.D");
+    addDemoText("Zera Bison, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Emma Celje, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Krasna Gorec, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Preja Volan, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Kravl Vodnik, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Voda Popit, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Nos Smerk, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Fina Smrekoc, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Heron Delon, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Mirk Novicki, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Karim Kozoleb, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    addDemoText("Sneja Pacifik, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Lunea Lolibruc, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Missi Sas, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Spona Okov, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Mons Titan, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    //----
+    addDemoText("#L2425 #R9.E");
+    addDemoText("Priska Fris, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Tor Bariton, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Sjor Bergerud, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Luis Armkil, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Disk Hardi, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Fravz Pic, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Jena Alidvak, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Zimija Zmilican, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    addDemoText("Krol Bojanec, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Kljuk Book, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
+    addDemoText("Raven Kodila, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
+    addDemoText("Mix Musikmen, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
+    addDemoText("Vrh Triglava, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
+    addDemoText("Petina Zmaga, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
+    addDemoText("Krizantema Vrt, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
+    addDemoText("Burak Osman, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Mladen Starina, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
+    addDemoText("Bindo Farina, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
+    addDemoText("Pikica Slon, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
 }
