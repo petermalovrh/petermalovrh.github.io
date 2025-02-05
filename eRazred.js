@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.13"
-const gl_versionDate = "3.2.2025"
+const gl_versionNr = "v1.14"
+const gl_versionDate = "5.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2272,13 +2272,6 @@ var lo_keyDownO = false; // 22.12.2023
 var lo_addTempMarginUp = 0;   //6.12.2023
 var lo_addTempMarginDown = 0; //6.12.2023
 //----
-var gl_changeByMouseWheel_F = false;   
-var gl_changeByMouseWheel_A = false;      
-var gl_changeByMouseWheel_P = false;   
-var gl_changeByMouseWheel_N = false; // 2.1.2025
-var gl_changeByMouseWheel_xNrF = false; 
-var gl_changeByMouseWheel_pixPerUnit = false; // 3.1.2025
-var gl_changeByMouseWheel_XP = false;  
 var gl_changeByMouseWheel_printLevel = false;   //4.1.2024
 
 //---- grafične meje med razredi
@@ -2293,57 +2286,6 @@ var lo_ga, lo_ghP, lo_gxP, lo_gyP;
 var lo_gwPS = 8; // šrina predmeta v pikslih
 var lo_gwArrowPS = 14; // šrina predmeta v pikslih
 var lo_ghArrowPS = 18; // šrina predmeta v pikslih
-//---- LEČA
-var lo_n = 1.6;
-const cv_n_min = 1.5; const cv_n_max = 1.9; // 2.1.2025
-var lo_lensR, lo_gLensR;
-var lo_gxLecaCenterL, lo_gxLecaCenterD; // centra krivin leče
-var lo_gdLece, lo_gdLeceHalf, lo_ghLece, lo_ghLeceHalf, lo_gxLecaLeft, lo_gxLecaRight;
-var lo_gyLecaTop, lo_gyLecaBottom;
-var lo_dLece, lo_dLeceHalf, lo_hLece, lo_hLeceHalf;
-const cv_lecaHeightMin = 2;
-const cv_lecaHeightMax = 200;
-const cv_lecaWidthMin = 2;
-const cv_lecaWidthMax = 100;
-var lo_ghLecaCurentMax = cv_lecaHeightMax;
-const cv_modeCalculate_byF = 1;
-const cv_modeCalculate_byLensSize = 2;
-var lo_modeCalculate = cv_modeCalculate_byF
-var lo_needToSetLensDimensionsAndPoins = false; // 4.1.2025
-var lo_needToSetLensPoins = false;      // 4.1.2025
-//----
-var lo_xNrF = 6; // toliko goriščnih razdalj zaobsega celotna x os, pol F-jev na levi, pol na desni strani leče
-var lo_pixPerUnit = 10; // toliko pikslov na enoto naj bo v začetku. Kasneje lahko to spreminja z "X"+mouseWheel
-var lo_f, lo_a, lo_b, lo_P, lo_povecava, lo_povecavaSlikeStr, lo_dioptrija, lo_S, lo_ghS, lo_gb, lo_gxS, lo_gyS;
-var lo_Sstr, lo_bStr;
-var kx; // koliko pikslov na cm
-//----
-lo_f = 25;  // // f25 a60 P30    3; // goriščna razdalja leče [cm] ... f=3cm
-lo_dLece = 0.2; //debelina leče [cm]
-lo_a = 60;  // f25 a60 P30    1.6 * lo_f; //pozicija predmeta na levi strani
-lo_P = 30;  // f25 a60 P30    2; // višina predmeta [cm]
-//----
-var lo_drawRulerH = true; // 30.12.2024
-var lo_drawRulerV = true; // 30.12.2024
-var lo_showRuler = true; // 31.12.2024
-var lo_rulerTop, lo_rulerBottom, lo_rulerHeight;
-//----
-var lo_showLegend = true; // 31.12.2024
-var lo_showRealLens = false;  //true; // 3.1.2025
-var lo_lensTooHigh = false; // 3.1.2025
-var lo_realniLom = true; // 11.1.2025
-//----
-var lo_selectedA = false;
-var lo_selectedF = false;
-var lo_selectedPredmet = false;
-var lo_selectedLeca = false; // 2.1.2025
-var lo_selectedCenterKrivineLece = false; // 3.1.2025
-var lo_selectedVrhLece = false; // 3.1.2025
-var lo_selectedTemeLece = false; // 4.1.2025
-//----
-const cv_addMarkWidthMin = -1; //13.12.2023
-const cv_addMarkWidthMax = 3; //13.12.2023
-var lo_addMarkWidth = 0; //13.12.2023
 
 const cv_addRightMarginMin = -200;   //15.12.2023
 const cv_addRightMarginMax = 100;   //15.12.2023
@@ -2488,10 +2430,7 @@ function main() {
    
     resizeCanvas();
 
-    //lf_setPrintLevel(false);
-
-    initGraphicalEnvironment();
-    //paint_eLeca_calculate();
+    //initGraphicalEnvironment();
 
     //let a;
     //let clipText = navigator.clipboard.readText(a);
@@ -2756,6 +2695,7 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI && lo_enabledMode) {
         if (buttonMode.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
+            lo_focusUcenec = 0; // 4.2.2025
             if (e.shiftKey) { // 26.1.2025
                 lf_changeMode(gl_mode - 1, true); // 2.2.2025
             } else {
@@ -2779,6 +2719,7 @@ elMyCanvas.addEventListener('click', (e) => {
                     data_prepareStructures_byRazredTest();                   
                     break;
                 case cv_mode_ucenec:
+                    lo_focusUcenec = 0; // 4.2.2025
                     break;                
             }
             paint();
@@ -2800,6 +2741,7 @@ elMyCanvas.addEventListener('click', (e) => {
                     data_prepareStructures_byRazredTest();                   
                     break;
                 case cv_mode_ucenec:
+                    lo_focusUcenec = 0; // 4.2.2025
                     break;                
             }              
             paint();
@@ -2820,6 +2762,7 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_ucenec:
                     if (e.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
                     else { lf_changeRazred(lo_razred + 1, true); };
+                    lo_focusUcenec = 0; // 4.2.2025
                     break;
             };            
             vl_end = true
@@ -2852,6 +2795,7 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && lo_showGUI && lo_enabledLoad) {
         if (buttonLoad.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
+            lo_focusUcenec = 0; // 4.2.2025
             clipboard_load();
             vl_end = true
         }
@@ -2896,36 +2840,36 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         //    //console.log("      mousemove(): slider overValue=" + rslt)
         //    if (rslt >= 0) { lf_dragInterval(rslt); }
         //    return;
-        if (lo_selectedVrhLece) {
-            let tmpMin = lo_pixPerUnit * cv_lecaHeightMin / 2;
-            if ((lo_gxLecaRight - lo_gxO) > tmpMin) { tmpMin = lo_gxLecaRight - lo_gxO };
-            let tmpMax = lo_pixPerUnit * cv_lecaHeightMax / 2; // več kot toliko leča nikoli ne more biti visoka
-            if (tmpMax > 0.95 * gpHeight / 2 ) { tmpMax = 0.95 * gpHeight / 2 }; // ven iz kadra leči ne pustim iti
-            //if (lo_ghLecaCurentMax < cv_lecaHeightMax) { tmpMax = lo_ghLecaCurentMax }; // pri trenutni leči pa je omejitev zaradi nizkega polmera kroga krivine lahko še nižja
-            if (valueBetween(lo_gyO - e.offsetY, tmpMin, tmpMax)) {
-                lo_gyLecaTop = e.offsetY;
-                lo_gyLecaBottom = lo_gyO + (lo_gyO - e.offsetY);
-                lo_ghLece = lo_gyLecaBottom - lo_gyLecaTop; // celotna višina leče 3.1.2025
-                lo_ghLeceHalf = lo_ghLece / 2;                // 3.1.2025
-                lo_hLece = lo_ghLece / lo_pixPerUnit;         // 4.1.2025
-                lo_hLeceHalf = lo_ghLeceHalf / lo_pixPerUnit; // 4.1.2025
-                lo_modeCalculate = cv_modeCalculate_byLensSize;
-            }
-        }
-        else if (lo_selectedTemeLece) {
-            let tmpMin = lo_pixPerUnit * cv_lecaWidthMin / 2;
-            let tmpMax = lo_pixPerUnit * cv_lecaWidthMax / 2; // več kot toliko leča nikoli ne more biti visoka
-            if ((lo_ghLeceHalf) < tmpMax) { tmpMax = lo_ghLeceHalf };
-            if (valueBetween(e.offsetX - lo_gxO, tmpMin, tmpMax)) {
-                lo_gxLecaRight = e.offsetX;
-                lo_gxLecaLeft = lo_gxO - (lo_gxLecaRight - lo_gxO);
-                lo_gdLece = lo_gxLecaRight - lo_gxLecaLeft; // celotna debelina leče 4.1.2025
-                lo_gdLeceHalf = lo_gdLece / 2;                // 4.1.2025
-                lo_dLece = lo_gdLece / lo_pixPerUnit;         // 4.1.2025
-                lo_dLeceHalf = lo_gdLeceHalf / lo_pixPerUnit; // 4.1.2025
-                lo_modeCalculate = cv_modeCalculate_byLensSize;
-            }
-        }
+        //if (lo_selectedVrhLece) {
+        //    let tmpMin = lo_pixPerUnit * cv_lecaHeightMin / 2;
+        //    if ((lo_gxLecaRight - lo_gxO) > tmpMin) { tmpMin = lo_gxLecaRight - lo_gxO };
+        //    let tmpMax = lo_pixPerUnit * cv_lecaHeightMax / 2; // več kot toliko leča nikoli ne more biti visoka
+        //    if (tmpMax > 0.95 * gpHeight / 2 ) { tmpMax = 0.95 * gpHeight / 2 }; // ven iz kadra leči ne pustim iti
+        //    //if (lo_ghLecaCurentMax < cv_lecaHeightMax) { tmpMax = lo_ghLecaCurentMax }; // pri trenutni leči pa je omejitev zaradi nizkega polmera kroga krivine lahko še nižja
+        //    if (valueBetween(lo_gyO - e.offsetY, tmpMin, tmpMax)) {
+        //        lo_gyLecaTop = e.offsetY;
+        //        lo_gyLecaBottom = lo_gyO + (lo_gyO - e.offsetY);
+        //        lo_ghLece = lo_gyLecaBottom - lo_gyLecaTop; // celotna višina leče 3.1.2025
+        //        lo_ghLeceHalf = lo_ghLece / 2;                // 3.1.2025
+        //        lo_hLece = lo_ghLece / lo_pixPerUnit;         // 4.1.2025
+        //        lo_hLeceHalf = lo_ghLeceHalf / lo_pixPerUnit; // 4.1.2025
+        //        lo_modeCalculate = cv_modeCalculate_byLensSize;
+        //    }
+        //}
+        //else if (lo_selectedTemeLece) {
+        //    let tmpMin = lo_pixPerUnit * cv_lecaWidthMin / 2;
+        //    let tmpMax = lo_pixPerUnit * cv_lecaWidthMax / 2; // več kot toliko leča nikoli ne more biti visoka
+        //    if ((lo_ghLeceHalf) < tmpMax) { tmpMax = lo_ghLeceHalf };
+        //    if (valueBetween(e.offsetX - lo_gxO, tmpMin, tmpMax)) {
+        //        lo_gxLecaRight = e.offsetX;
+        //        lo_gxLecaLeft = lo_gxO - (lo_gxLecaRight - lo_gxO);
+        //        lo_gdLece = lo_gxLecaRight - lo_gxLecaLeft; // celotna debelina leče 4.1.2025
+        //        lo_gdLeceHalf = lo_gdLece / 2;                // 4.1.2025
+        //        lo_dLece = lo_gdLece / lo_pixPerUnit;         // 4.1.2025
+        //        lo_dLeceHalf = lo_gdLeceHalf / lo_pixPerUnit; // 4.1.2025
+        //        lo_modeCalculate = cv_modeCalculate_byLensSize;
+        //    }
+        //}
     }
     else {
         //Me.Location = New Point((Me.Location.X - lo_lastMouseLocation.X) + e.X, (Me.Location.Y - lo_lastMouseLocation.Y) + e.Y)
@@ -3086,42 +3030,27 @@ window.addEventListener("wheel", event => {
     const delta = Math.sign(event.deltaY);
     let newValue, change, maxDiff;
     
-    //---- če vrti kolešček miške ob pritisnjeni tipki F, s tem spreminja goriščno razdaljo f
-    if (lo_keyDownF) {
-        //if (lo_enabledintChooserF) {
-        change = delta * lo_fStep;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        //newValue = lf_changeValueF(change);
-        //if (change > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { change -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
-        //newValue = Math.trunc(lf_changeValueF(change)); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
-        newValue = lf_changeValueF(change, true);
-        gl_changeByMouseWheel_F = true;
-        lo_selectedF = true; // 1.1.2024
-        lf_changeF(newValue, true);
+    if (gl_mode == cv_mode_ucenec) {
+        change = event.shiftKey ? delta : -delta;
+        newValue = lf_changeValueFocusUcenec(change);
+        gl_changeByMouseWheel_ucenecChart = true; // 4.2.2024
+        lf_changeFocusUcenec(newValue, true);
         //}
-        return; //konec prverjanja, ker je s pritisnjeno tipko F povedal, da hoče točno to in nič drugega
-    }
-    
+        return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
+    };
+
     ////---- če vrti kolešček miške ob pritisnjeni tipki X, s tem spreminja skupno število goriščnih razdalj na X osi
     //if (lo_keyDownX) {
     //    //if (lo_enabledintChooserF) {
     //    change = delta * lo_stepXnrF;
     //    if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
     //    newValue = lf_changeValueXnrF(change);
-    //    gl_changeByMouseWheel_xNrF = true; // 4.1.2024
+    //    gl_changeByMouseWheel_ucenecChart = true; // 4.1.2024
     //    lf_changeXnrF(newValue, true);
     //    //}
     //    return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
     //}
-    //---- če vrti kolešček miške ob pritisnjeni tipki X, s tem spreminja število pikslov na eno enoto (lo_pixPerUnit)
-    if (lo_keyDownX) {
-        change = delta * lo_stepPixPerUnit;
-        if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-        newValue = lf_changeValuePixPerUnit(change);
-        gl_changeByMouseWheel_pixPerUnit = true; // 4.1.2024
-        lf_changePixPerUnit(newValue, true);
-        return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
-    }
+
   
     ////---- ... sicer spreminja ...?        
     ////---- če si nad intChooserjem za goriščno razdaljo f lahko z vrtenjem koleščka miške spreminjaš f
@@ -3226,28 +3155,20 @@ window.addEventListener("keydown", (event) => {
             }              
             paint();
             break;
-        case 'KeyL':
-            //lo_keyDownL = true; break;
-            //console.log("L pressed");
-            lf_changeShowLegend(!lo_showLegend, true);
-            break;
-        case 'KeyE':
-            //lo_keyDownE = true; break;
-            //console.log("E pressed");
-            lf_changeShowRealLens(!lo_showRealLens, true);
-            break;
         case 'KeyB':
             //console.log("F7 pressed");
             if (lo_P == 27) {
                 lf_changeDebug(!dbg, true);
             }
             break;
-        case 'KeyO':
-            lo_keyDownO = true; break;
+        case 'KeyF':
+            lf_changeFocusUcenecOnOff(true);
+            break;
         case 'KeyU':
             lo_keyDownU = true; break;
         case 'KeyD':
             // Read text from the clipboard, or "paste"
+            lo_focusUcenec = 0; // 4.2.2025
             clipboard_load();
             break;
         case 'KeyW':
@@ -3297,29 +3218,6 @@ window.addEventListener("keyup", (event) => {
     let change, newValue;
 
     switch (event.code) {
-        case 'KeyF':
-            lo_keyDownF = false;
-            if (lo_keyDownControlLeft && !event.ctrlKey) { // 4.1.2025
-                lo_keyDownControlLeft = false
-            };
-            // 1.4.2024 Ali spreminja vrednost lo_f samo s pomočjo tipke F brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_F) {
-                // 21.12.2023 tole je primer spreminjanja lo_f samo s pomočjo tipke F  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_f
-                //console.log("UP: process keyPress(F)");
-                change = -lo_fStep;
-                // 4.1.2025 TULE BI BILO PAMETNO DELATI Z event.ctrlKey in event.shiftKey, STA BOLJ ZANESLJIVA !!!
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                //newValue = lf_changeValueF(-change);
-                lo_modeCalculate = cv_modeCalculate_byF;
-                newValue = lf_changeValueF(change, true); // 4.1.2025
-                lf_changeF(newValue, false);
-            }
-            lo_selectedF = false;
-            paint();
-            gl_changeByMouseWheel_F = false;
-            //console.log("UP: false"); console.log("----");
-            break;
         case 'KeyA':
             lo_keyDownA = false;
             // 1.4.2024 Ali spreminja vrednost lo_f samo s pomočjo tipke A brez vrtenja koleščka miške?
@@ -3357,7 +3255,7 @@ window.addEventListener("keyup", (event) => {
         //case 'KeyX':
         //    lo_keyDownX = false;
         //    // 1.4.2024 Ali spreminja vrednost lo_xNrF samo s pomočjo tipke X brez vrtenja koleščka miške?
-        //    if (!gl_changeByMouseWheel_xNrF) {
+        //    if (!gl_changeByMouseWheel_ucenecChart) {
         //        // 21.12.2023 tole je primer spreminjanja lo_xNrF samo s pomočjo tipke X  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_xNrF
         //        //console.log("UP: process keyPress(X)");
         //        change = lo_stepXnrF;
@@ -3366,7 +3264,7 @@ window.addEventListener("keyup", (event) => {
         //        newValue = lf_changeValueXnrF(-change);
         //        lf_changeXnrF(newValue, true);
         //    }
-        //    gl_changeByMouseWheel_xNrF = false;
+        //    gl_changeByMouseWheel_ucenecChart = false;
         //    //console.log("UP: false"); console.log("----");
         //    break;
         case 'KeyX':
@@ -3480,40 +3378,6 @@ function resizeCanvas() {
     lo_GUIlayoutHasChanged = true;
 }
 
-function initGraphicalEnvironment() {
-
-    //---- dimenzije grafične podlage za risanje
-    gpMarginTop = 20; gpMarginBottom = 16;
-    gpMarginLeft = 16; gpMarginRight = 16;
-    //---- po Y
-    gpTop = gpMarginTop;
-    gpHeight = ctxH - gpMarginTop - gpMarginBottom;
-    gpBottom = gpTop + gpHeight;
-    //---- po X
-    gpLeft = gpMarginLeft;
-    gpWidth = ctxW - gpMarginLeft - gpMarginRight;
-    //if (lo_useHalfPoint) { gpWidth += 30 };
-    gpRight = gpLeft + gpWidth;
-    //---- središče leče
-    lo_gxO = gpLeft + gpWidth / 2;
-    lo_gyO = gpTop + gpHeight / 2;
-    //---- panel za rezultate (29.12.2024)
-    rsltPanelLeft = gpLeft + 30;    // lo_gxO + 48;
-    rsltPanelTop = lo_gyO + 70; // gpTop + 28;
-    //---- panel za legendo žarkov (30.12.2024)
-    legendPanelLeft = gpRight - 150;
-    legendPanelTop = gpTop + 150;
-    //----
-    //kx = gpWidth / lo_xNrF / lo_f; // 3.1.2025
-
-    if (lo_modeCalculate == cv_modeCalculate_byLensSize) {
-        // zaradi premikov koordinatnega sistema so se spremenile tudi koordinate robov in centrov leč, gorišč
-        //setLensPoints();
-        lo_needToSetLensPoins = true;
-    }
-
-};
-
 function setLensDimensions() {
 
     // Zaradi ZOOM-a se grafične dimenzije leče in tudi njene grafične koordinate spremenijo in jih je treba na novo postaviti
@@ -3538,32 +3402,6 @@ function setLensPoints() {
     
 }
 
-function initGraphicalEnvironment_01() {
-
-    //---- dimenzije grafične podlage za risanje
-    gpMarginTop = 20; gpMarginBottom = 16;
-    gpMarginLeft = 16; gpMarginRight = 16;
-    //---- po Y
-    gpTop = gpMarginTop;
-    gpHeight = ctxH - gpMarginTop - gpMarginBottom;
-    gpBottom = gpTop + gpHeight;
-    //---- po X
-    gpLeft = gpMarginLeft;
-    gpWidth = ctxW - gpMarginLeft - gpMarginRight;
-    //if (lo_useHalfPoint) { gpWidth += 30 };
-    gpRight = gpLeft + gpWidth;
-    //---- središče leče
-    lo_gxO = gpLeft + gpWidth / 2;
-    lo_gyO = gpTop + gpHeight / 2;
-    //---- panel za rezultate (29.12.2024)
-    rsltPanelLeft = gpLeft + 30;    // lo_gxO + 48;
-    rsltPanelTop = lo_gyO + 70; // gpTop + 28;
-    //---- panel za legendo žarkov (30.12.2024)
-    legendPanelLeft = gpRight - 150;
-    legendPanelTop = gpTop + 150;
-
-};
-
 function paint() {
 
     //if (lo_showMap) { return }; // 29.12.2023
@@ -3575,7 +3413,7 @@ function paint() {
 
     //---- 30.1.2023 v1.6
     if (lo_GUIlayoutHasChanged) {
-        initGraphicalEnvironment();
+        //initGraphicalEnvironment();
         switch (lo_GUI_layout) {
             case cv_guiLayoutA: break;
             case cv_guiLayoutB:
@@ -3986,7 +3824,7 @@ function paint_eRazred_grafUcenec() {
     const marginTop = 8; const marginBottom = 8;
     let vGap = 10; let hGap = 10;
     
-    let rows, cols, row, col, x, y, itemWidth, itemHeight, ih, iw, k, w, h, tmpText;
+    let rows, cols, row, col, x, y, itemWidth, itemHeight, ih, iw, kAddFocud, w, h, tmpText;
     let fx, fy, fiw, fih, haveFocusGraph;
 
     //---- razred mora biti izbran
@@ -4006,7 +3844,7 @@ function paint_eRazred_grafUcenec() {
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
     
     col = 1; row = 1;
-    k = 0.15; // za ta faktor bo povečan graf učenca v fokusu
+    kAddFocud = 3; // za ta faktor bo povečan graf učenca v fokusu
     haveFocusGraph = false;
     for (i = 1; i <= nrUcencev; i++) {
         
@@ -4015,24 +3853,27 @@ function paint_eRazred_grafUcenec() {
         //}
 
         // ---- najprej ugotovimo pozicijo in dimenzije grafa za tekočega učenca. Upošteva se tudi učenec v fokusu, katerega graf bo večji
-        ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, i, row, col, itemWidth, itemHeight, k)
+        ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, i, row, col, itemWidth, itemHeight, false, kAddFocud);
         
         // ---- učenca v fokusu preskočim in ga izrišem na koncu po zanki učencev
         if (i == lo_focusUcenec) {
             // ta je fokusiran in si zapomnim podatke zanj, izrisal pa ga bom kasneje
             ;[fx, fy, fiw, fih] = [x, y, iw, ih];
             haveFocusGraph = true;
+            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih); // 4.2.2025 vseeno ga izrišem, na koncu pa bom še povečanega na sredini
         } else {
             // ta ni fokusiran, zato ga normalno izrišem
-            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih)
+            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih);
         }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
     }
     
     // ---- če imam učenca v fokusu, izrišem zdaj preko ostalih še povečan graf zanj
-    if (haveFocusGraph) {
-        paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, fx, fy, fiw, fih)
+    if (haveFocusGraph) {        
+        //paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, fx, fy, fiw, fih);
+        ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, lo_focusUcenec, row, col, itemWidth, itemHeight, true, kAddFocud)
+        paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, x, y, iw, ih);
     }
     
     // ---- Izpis trenutnega razreda
@@ -4046,10 +3887,10 @@ function paint_eRazred_grafUcenec() {
     
 }
 
-function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, ucenec, row, col, itemWidth, itemHeight, k) {
+function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, ucenec, row, col, itemWidth, itemHeight, vp_focusAware, vp_k) {
 
     let x, y, iw, ih, newY, yDiff, x0, y0;
- 
+
     x = marginLeft + (col - 1) * (hGap + itemWidth);
     y = marginTop + (row - 1) * (vGap + itemHeight);
     iw = itemWidth; ih = itemHeight;
@@ -4057,12 +3898,21 @@ function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight
     //30.7.2023 lokacijo v fokusu izrišem nekoliko večjo
     if (cols > 1 && rows > 1) {
         if (ucenec == lo_focusUcenec) {
-            x0 = x; y0 = y;
-            if (x > (marginLeft + k * iw)) { x -= k * iw; }
-            if (y > (marginTop + k * ih)) { y -= k * ih; }
-            iw += 2 * k * iw; ih += 2 * k * ih;
-            if ((x + iw) > (ctxW - marginRight)) { x = ctxW - marginRight - iw; }
-            if ((y + ih) > (ctxH - marginBottom)) { y = ctxH - marginBottom - ih; }
+            //x0 = x; y0 = y;
+            //if (x > (marginLeft + vp_k * iw)) { x -= vp_k * iw; }
+            //if (y > (marginTop + vp_k * ih)) { y -= vp_k * ih; }
+            //iw += 2 * vp_k * iw; ih += 2 * vp_k * ih;
+            //if ((x + iw) > (ctxW - marginRight)) { x = ctxW - marginRight - iw; }
+            //if ((y + ih) > (ctxH - marginBottom)) { y = ctxH - marginBottom - ih; }
+            // ----
+            if (vp_focusAware) { 
+                let kSize = 0.9;
+                iw = kSize * (ctxW - marginLeft - marginRight);
+                ih = iw * itemHeight / itemWidth;
+                if (ih > ctxH - marginTop - marginBottom) { ih = kSize * (ctxH - marginTop - marginBottom) };
+                x = ctxW / 2 - iw / 2;
+                y = ctxH / 2 - ih / 2;                
+            }            
         };
     }
         
@@ -4105,6 +3955,13 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     // ----
     let x, y, w, h, tmpText, tmpColor;
     let fontSmall = "10pt verdana";
+
+    // 4.2.2025
+    if (vp_razredUcenecId == lo_focusUcenec) {
+        let shW = 25; let radius = 12;
+        gBannerRoundRect2(chartLeft - shW, chartTop - shW, chartWidth + 2 * shW, chartHeight + 2 * shW, radius, gf_alphaColor(128, "khaki"), 0, "", "", 0, 0, false, true, true, true, true);
+        //gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 8, "", 0, "", "#FFFFFFC0", 20, 20, true, true, true, true, true);
+    }
 
     // ---- okvirček za celo področje chart-a
     gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 4, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false, true, true, true, true);
@@ -4171,7 +4028,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     ;[w, h] = gMeasureText(tmpText, fontUcenecImePriimek);
     x = chartRight - w - 5;
     y = chartTop + 4;
-    gBannerRoundRectWithText3(x, y, w, h, fontUcenecImePriimek, "darkSlateGray", tmpText, 2, 2, 2, 2, "azure", 1, "lightGray", "darkGray", 2, 2, false, true, true, true, true);
+    gBannerRoundRectWithText3(x, y, w, h, fontUcenecImePriimek, "darkSlateGray", tmpText, 2, 2, 2, 2, "#EBFFFFFF", 1, "lightGray", "darkGray", 2, 2, false, true, true, true, true); // med aliceBlue in lightCyan
 
     // ---- povprečje
     let avgValue = 0;
@@ -4430,7 +4287,7 @@ function paint_tips() {
             let font = "normal 12pt serif";
             let font2 = "italic 12pt serif";
             let font3 = "bold 12pt serif";
-            let nrTipRows = 9;
+            let nrTipRows = 11;
             let backHeight = nrTipRows * vStep + 15;
             const bannerWidth = 510;
 
@@ -4465,6 +4322,14 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("C", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... skrij/prika" + scZhLow + "i luknje v kriterijih to" + scTchLow + "kovnika", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... vklju" + scTchLow + "i/izklju" + scTchLow + "i fokus na graf ocen u" + scTchLow + "enca", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
+            //
+            y += vStep;
+            gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
+            gBannerRectWithText2("... izbira grafa ocen u" + scTchLow + "enca za prikaz v fokusu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
             //
             y += vStep;
             gLine(x0 - 4, y - 0.27 * vStep, x0 + bannerWidth - 30, y - 0.27 * vStep, 1, lo_tipsColor, [4, 4]);
@@ -4512,160 +4377,17 @@ function paint_GUI_layoutB() {
 
 }
 
-function lf_changeValueF(vp_diff, vp_trunc) {
+function lf_changeValueFocusUcenec(vp_diff) {
 
     let newValue;
 
-    if (vp_trunc) {
-        if (vp_diff > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { vp_diff -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
-        newValue = Math.trunc(lo_f - vp_diff); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
-    } else {
-        newValue = lo_f - vp_diff;
-    }
-
-    if (newValue < cv_f_min) { newValue = cv_f_min };
-    if (newValue > cv_f_max) { newValue = cv_f_max };
+    newValue = lo_focusUcenec - vp_diff;
+    if (newValue < 0) { newValue = razredNrUcencev[lo_razred] };
+    if (newValue > razredNrUcencev[lo_razred]) { newValue = 0 };
 
     return newValue;
 
 }
-
-function lf_changeValueA(vp_diff) {
-
-    let newValue;
-
-    newValue = lo_a - vp_diff;
-    if (newValue < cv_a_min) { newValue = cv_a_min };
-    let tmpMax = cv_a_max; if (20 * lo_f > cv_a_max) { tmpMax = 20 * lo_f }; // predmet lahko vedno postaviš vsaj za 20 goriščnih razdalj od sredine leče
-
-    if (newValue > tmpMax) { newValue = tmpMax };
-
-    return newValue;
-
-}
-
-function lf_changeValueP(vp_diff) {
-
-    let newValue;
-
-    newValue = lo_P - vp_diff;
-    if (newValue < cv_P_min) { newValue = cv_P_min };
-    if (newValue > cv_P_max) { newValue = cv_P_max };
-
-    return newValue;
-
-}
-
-function lf_changeValueN(vp_diff) {
-
-    let newValue;
-
-    newValue = lo_n - vp_diff;
-
-    newValue += 0.00001;
-    newValue = Math.trunc(newValue * 100)/100;
-    if (newValue < cv_n_min) { newValue = cv_n_min };
-    if (newValue > cv_n_max) { newValue = cv_n_max };
-
-    return newValue;
-
-}
-
-function lf_changeValueXnrF(vp_diff) {
-
-    let newValue;
-
-    newValue = lo_xNrF - vp_diff;
-    if (newValue < cv_xNrF_min) { newValue = cv_xNrF_min };
-    if (newValue > cv_xNrF_max) { newValue = cv_xNrF_max };
-
-    return newValue;
-
-}
-
-function lf_changeValuePixPerUnit(vp_diff) {
-
-    let newValue;
-
-    newValue = lo_pixPerUnit - vp_diff;
-    if (newValue < cv_pixPerUnit_min) { newValue = cv_pixPerUnit_min };
-    if (newValue > cv_pixPerUnit_max) { newValue = cv_pixPerUnit_max };
-
-    return newValue;
-
-}
-
-function lf_changeF(vp_newValue, vp_paint) {
-
-    lo_f = vp_newValue;
-    intChooserF.value = lo_f;
-
-    if (vp_paint) {
-        lo_modeCalculate = cv_modeCalculate_byF // 3.1.2025
-        paint_eLeca_calculate();
-        paint();
-    }
-
-}
-
-function lf_changeP(vp_newValue, vp_paint) {
-
-    lo_P = vp_newValue;
-    intChooserP.value = lo_P;
-
-    paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeXnrF(vp_newValue, vp_paint) {
-
-    lo_xNrF = vp_newValue;
-
-    initGraphicalEnvironment(); // spremenil se je zoom in je treba preračunati kx
-    paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changePixPerUnit(vp_newValue, vp_paint) {
-
-    lo_pixPerUnit = vp_newValue;
-
-    //initGraphicalEnvironment(); // spremenil se je zoom in je treba preračunati kx oziroma po novem lo_pixPerUnit
-    if (lo_modeCalculate == cv_modeCalculate_byLensSize) { // 4.1.2025
-        lo_needToSetLensDimensionsAndPoins = true;
-    }; 
-    paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeA(vp_newValue, vp_paint) {
-
-    lo_a = vp_newValue;
-    intChooserA.value = lo_a;
-
-    paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeN(vp_newValue, vp_paint) {
-
-    lo_n = vp_newValue;
-    intChooserN.value = lo_n;
-
-    paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
 
 function lf_changeValuePrintLevel(vp_change) {
 
@@ -4732,44 +4454,6 @@ function lf_setPrintLevel(vp_paint) {
 
 }
 
-function lf_changeUnitCm(vp_newValue, vp_paint) {
-
-    lo_unitCm = vp_newValue;
-    checkBoxUnitCm.value = lo_unitCm;
-
-    if (lo_unitCm) {
-        lo_unit = cv_unit_cm;
-        lo_unitStr = "cm";
-    } else {
-        lo_unit = cv_unit_mm;
-        lo_unitStr = "mm";
-    };
-
-    //paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeUnitMm(vp_newValue, vp_paint) {
-
-    lo_unitMm = vp_newValue;
-    checkBoxUnitMm.value = lo_unitMm;
-
-    if (lo_unitMm) {
-        lo_unit = cv_unit_mm;
-        lo_unitStr = "mm";
-    } else {
-        lo_unit = cv_unit_cm;
-        lo_unitStr = "cm";
-    };
-
-    //paint_eLeca_calculate();
-
-    if (vp_paint) { paint() }
-
-}
-
 function lf_changeShowRuler(vp_newValue, vp_paint) {
 
     lo_showRuler = vp_newValue;
@@ -4792,14 +4476,6 @@ function lf_changeSchrink(vp_newValue, vp_paint) {
 function lf_changeZaokrozujNaCeleProcente(vp_newValue, vp_paint) {
 
     lo_zaokrozujNaCeleProcente = vp_newValue;
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeShowLegend(vp_newValue, vp_paint) {
-
-    lo_showLegend = vp_newValue;
-    checkBoxLegend.value = lo_showLegend;
     if (vp_paint) { paint() }
 
 }
@@ -4854,12 +4530,6 @@ function lf_changeShowHelpTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
-function lf_changeShowRealRefl(vp_newValue, vp_paint) {
-
-    lo_realniLom = vp_newValue;
-    if (vp_paint) { paint() }
-}
-
 function lf_changeDebug(vp_newValue, vp_paint) {
 
     dbg = vp_newValue;
@@ -4884,6 +4554,30 @@ function lf_changeMode(vp_newValue, vp_paint) {
 
     lf_setMode(vp_newValue, vp_paint);
     
+}
+
+function lf_changeFocusUcenec(vp_newValue, vp_paint) {
+
+    lo_focusUcenec = vp_newValue;
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeFocusUcenecOnOff(vp_paint) {
+
+    if (gl_mode != cv_mode_ucenec) { return };
+
+    switch (lo_focusUcenec) {
+        case 0:
+            lo_focusUcenec = 1;
+            break;
+        default:
+            lo_focusUcenec = 0;
+            break;
+    }
+
+    if (vp_paint) { paint() }
+
 }
 
 function lf_setMode(vp_mode, vp_paint) {
@@ -4919,7 +4613,6 @@ function lf_setMode(vp_mode, vp_paint) {
     if (vp_paint) { paint() }
 
 }
-
 
 function tmMouseOutOfWindow_tick() {
     
@@ -6504,16 +6197,16 @@ function randomAtoB(a, b) {
     return (a + Math.trunc(range * Math.random()));
 }
 
-function generateDemoUcenecOceneVsiPredmeti(ocenaMin, ocenaMax) {
+function generateDemoUcenecOceneVsiPredmeti(vp_mesec0, vp_leto0, vp_mesecev, ocenaMin, ocenaMax) {
     // 2.2.2025
 
     let mesec, leto, i;
     let outStr = "";
 
     // filam ocene za 6 mesecev, začnem s septembrom 2024
-    mesec = 9; leto = 24;
-    for (i = 1; i <= 6; i++) {
-        if (mesec > 12) { mesec = 1; leto = 25; };
+    mesec = vp_mesec0; leto = vp_leto0;
+    for (i = 1; i <= vp_mesecev; i++) {
+        if (mesec > 12) { mesec = 1; leto = vp_leto0 + 1; };
         // FIZ v prvih 9 dnevih (dnevi 1-9), KEM 10-19, MAT 20-28
         outStr += generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, 1, 9, "F", ocenaMin, ocenaMax);
         outStr += generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, 10, 19, "K", ocenaMin, ocenaMax);
@@ -6528,7 +6221,7 @@ function generateDemoUcenecOceneVsiPredmeti(ocenaMin, ocenaMax) {
 
 function generateDemoUcenecOceneVsiPredmeti_singlePredmet(mesec, leto, dan0, dan1, kraticaPredmeta, ocenaMin, ocenaMax) {
     // 2.2.2025
-    
+
     let dan, datumStr, ocena, tipStr, maxTock, procent, tockStr;
     let outStr = "";
 
@@ -6909,94 +6602,96 @@ function load_demoText5() {
     // Ta varianta podatkov JE PODPRTA !!!
     // ---------------------------
 
+    let mesec = 9; let leto = 24; let mesecev = 6;
+
     addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
     //----
     addDemoText("#L2425 #R8.D");
-    addDemoText("Neja Franko, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Mare Car, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Janko Bergant, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Jasmin Brekalo, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Franc Gadafi, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Dolfe Titler, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Vanjka Semio, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Marija Beloder, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Finka Kruh, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Danka Cuker, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
-    addDemoText("Kiro Puter, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Zinka Vodni, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Krava Fik, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Tonka Keran, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Anja Banja, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Roja Finf, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Kir Per, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Vinko Tvrdi, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
-    addDemoText("Zeko Populare, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Amer Fujsov, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Pinka Rinka, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Daren Parlov, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Neja Franko, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Mare Car, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Janko Bergant, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Jasmin Brekalo, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Franc Gadafi, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Dolfe Titler, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Vanjka Semio, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Marija Beloder, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Finka Kruh, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Danka Cuker, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 3));
+    addDemoText("Kiro Puter, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Zinka Vodni, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Krava Fik, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Tonka Keran, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Anja Banja, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Roja Finf, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Kir Per, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Vinko Tvrdi, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 2));
+    addDemoText("Zeko Populare, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Amer Fujsov, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Pinka Rinka, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Daren Parlov, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
     
     //----
     addDemoText("#L2425 #R8.E");
-    addDemoText("Sin Skok, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Madalina Breskvar, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Aron Kron, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Zija Firbec, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Zara Motorka, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Mira Mar, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Jerka Kubic, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
-    addDemoText("Birma Firmska, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Seka Sekun, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
-    addDemoText("Mirza Delija, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
-    addDemoText("Adi Dasler, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Veter Velkaverh, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
-    addDemoText("Ken Reed, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Ari Peka, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Luki Krasi, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Porko Smeh, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Matona Pomagi, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Fjara Kiselj, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
-    addDemoText("Karina Enesu, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Kelia Kolas, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Dona Podbreg, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Gera Presek, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Zevs Novak, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
+    addDemoText("Sin Skok, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Madalina Breskvar, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Aron Kron, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Zija Firbec, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Zara Motorka, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Mira Mar, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Jerka Kubic, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 2));
+    addDemoText("Birma Firmska, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Seka Sekun, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 4));
+    addDemoText("Mirza Delija, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 3));
+    addDemoText("Adi Dasler, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Veter Velkaverh, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 3));
+    addDemoText("Ken Reed, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Ari Peka, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Luki Krasi, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Porko Smeh, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Matona Pomagi, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Fjara Kiselj, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 4));
+    addDemoText("Karina Enesu, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Kelia Kolas, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Dona Podbreg, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Gera Presek, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Zevs Novak, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 2));
     //----
     addDemoText("#L2425 #R9.D");
-    addDemoText("Zera Bison, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Emma Celje, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Krasna Gorec, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Preja Volan, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Kravl Vodnik, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Voda Popit, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Nos Smerk, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Fina Smrekoc, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Heron Delon, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Mirk Novicki, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Karim Kozoleb, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
-    addDemoText("Sneja Pacifik, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Lunea Lolibruc, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Missi Sas, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Spona Okov, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Mons Titan, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Zera Bison, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Emma Celje, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Krasna Gorec, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Preja Volan, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Kravl Vodnik, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Voda Popit, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Nos Smerk, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Fina Smrekoc, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Heron Delon, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Mirk Novicki, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Karim Kozoleb, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 2));
+    addDemoText("Sneja Pacifik, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Lunea Lolibruc, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Missi Sas, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Spona Okov, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Mons Titan, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
     //----
     addDemoText("#L2425 #R9.E");
-    addDemoText("Priska Fris, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Tor Bariton, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Sjor Bergerud, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Luis Armkil, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Disk Hardi, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Fravz Pic, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Jena Alidvak, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Zimija Zmilican, " + generateDemoUcenecOceneVsiPredmeti(1, 2));
-    addDemoText("Krol Bojanec, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Kljuk Book, " + generateDemoUcenecOceneVsiPredmeti(1, 5));
-    addDemoText("Raven Kodila, " + generateDemoUcenecOceneVsiPredmeti(1, 4));
-    addDemoText("Mix Musikmen, " + generateDemoUcenecOceneVsiPredmeti(1, 3));
-    addDemoText("Vrh Triglava, " + generateDemoUcenecOceneVsiPredmeti(2, 3));
-    addDemoText("Petina Zmaga, " + generateDemoUcenecOceneVsiPredmeti(2, 4));
-    addDemoText("Krizantema Vrt, " + generateDemoUcenecOceneVsiPredmeti(2, 5));
-    addDemoText("Burak Osman, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
-    addDemoText("Mladen Starina, " + generateDemoUcenecOceneVsiPredmeti(3, 4));
-    addDemoText("Bindo Farina, " + generateDemoUcenecOceneVsiPredmeti(4, 5));
-    addDemoText("Pikica Slon, " + generateDemoUcenecOceneVsiPredmeti(3, 5));
+    addDemoText("Priska Fris, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Tor Bariton, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Sjor Bergerud, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Luis Armkil, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Disk Hardi, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Fravz Pic, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Jena Alidvak, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Zimija Zmilican, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 2));
+    addDemoText("Krol Bojanec, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Kljuk Book, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Raven Kodila, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
+    addDemoText("Mix Musikmen, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
+    addDemoText("Vrh Triglava, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 3));
+    addDemoText("Petina Zmaga, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 4));
+    addDemoText("Krizantema Vrt, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 2, 5));
+    addDemoText("Burak Osman, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+    addDemoText("Mladen Starina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 4));
+    addDemoText("Bindo Farina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
+    addDemoText("Pikica Slon, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
 }
