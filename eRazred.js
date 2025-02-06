@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.14"
-const gl_versionDate = "5.2.2025"
+const gl_versionNr = "v1.15"
+const gl_versionDate = "6.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2055,7 +2055,8 @@ const ocenaPredmetId = [];
 const ocenaLetnikId = [];
 const ocenaDatumStr = [];    // "14-10-2024"
 const ocenaDatumMs = [];     // 1.2.2025 v številčne milisekunde pretvorjen datum oziroma razlika v ms od 1.1.1970 (to je JS base datum)
-const ocenaTip = [];         // "U" (ustna) ali "P" (pisna)
+const ocenaTip = [];         // "U" (ustna) ali "P1" (pisna prvi test), "P2" pisna drugi test ...
+const ocenaTipTip = [];      // "U" (ustna) ali "P" (pisna)
 const ocenaTipSerialNr = []; // "P1" pomeni prvi pisni test
 const ocenaTock = [];        // "P1" pomeni prvi pisni test
 const ocenaMaxTock = [];     // "P1" pomeni prvi pisni test
@@ -3118,7 +3119,8 @@ window.addEventListener("keydown", (event) => {
                     paint();                    
                     break;
                 case cv_mode_ucenec:
-                    if (event.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
+                    lo_focusUcenec = 0; // 4.2.2025
+                    if(event.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
                     else { lf_changeRazred(lo_razred + 1, true); };
                     break;
             };
@@ -3860,10 +3862,10 @@ function paint_eRazred_grafUcenec() {
             // ta je fokusiran in si zapomnim podatke zanj, izrisal pa ga bom kasneje
             ;[fx, fy, fiw, fih] = [x, y, iw, ih];
             haveFocusGraph = true;
-            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih); // 4.2.2025 vseeno ga izrišem, na koncu pa bom še povečanega na sredini
+            paint_eRazred_grafUcenec_drawSingleUcenec(i, false, x, y, iw, ih); // 4.2.2025 vseeno ga izrišem, na koncu pa bom še povečanega na sredini
         } else {
             // ta ni fokusiran, zato ga normalno izrišem
-            paint_eRazred_grafUcenec_drawSingleUcenec(i, x, y, iw, ih);
+            paint_eRazred_grafUcenec_drawSingleUcenec(i, false, x, y, iw, ih);
         }
         col += 1;
         if (col > cols) { col = 1; row += 1 };
@@ -3873,7 +3875,7 @@ function paint_eRazred_grafUcenec() {
     if (haveFocusGraph) {        
         //paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, fx, fy, fiw, fih);
         ;[x, y, iw, ih] = paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight, marginBottom, hGap, vGap, rows, cols, lo_focusUcenec, row, col, itemWidth, itemHeight, true, kAddFocud)
-        paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, x, y, iw, ih);
+        paint_eRazred_grafUcenec_drawSingleUcenec(lo_focusUcenec, true, x, y, iw, ih);
     }
     
     // ---- Izpis trenutnega razreda
@@ -3928,23 +3930,26 @@ function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight
     return [x, y, iw, ih]
 }
 
-function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft, chartTop, chartWidth, chartHeight) {
+function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, chartLeft, chartTop, chartWidth, chartHeight) {
 
     let gapLeft = 16; let gapRight = 8;
     let gapTop = 8; let gapBottom = 16;
+    if (vp_focus) { gapLeft += 4; gapTop += 4; gapBottom += 4; }; // 6.2.2025
     // ----
     let chartRight = chartLeft + chartWidth;
     let xRight = chartRight - gapRight;
     let xRightData = xRight - 12;
+    if (vp_focus) { xRightData -= 16 }; // 6.2.2025
     let chartBottom = chartTop + chartHeight;
     let yTop = chartTop + gapTop;
     let yTopData = yTop + 25;
     // ----
     let xYos = chartLeft + gapLeft;
     let xLeftData = xYos + 15;
+    if (vp_focus) { xLeftData += 12 }; // 6.2.2025
     let yXos = chartBottom - gapBottom;
     // ----
-    let yRangeOcene = 4.5; // ocena 1 naj bo na polovici višine ene ocene, potem pa po cele višine naprej gor proti 5
+    let yRangeOcene = 4.6; // ocena 1 naj bo na polovici višine ene ocene, potem pa po cele višine naprej gor proti 5
     let yRangePix = yXos - yTopData;
     let ky = yRangePix / yRangeOcene;
     // ----
@@ -3953,18 +3958,22 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     let xRangePix = xRightData - xLeftData;
     let kx = xRangePix / xRangeDate;
     // ----
-    let x, y, w, h, tmpText, tmpColor;
+    let x, y, w, h, tmpText, tmpColor, tmpLineWidth;
     let fontSmall = "10pt verdana";
 
     // 4.2.2025
-    if (vp_razredUcenecId == lo_focusUcenec) {
+    //if (vp_razredUcenecId == lo_focusUcenec) {
+    if (vp_focus) {
         let shW = 25; let radius = 12;
-        gBannerRoundRect2(chartLeft - shW, chartTop - shW, chartWidth + 2 * shW, chartHeight + 2 * shW, radius, gf_alphaColor(128, "khaki"), 0, "", "", 0, 0, false, true, true, true, true);
+        //gBannerRoundRect2(chartLeft - shW, chartTop - shW, chartWidth + 2 * shW, chartHeight + 2 * shW, radius, gf_alphaColor(128, "khaki"), 0, "", "", 0, 0, false, true, true, true, true);
+        gBannerRoundRect2(chartLeft - shW, chartTop - shW, chartWidth + 2 * shW, chartHeight + 2 * shW, radius, gf_alphaColor(128, "darkOliveGreen"), 0, "", "", 0, 0, false, true, true, true, true);
         //gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 8, "", 0, "", "#FFFFFFC0", 20, 20, true, true, true, true, true);
     }
 
     // ---- okvirček za celo področje chart-a
-    gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 4, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false, true, true, true, true);
+    tmpColor = "#F7F7F7FF";
+    if (vp_razredUcenecId == lo_focusUcenec && !vp_focus) { tmpColor = "papayaWhip"; };
+    gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 4, tmpColor, 1, "lightGray", "", 0, 0, false, true, true, true, true);
 
     // ---- osi
     gLine(xLeftData, yXos, xRightData, yXos, 1, "darkSlateGray", []);
@@ -4023,8 +4032,12 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     gText(tmpText, fontDatum, "darkSlateGray", x, y);    
 
     // ---- izpis učenca
-    tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId];
     let fontUcenecImePriimek = "bold 10pt verdana";
+    tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId];
+    //if (vp_razredUcenecId == lo_focusUcenec) {
+    if (vp_focus) {
+        fontUcenecImePriimek = "bold 13pt verdana";
+    }
     ;[w, h] = gMeasureText(tmpText, fontUcenecImePriimek);
     x = chartRight - w - 5;
     y = chartTop + 4;
@@ -4047,16 +4060,18 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     //gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y + h + 3);
     
     // ---- TABLETEK OCENE
-    let fontOcena = "bold 14pt verdana";
+    let fontOcena = "bold 14pt verdana"; let ddy = 8;
+    if (vp_focus) { fontOcena = "bold 18pt verdana"; ddy = 16 };
     for (let ocena = 1; ocena <= 5; ocena++) {
         tmpText = ocena.toString();
         ;[w, h] = gMeasureText(tmpText, fontOcena);
         y = yXos - ky * (ocena - 0.5);
-        gBannerRoundRectWithText(xYos - w / 2 - 3, y - h / 2, w, h, fontOcena, colorOcena[ocena], tmpText, 4, 8, 9, "white", 1, "darkGray", "#CACACAC0", 3, 2, false);
+        gBannerRoundRectWithText(xYos - w / 2 - 3, y - h / 2, w, h, fontOcena, colorOcena[ocena], tmpText, 4, ddy, 9, "white", 1, "darkGray", "#CACACAC0", 3, 2, false);
     }
 
-    // ---- OCENE
-    let ocenaId, ocenaNr, datumOceneMs, colorId, x0, yAvg, rollAvg, pisnaOcena, currentPredmetId;
+    // ---- OCENE - KRIVULJA POVPREČJA ... rišem jo spodaj, da so potem markerji ocen lepo čez njo in ne obratno popackano
+    let fontUcenecOcena = "bold 12pt verdana";
+    let ocenaId, ocenaNr, ocenaCifraStr, datumOceneMs, colorId, x0, yAvg, rollAvg, pisnaOcena, currentPredmetId, tmpAddY;
     let items = ucenecNrOcen[ucenecId];
     if (!lo_allPredmet) { items = ucenecPredmetNrOcen[ucenecId][lo_predmet]; };
     for (let i = 1; i <= items; i++) {
@@ -4067,9 +4082,6 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
             ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i];
             rollAvg = ucenecPredmetRollAvg[ucenecId][lo_predmet][i]; // 1.2.2025
         }
-        pisnaOcena = ocenaTip[ocenaId].substr(0, 1) == "P" ? true : false;
-        currentPredmetId = ocenaPredmetId[ocenaId];
-        ocenaNr = ocenaCifraNr[ocenaId];
         datumOceneMs = ocenaDatumMs[ocenaId];
         x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
         // ---- podaljšek krivulje tekočega povprečja do tega datuma in tekočega povprečja
@@ -4078,21 +4090,15 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
             tmpColor = "darkGray";
             if (rollAvg == 1.5) { tmpColor = "darkRed"; }
             else if (rollAvg < 1.5) { tmpColor = "red"; };
-            gLine(x0, y0, x, yAvg, 3, tmpColor, [4, 4]);
-        }
-        // ---- marker ocene
-        y = yXos - ky * (ocenaNr - 0.5);
-        if (pisnaOcena && (x - x0) <= 2) {
-            y -= 4
-        };
-        colorId = ocenaId - 10 * (Math.trunc((ocenaId - 1) / 10)) - 1;
-        //gEllipse(x, y, 3, 4, 0, rsltColor[colorId], 0, "");
-        gEllipse(x, y, 3, 4, 0, colorPredmet[currentPredmetId], 0, "");
-        gText(predmetKratica[ocenaPredmetId[ocenaId]].substr(0, 1), "9pt verdana", colorPredmet[currentPredmetId], x - 4, y + 15);
-        //
+            tmpLineWidth = 3;
+            //if (vp_razredUcenecId == lo_focusUcenec) { tmpLineWidth = 5 };
+            if (vp_focus) { tmpLineWidth = 5 };
+            gLine(x0, y0, x, yAvg, tmpLineWidth, tmpColor, [4, 4]);
+        }             
         x0 = x;
         y0 = yAvg;
     };
+    // ---- označitev končnega povprečja
     tmpText = "avg:";
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
     x += 10; if ((x + w) > (chartRight - 2)) { x = chartRight - w - 2 };
@@ -4101,6 +4107,45 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, chartLeft,
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
     gText(tmpText, fontSmall, "darkSlateGray", x, yAvg + h + 3);
 
+    // ---- OCENE - MARKERJI OCEN ... rešejo se preko že izrisane krivulje povprečja
+    for (let i = 1; i <= items; i++) {
+        if (lo_allPredmet) { ocenaId = ucenecOcenaId[ucenecId][i]; }
+        else { ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i]; };
+        pisnaOcena = ocenaTipTip[ocenaId] == "P" ? true : false; // 6.2.2025
+        currentPredmetId = ocenaPredmetId[ocenaId];
+        ocenaCifraStr = ocenaCifra[ocenaId];
+        ocenaNr = ocenaCifraNr[ocenaId];
+        datumOceneMs = ocenaDatumMs[ocenaId];
+        x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
+        // ---- marker ocene
+        y = yXos - ky * (ocenaNr - 0.5);
+        if (pisnaOcena && (x - x0) <= 2) {
+            y -= 4
+        };
+        colorId = ocenaId - 10 * (Math.trunc((ocenaId - 1) / 10)) - 1;
+        ctx.setLineDash([]);
+        if (vp_focus) {
+            tmpAddY = 1;
+            if (ocenaTipTip[ocenaId] == "P") {
+                //gEllipse(x, y, 7, 8, 0, "", 2, colorPredmet[currentPredmetId]);
+                //tmpAddY = 5;
+            }
+            //gEllipse(x, y, 4, 5, 0, colorPredmet[currentPredmetId], 0, "");
+            ;[w, h] = gMeasureText(ocenaCifraStr, fontUcenecOcena);
+            gBannerRoundRectWithText3(x - w / 2, y - h / 2, w, h, fontUcenecOcena, "white", ocenaCifraStr, 5, 3, 4, 6, colorPredmet[currentPredmetId], 1, "lightGray", "darkGray", 2, 2, false);
+            gText(predmetKratica[ocenaPredmetId[ocenaId]].substr(0, 1), "10pt verdana", colorPredmet[currentPredmetId], x - 4, y + h + 11 + tmpAddY);
+        } else {
+            tmpAddY = 0;
+            if (ocenaTipTip[ocenaId] == "P") {
+                gEllipse(x, y, 5, 6, 0, "", 1, colorPredmet[currentPredmetId]);
+                tmpAddY = 3;
+            }
+            gEllipse(x, y, 3, 4, 0, colorPredmet[currentPredmetId], 0, "");
+            gText(predmetKratica[ocenaPredmetId[ocenaId]].substr(0, 1), "9pt verdana", colorPredmet[currentPredmetId], x - 4, y + 15 + tmpAddY);
+        }
+        x0 = x;
+    };
+    
 }
 
 function lf_fixProcent(vp_nrStr) {
@@ -4909,7 +4954,8 @@ function intDataStructures() {
     ocenaLetnikId.length = 0;
     ocenaDatumStr.length = 0;    // "14-10-2024"
     ocenaDatumMs.length = 0;     // 1.2.2025
-    ocenaTip.length = 0;         // "U" (ustna) ali "P" (pisna)
+    ocenaTip.length = 0;         // "U" (ustna) ali "P1" (pisna prva/druga/tretja)
+    ocenaTipTip.length = 0;      // "U" (ustna) ali "P" (pisna) 6.2.2025
     ocenaTipSerialNr.length = 0; // "P1" pomeni prvi pisni test
     ocenaTock.length = 0; 
     ocenaMaxTock.length = 0; 
@@ -5116,7 +5162,7 @@ function data_parse_ucenec(lineStr) {
     //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
     //console.log(tmpStr + "    U: " + lineStr);
 
-    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpZnak1, tmpPredmetKratica1, tmpPredmetId, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
+    let tmpStr, pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpZnak1, tmpPredmetKratica1, tmpPredmetId, tmpOcenaCifra, tmpOcenaTip, tmpOcenaTipTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
     const itemList = lineStr.split(",");
     if (itemList.length < 1) {
         return false;
@@ -5199,7 +5245,7 @@ function data_parse_ucenec(lineStr) {
         paramId += 1;
 
         // ---- TIP OCENE
-        tmpOcenaTip = ocenaDataList[paramId].trim();
+        tmpOcenaTip = ocenaDataList[paramId].trim().toUpperCase();
         if (tmpOcenaTip.substr(0, 1) == "P") {
             tmpPisnaOcena = true;
         } else {
@@ -5239,6 +5285,7 @@ function data_parse_ucenec(lineStr) {
         ocenaCifra[lo_nrOcen] = tmpOcenaCifra;
         ocenaCifraNr[lo_nrOcen] = Number(tmpOcenaCifra);
         ocenaTip[lo_nrOcen] = tmpOcenaTip;
+        ocenaTipTip[lo_nrOcen] = tmpOcenaTip.substr(0, 1);
         ocenaTipSerialNr[lo_nrOcen] = 0;
         ocenaDatumStr[lo_nrOcen] = tmpOcenaDatum;
         ocenaDatumMs[lo_nrOcen] = datumOceneMs; // 1.2.2025
