@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.16"
-const gl_versionDate = "7.2.2025"
+const gl_versionNr = "v1.17"
+const gl_versionDate = "8.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2721,7 +2721,7 @@ elMyCanvas.addEventListener('click', (e) => {
                     data_prepareStructures_byRazredTest();                   
                     break;
                 case cv_mode_ucenec:
-                    lo_focusUcenec = 0; // 4.2.2025
+                    //lo_focusUcenec = 0; // 4.2.2025
                     break;                
             }
             paint();
@@ -2751,7 +2751,7 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
 
-    //---- ločen/skupen pregled po razredih 27.1.2025
+    //---- ločen/skupen pregled po razredih (mode_razredTest) oziroma preklop na naslednji razred (mode_učenec) 27.1.2025
     if (!vl_end && lo_showGUI && lo_enabledRazred) {
         if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
@@ -2762,9 +2762,9 @@ elMyCanvas.addEventListener('click', (e) => {
                     paint();                    
                     break;
                 case cv_mode_ucenec:
+                    lo_focusUcenec = 0; // 4.2.2025
                     if (e.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
                     else { lf_changeRazred(lo_razred + 1, true); };
-                    lo_focusUcenec = 0; // 4.2.2025
                     break;
             };            
             vl_end = true
@@ -4044,22 +4044,6 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     x = chartRight - w - 5;
     y = chartTop + 4;
     gBannerRoundRectWithText3(x, y, w, h, fontUcenecImePriimek, "darkSlateGray", tmpText, 2, 2, 2, 2, "#EBFFFFFF", 1, "lightGray", "darkGray", 2, 2, false, true, true, true, true); // med aliceBlue in lightCyan
-
-    // ---- povprečje
-    let avgValue = 0;
-    //if (lo_allPredmet) { avgValue = ucenecAvgOcena[ucenecId] }
-    //else { avgValue = ucenecPredmetAvgOcena[ucenecId][lo_predmet] };
-    //y = yXos - ky * (avgValue - 0.5);
-    //tmpColor = "darkGray";
-    //if (avgValue == 1.5) { tmpColor = "darkRed"; }
-    //else if (avgValue < 1.5) { tmpColor = "red"; };
-    //gLine(xLeftData, y, xRightData, y, 2, tmpColor, [3, 3]);
-    //tmpText = "avg:";
-    //;[w, h] = gMeasureText(tmpText, fontSmall);   
-    //gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y - 4);
-    //tmpText = avgValue.toFixed(2);
-    //;[w, h] = gMeasureText(tmpText, fontSmall);   
-    //gText(tmpText, fontSmall, "darkSlateGray", chartRight - w - 4, y + h + 3);
     
     // ---- TABLETEK OCENE
     let fontOcena = "bold 14pt verdana"; let ddy = 8;
@@ -4109,7 +4093,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
     gText(tmpText, fontSmall, "darkSlateGray", x, yAvg + h + 3);
 
-    // ---- OCENE - MARKERJI OCEN ... rešejo se preko že izrisane krivulje povprečja
+    // ---- OCENE - MARKERJI POSAMEZNIH OCEN ... rešejo se preko že izrisane krivulje povprečja
     for (let i = 1; i <= items; i++) {
         if (lo_allPredmet) { ocenaId = ucenecOcenaId[ucenecId][i]; }
         else { ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i]; };
@@ -4593,14 +4577,31 @@ function lf_changePisniTestNr(vp_newValue, vp_paint) {
 
 function lf_changePredmet(vp_newValue, vp_paint) {
 
-    let oldPredmet = lo_predmet;
+    // ---- če smo bili prej v mode_učenec na opciji ALL_predmet, potem grem zdaj ven iz tega na posamezen predmet. Predmet mora ostati isti, kot je bil prej, le opcija all_predmet se mora ukiniti
+    if (gl_mode == cv_mode_ucenec && lo_allPredmet) {
+        lo_allPredmet = false;
+        if (vp_paint) { paint() };
+        return;
+    }
 
+    // ---- v vseh ostalih primerih predmet normalno spremeninjamo
+    let oldPredmet = lo_predmet;
     lo_predmet = vp_newValue;
 
-    if (lo_predmet > lo_nrPredmetov) { lo_predmet = 1 };
-    if (lo_predmet < 1) { lo_predmet = lo_nrPredmetov };
+    if (lo_predmet > lo_nrPredmetov) {
+        lo_predmet = 1;
+        if (gl_mode == cv_mode_ucenec && !lo_allPredmet) { // pri prehodu na začetek ali konec predmetov v mode_učenec dam vmes še opcijo all_učenec
+            lo_allPredmet = true;
+        }
+    }
+    else if (lo_predmet < 1) {
+        lo_predmet = lo_nrPredmetov;
+        if (gl_mode == cv_mode_ucenec && !lo_allPredmet) { // pri prehodu na začetek ali konec predmetov v mode_učenec dam vmes še opcijo all_učenec
+            lo_allPredmet = true;
+        }
+    };
 
-    if (lo_predmet != oldPredmet) { lo_pisniTestNr = 1 }; // 28.1.2025
+    if (gl_mode == cv_mode_razredTest && lo_predmet != oldPredmet) { lo_pisniTestNr = 1 }; // 28.1.2025
 
     if (vp_paint) { paint() }
 
@@ -5719,7 +5720,7 @@ function calculate_avg_ucenec(vp_letnik, vp_ucenecId) {
         arrPredmetNrOcen[predmetId] += 1;
         arrPredmetOcenaId[predmetId][arrPredmetNrOcen[predmetId]] = ocenaId;
         predmetSumOcen[predmetId] += ocena;
-        arrPredmetRollAvg[predmetId][nrOcen] = predmetSumOcen[predmetId] / arrPredmetNrOcen[predmetId]; // 1.2.2025
+        arrPredmetRollAvg[predmetId][arrPredmetNrOcen[predmetId]] = predmetSumOcen[predmetId] / arrPredmetNrOcen[predmetId]; // 1.2.2025
 
     };
     
