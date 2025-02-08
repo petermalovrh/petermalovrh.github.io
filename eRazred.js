@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.15"
-const gl_versionDate = "6.2.2025"
+const gl_versionNr = "v1.16"
+const gl_versionDate = "7.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1884,6 +1884,7 @@ class button {
     }
     showToolTip() { // 10.1.2025
         //---- toolTip
+        if (!this.visible || !this.enabled) { return };
         if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
             gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
             if (this.keyStroke != "") {
@@ -2212,7 +2213,7 @@ var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še
 
 // ---- 27.1.2025
 var lo_toolbarStartPeriod = true;
-var lo_showToolbar = true;
+var lo_showDynamicToolbar = true;
 var tmToolbarStartPeriod;
 
 console.clear;
@@ -2880,20 +2881,17 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     }
 
     //23.1.2023 v1.0 Je miška nad kakšnim kontrolerjem?
-    if (lo_showGUI) {
-        if (lo_showToolbar) {
-            if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            else if (buttonLoad.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-            //} else if (intChooserA.eventMouseOverIncreaseDecrease(e.offsetX, e.offsetY, false)) {
-            //    document.body.style.cursor = "pointer"              
-            else { document.body.style.cursor = "default" };
-        }
+    if (lo_showGUI && lo_showDynamicToolbar) {
+        // pogoja VISIBLE in ENABLED se testirata že znotraj objekta in itak tako skoči ven, če ni viden ali aktiven!    
+        if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonLoad.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
     //če se miška v resnici ni premaknila ne naredim nič
@@ -2912,103 +2910,106 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     //     če pa je toolbar prikazan, se preveri, ali je miška šla daleč stran in v tem primeru se ga skrije
     const dist = 100;
     if (lo_mouseMoveX < 20 ||
-        mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, buttonRazred.left - dist, buttonRazred.top - dist, buttonHelp.left + buttonHelp.width + 1.5 * dist, buttonHelp.top + buttonHelp.height + dist)) {
-        lo_showToolbar = true;
+        mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, buttonMode.left - dist, buttonMode.top - dist, buttonHelp.left + buttonHelp.width + 1.5 * dist, buttonHelp.top + buttonHelp.height + dist)) {
+        lo_showDynamicToolbar = true;
     } else {
-        if (!lo_toolbarStartPeriod) { lo_showToolbar = false; }
+        if (!lo_toolbarStartPeriod) { lo_showDynamicToolbar = false; }
     };
+    //console.log("lo_showDynamicToolbar=" + lo_showDynamicToolbar.toString());
 
-    //---- Preverjanje, ali je z miško nad določenim elementom 
-    //let oldSpChartSelected = spChartSelected.slice(0);
-    let oldSpChartSelectedId = lo_spChartSelectedId;
-    let oldTestSelected = lo_testSelected;
-    let oldPcChartSelectedId = lo_pcChartSelectedId; // 23.1.2025
-    let oldBcChartSelectedId = lo_bcChartSelectedId; // 24.1.2025
-    let oldOcenaSelected = lo_ocenaSelected;
-    let chartSelected = false;
-    lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0; lo_bcChartSelectedId = 0;
-    let x, y;
-    let razredId, tmpTest, tmpOcena, fiMouse, tmpItemId;
-    //---- Smo z miško nad katerim od chartov za podatkovno analizo?
-    let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
-    for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-        // ---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
-        if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
-            chartSelected = true;
-            lo_spChartSelectedId = tmpItemId;
-            // ---- Je pod miško kateri od testov v scatter plot chartu?
-            lo_testSelected = 0;
-            for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
-                x = Math.round(spChartX[tmpItemId] + tmpTest);
-                y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
-                    lo_testSelected = tmpTest;
-                    break;
-                }
-            }
-            if (lo_testSelected <= 0) {
-                for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
-                    x = Math.round(spChartX[tmpItemId] + tmpTest);
-                    y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x-1, y-1, x+1, y+1)) {
-                        lo_testSelected = tmpTest;
-                        break;
-                    }
-                }
-            }
-            if (lo_testSelected <= 0) {
-                for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
-                    x = Math.round(spChartX[tmpItemId] + tmpTest);
-                    y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                    if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
-                        lo_testSelected = tmpTest;
-                        break;
-                    }
-                }
-            }
-            break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
-        }
-        // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
-        if (drawBarChart) { 
-            for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
-                if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[tmpItemId][tmpOcena], bcChartY[tmpItemId][tmpOcena], bcChartX1[tmpItemId][tmpOcena], bcChartY1[tmpItemId][tmpOcena])) {
-                    chartSelected = true;
-                    lo_bcChartSelectedId = tmpItemId; // miška je nad tem razredom
-                    lo_ocenaSelected = tmpOcena;     // miška je nad barom te ocene
-                    break; // ven iz pregledovanja selektiranosti chartov/ocen, ker selekcijo že imamo
-                } 
-            }
-        }
-        // ---- Je pod miško katera od ocen v pie chartu? 23.1.2025
-        if (drawPieChart) {
-            if (nrOcen[tmpItemId] && mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[tmpItemId], pcChartCy[tmpItemId], pcChartRadij[tmpItemId])) {
+    if (gl_mode == cv_mode_razredTest) {
+        //---- Preverjanje, ali je z miško nad določenim elementom 
+        //let oldSpChartSelected = spChartSelected.slice(0);
+        let oldSpChartSelectedId = lo_spChartSelectedId;
+        let oldTestSelected = lo_testSelected;
+        let oldPcChartSelectedId = lo_pcChartSelectedId; // 23.1.2025
+        let oldBcChartSelectedId = lo_bcChartSelectedId; // 24.1.2025
+        let oldOcenaSelected = lo_ocenaSelected;
+        let chartSelected = false;
+        lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0; lo_bcChartSelectedId = 0;
+        let x, y;
+        let razredId, tmpTest, tmpOcena, fiMouse, tmpItemId;
+        //---- Smo z miško nad katerim od chartov za podatkovno analizo?
+        let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
+        for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
+            // ---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
+            if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
                 chartSelected = true;
-                //pcChartSelected[tmpItemId] = true;
-                lo_pcChartSelectedId = tmpItemId;  // miška je nad tem razredom
-                // ---- Katera ocena je pod miško?
-                lo_ocenaSelected = 0;
-                fiMouse = Math.atan((pcChartCy[tmpItemId] - lo_mouseMoveY) / (lo_mouseMoveX - pcChartCx[tmpItemId]));
-                if (lo_mouseMoveX < pcChartCx[tmpItemId]) { fiMouse += Math.PI; }
-                else if (fiMouse < 0) { fiMouse += 2 * Math.PI; }
-                for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
-                    if (valueBetween(fiMouse, pcChartFi[tmpItemId][tmpOcena - 1], pcChartFi[tmpItemId][tmpOcena])) {
-                        lo_ocenaSelected = tmpOcena; // miška je nad pie kosom te ocene
+                lo_spChartSelectedId = tmpItemId;
+                // ---- Je pod miško kateri od testov v scatter plot chartu?
+                lo_testSelected = 0;
+                for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
+                    x = Math.round(spChartX[tmpItemId] + tmpTest);
+                    y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
+                    if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
+                        lo_testSelected = tmpTest;
                         break;
+                    }
+                }
+                if (lo_testSelected <= 0) {
+                    for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
+                        x = Math.round(spChartX[tmpItemId] + tmpTest);
+                        y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
+                        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x - 1, y - 1, x + 1, y + 1)) {
+                            lo_testSelected = tmpTest;
+                            break;
+                        }
+                    }
+                }
+                if (lo_testSelected <= 0) {
+                    for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
+                        x = Math.round(spChartX[tmpItemId] + tmpTest);
+                        y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
+                        if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
+                            lo_testSelected = tmpTest;
+                            break;
+                        }
                     }
                 }
                 break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
-            }     
-        }
-    };
-    // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
-    if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }   // 22.1.2025
-    if (!(lo_pcChartSelectedId == oldPcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 23.1.2025
-    if (!(lo_bcChartSelectedId == oldBcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 24.1.2025
+            }
+            // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
+            if (drawBarChart) {
+                for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
+                    if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[tmpItemId][tmpOcena], bcChartY[tmpItemId][tmpOcena], bcChartX1[tmpItemId][tmpOcena], bcChartY1[tmpItemId][tmpOcena])) {
+                        chartSelected = true;
+                        lo_bcChartSelectedId = tmpItemId; // miška je nad tem razredom
+                        lo_ocenaSelected = tmpOcena;     // miška je nad barom te ocene
+                        break; // ven iz pregledovanja selektiranosti chartov/ocen, ker selekcijo že imamo
+                    }
+                }
+            }
+            // ---- Je pod miško katera od ocen v pie chartu? 23.1.2025
+            if (drawPieChart) {
+                if (nrOcen[tmpItemId] && mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[tmpItemId], pcChartCy[tmpItemId], pcChartRadij[tmpItemId])) {
+                    chartSelected = true;
+                    //pcChartSelected[tmpItemId] = true;
+                    lo_pcChartSelectedId = tmpItemId;  // miška je nad tem razredom
+                    // ---- Katera ocena je pod miško?
+                    lo_ocenaSelected = 0;
+                    fiMouse = Math.atan((pcChartCy[tmpItemId] - lo_mouseMoveY) / (lo_mouseMoveX - pcChartCx[tmpItemId]));
+                    if (lo_mouseMoveX < pcChartCx[tmpItemId]) { fiMouse += Math.PI; }
+                    else if (fiMouse < 0) { fiMouse += 2 * Math.PI; }
+                    for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
+                        if (valueBetween(fiMouse, pcChartFi[tmpItemId][tmpOcena - 1], pcChartFi[tmpItemId][tmpOcena])) {
+                            lo_ocenaSelected = tmpOcena; // miška je nad pie kosom te ocene
+                            break;
+                        }
+                    }
+                    break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
+                }
+            }
+        };
+        // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
+        if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }   // 22.1.2025
+        if (!(lo_pcChartSelectedId == oldPcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 23.1.2025
+        if (!(lo_bcChartSelectedId == oldBcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 24.1.2025
 
-    // če ni spremembe, chart pa je selected, potem ne gledam drugih stvari glede selektiranosti in nič ne rišem ker ni potrebe (->return())
-    if (lo_spChartSelectedId > 0) { return }; // 22.1.2025
-    if (lo_pcChartSelectedId > 0) { return }; // 23.1.2025
-    if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
+        // če ni spremembe, chart pa je selected, potem ne gledam drugih stvari glede selektiranosti in nič ne rišem ker ni potrebe (->return())
+        if (lo_spChartSelectedId > 0) { return }; // 22.1.2025
+        if (lo_pcChartSelectedId > 0) { return }; // 23.1.2025
+        if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
+    }
 
     // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
 
@@ -3021,6 +3022,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     //if (lo_mouseDown && oldSelectedVrhLece) { lo_selectedVrhLece = true; } // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
     //else if (lo_mouseDown && oldSelectedTemeLece) { lo_selectedTemeLece = true; }; // ne glede na to, kje z miško vlečem, naj kar ostane selektiran
 
+    //console.log("mouse_move - calling paint_delay()")
     paint_delay() //da na oseh označi koordinate miške
     //console.log("mouse_move exit")
     
@@ -3193,7 +3195,7 @@ window.addEventListener("keydown", (event) => {
         case 'End':
         //lf_changeMonthEnd(nrMonthsAll, true); break;
         case 'KeyG': // GUI
-            lo_showGUI = !lo_showGUI; lo_GUIlayoutHasChanged = true; paint(); paint(); break;
+            lf_changeShowGUI(!lo_showGUI, true); paint(); break;
         case 'KeyN': case 'F2':
             lf_changeShowHelpTips(!lo_showHelpTips, true); break;
         case 'KeyI':
@@ -3918,7 +3920,7 @@ function paint_eRazred_grafUcenec_setPosition(marginLeft, marginTop, marginRight
         };
     }
         
-    if (col == 1 && row == 1 && buttonMode.visible) {
+    if (col == 1 && row == 1 && buttonMode.visible && lo_showDynamicToolbar && lo_showGUI) {
         newY = 32; yDiff = newY - y;
         if (yDiff > 0) { y = newY; ih -= yDiff; }   // y += 52; ih -= 52 }; //da ni pod toolbarom 29.1.2023 v1.6
     }
@@ -4288,26 +4290,36 @@ function paint_GUI() {
         //return
     };
 
+    if (lo_showGUI && lo_showDynamicToolbar) { 
+        //console.log("painting ...")
+        buttonMode.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        //console.log("    painted-buttons")
+        y = buttonRazred.top;
+        switch (gl_mode) {
+            case cv_mode_razredTest:
+                //console.log("    painting-rt")
+                x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+                break;
+            case cv_mode_ucenec:
+                //console.log("    painting-u")
+                x = buttonRazred.left + buttonRazred.width + 4.5;
+                gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+                break;
+        }
+        x = buttonLoad.left + buttonLoad.width + 4.5;
+        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+    }
+
+    // ---- PRIKAZ TOOLTIP-sov
     if (lo_showToolTips) { //1.4.2024
         if (lo_showGUI) {
             if (lo_enabledHelp) { // 27.1.2025
+                // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
                 buttonMode.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonRazred.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
             };
         };
     };
-
-    if (lo_showGUI && lo_showToolbar) { 
-        buttonMode.visible = true; buttonPredmet.visible = true; buttonTest.visible = true; buttonRazred.visible = true; buttonSPData.visible = true; buttonKritLuknje.visible = true; buttonLoad.visible = true; buttonHelp.visible = true;
-        buttonMode.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
-        x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-        y = buttonRazred.top;
-        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
-        x = buttonLoad.left + buttonLoad.width + 4.5;
-        y = buttonRazred.top;
-        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
-    } else {
-        buttonMode.visible = false; buttonPredmet.visible = false; buttonTest.visible = false; buttonRazred.visible = false; buttonSPData.visible = false; buttonKritLuknje.visible = false; buttonLoad.visible = false; buttonHelp.visible = false;
-    }
 
     //---- on-screen namigi/pomoč
     if (lo_showHelpTips) { paint_tips() };
@@ -4393,6 +4405,42 @@ function paint_tips() {
 }
 
 function paint_GUI_layoutB() {
+
+    switch (gl_mode) {
+        case cv_mode_razredTest:
+            paint_GUI_layoutB_modeRazredTest()
+            break;
+        case cv_mode_ucenec:
+            paint_GUI_layoutB_modeUcenec()
+            break;
+    }
+}
+
+function paint_GUI_layoutB_modeUcenec() {
+
+    const wSep = 4;
+    let x;
+    let yTop = 2;
+
+    //---- 27.1.2025
+    buttonMode.left = 2;
+    buttonMode.top = yTop;   
+    buttonPredmet.left = buttonMode.left + buttonMode.width + wSep;
+    buttonPredmet.top = buttonMode.top;
+    buttonRazred.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonRazred.top = buttonMode.top;
+    //----
+    x = buttonRazred.left + buttonRazred.width + wSep;
+    buttonLoad.left = x + wSep;
+    buttonLoad.top = buttonMode.top;
+    //----
+    x = buttonLoad.left + buttonLoad.width + wSep;
+    buttonHelp.left = x + wSep;
+    buttonHelp.top = buttonPredmet.top;
+
+}
+
+function paint_GUI_layoutB_modeRazredTest() {
 
     const wSep = 4;
     let x;
@@ -4575,6 +4623,36 @@ function lf_changeShowHelpTips(vp_newValue, vp_paint) {
     if (vp_paint) { paint() }
 }
 
+function lf_changeShowGUI(vp_newValue, vp_paint) {
+
+    lo_showGUI = vp_newValue;
+    
+    buttonMode.visible = lo_showGUI; buttonMode.enabled = lo_showGUI;
+    buttonPredmet.visible = lo_showGUI; buttonPredmet.enabled = lo_showGUI;
+    buttonTest.visible = lo_showGUI; buttonTest.enabled = lo_showGUI;
+    buttonRazred.visible = lo_showGUI; buttonRazred.enabled = lo_showGUI;
+    buttonSPData.visible = lo_showGUI; buttonSPData.enabled = lo_showGUI;
+    buttonKritLuknje.visible = lo_showGUI; buttonKritLuknje.enabled = lo_showGUI;
+    buttonLoad.visible = lo_showGUI; buttonLoad.enabled = lo_showGUI;
+    buttonHelp.visible = lo_showGUI; buttonHelp.enabled = lo_showGUI;
+
+    // ---- če se GUI prikazuje, nekatere gumbe glede na MODE vseeno skrijem/posivim
+    if (lo_showGUI) {
+        switch (gl_mode) {
+            case cv_mode_razredTest:
+                break;
+            case cv_mode_ucenec:
+                buttonTest.visible = false; buttonTest.enabled = false;
+                buttonSPData.visible = false; buttonSPData.enabled = false;
+                buttonKritLuknje.visible = false; buttonKritLuknje.enabled = false;
+                break;
+        }
+    }
+    lo_GUIlayoutHasChanged = true;
+
+    if (vp_paint) { paint() }
+}
+
 function lf_changeDebug(vp_newValue, vp_paint) {
 
     dbg = vp_newValue;
@@ -4630,32 +4708,51 @@ function lf_setMode(vp_mode, vp_paint) {
     gl_mode = vp_mode;
 
     //---- prilagoditev GUI (1)
+    hideAllControls();
     switch (gl_mode) {
         case cv_mode_razredTest:
             data_prepareStructures_byRazredTest();
-            //sliderMonthEnd.useValue0 = false;
-            //sliderTailMonths.visible = true; break;
+            showAndEnableControls_modeRazredTest();
         case cv_mode_ucenec:
             data_prepareStructures_byUcenec();
             lo_allPredmet = true; // 1.2.2025
-            //sliderMonthEnd.useValue0 = true;
-            //sliderTailMonths.visible = false; break;
-    }
-    //---- prilagoditev GUI (2)
-    //switch (gl_mode) { // 24.12.2023
-    //    case cv_mode_timeAvgTempSingle:
-    //        checkBoxAvgAllPlace.visible = true;
-    //        break;
-    //    case cv_mode_timeAvgTempMultiTimeSlice:
-    //        checkBoxAvgAllPlace.visible = true;
-            //----
-    //}
-    
-    //---- prilagoditev GUI (3)
-    //lf_setMonthIntervalText();
+            showAndEnableControls_modeUcenec();
+    };
 
     lo_GUIlayoutHasChanged = true;
     if (vp_paint) { paint() }
+
+}
+
+function hideAllControls() {
+
+    [buttonMode, buttonRazred, buttonTest, buttonPredmet, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
+
+}
+
+function showAndEnableControls_modeRazredTest() {
+
+    [buttonMode, buttonRazred, buttonTest, buttonPredmet, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+
+}
+
+function showAndEnableControls_modeUcenec() {
+
+    [buttonMode, buttonRazred, buttonPredmet, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+
+}
+
+function showAndEnableControl(control, index) {
+
+    control.visible = true;
+    control.enabled = true;
+
+}
+
+function hideAndDisableControl(control, index) {
+
+    control.visible = false;
+    control.enabled = false;
 
 }
 
@@ -6232,7 +6329,7 @@ function getKriterijiOcene(vp_ocena) {
 function tmToolbarStartPeriod_tick() {
 
     lo_toolbarStartPeriod = false;
-    lo_showToolbar = false;
+    lo_showDynamicToolbar = false;
     paint(); paint(); // 2.2.2025 dvakrat zato, ker pri prvem prehodu najprej riše grafe in šele potem da .visible značko gumbom. Ko riše drugič, pa se to že upošteva in se grafi prilagodijo
 
 }
