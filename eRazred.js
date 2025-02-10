@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.17"
-const gl_versionDate = "8.2.2025"
+const gl_versionNr = "v1.18"
+const gl_versionDate = "10.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2197,6 +2197,12 @@ var ucChartKx = [];
 var ucChartKy = [];
 var lo_ucChartSelectedId = 0;
 var lo_focusUcenec = 0; // 1.2.2025
+var fuChartX0 = 0; // 9.2.2025
+var fuChartY0 = 0;
+var fuChartX1 = 0;
+var fuChartY1 = 0;
+var fuChartKx = 0;
+var fuChartKy = 0;
 
 var lo_enabledHelp = true;       // 10.1.2025
 var lo_enabledMode = true;       // 2.2.2025
@@ -2215,6 +2221,8 @@ var lo_printLevel = cv_printLevelMax; //5-vse, 4-manjka checkBox, 3-manjkajo še
 var lo_toolbarStartPeriod = true;
 var lo_showDynamicToolbar = true;
 var tmToolbarStartPeriod;
+
+var lo_tipDatumMs = 0; // 9.2.2025
 
 console.clear;
 
@@ -2917,6 +2925,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     };
     //console.log("lo_showDynamicToolbar=" + lo_showDynamicToolbar.toString());
 
+    // ---- ALI JE V MODE_RAZREDTEST NAD KAKŠNIM GRAFOM?
     if (gl_mode == cv_mode_razredTest) {
         //---- Preverjanje, ali je z miško nad določenim elementom 
         //let oldSpChartSelected = spChartSelected.slice(0);
@@ -3011,6 +3020,14 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
     }
 
+    // ---- ALI JE V MODE_UČENEC NAD GRAFOM FOKUSIRANEGA UČENCA? 9.2.2025
+    if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
+        lo_tipDatumMs = 0;
+        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, fuChartX0, fuChartY0, fuChartX1, fuChartY1)) {
+            let ucenecId = razredUcenecId[lo_razred][lo_focusUcenec];
+            lo_tipDatumMs = ucenciPrvaOcenaDatum + (lo_mouseMoveX - fuChartX0) / fuChartKx;
+        }
+    }
     // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
 
     // tudi nič drugega ni selektiranega, zato izhod brez potrebe po ponovnem risanju!
@@ -3959,6 +3976,10 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     let xRangeDate = ucenciOceneRazponDni
     let xRangePix = xRightData - xLeftData;
     let kx = xRangePix / xRangeDate;
+    // ---- 9.2.2025
+    fuChartX0 = xLeftData; fuChartX1 = xRightData;
+    fuChartY0 = yTopData; fuChartY1 = yXos;
+    fuChartKx = kx; fuChartKy = ky;
     // ----
     let x, y, w, h, tmpText, tmpColor, tmpLineWidth;
     let fontSmall = "10pt verdana";
@@ -3999,10 +4020,11 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     mesec += 1; if (mesec > 11) { mesec = 0; leto += 1 };
     let mesec0 = mesec;
     let diffPix;
+    let tmpDatum, tmpDatumMs;
     for (let i = 1; !outOfDateRange; i++) {
         if (mesec > 11) { mesec = 0; leto += 1 };
-        let tmpDatum = new Date(leto, mesec, 1, 12);
-        let tmpDatumMs = Date.parse(tmpDatum); 
+        tmpDatum = new Date(leto, mesec, 1, 12);
+        tmpDatumMs = Date.parse(tmpDatum); 
         if (tmpDatumMs > ucenciZadnjaOcenaDatum) {
             outOfDateRange = true;
             break;
@@ -4132,6 +4154,122 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         x0 = x;
     };
     
+    // ======== TOOL TIP NAD FOKUSIRANIM UČENCEM ========
+    // ---- nabiranje podatkov za toolTip
+    let fOcena = "bold 12pt verdana";
+    let fPredmet = "bold 12pt verdana";
+    let fTip = "bold 12pt verdana";
+    let fTockeProcenti = "12pt verdana";
+    if (vp_focus && lo_tipDatumMs > 0) {
+        date0 = new Date(lo_tipDatumMs);
+        dan = date0.getDate();
+        mesec = date0.getMonth();
+        leto = date0.getFullYear();
+        let tmpFocusDatumStr = dan.toString() + "-" + (mesec + 1).toString() + "-" + leto.toString().substr(2, 2);   
+
+        ucenecId = razredUcenecId[lo_razred][lo_focusUcenec];
+        let focusOceneOcenaCifra = []; // 9.2.2025
+        let focusOceneOcenaNr = [];    // 9.2.2025
+        let focusOceneTip = [];        // 9.2.2025
+        let focusRazredIme = [];       // 9.2.2025
+        let focusPredmetId = [];       // 9.2.2025
+        let focusPredmetIme = [];      // 9.2.2025
+        let focusOceneTockStr = [];    // 9.2.2025
+        let focusOceneMaxTockStr = []; // 9.2.2025
+        let focusOcenePercentStr = []; // 9.2.2025
+        let focusNrOcen = 0;
+        let focusAvg = 0;
+        let havePisneOcene = false;
+        let wPredmetMax = 0;
+        for (let i = 1; i <= items; i++) {
+            if (lo_allPredmet) {
+                ocenaId = ucenecOcenaId[ucenecId][i];
+                rollAvg = ucenecRollAvg[ucenecId][i]; // 1.2.2025
+            } else {
+                ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i];
+                rollAvg = ucenecPredmetRollAvg[ucenecId][lo_predmet][i]; // 1.2.2025
+            }
+            // ---- datum ocene se mora ujemati z datumom pod miško
+            if (ocenaDatumStr[ocenaId] != tmpFocusDatumStr) { continue; };
+            // ---- dopišem to oceno v tableo najdenih ocen na pravi datum za pravega učenca pri pravem predmetu/ih
+            focusNrOcen += 1;
+            focusOceneOcenaCifra[focusNrOcen] = ocenaCifra[ocenaId];
+            focusOceneOcenaNr[focusNrOcen] = ocenaCifraNr[ocenaId];
+            focusOceneTip[focusNrOcen] = ocenaTip[ocenaId];
+            focusAvg = rollAvg;
+            focusRazredIme[focusNrOcen] = razredIme[lo_razred];
+            focusPredmetId[focusNrOcen] = ocenaPredmetId[ocenaId];
+            focusPredmetIme[focusNrOcen] = predmetIme[ocenaPredmetId[ocenaId]];
+            ;[w, h] = gMeasureText(focusPredmetIme[focusNrOcen], fPredmet);
+            if (w > wPredmetMax) { wPredmetMax = w };
+            pisnaOcena = ocenaTipTip[ocenaId] == "P" ? true : false; // 6.2.2025
+            if (pisnaOcena) {
+                focusOceneTockStr[focusNrOcen] = ocenaTock[ocenaId].toString();
+                focusOceneMaxTockStr[focusNrOcen] = ocenaMaxTock[ocenaId].toString();
+                focusOcenePercentStr[focusNrOcen] = (ocenaTock[ocenaId] / ocenaMaxTock[ocenaId] * 100).toFixed(1) + "%";
+                havePisneOcene = true;
+            } else {
+                focusOceneTockStr[focusNrOcen] = "";
+                focusOceneMaxTockStr[focusNrOcen] = "";
+                focusOcenePercentStr[focusNrOcen] = "";
+            }
+        }
+
+        tmpText = dan.toString() + "." + (mesec + 1).toString() + "." + leto.toString();
+        fontDatum = "bold 11pt verdana";
+        ;[w, h] = gMeasureText(tmpText, fontDatum);
+
+        // ----
+        let bLeft = lo_mouseMoveX + 16;
+        let bTop = lo_mouseMoveY + h + 16;
+        // ----
+        const wTabOcena = 24; const wTabTip = 26; const wTabTock = 165; const wTabPredmet = 80;
+        let bWidth = w + 8;
+        if (focusNrOcen > 0) { bWidth = wTabOcena + wTabTip + wPredmetMax + 12 };
+        if (havePisneOcene) { bWidth += wTabTock };
+        // ----
+        let datumLineHeight = h + 8;
+        let bHeight = datumLineHeight;
+        let dataLineHeight = 26;
+        if (focusNrOcen > 0) {
+            bHeight += focusNrOcen * dataLineHeight
+        };
+        // ---- če na desni gre ven iz okna, je treba izpisovati malo bolj levo        
+        if (bLeft + bWidth + 8 > ctxW) { bLeft = ctxW - bWidth - 8; }
+        const posTabOcena = bLeft + 7; const posTabTip = posTabOcena + wTabOcena;
+        const posTabTock = posTabTip + wTabTip;
+
+        // ---- BANNER ZA CELOTEN TOOL TIP
+        gBannerRoundRect2(bLeft, bTop, bWidth, bHeight, 6, gf_alphaColor(192,"azure"), 1, "lightGray", "#DCDCDCC0", 2, 2, true, true, true, true, true);
+        // ---- DATUM
+        gBannerRoundRect2(bLeft, bTop, bWidth, datumLineHeight, 6, gf_alphaColor(160, "#300808F0"), 1, "", "", 0, 0, false, true, true, false, false);
+        //x = bLeft + bWidth - w - 5; // na desni strani
+        x = bLeft + bWidth / 2 - w / 2;
+        y = bTop + datumLineHeight / 2 + h / 2;
+        gText(tmpText, fontDatum, "white", x, y);
+        // ---- NABRANE OCENE
+        y = bTop + datumLineHeight + dataLineHeight / 2 + h / 2;
+        for (let i = 1; i <= focusNrOcen; i++) {
+            // ---- OCENA
+            x = posTabOcena;
+            tmpText = focusOceneOcenaCifra[i];
+            ;[w, h] = gMeasureText(tmpText, fOcena);
+            gBannerRoundRectWithText3(x, y-h, w, h, fOcena, "white", tmpText, 5, 3, 4, 6, colorOcena[focusOceneOcenaNr[i]], 1, "lightGray", "darkGray", 2, 2, false);
+            // ---- TIP OCENE
+            x = posTabTip;
+            gText(focusOceneTip[i], fPredmet, "darkSlateGray", x, y);
+            x = posTabTock;
+            if (havePisneOcene) {
+                // ---- TOČK / MAX TOČK / PERCENT
+                gText(focusOceneTockStr[i] + " od " + focusOceneMaxTockStr[i] + " : " + focusOcenePercentStr[i], fTockeProcenti, "darkSlateGray", x, y);
+                x += wTabTock;
+            }
+            // ---- PREDMET
+            gText(focusPredmetIme[i], fPredmet, colorPredmet[focusPredmetId[i]], x, y);
+            // ----
+            y += dataLineHeight / 2;
+        }
+    } 
 }
 
 function lf_fixProcent(vp_nrStr) {
