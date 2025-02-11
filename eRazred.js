@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.18"
-const gl_versionDate = "10.2.2025"
+const gl_versionNr = "v1.19"
+const gl_versionDate = "11.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2197,10 +2197,15 @@ var ucChartKx = [];
 var ucChartKy = [];
 var lo_ucChartSelectedId = 0;
 var lo_focusUcenec = 0; // 1.2.2025
-var fuChartX0 = 0; // 9.2.2025
-var fuChartY0 = 0;
-var fuChartX1 = 0;
-var fuChartY1 = 0;
+var lo_selectedUcenec = 0; // 11.2.2025 učenec, katerega graf je pod miško
+var fuChartX0 = []; // 9.2.2025
+var fuChartY0 = [];
+var fuChartX1 = [];
+var fuChartY1 = [];
+var fuChartDataX0 = 0; // 9.2.2025
+var fuChartDataY0 = 0;
+var fuChartDataX1 = 0;
+var fuChartDataY1 = 0;
 var fuChartKx = 0;
 var fuChartKy = 0;
 
@@ -2726,11 +2731,11 @@ elMyCanvas.addEventListener('click', (e) => {
             }
             switch (gl_mode) {
                 case cv_mode_razredTest:
-                    data_prepareStructures_byRazredTest();                   
+                    data_prepareStructures_byRazredTest();
                     break;
                 case cv_mode_ucenec:
                     //lo_focusUcenec = 0; // 4.2.2025
-                    break;                
+                    break;
             }
             paint();
             vl_end = true
@@ -2748,12 +2753,12 @@ elMyCanvas.addEventListener('click', (e) => {
             }
             switch (gl_mode) {
                 case cv_mode_razredTest:
-                    data_prepareStructures_byRazredTest();                   
+                    data_prepareStructures_byRazredTest();
                     break;
                 case cv_mode_ucenec:
                     lo_focusUcenec = 0; // 4.2.2025
-                    break;                
-            }              
+                    break;
+            }
             paint();
             vl_end = true
         }
@@ -2767,14 +2772,14 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_razredTest:
                     lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
                     data_prepareStructures_byRazredTest();
-                    paint();                    
+                    paint();
                     break;
                 case cv_mode_ucenec:
                     lo_focusUcenec = 0; // 4.2.2025
                     if (e.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
                     else { lf_changeRazred(lo_razred + 1, true); };
                     break;
-            };            
+            };
             vl_end = true
         }
     }
@@ -2788,7 +2793,7 @@ elMyCanvas.addEventListener('click', (e) => {
             } else {
                 lf_changeSchrink(lo_schrink + 1, true);
             }
-            vl_end = true
+            vl_end = true;
         }
     }
     
@@ -2797,7 +2802,7 @@ elMyCanvas.addEventListener('click', (e) => {
         if (buttonKritLuknje.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
-            vl_end = true
+            vl_end = true;
         }
     }
 
@@ -2807,8 +2812,22 @@ elMyCanvas.addEventListener('click', (e) => {
             //console.log("click(): rslt=" + rslt.toString())
             lo_focusUcenec = 0; // 4.2.2025
             clipboard_load();
-            vl_end = true
+            vl_end = true;
         }
+    }
+    
+    //---- je v mode_učenec kliknil na enega od grafov učencev? 11.2.2025
+    if (!vl_end && gl_mode == cv_mode_ucenec && lo_focusUcenec <= 0) {
+        if (valueBetween(lo_selectedUcenec, 1, razredNrUcencev[lo_razred])) {
+            lf_changeFocusUcenec(lo_selectedUcenec, true);
+            vl_end = true;
+        }
+    }
+
+    //---- je v mode_učenec pri prikazu grafa fokusiranega učenca kliknil kamorkoli? V tem primeru naj se ne prikazuje več fokusiranega učenca, kot nek ESC 11.2.2025
+    if (!vl_end && gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
+        lf_changeFocusUcenec(0, true);
+        vl_end = true;
     }
     
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
@@ -3020,14 +3039,27 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
     }
 
-    // ---- ALI JE V MODE_UČENEC NAD GRAFOM FOKUSIRANEGA UČENCA? 9.2.2025
-    if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
-        lo_tipDatumMs = 0;
-        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, fuChartX0, fuChartY0, fuChartX1, fuChartY1)) {
-            let ucenecId = razredUcenecId[lo_razred][lo_focusUcenec];
-            lo_tipDatumMs = ucenciPrvaOcenaDatum + (lo_mouseMoveX - fuChartX0) / fuChartKx;
+    if (gl_mode == cv_mode_ucenec) {
+        if (lo_focusUcenec > 0) {
+            // ---- ALI JE V MODE_UČENEC NAD GRAFOM FOKUSIRANEGA UČENCA? 9.2.2025
+            lo_tipDatumMs = 0;
+            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, fuChartDataX0, fuChartDataY0, fuChartDataX1, fuChartDataY1)) {
+                let ucenecId = razredUcenecId[lo_razred][lo_focusUcenec];
+                lo_tipDatumMs = ucenciPrvaOcenaDatum + (lo_mouseMoveX - fuChartDataX0) / fuChartKx;
+            }
+        }
+        else {
+            // ---- ALI JE V MODE_UČENEC NAD GRAFOM ENEGA OD UČENCEV? 11.2.2025
+            lo_selectedUcenec = 0;
+            for (let i = 1; i <= razredNrUcencev[lo_razred]; i++) {
+                if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, fuChartX0[i], fuChartY0[i], fuChartX1[i], fuChartY1[i])) {
+                    lo_selectedUcenec = i;
+                    break;
+                }
+            }
         }
     }
+
     // noben chart in noben učenec nista selektirana -> treba je pogledati, ali je selektirano karkoli drugega ...
 
     // tudi nič drugega ni selektiranega, zato izhod brez potrebe po ponovnem risanju!
@@ -3175,6 +3207,11 @@ window.addEventListener("keydown", (event) => {
                     break;                
             }              
             paint();
+            break;
+        case 'Escape':
+            if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
+                lf_changeFocusUcenec(0, true);
+            }
             break;
         case 'KeyB':
             //console.log("F7 pressed");
@@ -3958,7 +3995,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     let chartRight = chartLeft + chartWidth;
     let xRight = chartRight - gapRight;
     let xRightData = xRight - 12;
-    if (vp_focus) { xRightData -= 16 }; // 6.2.2025
+    if (vp_focus) { xRightData -= 24 }; // 6.2.2025
     let chartBottom = chartTop + chartHeight;
     let yTop = chartTop + gapTop;
     let yTopData = yTop + 25;
@@ -3977,8 +4014,10 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     let xRangePix = xRightData - xLeftData;
     let kx = xRangePix / xRangeDate;
     // ---- 9.2.2025
-    fuChartX0 = xLeftData; fuChartX1 = xRightData;
-    fuChartY0 = yTopData; fuChartY1 = yXos;
+    fuChartX0[vp_razredUcenecId] = chartLeft; fuChartX1[vp_razredUcenecId] = chartRight; // 11.2.2025
+    fuChartY0[vp_razredUcenecId] = chartTop; fuChartY1[vp_razredUcenecId] = chartBottom; // 11.2.2025
+    fuChartDataX0 = xLeftData; fuChartDataX1 = xRightData;
+    fuChartDataY0 = yTopData; fuChartDataY1 = yXos;
     fuChartKx = kx; fuChartKy = ky;
     // ----
     let x, y, w, h, tmpText, tmpColor, tmpLineWidth;
@@ -3996,6 +4035,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     // ---- okvirček za celo področje chart-a
     tmpColor = "#F7F7F7FF";
     if (vp_razredUcenecId == lo_focusUcenec && !vp_focus) { tmpColor = "papayaWhip"; };
+    if (vp_razredUcenecId == lo_selectedUcenec && lo_focusUcenec <= 0) { tmpColor = "honeydew"; };
     gBannerRoundRect2(chartLeft, chartTop, chartWidth, chartHeight, 4, tmpColor, 1, "lightGray", "", 0, 0, false, true, true, true, true);
 
     // ---- osi
@@ -4109,7 +4149,9 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     // ---- označitev končnega povprečja
     tmpText = "avg:";
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
-    x += 10; if ((x + w) > (chartRight - 2)) { x = chartRight - w - 2 };
+    x += 10;
+    if (vp_focus) { x += 5 }; // 11.2.2025
+    if ((x + w) > (chartRight - 2)) { x = chartRight - w - 2 };
     gText(tmpText, fontSmall, "darkSlateGray", x, yAvg - 4);
     tmpText = rollAvg.toFixed(2);
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
