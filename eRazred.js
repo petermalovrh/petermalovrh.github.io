@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.19"
-const gl_versionDate = "11.2.2025"
+const gl_versionNr = "v1.20"
+const gl_versionDate = "15.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -4020,7 +4020,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     fuChartDataY0 = yTopData; fuChartDataY1 = yXos;
     fuChartKx = kx; fuChartKy = ky;
     // ----
-    let x, y, w, h, tmpText, tmpColor, tmpLineWidth;
+    let x, y, w, h, tmpText, tmpColor, tmpLineWidth, x0, x1;
     let fontSmall = "10pt verdana";
 
     // 4.2.2025
@@ -4044,6 +4044,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
 
     // ---- datumi na datumski X osi
     // ---- prvi datum ocene
+    const cv_danMs = 24 * 3600 * 1000;
     let date0 = new Date(ucenciPrvaOcenaDatum);
     let dan = date0.getDate();
     let mesec = date0.getMonth();
@@ -4055,32 +4056,46 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     y = yXos + h + 4;
     gLine(xLeftData, yXos - 2, xLeftData, yXos + 2, 1, "darkSlateGray", []);
     gText(tmpText, fontDatum, "darkSlateGray", x, y);
+    // ----
+    let tmpDatum, tmpDatumMs, tmpDatumMs00, tmpDatumMs00prev;
+    tmpDatum = new Date(leto, mesec, 1, 12);
+    tmpDatumMs = Date.parse(tmpDatum); 
+    tmpDatumMs00prev = tmpDatumMs - cv_danMs / 2; 
+    x0 = xLeftData - kx * cv_danMs / 2;
     // ---- vsak vmesni prvi v mesecu
     let outOfDateRange = false;
     mesec += 1; if (mesec > 11) { mesec = 0; leto += 1 };
     let mesec0 = mesec;
-    let diffPix;
-    let tmpDatum, tmpDatumMs;
-    for (let i = 1; !outOfDateRange; i++) {
+    let diffPix, i;
+    for (i = 1; !outOfDateRange; i++) {
         if (mesec > 11) { mesec = 0; leto += 1 };
         tmpDatum = new Date(leto, mesec, 1, 12);
         tmpDatumMs = Date.parse(tmpDatum); 
+        tmpDatumMs00 = tmpDatumMs - cv_danMs / 2; 
         if (tmpDatumMs > ucenciZadnjaOcenaDatum) {
             outOfDateRange = true;
             break;
-        }        
+        }
+        x = xLeftData + kx * (tmpDatumMs - ucenciPrvaOcenaDatum);    // tu bo označen naslednji prvi v mesecu ob 12:00
+        // ---- posivljeno področje meseca 15.2.2025
+        x1 = xLeftData + kx * (tmpDatumMs00 - ucenciPrvaOcenaDatum); // tu se konča prejšnji mesec ob 00:00
+        tmpColor = "#DCDCDC60"; if (2 * Math.trunc(i / 2) == i) { tmpColor = "#EAEAEA60"; };
+        gBannerRoundRect(x0, yTopData - 5, x1 - x0, yRangePix + 5 - 1, 0, tmpColor, 0, "", "", 0, 0, false);        
+        // --- zapis prvega prvega dneva v mesecu lahko ne naredim, če je preblizu prvega dneva vseh ocen (ta je sigurno označen)
         if (i == 1) {
             diffPix = kx * (tmpDatumMs - ucenciPrvaOcenaDatum);
             if (diffPix < w) {
-                mesec += 1; continue;
+                tmpDatumMs00prev = tmpDatumMs00; x0 = x1; mesec += 1; continue;
             }
         };
-        x = xLeftData + kx * (tmpDatumMs - ucenciPrvaOcenaDatum);
+        // ---- označitev naslednjega prvega v mesecu
         gLine(x, yXos - 2, x, yXos + 2, 1, "darkSlateGray", []);
         tmpText = "1." + (mesec + 1).toString() + ".";
         ;[w, h] = gMeasureText(tmpText, fontDatum);
         gText(tmpText, fontDatum, "darkSlateGray", x - w / 2, y);
         //
+        tmpDatumMs00prev = tmpDatumMs00;
+        x0 = x1;
         mesec += 1;
     }
     // ---- zadnji datum ocene
@@ -4094,6 +4109,10 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     y = yXos + h + 3;
     gLine(xRightData, yXos - 2, xRightData, yXos + 2, 1, "darkSlateGray", []);
     gText(tmpText, fontDatum, "darkSlateGray", x, y);    
+    // ---- posivljeno področje meseca zadnje ocene 15.2.2025
+    x1 = xRightData + kx * cv_danMs / 2;  // tu se konča dan zadnje ocene ob 24:00
+    tmpColor = "#DCDCDC60"; if (2 * Math.trunc(i / 2) == i) { tmpColor = "#EAEAEA60"; };
+    gBannerRoundRect(x0, yTopData - 5, x1 - x0, yRangePix + 5 - 1, 0, tmpColor, 0, "", "", 0, 0, false);
 
     // ---- izpis učenca
     let fontUcenecImePriimek = "bold 10pt verdana";
@@ -4117,12 +4136,24 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         gBannerRoundRectWithText(xYos - w / 2 - 3, y - h / 2, w, h, fontOcena, colorOcena[ocena], tmpText, 4, ddy, 9, "white", 1, "darkGray", "#CACACAC0", 3, 2, false);
     }
 
+    // ======== TOOL TIP VERTICAL LINE ======== 14.2.2025
+    let date0int;
+    if (vp_focus && lo_tipDatumMs > 0) {
+        date0 = new Date(lo_tipDatumMs);
+        dan = date0.getDate();
+        mesec = date0.getMonth();
+        leto = date0.getFullYear();
+        date0int = new Date(leto, mesec, dan, 12, 0, 0, 0); // isti dan ne glede na to, ali si z miško bolj v dopoldnevu ali popoldnevu
+        x = xLeftData + kx * (Date.parse(date0int) - ucenciPrvaOcenaDatum);
+        gLine(x, yTopData, x, yXos + 4, 1, "gray", [3, 4]);
+    }
+
     // ---- OCENE - KRIVULJA POVPREČJA ... rišem jo spodaj, da so potem markerji ocen lepo čez njo in ne obratno popackano
     let fontUcenecOcena = "bold 12pt verdana";
-    let ocenaId, ocenaNr, ocenaCifraStr, datumOceneMs, colorId, x0, yAvg, rollAvg, pisnaOcena, currentPredmetId, tmpAddY;
+    let ocenaId, ocenaNr, ocenaCifraStr, datumOceneMs, colorId, yAvg, rollAvg, pisnaOcena, currentPredmetId, tmpAddY;
     let items = ucenecNrOcen[ucenecId];
     if (!lo_allPredmet) { items = ucenecPredmetNrOcen[ucenecId][lo_predmet]; };
-    for (let i = 1; i <= items; i++) {
+    for (i = 1; i <= items; i++) {
         if (lo_allPredmet) { 
             ocenaId = ucenecOcenaId[ucenecId][i];
             rollAvg = ucenecRollAvg[ucenecId][i]; // 1.2.2025
@@ -4158,7 +4189,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     gText(tmpText, fontSmall, "darkSlateGray", x, yAvg + h + 3);
 
     // ---- OCENE - MARKERJI POSAMEZNIH OCEN ... rešejo se preko že izrisane krivulje povprečja
-    for (let i = 1; i <= items; i++) {
+    for (i = 1; i <= items; i++) {
         if (lo_allPredmet) { ocenaId = ucenecOcenaId[ucenecId][i]; }
         else { ocenaId = ucenecPredmetOcenaId[ucenecId][lo_predmet][i]; };
         pisnaOcena = ocenaTipTip[ocenaId] == "P" ? true : false; // 6.2.2025
@@ -4203,6 +4234,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     let fTip = "bold 12pt verdana";
     let fTockeProcenti = "12pt verdana";
     if (vp_focus && lo_tipDatumMs > 0) {
+
         date0 = new Date(lo_tipDatumMs);
         dan = date0.getDate();
         mesec = date0.getMonth();
@@ -4223,7 +4255,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         let focusAvg = 0;
         let havePisneOcene = false;
         let wPredmetMax = 0;
-        for (let i = 1; i <= items; i++) {
+        for (i = 1; i <= items; i++) {
             if (lo_allPredmet) {
                 ocenaId = ucenecOcenaId[ucenecId][i];
                 rollAvg = ucenecRollAvg[ucenecId][i]; // 1.2.2025
@@ -4291,7 +4323,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         gText(tmpText, fontDatum, "white", x, y);
         // ---- NABRANE OCENE
         y = bTop + datumLineHeight + dataLineHeight / 2 + h / 2;
-        for (let i = 1; i <= focusNrOcen; i++) {
+        for (i = 1; i <= focusNrOcen; i++) {
             // ---- OCENA
             x = posTabOcena;
             tmpText = focusOceneOcenaCifra[i];
