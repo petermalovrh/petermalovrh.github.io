@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.21"
-const gl_versionDate = "16.2.2025"
+const gl_versionNr = "v1.22"
+const gl_versionDate = "17.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -4054,11 +4054,17 @@ function paint_eRazred_grafRazred() {
     if (nrItems <= 0) { return };
 
     //---- dimenzije matrike
-    cols = Math.trunc(Math.sqrt(nrItems * 0.7 - 1)) + 1;
-    let ratio = ctxW / (ctxH + 1);
-    if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
-    if (cols > nrItems) { cols = nrItems };
-    rows = Math.trunc((nrItems - 1) / cols) + 1;
+    let ratio;
+    if (nrItems == 1) {
+        cols = 1; rows = 1; ratio = ctxW / (ctxH + 1);
+    } else {
+        cols = Math.trunc(Math.sqrt(nrItems * 0.7 - 1)) + 1;
+        ratio = ctxW / (ctxH + 1);
+        if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
+        if (cols > nrItems) { cols = nrItems };
+        rows = Math.trunc((nrItems - 1) / cols) + 1;
+    }
+
     //----
     itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
@@ -4086,7 +4092,7 @@ function paint_eRazred_grafRazred() {
             paint_eRazred_grafRazred_drawSingleRazred(i, false, x, y, iw, ih);
         }
         col += 1;
-        if (col > cols) { col = 1; row += 1 };
+        if (col > cols) { col = 1; if (row < rows) { row += 1 } };
     }
     
     // ---- če imam graf v fokusu, izrišem zdaj preko ostalih še povečan graf zanj
@@ -4110,10 +4116,11 @@ function paint_eRazred_grafRazred_setPosition(marginLeft, marginTop, marginRight
     if (!(cols == 1 && rows == 1)) {
         if (razred == lo_focusRazred) {
             if (vp_focusAware) { 
-                let kSize = 0.9;
+                let kSize = 0.85;
                 iw = kSize * (ctxW - marginLeft - marginRight);
                 ih = iw * itemHeight / itemWidth;
                 if (ih > ctxH - marginTop - marginBottom) { ih = kSize * (ctxH - marginTop - marginBottom) };
+                if (ih < 0.7 * (ctxH - marginTop - marginBottom)) { ih = kSize * (ctxH - marginTop - marginBottom) };
                 x = ctxW / 2 - iw / 2;
                 y = ctxH / 2 - ih / 2;                
             }            
@@ -4166,7 +4173,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     fuChartDataY0 = yTopData; fuChartDataY1 = yXos;
     fuChartKx = kx; fuChartKy = ky;
     // ----
-    let x, y, w, h, tmpText, tmpColor, tmpLineWidth, x0, x1;
+    let x, y, w, h, tmpText, tmpColor, tmpLineWidth, x0, x1, y0;
     let fontSmall = "10pt verdana";
 
     // 4.2.2025
@@ -4208,11 +4215,12 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     tmpDatumMs = Date.parse(tmpDatum); 
     tmpDatumMs00prev = tmpDatumMs - cv_danMs / 2; 
     x0 = xLeftData - kx * cv_danMs / 2;
+    if (x0 < (xLeftData - 12)) { x0 = (xLeftData - 12) };
     // ---- vsak vmesni prvi v mesecu
     let outOfDateRange = false;
     mesec += 1; if (mesec > 11) { mesec = 0; leto += 1 };
     let mesec0 = mesec;
-    let diffPix, i;
+    let diffPix, i, j;
     for (i = 1; !outOfDateRange; i++) {
         if (mesec > 11) { mesec = 0; leto += 1 };
         tmpDatum = new Date(leto, mesec, 1, 12);
@@ -4257,6 +4265,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     gText(tmpText, fontDatum, "darkSlateGray", x, y);    
     // ---- posivljeno področje meseca zadnje ocene 15.2.2025
     x1 = xRightData + kx * cv_danMs / 2;  // tu se konča dan zadnje ocene ob 24:00
+    if (x1 > (xRightData + 12)) { x1 = (xRightData + 12) };
     tmpColor = "#DCDCDC60"; if (2 * Math.trunc(i / 2) == i) { tmpColor = "#EAEAEA60"; };
     gBannerRoundRect(x0, yTopData - 5, x1 - x0, yRangePix + 5 - 1, 0, tmpColor, 0, "", "", 0, 0, false);
 
@@ -4293,7 +4302,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
 
     // ---- OCENE - KRIVULJA POVPREČJA ... rišem jo spodaj, da so potem markerji ocen lepo čez njo in ne obratno popackano
     let fontUcenecOcena = "bold 12pt verdana";
-    let ocenaId, ocenaNr, ocenaCifraStr, datumOceneMs, colorId, yAvg, rollAvg, pisnaOcena, currentPredmetId, tmpAddY;
+    let ocenaId, ocenaNr, ocenaCifraStr, datumOceneMs, datumOceneMsPrev, colorId, yAvg, rollAvg, pisnaOcena, currentPredmetId, tmpAddY;
     let items;
     switch (lo_byRazredGen) {
         case false:
@@ -4332,7 +4341,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
         yAvg = yXos - ky * (rollAvg - 0.5);
         if (i > 1) {
             tmpColor = "darkGray";
-            if (rollAvg == 1.5) { tmpColor = "darkRed"; }
+            if (valueBetween(rollAvg, 1.5, 1.65)) { tmpColor = "darkRed"; }
             else if (rollAvg < 1.5) { tmpColor = "red"; };
             tmpLineWidth = 3;
             //if (vp_razredId == lo_focusRazred) { tmpLineWidth = 5 };
@@ -4357,23 +4366,53 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     gText(tmpText, fontSmall, "darkSlateGray", x, yAvg + h + 3);
 
     // ---- OCENE - MARKERJI POSAMEZNIH OCEN ... rešejo se preko že izrisane krivulje povprečja
+    datumOceneMsPrev = 0; // 17.2.2025
+    let newDatum = true;  // 17.2.2025
+    let sameDate = false; // 17.2.2025
+    let oceneCounter = []; oceneCounter[1] = 0; oceneCounter[2] = 0; oceneCounter[3] = 0; oceneCounter[4] = 0; oceneCounter[5] = 0;
     for (i = 1; i <= items; i++) {
         // najprej potegnem ID ocene, katere lokacija je odvisna od predmeta (vsi/določen) in razreda (razred/generacija)
         switch (lo_byRazredGen) {
             case false:
                 if (lo_allPredmet) { ocenaId = razredOcenaId[vp_razredId][i]; }
-                else { ocenaId = razredPredmetOcenaId[vp_razredId][lo_predmet][i]; }    
+                else { ocenaId = razredPredmetOcenaId[vp_razredId][lo_predmet][i]; }
                 break;
             case true:
                 if (lo_allPredmet) { ocenaId = razredGenOcenaId[vp_razredId][i]; }
                 else { ocenaId = razredGenPredmetOcenaId[vp_razredId][lo_predmet][i]; }
                 break;
-        }   
+        }
         pisnaOcena = ocenaTipTip[ocenaId] == "P" ? true : false; // 6.2.2025
         currentPredmetId = ocenaPredmetId[ocenaId];
         ocenaCifraStr = ocenaCifra[ocenaId];
         ocenaNr = ocenaCifraNr[ocenaId];
         datumOceneMs = ocenaDatumMs[ocenaId];
+
+        // ---- Kolikorat se posamezna ocena na isti datum ponovi? 17.2.2025
+        sameDate = (datumOceneMs == datumOceneMsPrev);
+        if (vp_focus) {
+            if (i == 1) { 
+                // ---- (A) prva ocena
+                oceneCounter[ocenaNr] += 1;
+            } else if (sameDate) { 
+                // ---- (B) nova ocena na isti datum
+                oceneCounter[ocenaNr] += 1;
+                if (oceneCounter[ocenaNr] > 1) {
+                    continue; // za to oceno je bil marker že narisan in je čez njega brez veze risati še enega
+                }
+            } else { 
+                // ---- (C) datum se je spremenil - pri prejšnjem je treba pogledati, če je bila kakšna ocena več kot enkrat, in tam dopisati ustrezen znakec na marker
+                for (j = 1; j <= 5; j++) {
+                    if (oceneCounter[j] > 1) {
+                        y0 = yXos - ky * (j - 0.5);
+                        gBannerRoundRectWithText3(x + 3, y0 - 20, 9, 10, "bold 9pt verdana", "black", oceneCounter[j].toString(), 3, 2, 3, 6, "white", 1, "gray", "", 0, 0, false);
+                    }
+                }
+                oceneCounter[1] = 0; oceneCounter[2] = 0; oceneCounter[3] = 0; oceneCounter[4] = 0; oceneCounter[5] = 0;
+                oceneCounter[ocenaNr] += 1;
+            }
+        }
+
         x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
         // ---- marker ocene
         y = yXos - ky * (ocenaNr - 0.5);
@@ -4402,6 +4441,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
             gText(predmetKratica[ocenaPredmetId[ocenaId]].substr(0, 1), "9pt verdana", colorPredmet[currentPredmetId], x - 4, y + 15 + tmpAddY);
         }
         x0 = x;
+        datumOceneMsPrev = datumOceneMs;
     };
 
     // ======== TOOL TIP NAD FOKUSIRANIM UČENCEM ========
@@ -4508,7 +4548,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
         let bHeight = datumLineHeight;
         let dataLineHeight = 26;
         if (focusNrOcen > 0) {
-            bHeight += focusNrOcen * dataLineHeight
+            bHeight += (focusNrOcen + 1) * dataLineHeight;
         };
         // ---- če na desni gre ven iz okna, je treba izpisovati malo bolj levo        
         if (bLeft + bWidth + 8 > ctxW) { bLeft = ctxW - bWidth - 8; }
@@ -4550,6 +4590,19 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
             // ----
             y += dataLineHeight;
         }
+        // ---- AVG na koncu ocen za ta dan 17.2.2025
+        if (focusNrOcen > 0) {
+            tmpColor = "darkGray";
+            if (valueBetween(rollAvg, 1.5, 1.65)) { tmpColor = "darkRed"; }
+            else if (rollAvg < 1.5) { tmpColor = "red"; };
+            tmpLineWidth = 3;
+            if (vp_focus) { tmpLineWidth = 4 };
+            const wAvgLine = 60; const dyAvg = 6; x = bLeft + 4;
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth + 8, "firebrick", []);
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth + 5, "white", []);
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth, "darkSlateGray", []);
+            gText("avg: " + focusAvg.toFixed(2), "bold 11pt verdana", "darkSlateGray", x + wAvgLine + 6, y - 2);
+        };
     } 
 }
 
@@ -4571,11 +4624,16 @@ function paint_eRazred_grafUcenec() {
     if (nrUcencev <= 0) { return };
 
     //---- dimenzije matrike
-    cols = Math.trunc(Math.sqrt(nrUcencev * 0.7 - 1)) + 1;
-    let ratio = ctxW / (ctxH + 1);
-    if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
-    if (cols > nrUcencev) { cols = nrUcencev };
-    rows = Math.trunc((nrUcencev - 1) / cols) + 1;
+    let ratio;
+    if (nrUcencev == 1) {
+        cols = 1; rows = 1; ratio = ctxW / (ctxH + 1);
+    } else {
+        cols = Math.trunc(Math.sqrt(nrUcencev * 0.7 - 1)) + 1;
+        ratio = ctxW / (ctxH + 1);
+        if (ratio > 2.1) { cols += 1 }; if (ratio > 2.5) { cols += 1 }; if (ratio > 3.3) { cols += 1 }; if (ratio > 5) { cols += 1 }; //21.12.2023 spremenil faktor 1.8 -> 2.1
+        if (cols > nrUcencev) { cols = nrUcencev };
+        rows = Math.trunc((nrUcencev - 1) / cols) + 1;
+    }
     //----
     itemWidth = (ctxW - marginLeft - marginRight - (cols - 1) * hGap) / cols;
     itemHeight = (ctxH - marginTop - marginBottom - (rows - 1) * vGap) / rows;
@@ -4603,7 +4661,7 @@ function paint_eRazred_grafUcenec() {
             paint_eRazred_grafUcenec_drawSingleUcenec(i, false, x, y, iw, ih);
         }
         col += 1;
-        if (col > cols) { col = 1; row += 1 };
+        if (col > cols) { col = 1; if (row < rows) { row += 1 } };
     }
     
     // ---- če imam učenca v fokusu, izrišem zdaj preko ostalih še povečan graf zanj
@@ -8226,4 +8284,23 @@ function load_demoText5() {
     addDemoText("Mladen Starina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 4));
     addDemoText("Bindo Farina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
     addDemoText("Pikica Slon, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+}
+
+function load_demoText6() {
+
+    // ---------------------------
+    // Test variante, ko imaš spredaj najprej katalog vseh predmetov z imenom, trimestno kratico in enomestno kratico
+    // Potem v nadaljevanju imaš za vsak razred header vrstico z letnikom (#L) in razredom (#R) ... pozor: predmet tu ni naveden, ker bo enomestna kratica predmeta prisotna pri vseki oceni posebej
+    // Nato pa v nadaljevanju seznam vseh učemcev razreda, z vsemi njihovimi ocenami pri vseh predmetih.
+    //    primer ene ocene: "K|4|P1|15-1-25|70.5|81" ... KEMIJA, ocena 4, prvi pisni test, na dan 15.1.2025, 70.5 točk od 81 točk
+    // Ta varianta podatkov JE PODPRTA !!!
+    // ---------------------------
+
+    addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
+    //----
+    addDemoText("#L2425 #R8.D");
+    addDemoText("Neja Franko,     F|2|U|17-10-24, K|2|U|17-10-24,  M|4|U|17-10-24, F|3|U|18-10-24,");
+    addDemoText("Mare Car,        F|4|U|17-10-24,  K|2|U|17-10-24,  M|5|U|17-10-24, F|3|U|18-10-24, K|4|U|18-10-24,");
+    addDemoText("Janko Bergant,   F|2|U|17-10-24,  F|3|U|18-10-24, K|3|U|18-10-24, M|2|U|18-10-24, F|3|U|19-10-24,");
+    
 }
