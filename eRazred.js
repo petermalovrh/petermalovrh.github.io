@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.22"
-const gl_versionDate = "17.2.2025"
+const gl_versionNr = "v1.23"
+const gl_versionDate = "18.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -4220,7 +4220,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     let outOfDateRange = false;
     mesec += 1; if (mesec > 11) { mesec = 0; leto += 1 };
     let mesec0 = mesec;
-    let diffPix, i, j;
+    let diffPix, i, j, jj;
     for (i = 1; !outOfDateRange; i++) {
         if (mesec > 11) { mesec = 0; leto += 1 };
         tmpDatum = new Date(leto, mesec, 1, 12);
@@ -4297,7 +4297,7 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
         leto = date0.getFullYear();
         date0int = new Date(leto, mesec, dan, 12, 0, 0, 0); // isti dan ne glede na to, ali si z miško bolj v dopoldnevu ali popoldnevu
         x = xLeftData + kx * (Date.parse(date0int) - ucenciPrvaOcenaDatum);
-        gLine(x, yTopData, x, yXos + 4, 1, "gray", [3, 4]);
+        gLine(x, yTopData, x, yXos + 4, 2, "gray", [3, 4]);
     }
 
     // ---- OCENE - KRIVULJA POVPREČJA ... rišem jo spodaj, da so potem markerji ocen lepo čez njo in ne obratno popackano
@@ -4367,9 +4367,10 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
 
     // ---- OCENE - MARKERJI POSAMEZNIH OCEN ... rešejo se preko že izrisane krivulje povprečja
     datumOceneMsPrev = 0; // 17.2.2025
-    let newDatum = true;  // 17.2.2025
+    let tmpDistX, tmpDistY;
     let sameDate = false; // 17.2.2025
     let oceneCounter = []; oceneCounter[1] = 0; oceneCounter[2] = 0; oceneCounter[3] = 0; oceneCounter[4] = 0; oceneCounter[5] = 0;
+    let ocenePredmetId = []; ocenePredmetId[1] = []; ocenePredmetId[2] = []; ocenePredmetId[3] = []; ocenePredmetId[4] = []; ocenePredmetId[5] = []; // 18.2.2025
     for (i = 1; i <= items; i++) {
         // najprej potegnem ID ocene, katere lokacija je odvisna od predmeta (vsi/določen) in razreda (razred/generacija)
         switch (lo_byRazredGen) {
@@ -4394,9 +4395,11 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
             if (i == 1) { 
                 // ---- (A) prva ocena
                 oceneCounter[ocenaNr] += 1;
+                ocenePredmetId[ocenaNr][oceneCounter[ocenaNr]] = currentPredmetId;
             } else if (sameDate) { 
                 // ---- (B) nova ocena na isti datum
                 oceneCounter[ocenaNr] += 1;
+                ocenePredmetId[ocenaNr][oceneCounter[ocenaNr]] = currentPredmetId;
                 if (oceneCounter[ocenaNr] > 1) {
                     continue; // za to oceno je bil marker že narisan in je čez njega brez veze risati še enega
                 }
@@ -4405,20 +4408,28 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
                 for (j = 1; j <= 5; j++) {
                     if (oceneCounter[j] > 1) {
                         y0 = yXos - ky * (j - 0.5);
-                        gBannerRoundRectWithText3(x + 3, y0 - 20, 9, 10, "bold 9pt verdana", "black", oceneCounter[j].toString(), 3, 2, 3, 6, "white", 1, "gray", "", 0, 0, false);
+                        //gBannerRoundRectWithText3(x + 3, y0 - 20, 9, 10, "bold 9pt verdana", "black", oceneCounter[j].toString(), 3, 2, 3, 6, "white", 1, "gray", "", 0, 0, false);
+                        tmpText = j.toString();
+                        ;[w, h] = gMeasureText(tmpText, fontUcenecOcena);
+                        tmpDistX = 3; tmpDistY = 8;
+                        y = yXos - ky * (j - 0.5);                       
+                        for (jj = oceneCounter[j] - 1; jj >= 0; jj--) {
+                            gBannerRoundRectWithText3(x - w / 2 + tmpDistX * jj, y - h / 2 - tmpDistY * jj, w, h, fontUcenecOcena, "white", tmpText, 5, 3, 4, 6, colorPredmet[ocenePredmetId[j][jj + 1]], 1, "lightGray", "darkGray", 2, 2, false);
+                        }
                     }
                 }
                 oceneCounter[1] = 0; oceneCounter[2] = 0; oceneCounter[3] = 0; oceneCounter[4] = 0; oceneCounter[5] = 0;
                 oceneCounter[ocenaNr] += 1;
+                ocenePredmetId[ocenaNr][oceneCounter[ocenaNr]] = currentPredmetId;
             }
         }
 
         x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
         // ---- marker ocene
         y = yXos - ky * (ocenaNr - 0.5);
-        if (pisnaOcena && (x - x0) <= 2) {
-            y -= 4
-        };
+        //if (pisnaOcena && (x - x0) <= 2) {
+        //    y -= 4
+        //};
         colorId = ocenaId - 10 * (Math.trunc((ocenaId - 1) / 10)) - 1;
         ctx.setLineDash([]);
         if (vp_focus) {
@@ -4444,6 +4455,20 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
         datumOceneMsPrev = datumOceneMs;
     };
 
+    // ---- (D) za zadnji datum še nisem izpisal vseh potrebnih markerjev  18.2.2025
+    for (j = 1; j <= 5; j++) {
+        if (oceneCounter[j] > 1) {
+            y0 = yXos - ky * (j - 0.5);
+            tmpText = j.toString();
+            ;[w, h] = gMeasureText(tmpText, fontUcenecOcena);
+            tmpDistX = 3; tmpDistY = 8;
+            y = yXos - ky * (j - 0.5);
+            for (jj = oceneCounter[j] - 1; jj >= 0; jj--) {
+                gBannerRoundRectWithText3(x - w / 2 + tmpDistX * jj, y - h / 2 - tmpDistY * jj, w, h, fontUcenecOcena, "white", tmpText, 5, 3, 4, 6, colorPredmet[ocenePredmetId[j][jj + 1]], 1, "lightGray", "darkGray", 2, 2, false);
+            }
+        }
+    }
+    
     // ======== TOOL TIP NAD FOKUSIRANIM UČENCEM ========
     // ---- nabiranje podatkov za toolTip
     let fOcena = "bold 12pt verdana";
@@ -5988,6 +6013,8 @@ function data_initParseAndPrepare(textData) {
     // Inicializacija potrebnih struktur za risanje grafov
     lo_predmet = 1; // FIZIKA
     lo_pisniTestNr = 1; // P1
+    if (lo_razred > 1) { lo_razred = 1; };       // 18.2.2025
+    if (lo_razredGen > 1) { lo_razredGen = 1; }; // 18.2.2025
     data_prepareStructures_byTest();    // 23.1.2025
     data_prepareStructures_byUcenec();  //  2.2.2025
     data_prepareStructures_byRazred();  // 16.2.2025
@@ -8197,7 +8224,8 @@ function load_demoText5() {
     addDemoText("#PIK! #MATEMATIKA|MAT|M #FIZIKA|FIZ|F #KEMIJA|KEM|K #BIOLOGIJA|BIO|B #GEOGRAFIJA|GEO|G #SLOVENŠČINA|SLJ|S #ANGLEŠČINA|ANG|A #ŠPORT|ŠPO|P");
     //----
     addDemoText("#L2425 #R8.D");
-    addDemoText("Neja Franko, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    //addDemoText("Neja Franko, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
+    addDemoText("Jo" + scZhLow + "e Zajc, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 5));
     addDemoText("Mare Car, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
     addDemoText("Janko Bergant, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 4));
     addDemoText("Jasmin Brekalo, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 1, 3));
