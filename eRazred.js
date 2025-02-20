@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.23"
-const gl_versionDate = "18.2.2025"
+const gl_versionNr = "v1.24"
+const gl_versionDate = "20.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2247,6 +2247,7 @@ var lo_enabledHelp = true;       // 10.1.2025
 var lo_enabledMode = true;       // 2.2.2025
 var lo_enabledPredmet = true;    // 28.1.2025
 var lo_enabledTest = true;       // 27.1.2025
+var lo_enabledLetnik = true;     // 20.2.2025
 var lo_enabledRazred = true;     // 27.1.2025
 var lo_enabledSPData = true;     // 27.1.2025
 var lo_enabledKritLuknje = true; // 27.1.2025
@@ -2402,9 +2403,11 @@ switch (lo_GUI_layout) {
         //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //var checkBoxRealLens = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Realna le" + scTchLow + "a", "gray", "normal 10pt verdana", 4, "right-middle", lo_showRealLens, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz realne le" + scTchLow + "e", "E");  //String.fromCharCode(0x0110));
         var buttonMode = new button(gpLeft, gpTop + 10, wBtn, hBtn, "M", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "salmon", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji pogled ...", "M");
+        var buttonLetnik = new button(gpLeft, gpTop + 10, wBtn, hBtn, "L", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Skupen/lo" + scTchLow + "en pogled razredov v letniku", "L");
+        var buttonRazred = new button(gpLeft, gpTop + 10, wBtn, hBtn, "R", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji razred ...", "R");
         var buttonPredmet = new button(gpLeft, gpTop + 10, wBtn, hBtn, "P", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji predmet ...", "P");
         var buttonTest = new button(gpLeft, gpTop + 10, wBtn, hBtn, "T", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji test ...", "T");
-        var buttonRazred = new button(gpLeft, gpTop + 10, wBtn, hBtn, "R", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Skupen/lo" + scTchLow + "en pogled po razredih", "R");
+        var buttonUcenec = new button(gpLeft, gpTop + 10, wBtn, hBtn, "U", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji u" + scTchLow + "enec ...", "U");
         var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S (+SHIFT)");
         var buttonKritLuknje = new button(gpLeft, gpTop + 10, wBtn, hBtn, "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
         var buttonLoad = new button(gpLeft, gpTop + 10, wBtn, hBtn, "D", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "powderBlue", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Nalo" + scZhLow + "i skopirane podatke razredov in ocen iz clipboard-a ...", "D");
@@ -2495,6 +2498,7 @@ function main() {
     //    })
     
     demo_load();
+    lf_changeMode(cv_mode_test, false); // 20.2.2025
     paint();
     
     if (lo_showHelpTips) { // 3.1.2025
@@ -2757,6 +2761,42 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
 
+    //---- ločen/skupen pregled po razredih (mode_test, mode razred) 20.2.2025
+    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+        if (buttonLetnik.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            switch (gl_mode) {
+                case cv_mode_test:
+                    lf_changeByRazredGen(!lo_byRazredGen, false);
+                    data_prepareStructures_byTest();
+                    paint();
+                    break;
+                case cv_mode_razred:
+                    lo_focusRazred = 0;
+                    lf_changeByRazredGen(!lo_byRazredGen, true);
+                    break;
+            };
+            vl_end = true
+        }
+    }
+
+    //---- ločen/skupen pregled po razredih (mode_razredTest) oziroma preklop na naslednji razred (mode_učenec) 27.1.2025
+    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+        if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            switch (gl_mode) {
+                case cv_mode_ucenec:
+                    lo_focusUcenec = 0; // 4.2.2025
+                    lf_changeRazred(lo_razred + (e.shiftKey ? -1 : 1), true);
+                    break;
+                case cv_mode_razred:
+                    lf_changeFocusRazred(lf_changeValueFocusRazred(e.shiftKey ? -1 : 1), true);
+                    break;
+            };
+            vl_end = true;
+        }
+    }
+    
     //---- preklop na naslednji predmet 28.1.2025
     if (!vl_end && lo_showGUI && lo_enabledPredmet) {
         if (buttonPredmet.eventClick(e.offsetX, e.offsetY)) {
@@ -2803,24 +2843,14 @@ elMyCanvas.addEventListener('click', (e) => {
 
     //---- ločen/skupen pregled po razredih (mode_razredTest) oziroma preklop na naslednji razred (mode_učenec) 27.1.2025
     if (!vl_end && lo_showGUI && lo_enabledRazred) {
-        if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
+        if (buttonUcenec.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
-                case cv_mode_test:
-                    lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
-                    data_prepareStructures_byTest();
-                    paint();
-                    break;
                 case cv_mode_ucenec:
-                    lo_focusUcenec = 0; // 4.2.2025
-                    if (e.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
-                    else { lf_changeRazred(lo_razred + 1, true); };
-                    break;
-                case cv_mode_razred:
-                    lf_changeByRazredGen(!lo_byRazredGen, true); // 16.2.2025
+                    lf_changeFocusUcenec(lf_changeValueFocusUcenec(e.shiftKey ? 1 : -1), true);
                     break;
             };
-            vl_end = true
+            vl_end = true;
         }
     }
     
@@ -2970,9 +3000,11 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         // pogoja VISIBLE in ENABLED se testirata že znotraj objekta in itak tako skoči ven, če ni viden ali aktiven!    
         if (buttonHelp.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonMode.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-        else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-        else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonLetnik.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }            
+        else if (buttonUcenec.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonLoad.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
@@ -3161,19 +3193,13 @@ window.addEventListener("wheel", event => {
     let newValue, change, maxDiff;
     
     if (gl_mode == cv_mode_ucenec) {
-        change = event.shiftKey ? delta : -delta;
-        newValue = lf_changeValueFocusUcenec(change);
         gl_changeByMouseWheel_ucenecChart = true; // 4.2.2024
-        lf_changeFocusUcenec(newValue, true);
-        //}
+        lf_changeFocusUcenec(lf_changeValueFocusUcenec(event.shiftKey ? delta : -delta), true);
         return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
     };
     if (gl_mode == cv_mode_razred) {
-        change = event.shiftKey ? delta : -delta;
-        newValue = lf_changeValueFocusRazred(change);
         gl_changeByMouseWheel_razredChart = true; // 4.2.2024
-        lf_changeFocusRazred(newValue, true);
-        //}
+        lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -delta : delta), true);
         return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
     };
 
@@ -3246,22 +3272,32 @@ window.addEventListener("keydown", (event) => {
             if (event.shiftKey) { lf_changeMode(gl_mode + 1, true); }
             else { lf_changeMode(gl_mode - 1, true); }
             break;
-        case 'KeyR':
-            //lo_keyDownR = true; break;
-            //console.log("R pressed");
+        case 'KeyL':
+            //console.log("L pressed");
             switch (gl_mode) {
                 case cv_mode_test:
                     lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
                     data_prepareStructures_byTest();
                     paint();
                     break;
+                case cv_mode_razred: // spremeni razred <-> razredGen 16.2.2025
+                    lo_focusRazred = 0;
+                    lf_changeByRazredGen(!lo_byRazredGen, true);
+                    break;
+            };
+            break;
+        case 'KeyR':
+            //lo_keyDownR = true; break;
+            //console.log("R pressed");
+            switch (gl_mode) {
                 case cv_mode_ucenec:
                     lo_focusUcenec = 0; // 4.2.2025
                     if (event.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
                     else { lf_changeRazred(lo_razred + 1, true); };
                     break;
                 case cv_mode_razred: // spremeni razred <-> razredGen 16.2.2025
-                    lf_changeByRazredGen(!lo_byRazredGen, true);
+                    //lf_changeFocusRazred(!lo_byRazredGen, true);
+                    lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -1 : 1), true);
                     break;
             };
             break;
@@ -3274,11 +3310,11 @@ window.addEventListener("keydown", (event) => {
             }
             switch (gl_mode) {
                 case cv_mode_test:
-                    data_prepareStructures_byTest();                   
+                    data_prepareStructures_byTest();
                     break;
                 default:
-                    break;                
-            }            
+                    break;
+            }
             paint();
             break;
         case 'KeyT': // sprememba zaporedne številke testa pri istem predmetu
@@ -3290,13 +3326,21 @@ window.addEventListener("keydown", (event) => {
             }
             switch (gl_mode) {
                 case cv_mode_test:
-                    data_prepareStructures_byTest();                   
+                    data_prepareStructures_byTest();
                     break;
                 default:
-                    break;                
-            }              
+                    break;
+            }
             paint();
             break;
+        case 'KeyU':
+            //console.log("U pressed");
+            switch (gl_mode) {
+                case cv_mode_ucenec: // premakni se s fokusom na naslednjega/ prejšnjega učenca 20.2.2025
+                    lf_changeFocusUcenec(lf_changeValueFocusUcenec(event.shiftKey ? 1 : -1), true);
+                    break;
+            };
+            break;        
         case 'Escape':
             if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
                 lf_changeFocusUcenec(0, true);
@@ -3311,8 +3355,6 @@ window.addEventListener("keydown", (event) => {
         case 'KeyF':
             lf_changeFocusUcenecOnOff(true);
             break;
-        case 'KeyU':
-            lo_keyDownU = true; break;
         case 'KeyD':
             // Read text from the clipboard, or "paste"
             lo_focusUcenec = 0; // 4.2.2025
@@ -3444,8 +3486,6 @@ window.addEventListener("keyup", (event) => {
             gl_changeByMouseWheel_kriterij12 = false;
             //console.log("UP: false"); console.log("----");
             break;
-        case 'KeyU':
-            lo_keyDownU = false; break;
         case 'KeyD':
             lo_keyDownD = false; break;
         case 'KeyW':
@@ -5243,18 +5283,18 @@ function paint_GUI() {
 
     if (lo_showGUI && lo_showDynamicToolbar) { 
         //console.log("painting ...")
-        buttonMode.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonRazred.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
         //console.log("    painted-buttons")
-        y = buttonRazred.top;
+        y = buttonMode.top;
         switch (gl_mode) {
             case cv_mode_test:
                 //console.log("    painting-rt")
                 x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-                gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+                gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
                 break;
             case cv_mode_ucenec: case cv_mode_razred:
                 //console.log("    painting-u")
-                x = buttonRazred.left + buttonRazred.width + 4.5;
+                x = buttonUcenec.left + buttonUcenec.width + 4.5;
                 gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
                 break;
         }
@@ -5267,7 +5307,7 @@ function paint_GUI() {
         if (lo_showGUI) {
             if (lo_enabledHelp) { // 27.1.2025
                 // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
-                buttonMode.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonRazred.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+                buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
             };
         };
     };
@@ -5379,12 +5419,14 @@ function paint_GUI_layoutB_modeRazred() {
     //---- 27.1.2025
     buttonMode.left = 2;
     buttonMode.top = yTop;   
-    buttonPredmet.left = buttonMode.left + buttonMode.width + wSep;
-    buttonPredmet.top = buttonMode.top;
-    buttonRazred.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonLetnik.left = buttonMode.left + buttonMode.width + wSep;
+    buttonLetnik.top = buttonMode.top;
+    buttonRazred.left = buttonLetnik.left + buttonLetnik.width + wSep;
     buttonRazred.top = buttonMode.top;
+    buttonPredmet.left = buttonRazred.left + buttonRazred.width + wSep;
+    buttonPredmet.top = buttonMode.top;    
     //----
-    x = buttonRazred.left + buttonRazred.width + wSep;
+    x = buttonPredmet.left + buttonPredmet.width + wSep;
     buttonLoad.left = x + wSep;
     buttonLoad.top = buttonMode.top;
     //----
@@ -5403,18 +5445,20 @@ function paint_GUI_layoutB_modeUcenec() {
     //---- 27.1.2025
     buttonMode.left = 2;
     buttonMode.top = yTop;   
-    buttonPredmet.left = buttonMode.left + buttonMode.width + wSep;
-    buttonPredmet.top = buttonMode.top;
-    buttonRazred.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonRazred.left = buttonMode.left + buttonMode.width + wSep;
     buttonRazred.top = buttonMode.top;
+    buttonPredmet.left = buttonRazred.left + buttonRazred.width + wSep;
+    buttonPredmet.top = buttonMode.top;
+    buttonUcenec.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonUcenec.top = buttonMode.top;
     //----
-    x = buttonRazred.left + buttonRazred.width + wSep;
+    x = buttonUcenec.left + buttonUcenec.width + wSep;
     buttonLoad.left = x + wSep;
     buttonLoad.top = buttonMode.top;
     //----
     x = buttonLoad.left + buttonLoad.width + wSep;
     buttonHelp.left = x + wSep;
-    buttonHelp.top = buttonPredmet.top;
+    buttonHelp.top = buttonMode.top;
 
 }
 
@@ -5426,14 +5470,15 @@ function paint_GUI_layoutB_modeTest() {
 
     //---- 27.1.2025
     buttonMode.left = 2;
-    buttonMode.top = yTop;   
-    buttonPredmet.left = buttonMode.left + buttonMode.width + wSep;
+    buttonMode.top = yTop;
+    buttonLetnik.left = buttonMode.left + buttonMode.width + wSep;
+    buttonLetnik.top = buttonMode.top;
+    buttonPredmet.left = buttonLetnik.left + buttonLetnik.width + wSep;
     buttonPredmet.top = buttonMode.top;
     buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
     buttonTest.top = buttonMode.top;
-    buttonRazred.left = buttonTest.left + buttonTest.width + wSep;
-    buttonRazred.top = buttonMode.top;
-    buttonSPData.left = buttonRazred.left + buttonRazred.width + wSep;
+    // ----
+    buttonSPData.left = buttonTest.left + buttonTest.width + wSep;
     buttonSPData.top = buttonMode.top;
     buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
     buttonKritLuknje.top = buttonMode.top;
@@ -5460,11 +5505,17 @@ function lf_changeValueFocusUcenec(vp_diff) {
 
 }
 
+function lf_nextPrevFocusRazred(shift) {
+
+    lf_changeFocusRazred(lf_changeValueFocusRazred(shift ? -1 : 1), true);
+
+}
+
 function lf_changeValueFocusRazred(vp_diff) {
 
     let newValue;
 
-    newValue = lo_focusRazred - vp_diff;
+    newValue = lo_focusRazred + vp_diff;
 
     let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
     if (newValue < 0) { newValue = nrItems };
@@ -5637,9 +5688,11 @@ function lf_changeShowGUI(vp_newValue, vp_paint) {
     lo_showGUI = vp_newValue;
     
     buttonMode.visible = lo_showGUI; buttonMode.enabled = lo_showGUI;
+    buttonLetnik.visible = lo_showGUI; buttonLetnik.enabled = lo_showGUI;
+    buttonRazred.visible = lo_showGUI; buttonRazred.enabled = lo_showGUI;
     buttonPredmet.visible = lo_showGUI; buttonPredmet.enabled = lo_showGUI;
     buttonTest.visible = lo_showGUI; buttonTest.enabled = lo_showGUI;
-    buttonRazred.visible = lo_showGUI; buttonRazred.enabled = lo_showGUI;
+    buttonUcenec.visible = lo_showGUI; buttonUcenec.enabled = lo_showGUI;
     buttonSPData.visible = lo_showGUI; buttonSPData.enabled = lo_showGUI;
     buttonKritLuknje.visible = lo_showGUI; buttonKritLuknje.enabled = lo_showGUI;
     buttonLoad.visible = lo_showGUI; buttonLoad.enabled = lo_showGUI;
@@ -5730,14 +5783,17 @@ function lf_setMode(vp_mode, vp_paint) {
         case cv_mode_test:
             data_prepareStructures_byTest();
             showAndEnableControls_modeTest();
+            break;
         case cv_mode_ucenec:
             data_prepareStructures_byUcenec();
             lo_allPredmet = true; // 1.2.2025
             showAndEnableControls_modeUcenec();
+            break;
         case cv_mode_razred:
             data_prepareStructures_byRazred();
             lo_allPredmet = true; // 1.2.2025
             showAndEnableControls_modeRazred();
+            break;
     };
 
     lo_GUIlayoutHasChanged = true;
@@ -5747,25 +5803,25 @@ function lf_setMode(vp_mode, vp_paint) {
 
 function hideAllControls() {
 
-    [buttonMode, buttonRazred, buttonTest, buttonPredmet, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
+    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonUcenec, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
 
 }
 
 function showAndEnableControls_modeTest() {
 
-    [buttonMode, buttonRazred, buttonTest, buttonPredmet, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    [buttonMode, buttonLetnik, buttonPredmet, buttonTest, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
 
 }
 
 function showAndEnableControls_modeUcenec() {
 
-    [buttonMode, buttonRazred, buttonPredmet, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    [buttonMode, buttonRazred, buttonPredmet, buttonUcenec, buttonLoad, buttonHelp].forEach(showAndEnableControl);
 
 }
 
 function showAndEnableControls_modeRazred() {
 
-    [buttonMode, buttonRazred, buttonPredmet, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonLoad, buttonHelp].forEach(showAndEnableControl);
 
 }
 
