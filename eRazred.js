@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.25"
-const gl_versionDate = "21.2.2025"
+const gl_versionNr = "v1.26"
+const gl_versionDate = "25.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -533,6 +533,7 @@ function gLik(x0, y0, dx, dy, fillColor, strokeWidth, strokeColor, strokeDash) {
     }
 }
 
+// https://www.w3schools.com/jsref/canvas_font.asp
 function gText(text, font, color, x, y) {
     ctx.font = font
     ctx.fillStyle = color
@@ -553,7 +554,7 @@ function gMeasureText(text, font) {
     // fontHeight is the bounding box height regardless of the string being rendered. actualHeight is specific to the string being rendered.    
     //----------------------------------------
     
-    ctx.font = font
+    ctx.font = font;
     let msrText = ctx.measureText(text);
     //if (text == gl_versionDate) { console.log("msrText.width=" + msrText.width) }
     return [msrText.width, msrText.actualBoundingBoxAscent]; // The distance from the horizontal line indicated by the textBaseline attribute to the top of the bounding rectangle of the given text, in CSS pixels; positive numbers indicating a distance going up from the given baseline.
@@ -1869,7 +1870,7 @@ class button {
         let x0 = this.left + this.gapLeft; let x1 = this.left + this.width - this.gapRight;
         switch (this.hAlign) {
             case "left": x = x0; break;
-            case "top": x = x1 - tmpW; break;
+            case "right": x = x1 - tmpW; break;
             case "middle": x = x0 + (x1 - x0) / 2 - tmpW / 2; break;
         }
         let y0 = this.top + this.gapTop; let y1 = this.top + this.height - this.gapBottom;
@@ -1905,6 +1906,73 @@ class button {
         if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) 
              { return true; }
         else { return false; }
+    }
+}
+
+class httpLink { // 24.2.2025
+    constructor(left, top, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, hAlign, vAlign, enabled, disabledTextColor, visible, toolTipText, keyStroke) {
+        this.left = left; this.top = top;
+        this.text = text; this.font = font; this.textColor = textColor; this.focusedTextColor = focusedTextColor;
+        this.dimSet = false;
+        this.lineWidth = lineWidth; this.lineColor = lineColor; this.focusedLineColor = focusedLineColor;
+        this.hAlign = hAlign; this.vAlign = vAlign;
+        this.enabled = enabled; this.disabledTextColor = disabledTextColor;
+        this.visible = visible;
+        this.toolTipText = toolTipText;
+        this.keyStroke = keyStroke;
+    }
+    paint() {
+        if (!this.visible) { return };
+        //---- pravokotnik
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        let lineColor = focused ? this.focusedLineColor : this.lineColor;
+        //---- text
+        let tmpW, tmpH, x, y;
+        if (!this.dimSet) {
+            ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+            this.width = tmpW;
+            this.height = tmpH;
+            this.dimSet = true;
+        }
+        let x0 = this.left; let x1 = this.left + this.width;
+        switch (this.hAlign) {
+            case "left": x = x0; break;
+            case "right": x = x1 - this.width; break;
+            case "middle": x = x0 + (x1 - x0) / 2 - this.width / 2; break;
+        }
+        let y0 = this.top ; let y1 = this.top + this.height;
+        switch (this.vAlign) {
+            case "top": y = y0 + this.height; break;
+            case "bottom": y = y1; break;
+            case "middle": y = y1 - (y1 - y0) / 2 + this.height / 2; break;
+        }
+        let textColor = this.disabledTextColor;
+        if (this.enabled) { textColor = focused ? this.focusedTextColor : this.textColor; }
+        gText(this.text, this.font, textColor, x, y);
+        gLine(x, y + 2, x + this.width, y + 2, 1, textColor, []);
+    }
+    showToolTip() { // 10.1.2025
+        //---- toolTip
+        if (!this.visible || !this.enabled) { return };
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            if (this.keyStroke != "") {
+                gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
+            }
+        }      
+    } 
+    eventClick(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        const dWidth = 2;
+        let x0 = this.left - dWidth;
+        let x1 = this.left + this.width + dWidth;
+        let y0 = this.top - dWidth;
+        let y1 = this.top + this.height + dWidth + 2; // +2 zaradi črte za podčrtavanje
+        if (mouseInsideRect(mouseX, mouseY, x0, y0, x1, y1)) { return true; } else { return false; };
     }
 }
 
@@ -2412,6 +2480,7 @@ switch (lo_GUI_layout) {
         var buttonKritLuknje = new button(gpLeft, gpTop + 10, wBtn, hBtn, "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
         var buttonLoad = new button(gpLeft, gpTop + 10, wBtn, hBtn, "D", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "powderBlue", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Nalo" + scZhLow + "i skopirane podatke razredov in ocen iz clipboard-a ...", "D");
         var buttonHelp = new button(gpLeft, gpTop + 10, wBtn, hBtn, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
+        var buttonPDF = new httpLink(gpLeft, gpTop + 10, "PDF navodila", "italic 10pt verdana", "darkSlateGray", "blue", 1, "gray", "blue", "middle", "middle", true, disabledControlTextColor, true, "Prika" + scZhLow + "i PDF uporabni" + scSchLow + "ka navodila", "");
     }
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
@@ -2917,6 +2986,16 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
     
+    //---- prikaz lukenj med kriteriji ocen 27.1.2025
+    if (!vl_end && lo_showHelpTips) {
+        if (buttonPDF.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            // SPAWN NEW BROWSER WINDO WITH LINK TO PDF DOCUMENT
+            window.open("eRazred-userManual.pdf")
+            vl_end = true;
+        }
+    }
+    
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 
 });
@@ -3008,6 +3087,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonLoad.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonPDF.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else { document.body.style.cursor = "default" };
     } else { document.body.style.cursor = "default" };
     
@@ -5275,9 +5355,55 @@ function paint_GUI() {
 
     let x, y;
 
+    //---- 1. on-screen namigi/pomoč
+    if (lo_showHelpTips) { paint_tips(); paint_tips_PDF(); }
+    else { paint_tips_noPDF(); }; // 24.2.2025
+
+    //---- 2. toolBar
+    if (!lo_showGUI) { return };
+
+    if (lo_showDynamicToolbar) { 
+        //console.log("painting ...")
+        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        //console.log("    painted-buttons")
+        y = buttonMode.top;
+        switch (gl_mode) {
+            case cv_mode_test:
+                //console.log("    painting-rt")
+                x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
+                break;
+            case cv_mode_ucenec: case cv_mode_razred:
+                //console.log("    painting-u")
+                x = buttonUcenec.left + buttonUcenec.width + 4.5;
+                gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+                break;
+        }
+        x = buttonLoad.left + buttonLoad.width + 4.5;
+        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+    }
+    // ---- PRIKAZ TOOLTIP-sov za gumbe v toolBar-u
+    if (lo_showToolTips) { //1.4.2024
+        if (lo_enabledHelp) { // 27.1.2025
+            // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
+            buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+        };
+    };
+
+    if (dbg) {
+        vStep = 15;
+        x = 4; y = 15;
+        //if (lo_modeCalculate == cv_modeCalculate_byF) { gText("lo_modeCalculate = -byF-", "10pt verdana", "black", x, y) } else { gText("lo_modeCalculate = -byLensSize-", "10pt verdana", "black", x, y) };
+    }
+}
+
+function paint_GUI_old() {
+
+    let x, y;
+
     if (!lo_showGUI) {
         //---- on-screen namigi/pomoč
-        if (lo_showHelpTips) { paint_tips() };
+        if (lo_showHelpTips) { paint_tips(); paint_tips_PDF(); } else { paint_tips_noPDF(); }; // 24.2.2025
         //return
     };
 
@@ -5313,13 +5439,28 @@ function paint_GUI() {
     };
 
     //---- on-screen namigi/pomoč
-    if (lo_showHelpTips) { paint_tips() };
+    if (lo_showGUI && lo_showHelpTips) { paint_tips(); paint_tips_PDF(); } else { paint_tips_noPDF(); }; // 24.2.2025
 
     if (dbg) {
         vStep = 15;
         x = 4; y = 15;
         //if (lo_modeCalculate == cv_modeCalculate_byF) { gText("lo_modeCalculate = -byF-", "10pt verdana", "black", x, y) } else { gText("lo_modeCalculate = -byLensSize-", "10pt verdana", "black", x, y) };
     }
+}
+
+function paint_tips_PDF() {
+
+    buttonPDF.visible = true; buttonPDF.enabled = true;
+    buttonPDF.left = 470; buttonPDF.top = 45;
+    buttonPDF.paint();
+    buttonPDF.showToolTip();
+
+}
+
+function paint_tips_noPDF() {
+
+    buttonPDF.visible = false; buttonPDF.enabled = false;
+
 }
 
 function paint_tips() {
@@ -5371,7 +5512,7 @@ function paint_tips() {
             gBannerRectWithText2("... naslednji/prej" + scSchLow + "nji pisni test pri istem predmetu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("...+SHIFT", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... vklop smeri nazaj pri L/R/P/U/T", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);              
+            gBannerRectWithText2("... vklop smeri nazaj pri L/R/P/U/T", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             y += vStep;
             gBannerRectWithText2("S", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("(+", x0 + 25, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
@@ -5390,12 +5531,12 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("F", x0, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("/", x0 + 19, y + 1, font3, 0, 0, 0, 0, "", 0, "", lo_tipsColor, "", 0, 0);
-            gBannerRectWithText2("Esc", x0 + 33, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);            
+            gBannerRectWithText2("Esc", x0 + 33, y, font, 3, 3, 1, 1, "seaShell", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... vklju" + scTchLow + "i/izklju" + scTchLow + "i fokus na graf ocen razreda / u" + scTchLow + "enca", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             //
             y += vStep;
             gBannerRectWithText2("kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
-            gBannerRectWithText2("... izbira grafa ocen razreda ali u" + scTchLow + "enca za prikaz v fokusu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);            
+            gBannerRectWithText2("... izbira grafa ocen razreda ali u" + scTchLow + "enca za prikaz v fokusu", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
             
             //
             y += (vStep + vStepSep) / 2;
@@ -5422,7 +5563,7 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-                      
+                
     }
 }
 
@@ -5744,9 +5885,17 @@ function lf_changeShowGUI(vp_newValue, vp_paint) {
     if (lo_showGUI) {
         switch (gl_mode) {
             case cv_mode_test:
+                buttonRazred.visible = false; buttonRazred.enabled = false;
+                buttonUcenec.visible = false; buttonUcenec.enabled = false;
                 break;
-            case cv_mode_ucenec: case cv_mode_razred:
+            case cv_mode_ucenec:
                 buttonTest.visible = false; buttonTest.enabled = false;
+                buttonSPData.visible = false; buttonSPData.enabled = false;
+                buttonKritLuknje.visible = false; buttonKritLuknje.enabled = false;
+                break;
+            case cv_mode_razred:
+                buttonTest.visible = false; buttonTest.enabled = false;
+                buttonUcenec.visible = false; buttonUcenec.enabled = false;
                 buttonSPData.visible = false; buttonSPData.enabled = false;
                 buttonKritLuknje.visible = false; buttonKritLuknje.enabled = false;
                 break;
