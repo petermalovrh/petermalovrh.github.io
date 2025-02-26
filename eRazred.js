@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.26"
-const gl_versionDate = "25.2.2025"
+const gl_versionNr = "v1.27"
+const gl_versionDate = "26.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -535,9 +535,66 @@ function gLik(x0, y0, dx, dy, fillColor, strokeWidth, strokeColor, strokeDash) {
 
 // https://www.w3schools.com/jsref/canvas_font.asp
 function gText(text, font, color, x, y) {
-    ctx.font = font
-    ctx.fillStyle = color
-    ctx.fillText(text, x, y)
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+}
+
+// https://www.w3schools.com/jsref/canvas_font.asp
+function gTextSO(text, font, color, colorMiddle, colorOut, distMiddle, distOut, x, y) {
+    // 26.2.2025 text, osenčen z zunanjim in notranjim slojem v izbranih barvah in na različnih razdaljah
+    ctx.font = font;
+    ctx.fillStyle = colorOut;
+    ctx.fillText(text, x + distOut, y + distOut);
+    ctx.fillStyle = colorMiddle;
+    ctx.fillText(text, x + distMiddle, y + distMiddle);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+}
+
+// https://www.w3schools.com/jsref/canvas_font.asp
+function gText2(text, font, color, color2, borderWidth, innerMarginX, innerMarginY, x, y) {
+
+    let w, h;
+
+    ctx.font = font;
+    ctx.fillStyle = color2;
+
+    // ---- praznenje notranjosti pravokotnika izpisa, a z 10% roba na vsaki stranici
+    if (text.length > 1 && (innerMarginX > 0 || innerMarginY > 0)) {
+        ;[w, h] = gMeasureText(text, font);
+        ctx.fillRect(x + innerMarginX, y - h + innerMarginY, w - 2 * innerMarginX, h - 2 * innerMarginY);
+    }
+
+    // ---- spraznjeno področje v pravokotniku en pixel okoli teksta
+    ctx.fillText(text, x - 1, y - 1);
+    ctx.fillText(text, x, y - 1);
+    ctx.fillText(text, x + 1, y - 1);
+    ctx.fillText(text, x + 1, y);
+    ctx.fillText(text, x + 1, y + 1);
+    ctx.fillText(text, x , y + 1);
+    ctx.fillText(text, x - 1, y + 1);
+    ctx.fillText(text, x - 1, y);
+
+    if (borderWidth == 2) {
+        // ---- spraznjeno področje v pravokotniku 2 pixla okoli teksta (vogalov ne praznim)
+        ctx.fillText(text, x - 1, y - 2);
+        ctx.fillText(text, x, y - 2);
+        ctx.fillText(text, x + 1, y - 2);
+        ctx.fillText(text, x + 2, y - 1);
+        ctx.fillText(text, x + 2, y);
+        ctx.fillText(text, x + 2, y + 1);
+        ctx.fillText(text, x + 1, y + 2);
+        ctx.fillText(text, x , y + 2);
+        ctx.fillText(text, x - 1, y + 2);
+        ctx.fillText(text, x - 2, y + 1);
+        ctx.fillText(text, x - 2, y);
+        ctx.fillText(text, x - 2, y - 1);
+    };
+
+    // ---- še sm tekst v svoji pravi barvi
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
 }
 
 function gMeasureText(text, font) {
@@ -3965,8 +4022,8 @@ function paint_eRazred_grafTest() {
     let nrItems = lo_nrRazredov;
     if (lo_byRazredGen) { nrItems = lo_nrRazredGen }; // 25.1.2025
     let chartWidth = (ctxW - 2 * chartMargin - (nrItems - 1) * chartGapX) / nrItems;
-    let x0 = 20; let y0;
-    let tmpText, w, h, colorId;
+    let x0 = 20;
+    let tmpText, w, h, colorId, x, y, y0;
     let titleFont = "bold 18pt verdana";
 
     // ---- Common title panel
@@ -3984,7 +4041,10 @@ function paint_eRazred_grafTest() {
         tmpText = predmetIme[lo_predmet] + " - " + lo_pisniTestNr.toString() + ". pisni test";
         ;[w, h] = gMeasureText(tmpText, titleFont);
         gBannerRect(titlePanelLeft, yTitleTop, titlePanelLeft + titlePanelWidth, 34, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
-        gText(tmpText, titleFont, "darkSlateGray", titlePanelLeft + titlePanelWidth / 2 - w / 2, yTitleTop + h + 7);
+        x = titlePanelLeft + titlePanelWidth / 2 - w / 2;
+        y = yTitleTop + h + 7;
+        gTextSO(tmpText, titleFont, "darkSlateGray", "powderBlue", "darkGray", 2, 3, x, y);
+        //gText2(tmpText, titleFont, "darkSlateGray", "white", 2, 0, 0, titlePanelLeft + titlePanelWidth / 2 - w / 2, yTitleTop + h + 7);
     }
     
     y0 = yTitleTop + titlePanelHeight + 18;
@@ -5012,15 +5072,15 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
     }
 
     // ======== TOOL TIP VERTICAL LINE ======== 14.2.2025
-    let date0int;
+    let date0int, xFocus;
     if (vp_focus && lo_tipDatumMs > 0) {
         date0 = new Date(lo_tipDatumMs);
         dan = date0.getDate();
         mesec = date0.getMonth();
         leto = date0.getFullYear();
         date0int = new Date(leto, mesec, dan, 12, 0, 0, 0); // isti dan ne glede na to, ali si z miško bolj v dopoldnevu ali popoldnevu
-        x = xLeftData + kx * (Date.parse(date0int) - ucenciPrvaOcenaDatum);
-        gLine(x, yTopData, x, yXos + 4, 1, "gray", [3, 4]);
+        xFocus = xLeftData + kx * (Date.parse(date0int) - ucenciPrvaOcenaDatum);
+        gLine(xFocus, yTopData, xFocus, yXos + 4, 1, "gray", [3, 4]);
     }
 
     // ---- OCENE - KRIVULJA POVPREČJA ... rišem jo spodaj, da so potem markerji ocen lepo čez njo in ne obratno popackano
@@ -5048,11 +5108,20 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
             //if (vp_razredUcenecId == lo_focusUcenec) { tmpLineWidth = 5 };
             if (vp_focus) { tmpLineWidth = 5 };
             gLine(x0, y0, x, yAvg, tmpLineWidth, tmpColor, [4, 4]);
+            //
+            if (vp_focus) {
+                ctx.setLineDash([]);
+                gEllipse(x0, y0, 4, 4, 0, "white", 2, "darkGray");
+            }
         }             
         x0 = x;
         y0 = yAvg;
     };
     // ---- označitev končnega povprečja
+    if (vp_focus) { 
+        ctx.setLineDash([]);
+        gEllipse(x, yAvg, 4, 4, 0, "white", 2, "darkGray");
+    }
     tmpText = "avg:";
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
     x += 10;
@@ -5181,7 +5250,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         let bHeight = datumLineHeight;
         let dataLineHeight = 26;
         if (focusNrOcen > 0) {
-            bHeight += focusNrOcen * dataLineHeight
+            bHeight += (focusNrOcen + 1) * dataLineHeight;
         };
         // ---- če na desni gre ven iz okna, je treba izpisovati malo bolj levo        
         if (bLeft + bWidth + 8 > ctxW) { bLeft = ctxW - bWidth - 8; }
@@ -5203,7 +5272,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
             x = posTabOcena;
             tmpText = focusOceneOcenaCifra[i];
             ;[w, h] = gMeasureText(tmpText, fOcena);
-            gBannerRoundRectWithText3(x, y-h, w, h, fOcena, "white", tmpText, 5, 3, 4, 6, colorOcena[focusOceneOcenaNr[i]], 1, "lightGray", "darkGray", 2, 2, false);
+            gBannerRoundRectWithText3(x, y - h, w, h, fOcena, "white", tmpText, 5, 3, 4, 6, colorOcena[focusOceneOcenaNr[i]], 1, "lightGray", "darkGray", 2, 2, false);
             // ---- TIP OCENE
             x = posTabTip;
             gText(focusOceneTip[i], fPredmet, "darkSlateGray", x, y);
@@ -5216,8 +5285,24 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
             // ---- PREDMET
             gText(focusPredmetIme[i], fPredmet, colorPredmet[focusPredmetId[i]], x, y);
             // ----
-            y += dataLineHeight / 2;
+            y += dataLineHeight;
         }
+        // ---- AVG na koncu ocen za ta dan 26.2.2025
+        if (focusNrOcen > 0) {
+            tmpColor = "darkGray";
+            if (valueBetween(rollAvg, 1.5, 1.65)) { tmpColor = "darkRed"; }
+            else if (rollAvg < 1.5) { tmpColor = "red"; };
+            tmpLineWidth = 3;
+            if (vp_focus) { tmpLineWidth = 4 };
+            let wAvgLine = 50; const dyAvg = 6; x = bLeft + 4;
+            if (bWidth < 140) { wAvgLine = 35 };
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth + 8, "firebrick", []);
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth + 5, "white", []);
+            gLine(x, y - dyAvg, x + wAvgLine, y - dyAvg, tmpLineWidth, "darkSlateGray", []);
+            gText("avg: " + focusAvg.toFixed(2), "bold 11pt verdana", "darkSlateGray", x + wAvgLine + 6, y - 2);
+            yAvg = yXos - ky * (focusAvg - 0.5);
+            gEllipse(xFocus, yAvg, 5, 5, 0, "white", 3, "gray");
+        };        
     } 
 }
 
@@ -7676,9 +7761,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
         y = 60;
         if (x > (ctxW - 160)) { x = ctxW - 160; }
     };
-    gText(tmpText, fontTitle, "darkGray", x + 3, y + 3);
-    gText(tmpText, fontTitle, "powderBlue", x + 2, y + 2);
-    gText(tmpText, fontTitle, "darkSlateGray", x, y);
+    gTextSO(tmpText, fontTitle, "darkSlateGray", "powderBlue", "darkGray", 2, 3, x, y);
 
 };
 
