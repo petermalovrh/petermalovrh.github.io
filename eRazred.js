@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.27"
-const gl_versionDate = "26.2.2025"
+const gl_versionNr = "v1.28"
+const gl_versionDate = "28.2.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -3406,8 +3406,8 @@ window.addEventListener("keydown", (event) => {
         case 'KeyM':
             //lo_keyDownM = true; break;
             //console.log("M pressed");
-            if (event.shiftKey) { lf_changeMode(gl_mode + 1, true); }
-            else { lf_changeMode(gl_mode - 1, true); }
+            if (event.shiftKey) { lf_changeMode(gl_mode - 1, true); }
+            else { lf_changeMode(gl_mode + 1, true); }
             break;
         case 'KeyL':
             //console.log("L pressed");
@@ -4494,46 +4494,11 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
             if (!lo_allPredmet) { items = razredGenPredmetNrOcen[vp_razredId][lo_predmet]; };
             break;
     }
-    for (i = 1; i <= items; i++) {
-        switch (lo_byRazredGen) {
-            case false:
-                if (lo_allPredmet) { 
-                    ocenaId = razredOcenaId[vp_razredId][i];
-                    rollAvg = razredRollAvg[vp_razredId][i]; // 1.2.2025
-                } else {
-                    ocenaId = razredPredmetOcenaId[vp_razredId][lo_predmet][i];
-                    rollAvg = razredPredmetRollAvg[vp_razredId][lo_predmet][i]; // 1.2.2025
-                }      
-                break;
-            case true:
-                if (lo_allPredmet) { 
-                    ocenaId = razredGenOcenaId[vp_razredId][i];
-                    rollAvg = razredGenRollAvg[vp_razredId][i]; // 1.2.2025
-                } else {
-                    ocenaId = razredGenPredmetOcenaId[vp_razredId][lo_predmet][i];
-                    rollAvg = razredGenPredmetRollAvg[vp_razredId][lo_predmet][i]; // 1.2.2025
-                }
-                break;
-        }        
-        datumOceneMs = ocenaDatumMs[ocenaId];
-        x = xLeftData + kx * (datumOceneMs - ucenciPrvaOcenaDatum);
-        // ---- podaljšek krivulje tekočega povprečja do tega datuma in tekočega povprečja
-        yAvg = yXos - ky * (rollAvg - 0.5);
-        if (i > 1) {
-            tmpColor = "darkGray";
-            if (valueBetween(rollAvg, 1.5, 1.65)) { tmpColor = "darkRed"; }
-            else if (rollAvg < 1.5) { tmpColor = "red"; };
-            tmpLineWidth = 3;
-            //if (vp_razredId == lo_focusRazred) { tmpLineWidth = 5 };
-            if (vp_focus) { tmpLineWidth = 4 };
-            gLine(x0, y0, x, yAvg, tmpLineWidth + 8, "firebrick", []);
-            gLine(x0, y0, x, yAvg, tmpLineWidth + 5, "white", []);
-            //gLine(x0, y0, x, yAvg, tmpLineWidth, tmpColor, [4, 4]);
-            gLine(x0, y0, x, yAvg, tmpLineWidth, "darkSlateGray", []);
-        }             
-        x0 = x;
-        y0 = yAvg;
-    };
+    tmpLineWidth = 3; if (vp_focus) { tmpLineWidth = 4 };
+    ;[x, rollAvg, yAvg] = paint_eRazred_grafRazred_drawSingleRazred_avgLine(vp_razredId, items, yXos, xLeftData, kx, ky, "firebrick", tmpLineWidth + 8);
+    ;[x, rollAvg, yAvg] = paint_eRazred_grafRazred_drawSingleRazred_avgLine(vp_razredId, items, yXos, xLeftData, kx, ky, "white", tmpLineWidth + 5);
+    ;[x, rollAvg, yAvg] = paint_eRazred_grafRazred_drawSingleRazred_avgLine(vp_razredId, items, yXos, xLeftData, kx, ky, "darkSlateGray", tmpLineWidth);
+
     // ---- označitev končnega povprečja
     tmpText = "avg:";
     ;[w, h] = gMeasureText(tmpText, fontSmall);   
@@ -4811,6 +4776,51 @@ function paint_eRazred_grafRazred_drawSingleRazred(vp_razredId, vp_focus, chartL
     } 
 }
 
+function paint_eRazred_grafRazred_drawSingleRazred_avgLine(vp_razredId, vp_items, vp_yXos, vp_xLeftData, vp_kx, vp_ky, vp_color, vp_lineWidth) {
+
+    let i, ocenaId, rollAvg, datumOceneMs, x, yAvg, x0, y0;
+    for (i = 1; i <= vp_items; i++) {
+        switch (lo_byRazredGen) {
+            case false:
+                if (lo_allPredmet) { 
+                    ocenaId = razredOcenaId[vp_razredId][i];
+                    rollAvg = razredRollAvg[vp_razredId][i]; // 1.2.2025
+                } else {
+                    ocenaId = razredPredmetOcenaId[vp_razredId][lo_predmet][i];
+                    rollAvg = razredPredmetRollAvg[vp_razredId][lo_predmet][i]; // 1.2.2025
+                }      
+                break;
+            case true:
+                if (lo_allPredmet) { 
+                    ocenaId = razredGenOcenaId[vp_razredId][i];
+                    rollAvg = razredGenRollAvg[vp_razredId][i]; // 1.2.2025
+                } else {
+                    ocenaId = razredGenPredmetOcenaId[vp_razredId][lo_predmet][i];
+                    rollAvg = razredGenPredmetRollAvg[vp_razredId][lo_predmet][i]; // 1.2.2025
+                }
+                break;
+        }        
+        datumOceneMs = ocenaDatumMs[ocenaId];
+        x = vp_xLeftData + vp_kx * (datumOceneMs - ucenciPrvaOcenaDatum);
+        // ---- podaljšek krivulje tekočega povprečja do tega datuma in tekočega povprečja
+        yAvg = vp_yXos - vp_ky * (rollAvg - 0.5);
+        if (i > 1) {
+            gLine(x0, y0, x, yAvg, vp_lineWidth, vp_color, []);
+            gEllipse(x0, y0, (vp_lineWidth - 1) / 2, (vp_lineWidth - 1) / 2, 0, vp_color, 0, "");
+            //gLine(x0, y0, x, yAvg, vp_lineWidth, "firebrick", []);
+            //gEllipse(x0, y0, (vp_lineWidth - 1) / 2, (vp_lineWidth - 1) / 2, 0, "firebrick", 0, "");
+            //gLine(x0, y0, x, yAvg, vp_lineWidth - 3, "white", []);
+            //gEllipse(x0, y0, (vp_lineWidth - 4) / 2, (vp_lineWidth - 4) / 2, 0, "white", 0, "");
+            //gLine(x0, y0, x, yAvg, vp_lineWidth - 8, "darkSlateGray", []);
+            //gEllipse(x0, y0, (vp_lineWidth - 8) / 2, (vp_lineWidth - 8) / 2, 0, "darkSlateGray", 0, "");
+        }             
+        x0 = x;
+        y0 = yAvg;
+    };
+
+    return [x, rollAvg, yAvg];
+
+}
 function paint_eRazred_grafUcenec() {
      
     if (!lo_dataPrepared) { return; };
