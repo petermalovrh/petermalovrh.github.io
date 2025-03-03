@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.28"
-const gl_versionDate = "28.2.2025"
+const gl_versionNr = "v1.29"
+const gl_versionDate = "3.3.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2861,11 +2861,28 @@ elMyCanvas.addEventListener('click', (e) => {
     //console.log("click(): dragMonthEndActive=" + lo_dragMonthEndActive)
     let rslt = 0; let boolRslt = false; let rslt2 = [0, 0];
     let vl_end = false;
-
-    if (lo_showHelpTips && lo_initHelpTips) { lf_changeShowHelpTips(false, true); }; // 3.1.2025
+        
+    //---- prikaz PDF navodil
+    //if (!vl_end && lo_showHelpTips) {
+        if (!vl_end && buttonPDF.visible && buttonPDF.enabled && lo_showHelpTips) {
+            if (buttonPDF.eventClick(e.offsetX, e.offsetY)) {
+                //console.log("click(): rslt=" + rslt.toString())
+                // SPAWN NEW BROWSER WINDO WITH LINK TO PDF DOCUMENT
+                window.open("eRazred-userManual.pdf")
+                vl_end = true;
+            }
+    }
+    
+    //---- so HelpTips-i trenutno že prikazabi?
+    //if (lo_showHelpTips && lo_initHelpTips) { lf_changeShowHelpTips(false, true); }; // 3.1.2025
+    if (!vl_end && lo_showHelpTips) { // 3.3.2025
+        lf_changeShowHelpTips(false, true);
+        vl_end = true;
+    };
 
     //---- prikaži pomoč 10.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledHelp) {
+    //if (!vl_end && lo_showGUI && lo_enabledHelp) {
+    if (!vl_end && buttonHelp.visible && buttonHelp.enabled) {
         if (buttonHelp.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lf_changeShowHelpTips(!lo_showHelpTips, true);
@@ -2874,7 +2891,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
 
     //---- preklop mode 2.2.2025
-    if (!vl_end && lo_showGUI && lo_enabledMode) {
+    //if (!vl_end && lo_showGUI && lo_enabledMode) {
+    if (!vl_end && buttonMode.visible && buttonMode.enabled) {
         if (buttonMode.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lo_focusUcenec = 0; // 4.2.2025
@@ -2888,7 +2906,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
 
     //---- ločen/skupen pregled po razredih (mode_test, mode razred) 20.2.2025
-    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    //if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    if (!vl_end && buttonLetnik.visible && buttonLetnik.enabled) {
         if (buttonLetnik.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
@@ -2907,7 +2926,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
 
     //---- ločen/skupen pregled po razredih (mode_razredTest) oziroma preklop na naslednji razred (mode_učenec) 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    //if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    if (!vl_end && buttonRazred.visible && buttonRazred.enabled) {
         if (buttonRazred.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
@@ -2924,7 +2944,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
     
     //---- preklop na naslednji predmet 28.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledPredmet) {
+    //if (!vl_end && lo_showGUI && lo_enabledPredmet) {
+    if (!vl_end && buttonPredmet.visible && buttonPredmet.enabled) {
         if (buttonPredmet.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             if (e.shiftKey) { // 26.1.2025
@@ -2946,7 +2967,8 @@ elMyCanvas.addEventListener('click', (e) => {
     };
 
     //---- analiza naslednjega testa 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledTest) {
+    //if (!vl_end && lo_showGUI && lo_enabledTest) {
+    if (!vl_end && buttonTest.visible && buttonTest.enabled) {
         if (buttonTest.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             if (e.shiftKey) { // 26.1.2025
@@ -2968,7 +2990,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
 
     //---- ločen/skupen pregled po razredih (mode_razredTest) oziroma preklop na naslednji razred (mode_učenec) 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    //if (!vl_end && lo_showGUI && lo_enabledRazred) {
+    if (!vl_end && buttonUcenec.visible && buttonUcenec.enabled) {
         if (buttonUcenec.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
@@ -2981,7 +3004,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
     
     //---- Zoom scatter plot charta za analizo podatkov testa 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledSPData) {
+    //if (!vl_end && lo_showGUI && lo_enabledSPData) {
+    if (!vl_end && buttonSPData.visible && buttonSPData.enabled) {
         if (buttonSPData.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             if (e.shiftKey) {
@@ -2994,7 +3018,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
     
     //---- prikaz lukenj med kriteriji ocen 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledKritLuknje) {
+    //if (!vl_end && lo_showGUI && lo_enabledKritLuknje) {
+    if (!vl_end && buttonKritLuknje.visible && buttonKritLuknje.enabled) {
         if (buttonKritLuknje.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
@@ -3003,7 +3028,8 @@ elMyCanvas.addEventListener('click', (e) => {
     }
 
     //---- naloži podatke razredov in ocen iz clipboard-a 27.1.2025
-    if (!vl_end && lo_showGUI && lo_enabledLoad) {
+    //if (!vl_end && lo_showGUI && lo_enabledLoad) {
+    if (!vl_end && buttonLoad.visible && buttonLoad.enabled) {
         if (buttonLoad.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lo_focusUcenec = 0; // 4.2.2025
@@ -3039,16 +3065,6 @@ elMyCanvas.addEventListener('click', (e) => {
         } else {
             //---- v mode_razred je pri prikazu grafa fokusiranega razreda kliknil kamorkoli. V tem primeru naj se ne prikazuje več fokusiranega razreda, kot nek ESC 11.2.2025
             lf_changeFocusRazred(0, true);
-            vl_end = true;
-        }
-    }
-    
-    //---- prikaz lukenj med kriteriji ocen 27.1.2025
-    if (!vl_end && lo_showHelpTips) {
-        if (buttonPDF.eventClick(e.offsetX, e.offsetY)) {
-            //console.log("click(): rslt=" + rslt.toString())
-            // SPAWN NEW BROWSER WINDO WITH LINK TO PDF DOCUMENT
-            window.open("eRazred-userManual.pdf")
             vl_end = true;
         }
     }
@@ -3485,7 +3501,7 @@ window.addEventListener("keydown", (event) => {
             break;
         case 'KeyB':
             //console.log("F7 pressed");
-            if (lo_P == 27) {
+            if (lo_focusRazred == 2) {
                 lf_changeDebug(!dbg, true);
             }
             break;
@@ -5455,7 +5471,7 @@ function paint_GUI() {
     else { paint_tips_noPDF(); }; // 24.2.2025
 
     //---- 2. toolBar
-    if (!lo_showGUI) { return };
+    //if (!lo_showGUI) { return };
 
     if (lo_showDynamicToolbar) { 
         //console.log("painting ...")
@@ -5479,62 +5495,11 @@ function paint_GUI() {
     }
     // ---- PRIKAZ TOOLTIP-sov za gumbe v toolBar-u
     if (lo_showToolTips) { //1.4.2024
-        if (lo_enabledHelp) { // 27.1.2025
-            // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
-            buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
-        };
+        //if (lo_enabledHelp) { // 27.1.2025
+        // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
+        buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+        //};
     };
-
-    if (dbg) {
-        vStep = 15;
-        x = 4; y = 15;
-        //if (lo_modeCalculate == cv_modeCalculate_byF) { gText("lo_modeCalculate = -byF-", "10pt verdana", "black", x, y) } else { gText("lo_modeCalculate = -byLensSize-", "10pt verdana", "black", x, y) };
-    }
-}
-
-function paint_GUI_old() {
-
-    let x, y;
-
-    if (!lo_showGUI) {
-        //---- on-screen namigi/pomoč
-        if (lo_showHelpTips) { paint_tips(); paint_tips_PDF(); } else { paint_tips_noPDF(); }; // 24.2.2025
-        //return
-    };
-
-    if (lo_showGUI && lo_showDynamicToolbar) { 
-        //console.log("painting ...")
-        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
-        //console.log("    painted-buttons")
-        y = buttonMode.top;
-        switch (gl_mode) {
-            case cv_mode_test:
-                //console.log("    painting-rt")
-                x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-                gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
-                break;
-            case cv_mode_ucenec: case cv_mode_razred:
-                //console.log("    painting-u")
-                x = buttonUcenec.left + buttonUcenec.width + 4.5;
-                gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
-                break;
-        }
-        x = buttonLoad.left + buttonLoad.width + 4.5;
-        gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
-    }
-
-    // ---- PRIKAZ TOOLTIP-sov
-    if (lo_showToolTips) { //1.4.2024
-        if (lo_showGUI) {
-            if (lo_enabledHelp) { // 27.1.2025
-                // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
-                buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
-            };
-        };
-    };
-
-    //---- on-screen namigi/pomoč
-    if (lo_showGUI && lo_showHelpTips) { paint_tips(); paint_tips_PDF(); } else { paint_tips_noPDF(); }; // 24.2.2025
 
     if (dbg) {
         vStep = 15;
@@ -5964,6 +5929,15 @@ function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 function lf_changeShowGUI(vp_newValue, vp_paint) {
 
     lo_showGUI = vp_newValue;
+
+    lo_toolbarStartPeriod = false; // 3.3.2025
+
+    if (vp_paint) { paint() }
+}
+
+function lf_changeShowGUI_old(vp_newValue, vp_paint) {
+
+    lo_showGUI = vp_newValue;
     
     buttonMode.visible = lo_showGUI; buttonMode.enabled = lo_showGUI;
     buttonLetnik.visible = lo_showGUI; buttonLetnik.enabled = lo_showGUI;
@@ -6241,13 +6215,16 @@ document.onvisibilitychange = function () {
 //var tmDelayPaintId
 //clearInterval(tmDelayPaintId)
 function paint_delay() {
-
+    if (dbg) { console.log("-- paint_delay()"); }
     switch (lo_repaintTimerActive) {
         case true:
-            lo_hasRepaintRequest = true
+            lo_hasRepaintRequest = true;
+            if (dbg) { console.log("   .. repaint timer active / have repaint requests"); }
             return;
         case false:
+            if (dbg) { console.log("   .. repaint timer inactive / call paint() ..."); }
             paint();
+            if (dbg) { console.log("      painted ... set repaint timer now, has no repaint requests"); }
             setTimeout(tmPaintDelay_tick, 10)
             lo_repaintTimerActive = true
             lo_hasRepaintRequest = false
@@ -6255,11 +6232,15 @@ function paint_delay() {
 }
 
 function tmPaintDelay_tick() {
-    
+    if (dbg) { console.log("-- tmPaintDelay_tick()") };
     lo_repaintTimerActive = false
     if (lo_hasRepaintRequest) {
-        lo_hasRepaintRequest = false
-        paint()
+        lo_hasRepaintRequest = false;
+        if (dbg) { console.log("   .. have repaint reqs .. call paint() ..."); }
+        paint();
+        if (dbg) { console.log("      painted"); }
+    } else {
+        if (dbg) { console.log("   .. no repaint reqs"); }
     }
     //console.log(lo_mouseMoveX)
 
