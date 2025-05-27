@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v1.29"
-const gl_versionDate = "3.3.2025"
+const gl_versionNr = "v2.0"
+const gl_versionDate = "27.5.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1111,6 +1111,75 @@ function gBannerRect(left, top, width, height, ddx, ddy, fillColor, strokeWidth,
     }
 }
 
+function gBannerRect2(left, top, width, height, ddx, ddy, fillColor, strokeWidth, strokeColor, dash, shaddowColor, xShaddow, yShaddow, shaddowAll) {
+    //-------------------------------
+    // left, top, width, height ... okvir
+    // ddx, ddy                 ... koliko poreže vogale
+    // xShaddow, yShaddow       ... kako daleč pade senca desno in navzdol
+    // shaddowAll               ... ali mora biti senčeno okoli in okoli (boolean)
+    //-------------------------------
+    let w, h;
+
+    let right = left + width; let bottom = top + height;
+    let x1, x2, x3, x4, y1, y2, y3, y4;
+    x1 = left; x2 = left + ddx; x3 = right - ddx; x4 = right;
+    y1 = top; y2 = top + ddy; y3 = bottom - ddy; y4 = bottom;
+    //----
+    if (shaddowColor != "") {
+        ctx.beginPath()
+        switch (shaddowAll) {
+            case true:
+                ctx.moveTo(x2 - xShaddow, y1 - yShaddow);
+                ctx.lineTo(x3 + xShaddow, y1 - yShaddow);
+                ctx.lineTo(x4 + xShaddow, y2 - yShaddow);
+                ctx.lineTo(x4 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x2 - xShaddow, y4 + yShaddow);
+                ctx.lineTo(x1 - xShaddow, y3 + yShaddow);
+                ctx.lineTo(x1 - xShaddow, y2 - yShaddow);
+                break;
+            case false:
+                ctx.moveTo(x2 + xShaddow, y1 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y1 + yShaddow);
+                ctx.lineTo(x4 + xShaddow, y2 + yShaddow);
+                ctx.lineTo(x4 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x3 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x2 + xShaddow, y4 + yShaddow);
+                ctx.lineTo(x1 + xShaddow, y3 + yShaddow);
+                ctx.lineTo(x1 + xShaddow, y2 + yShaddow);
+                break;
+        }
+        ctx.closePath();  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+        ctx.fillStyle = shaddowColor;
+        ctx.fill();
+    }
+    //----
+    if (fillColor != "" || strokeWidth > 0) {
+        ctx.beginPath()
+        ctx.moveTo(x2, y1)
+        ctx.lineTo(x3, y1)
+        ctx.lineTo(x4, y2)
+        ctx.lineTo(x4, y3)
+        ctx.lineTo(x3, y4)
+        ctx.lineTo(x2, y4)
+        ctx.lineTo(x1, y3)
+        ctx.lineTo(x1, y2)
+        ctx.closePath()  //ctx.lineTo(xiLeft, top) ... zadnjo ni treba vleči črte, ampak samo zapreš pot
+    }
+    //----
+    if (fillColor != "") {
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+    }
+    //----
+    if (strokeWidth > 0) {
+        ctx.setLineDash(dash);
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.stroke();
+    }
+}
+
 function test_rotate() {
 
     // Non-rotated rectangle
@@ -2146,6 +2215,7 @@ const razredLetnik = [];
 const razredCrka = [];
 var lo_nrRazredov = 0;
 var lo_razred;
+var lo_razredAll = true; // 25.5.2025
 
 // 25.1.2025
 const razredGen = [];   // generacije (primer: [8r, 9r])
@@ -2170,7 +2240,23 @@ var lo_nrLetnikov = 0;
 var lo_letnik;
 
 var lo_nrPredmetPisnihTestov = []; // max številka pisnega testa znotraj posameznega predmeta
-var lo_pisniTestNr = 1; // 26.1.2025
+var lo_pisniTestNr = 1; // 26.1.2025 ... kateri pisni test trenutno gledamo (oštevilčeno znotraj razreda in predmeta. Recimo 2. pisni test, mišljeno pri fiziki v osmih razredih)
+//----
+var pisniTestLetnik = [];        // 23.5.2025 primer: pisniTestLetnik[2]=1   ... letnik drugega pisnega testa, navedenega na koncu data.txt, ima ID letnika 1
+var pisniTestPredmet = [];       // 23.5.2025 primer: pisniTestPredmet[2]=1  ... predmet drugega pisnega testa, navedenega na koncu data.txt, ima ID predmeta 1
+var pisniTestRazred = [];        // 23.5.2025 primer: pisniTestRazred[2]=3   ... razred drugega pisnega testa, navedenega na koncu data.txt, ima ID razred 3
+var pisniTestNr = [];            // 23.5.2025 primer: pisniTestNr[2]=5       ... pri drugem navedenem pisnem testu na koncu data.txt je zapisano, da je to test P5.
+var pisniTestMaxTock = [];       // 23.5.2025 primer: pisniTestMaxTock[2]=65 ... pri drugem navedenem pisnem testu na koncu data.txt je zapisano, da je pri njem max 65 točk
+var pisniTestNalogeTock = [];    // 23.5.2025 primer: pisniTestNalogeTock[2]=[12 7 5 4 7 8 1] ... pri drugem navedenem pisnem testu na koncu data.txt je zapisano, da je pri posameznih nalogah testa največ možno po toliko točk
+var lo_nrPisnihTestov = 0;       // 23.5.2025 primer: lo_nrPisnihTestov=4    ... na koncu data.txt so navedeni štirje pisni testi
+var pisniTestUcenciTockeNalogUcenec = [];    // 24.5.2025 primer: pisniTestUcenciTockeNalogUcenec[2]=[.., 24, 25, 26, 27 itd] ... navedeni Id-ji učencev, ki so pisali drugi pisni test s konca data.txt
+var pisniTestUcenciTockeNalogTocke = [];     // 24.5.2025 primer: pisniTestUcenciTockeNalogTocke[2][3]=[11, 4, 6, 2, 8, itd]  ... navedena števila doseženih točk na drugem pisnem testu s konca data.txt s strani tretjega učenca, ki ima Id=26 (glej prejšnjo vrstico)
+var pisniTestUcencevPoTockahNalog1 = [];     // 24.5.2025
+var pisniTestUcencevPoTockahNalog05 = [];    // 24.5.2025
+var pisniTestMaxUcencevPoTockahNalog1 = [];  // 24.5.2025
+var pisniTestMaxUcencevPoTockahNalog05 = []; // 24.5.2025
+
+var lo_drawAnalizaNalog = false;
 
 const rsltColor = ["darkBlue", "darkRed", "darkOrchid", "darkSlateGray", "darkGoldenrod", "darkGreen", "maroon", "purple", "darkCyan", "peru"];
 
@@ -2185,9 +2271,10 @@ const ocenaDatumStr = [];    // "14-10-2024"
 const ocenaDatumMs = [];     // 1.2.2025 v številčne milisekunde pretvorjen datum oziroma razlika v ms od 1.1.1970 (to je JS base datum)
 const ocenaTip = [];         // "U" (ustna) ali "P1" (pisna prvi test), "P2" pisna drugi test ...
 const ocenaTipTip = [];      // "U" (ustna) ali "P" (pisna)
-const ocenaTipSerialNr = []; // "P1" pomeni prvi pisni test
-const ocenaTock = [];        // "P1" pomeni prvi pisni test
-const ocenaMaxTock = [];     // "P1" pomeni prvi pisni test
+const ocenaTipSerialNr = []; // zaporedna številka pisnega testa pri predmetu
+const ocenaTock = [];        // doseženih točk na pisnem testu
+const ocenaMaxTock = [];     // max. možnih točk na pisnem testu
+const ocenaTockPoNalogahArr = [];  // koliko je doseženih točk po posamezni nalogi (22.5.2025)
 var lo_nrOcen = 0;
 var lo_ocena;
 const sortIndexOcenOcenaId = [];        // 16.2.2025
@@ -2313,6 +2400,7 @@ var drawCommonChartTitle = true; // 26.1.2025
 var drawBarChart = true;
 var drawPieChart = true;
 var drawSpChart = true;
+var drawAnChart = true; // 25.5.2025
 
 //---- 22.1.2025
 var spChartX = [];
@@ -2342,6 +2430,23 @@ var bcChartY = [];
 var bcChartX1 = [];
 var bcChartY1 = [];
 var lo_bcChartSelectedId = 0;
+
+//---- 26.5.2025
+var anChartX = [];
+var anChartY = [];
+var anChartX1 = [];
+var anChartY1 = [];
+var lo_anChartSelectedId = 0;
+var anChartXnaloga = [];
+var anChartYnaloga = [];
+var anChartX1naloga = [];
+var anChartY1naloga = [];
+var lo_anChartNalogaSelectedId = 0;
+var anChartXtock = [];
+var anChartYtock = [];
+var anChartX1tock = [];
+var anChartY1tock = [];
+var lo_anChartTockSelectedId = 0;
 
 //---- 31.1.2025
 var ucChartX = [];
@@ -3189,55 +3294,63 @@ elMyCanvas.addEventListener('mousemove', (e) => {
 
     // ---- ALI JE V MODE_RAZREDTEST NAD KAKŠNIM GRAFOM?
     if (gl_mode == cv_mode_test) {
-        //---- Preverjanje, ali je z miško nad določenim elementom 
+        //---- Preverjanje, ali je z miško nad določenim elementom
         //let oldSpChartSelected = spChartSelected.slice(0);
         let oldSpChartSelectedId = lo_spChartSelectedId;
         let oldTestSelected = lo_testSelected;
         let oldPcChartSelectedId = lo_pcChartSelectedId; // 23.1.2025
         let oldBcChartSelectedId = lo_bcChartSelectedId; // 24.1.2025
+        let oldAnChartSelectedId = lo_anChartSelectedId;             // 26.5.2025
+        let oldAnChartNalogaSelectedId = lo_anChartNalogaSelectedId; // 26.5.2025
+        let oldAnChartTockSelectedId = lo_anChartTockSelectedId;     // 26.5.2025
         let oldOcenaSelected = lo_ocenaSelected;
         let chartSelected = false;
-        lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0; lo_bcChartSelectedId = 0;
+        lo_spChartSelectedId = 0; lo_pcChartSelectedId = 0; lo_bcChartSelectedId = 0; lo_anChartSelectedId = 0; lo_anChartNalogaSelectedId = 0; lo_anChartTockSelectedId = 0;
         let x, y;
-        let razredId, tmpTest, tmpOcena, fiMouse, tmpItemId;
+        let razredId, tmpTest, tmpOcena, fiMouse, tmpItemId, naloga, nrNalog, myRazred, myPisniTestId, moznihTockNaloge, tock;
         //---- Smo z miško nad katerim od chartov za podatkovno analizo?
         let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
-        for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
+        let tmpItemIdMin = 1; let tmpItemIdMax = nrItems; 
+        if (!lo_razredAll) { tmpItemIdMin = lo_razred; tmpItemIdMax = lo_razred; }; // 26.5.2025
+        //for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
+        for (tmpItemId = tmpItemIdMin; tmpItemId <= tmpItemIdMax; tmpItemId++) {
             // ---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo?
-            if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
-                chartSelected = true;
-                lo_spChartSelectedId = tmpItemId;
-                // ---- Je pod miško kateri od testov v scatter plot chartu?
-                lo_testSelected = 0;
-                for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
-                    x = Math.round(spChartX[tmpItemId] + tmpTest);
-                    y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                    if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
-                        lo_testSelected = tmpTest;
-                        break;
-                    }
-                }
-                if (lo_testSelected <= 0) {
+            if (drawSpChart) {
+                if (nrOcen[tmpItemId] && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
+                    chartSelected = true;
+                    lo_spChartSelectedId = tmpItemId;
+                    // ---- Je pod miško kateri od testov v scatter plot chartu?
+                    lo_testSelected = 0;
                     for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
                         x = Math.round(spChartX[tmpItemId] + tmpTest);
                         y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x - 1, y - 1, x + 1, y + 1)) {
+                        if (x == lo_mouseMoveX && y == lo_mouseMoveY) {
                             lo_testSelected = tmpTest;
                             break;
                         }
                     }
-                }
-                if (lo_testSelected <= 0) {
-                    for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
-                        x = Math.round(spChartX[tmpItemId] + tmpTest);
-                        y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
-                        if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
-                            lo_testSelected = tmpTest;
-                            break;
+                    if (lo_testSelected <= 0) {
+                        for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
+                            x = Math.round(spChartX[tmpItemId] + tmpTest);
+                            y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
+                            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, x - 1, y - 1, x + 1, y + 1)) {
+                                lo_testSelected = tmpTest;
+                                break;
+                            }
                         }
                     }
+                    if (lo_testSelected <= 0) {
+                        for (tmpTest = 1; tmpTest <= (arrArrRezultatiTock[tmpItemId].length - 1); tmpTest++) {
+                            x = Math.round(spChartX[tmpItemId] + tmpTest);
+                            y = Math.round(spChartY1[tmpItemId] - spChartKy[tmpItemId] * arrArrRezultatiTock[tmpItemId][tmpTest]);
+                            if (mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, x, y, 12)) {
+                                lo_testSelected = tmpTest;
+                                break;
+                            }
+                        }
+                    }
+                    break; // ven iz pregledovanja selektiranosti chartov, ker selektiran chart že imamo in znotraj morda že tudi selektiran test in s tem učenca
                 }
-                break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
             }
             // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
             if (drawBarChart) {
@@ -3270,16 +3383,53 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                     break; // ven iz pregledovanja selektiranosti chartov, ker selektiran char že imamo in znotraj morda že tudi selektiran test in s tem učenca
                 }
             }
+            // ---- Je pod miško analiza nalog? 26.5.2025
+            if (drawAnChart && !lo_byRazredGen) {
+                myRazred = tmpItemId;
+                myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
+                if (myPisniTestId > 0) { 
+                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, anChartX[tmpItemId], anChartY[tmpItemId], anChartX1[tmpItemId], anChartY1[tmpItemId])) {
+                        chartSelected = true;
+                        lo_anChartSelectedId = tmpItemId; // miška je nad amalizo nalog tega razreda
+                        lo_anChartNalogaSelectedId = -1;
+                        lo_anChartTockSelectedId = -1;
+                        //---- Zdaj pogledam, če je miška nad katero od nalog znotraj izbranega razreda/pisnega testa                     
+                        nrNalog = pisniTestNalogeTock[myPisniTestId].length; // število nalog na tem pisnem testu
+                        if (nrNalog > 0) {
+                            for (naloga = 1; naloga <= nrNalog; naloga++) {
+                                if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, anChartXnaloga[tmpItemId][naloga], anChartYnaloga[tmpItemId][naloga], anChartX1naloga[tmpItemId][naloga], anChartY1naloga[tmpItemId][naloga])) {
+                                    lo_anChartNalogaSelectedId = naloga; // miška je nad to zaporedno številko naloge znotraj testa
+                                    //---- Zdaj pogledam še, če je miška nad katero od možnega števila točk za to nalogo
+                                    moznihTockNaloge = pisniTestNalogeTock[myPisniTestId][naloga - 1]; // število možnih točk pri tej nalogi
+                                    for (tock = 0; tock <= moznihTockNaloge; tock++) {
+                                        if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, anChartXtock[tmpItemId][naloga][tock], anChartYtock[tmpItemId][naloga][tock], anChartX1tock[tmpItemId][naloga][tock], anChartY1tock[tmpItemId][naloga][tock])) {
+                                            lo_anChartTockSelectedId = tock; // miška je nad tem številom točk pri izbrani nalogi izbranega pisnega testa
+                                            break;
+                                        }
+                                    }
+                                    break; // ven iz pregledovanja selektiranosti chartov/ocen, ker selekcijo že imamo
+                                }
+                            }
+                            break;
+                        } else {
+                            break; // imam selektirano analizo, kaj več pa ne
+                        }
+                    }
+                } 
+            }     
         };
+
         // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
         if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }   // 22.1.2025
         if (!(lo_pcChartSelectedId == oldPcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 23.1.2025
         if (!(lo_bcChartSelectedId == oldBcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 24.1.2025
+        if (!(lo_anChartSelectedId == oldAnChartSelectedId && lo_anChartNalogaSelectedId == oldAnChartNalogaSelectedId && lo_anChartTockSelectedId == oldAnChartTockSelectedId)) { paint_delay(); return; } // 24.1.2025
 
         // če ni spremembe, chart pa je selected, potem ne gledam drugih stvari glede selektiranosti in nič ne rišem ker ni potrebe (->return())
         if (lo_spChartSelectedId > 0) { return }; // 22.1.2025
         if (lo_pcChartSelectedId > 0) { return }; // 23.1.2025
         if (lo_bcChartSelectedId > 0) { return }; // 24.1.2025
+        if (lo_anChartSelectedId > 0) { return }; // 26.5.2025
     }
 
     if (gl_mode == cv_mode_ucenec) {
@@ -3452,6 +3602,10 @@ window.addEventListener("keydown", (event) => {
                     //lf_changeFocusRazred(!lo_byRazredGen, true);
                     lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -1 : 1), true);
                     break;
+                case cv_mode_test: // 25.5.2025
+                    let tmpChange = event.shiftKey ? -1 : 1;
+                    lf_changeRazred(lo_razred + tmpChange, true);
+                    break;                
             };
             break;
         case 'KeyP': // sprememba predmeta 28.1.2025
@@ -3519,6 +3673,11 @@ window.addEventListener("keydown", (event) => {
             lo_realniLom = !lo_realniLom;
             paint();
             break;
+        case 'KeyA':
+            //lo_keyDownA = true; break;
+            lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
+            paint();
+            break;        
         case 'KeyE':
             lo_keyDownE = true; break;
         case 'ArrowRight':
@@ -3560,23 +3719,6 @@ window.addEventListener("keyup", (event) => {
     let change, newValue;
 
     switch (event.code) {
-        case 'KeyA':
-            lo_keyDownA = false;
-            // 1.4.2024 Ali spreminja vrednost lo_f samo s pomočjo tipke A brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_A) {
-                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
-                //console.log("UP: process keyPress(T)");
-                change = lo_aStep;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueA(-change);
-                lf_changeA(newValue, false);
-            }
-            lo_selectedA = false;
-            paint();
-            gl_changeByMouseWheel_A = false;
-            //console.log("UP: false"); console.log("----");
-            break;
         case 'Digit0':
             lo_keyDownDigit0 = false;
             // 1.4.2024 Ali spreminja vrednost lo_n samo s pomočjo tipke 0 brez vrtenja koleščka miške?
@@ -4033,6 +4175,19 @@ function paint_eRazred_grafTest() {
      
     if (!lo_dataPrepared) { return; };
 
+    //---- 25.5.2025 Dodana opcija, da se riše samo za posamezen razred in ne vedno za vse razrede en za drugim
+    if (!lo_razredAll) {
+        paint_eRazred_grafTest_singleRazred();
+    } else {
+        paint_eRazred_grafTest_allRazred();
+    }
+    
+    paint_eRazred_grafTest_mouseOverTips(); // 26.5.2025 uporaba skupne funkcije za mouse over tipse
+
+}
+
+function paint_eRazred_grafTest_allRazred() {
+
     let chartMargin = 20;
     let chartGapX = 30; let chartGapY = 30;
     let nrItems = lo_nrRazredov;
@@ -4138,24 +4293,154 @@ function paint_eRazred_grafTest() {
         case 5: chartHeight = ctxH - 2 * chartMargin; break;
     }
     x1 = 20;
-    // Za vse razrede nariši pie-chart-e
+    // Za vse razrede nariši scatterplot-chart-e
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-        // za tekoči razred narišem pie chart
+        // za tekoči razred narišem scatter plot chart
         if (nrOcen[tmpItemId] > 0) {
-            paint_scatterPlotChart_byRazprsenost(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
-                tmpItemId,
-                arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
-                maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
-                avgTock[tmpItemId], avgPercent[tmpItemId],
-                arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
-                arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
+            switch (lo_drawAnalizaNalog) {
+                case false:
+                    drawSpChart = true;
+                    drawAnChart = false;
+                    paint_scatterPlotChart_byRazprsenost(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
+                        tmpItemId,
+                        arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
+                        maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
+                        avgTock[tmpItemId], avgPercent[tmpItemId],
+                        arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
+                        arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
+                    break;
+                case true:
+                    drawSpChart = false;
+                    drawAnChart = true;
+                    paint_barChart_analizaNalog(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight, tmpItemId);
+                    break;
+            }
         }
     }
+
+}
+
+function paint_eRazred_grafTest_singleRazred() {
+    //------------------------- 
+    //---- 25.5.2025 Dodana ta opcija, da se riše samo za posamezen razred in ne vedno za vse razrede en za drugim
+    //-------------------------
+
+    let chartMargin = 20;
+    let chartGapX = 20; let chartGapY = 20;
+    let vl_item = lo_razred;
+    if (lo_byRazredGen) { vl_item = lo_razredGen }; 
+    let tmpItemId = vl_item;
+    let chartWidth = (ctxW - 2 * chartMargin);
+    let x0 = 20;
+    let tmpText, w, h, colorId, x, y, y0;
+    let titleFont = "bold 18pt verdana";
+    let vl_razredTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
+
+    // ---- Common title panel
+    drawCommonChartTitle = true;
+    titlePanelHeight = 34;
+    switch (lo_schrink) {
+        case 5: titlePanelHeight = 0; drawCommonChartTitle = false; break;
+    }
+    if (drawCommonChartTitle) {
+        yTitleTop = 8;
+        let titlePanelLeft = x0 - 8;
+        let titlePanelWidth = ctxW - 2 * chartMargin + 4;
+        if (lo_showGUI) { titlePanelWidth -= 198 };
+        //tmpText = "FIZIKA - 1. pisni test";
+        tmpText = vl_razredTitle + " - " + predmetIme[lo_predmet] + " - " + lo_pisniTestNr.toString() + ". pisni test";
+        ;[w, h] = gMeasureText(tmpText, titleFont);
+        gBannerRect(titlePanelLeft, yTitleTop, titlePanelLeft + titlePanelWidth, 34, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
+        x = titlePanelLeft + titlePanelWidth / 2 - w / 2;
+        y = yTitleTop + h + 7;
+        gTextSO(tmpText, titleFont, "darkSlateGray", "powderBlue", "darkGray", 2, 3, x, y);
+        //gText2(tmpText, titleFont, "darkSlateGray", "white", 2, 0, 0, titlePanelLeft + titlePanelWidth / 2 - w / 2, yTitleTop + h + 7);
+    }
     
+    y0 = yTitleTop + titlePanelHeight + 18;
+
+    let marginBannerH = 12;
+    let bannerWidth = ctxW - 2 * marginBannerH;
+    let chartGapBannerH = 8;
+    x0 = marginBannerH + chartGapBannerH;
+    let chartAreaWidth = bannerWidth - 2 * chartGapBannerH;
+    let chartAreaWidthJustCharts = chartAreaWidth - 2 * chartGapX;
+
+    let bannerHeight = ctxH - 2 * chartMargin + 15 - titlePanelHeight;
+    let chartGapBannerV = 8; // spodaj od dna bannerja navzgor do dna najnižjega charta
+    const marginBannerV = 12;
+    let chartAreaHeight = bannerHeight - 20; //ctxH - y0 - marginBannerV - chartGapBannerV;
+    let chartAreaHeightJustCharts = chartAreaHeight - chartGapY;
+
+    // ---- Za konkreten razred narišem panel čez celo višino ekrana
+    gBannerRect(x0 - 8, y0 - 10, chartWidth + 16, bannerHeight, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
+    
+    // ============ (1) RAZPRŠENOST REZULTATOV IN POVPREČJA  ============
+    
+    let spChartTop = y0;
+    let spChartWidth = 0.2 * chartAreaWidthJustCharts;
+    if (spChartWidth < 300) { spChartWidth = 300 };
+    drawSpChart = true;
+    let spChartHeight = chartAreaHeight; // ctxH - spChartTop - chartMargin;
+    // za tekoči razred narišem scatter plot chart
+    if (nrOcen[tmpItemId] > 0) {
+        drawSpChart = true;
+        paint_scatterPlotChart_byRazprsenost(x0, spChartTop, spChartWidth, spChartHeight,
+            tmpItemId,
+            arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
+            maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
+            avgTock[tmpItemId], avgPercent[tmpItemId],
+            arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
+            arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
+    }
+    
+    // ============ (2) DELEŽ TESTOV PO OCENAH - PIE CHART  ============
+
+    // .... Kje bo vrh pie chartov (y1)
+    let pieChartWidth = 0.3 * chartAreaWidthJustCharts;
+    drawPieChart = true;
+    let pieChartHeight = 0.32 * ctxH - chartGapY;
+    if (pieChartHeight > pieChartWidth) { pieChartHeight = pieChartWidth };
+    x1 = x0 + spChartWidth + chartGapX;
+    // Za razred nariši pie-chart
+    if (nrOcen[tmpItemId] > 0) {
+        paint_pieChart_byOcenaShare(x1, y0, pieChartWidth, pieChartHeight, tmpItemId, arrArrOceneCount[tmpItemId], nrOcen[tmpItemId]);
+    }
+    
+    // ============ (3) ŠTEVILO TESTOV PO OCENAH - BAR CHART  ============
+
+    let barChartWidth = chartAreaWidth - spChartWidth - chartGapX - pieChartWidth - chartGapX;
+    drawBarChart = true;
+    let barChartHeight = pieChartHeight;
+    // za tekoči razred ali tekočo generacijo razredov narišem graf
+    x1 = x0 + spChartWidth + chartGapX + pieChartWidth + chartGapX;
+    if (nrOcen[tmpItemId] > 0) {
+    paint_barChart_byOcena(x1, y0, barChartWidth, barChartHeight, tmpItemId, arrArrOceneCount[tmpItemId], maxOcenaCount, "");
+    }
+    
+    // ============ (4) ANALIZA PO NALOGAH  ============
+
+    // .... Kje bo vrh scatter plot chartov
+    drawAnChart = true;
+    x1 = x0 + spChartWidth + chartGapX;
+    let anChartTop = y0 + pieChartHeight + chartGapY;
+    let anChartHeight = chartAreaHeightJustCharts - pieChartHeight;
+    let anChartWidth = chartAreaWidth - spChartWidth - chartGapX;
+    // za razred narišem bar chart-e z analizo doseženih točk po nalogah znotraj testa
+    if (nrOcen[tmpItemId] > 0) {
+        paint_barChart_analizaNalog(x1, anChartTop, anChartWidth, anChartHeight, tmpItemId);
+    }
+
+}
+
+function paint_eRazred_grafTest_mouseOverTips() {
+
     // ---- MOUSE OVER TIPS - SCATTER PLOT CHART 22.1.2025
 
+    let x, y, colorId, tmpText, w, h, x1, y1, i, tmpItemId;
+
     let tipFont = "bold italic 12pt verdana";
-    if (lo_spChartSelectedId > 0) {
+    if (drawSpChart && lo_spChartSelectedId > 0) {
         if (lo_testSelected > 0) {
             // ---- odebeljen krogec okoli testa
             x = spChartX[lo_spChartSelectedId] + lo_testSelected;
@@ -4183,14 +4468,15 @@ function paint_eRazred_grafTest() {
     
     // ---- MOUSE OVER TIPS - BAR/PIE CHART 24.1.2025
     let printList = false;
+    let arrTipText = [];
+    let textExceedH = false;
     if (lo_ocenaSelected > 0) {
         if (drawPieChart && lo_pcChartSelectedId > 0) { tmpItemId = lo_pcChartSelectedId; printList = true }
         else if (drawBarChart && lo_bcChartSelectedId > 0) { tmpItemId = lo_bcChartSelectedId; printList = true };
     }
     if (printList) {
         // ---- nabiranje teksta za prikaz toolTip-a
-        let textExceed = false;
-        let arrTipText = [];
+        textExceedH = false;
         let ocenaIdVRazredu;
         for (i = 1; i <= arrArrOceneCount[tmpItemId][lo_ocenaSelected]; i++) {
             ocenaIdVRazredu = arrRazredArrOceneArrRezultatiOcenaIdVRazredu[tmpItemId][lo_ocenaSelected][i];
@@ -4206,10 +4492,10 @@ function paint_eRazred_grafTest() {
             tmpText += ", " + arrRazredArrOceneArrRezultatiPercent[tmpItemId][lo_ocenaSelected][i].toFixed(1) + "%";
             arrTipText[i - 1] = tmpText; // zaradi kasnejšega sortiranja si zapise zapisujem od indeksa 0 vključno naprej
             // ---- če še noben text ni pogledal ven iz ekrana, potem to preverim za tekoči tekst
-            if (!textExceed) {
+            if (!textExceedH) {
                 ;[w, h] = gMeasureText(tmpText.split("t#")[2], tipFont);
                 if ((lo_mouseMoveX + w + 30) > ctxW) {
-                    textExceed = true;
+                    textExceedH = true;
                 };
             }
         }
@@ -4222,10 +4508,74 @@ function paint_eRazred_grafTest() {
             ;[w, h] = gMeasureText(tmpText, tipFont);
             x1 = lo_mouseMoveX + 24;
             y1 = lo_mouseMoveY + 16 + i * 21;
-            if (textExceed) { x1 = ctxW - w - 7; y1 += 18; };
+            if (textExceedH) { x1 = ctxW - w - 7; y1 += 18; };
             //gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", gf_alphaColor(208, "lightGray"), 5, 5);
             colorId = Number(arrTipText[i].split("t#")[1]);
             gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", rsltColor[colorId], "", 0, 0); // prej so bili vsi izpisani v darkBlue barvi!
+        }
+    }
+
+    // ---- MOUSE OVER TIPS - BAR CHART Z ANALIZAMI NALOG 24.1.2025
+    //---- najprej samo okvir okoli bar chart-a ene naloge
+    let myRazred, myPisniTestId, naloga, tock, tockReal, tmpTitle, tmpBody, ucenecId, nrUcencev;
+    let textExceedV = false;
+    let ucenecOutV = 0; // 27.5.2025 pri katerem učencu iz toolTip-a se je ta že hotel izpisati navpično ven iz ekrana
+    let ucencevOutV = 0; // ... koliko pa bi potem bilo vseh, ki bi se izpisali spodaj ven?
+    if (drawAnChart && lo_anChartSelectedId > 0 && lo_anChartNalogaSelectedId > 0) { 
+        if (lo_anChartTockSelectedId < 0) {
+            // ---- noben bar ni selektiran -> narišem samo črtkan okvir okoli bar chart grafa ene naloge
+            x = anChartXnaloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] - 5;
+            y = anChartYnaloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] - 5;
+            x1 = anChartX1naloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] + 1;
+            y1 = anChartY1naloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] + 1;
+            //gBannerRect2(x, y, x1 - x, y1 - y, 0, 0, "", 3, "crimson", [3, 3], "", 0, 0, false);
+        } else {
+            // ---- selektiran je en konkreten bar pri določenem številu točk ene konkretne naloge na enem konkretnem testu
+            tmpItemId = lo_anChartSelectedId;
+            myRazred = tmpItemId;
+            myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
+            naloga = lo_anChartNalogaSelectedId;
+            tock = lo_anChartTockSelectedId;
+            //---- 
+            tmpTitle = naloga.toString() + ". naloga, " + tock.toString() + " točk";
+            tmpBody = ""; nrUcencev = 0;
+            arrTipText.length = 0; textExceedH = false;
+            for (let tmpUcenec = 1; tmpUcenec <= pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1; tmpUcenec++) {
+                tockReal = pisniTestUcenciTockeNalogTocke[myPisniTestId][tmpUcenec][naloga - 1];
+                if (Math.round(tockReal) == tock) {
+                    //---- tale učenec je že tak, da je pisal točno toliko točk pri tej nalogi na tem testu
+                    nrUcencev += 1;
+                    ucenecId = pisniTestUcenciTockeNalogUcenec[myPisniTestId][tmpUcenec];
+                    //tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId]; // + ", " + razredIme[myRazred];
+                    tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId] + ", " + tockReal.toString() + "t";
+                    arrTipText[nrUcencev] = tmpText;
+                    // ---- če še noben text ni pogledal ven iz ekrana, potem to preverim za tekoči tekst
+                    if (!textExceedH || !textExceedV) {
+                        ;[w, h] = gMeasureText(tmpText, tipFont);
+                        if (!textExceedH) { if ((lo_mouseMoveX + w + 30) > ctxW) { textExceedH = true; }; };
+                        if (!textExceedV) {
+                            y1 = lo_mouseMoveY + 16 + nrUcencev * 21 + 37; // x1 = lo_mouseMoveX - 150; gLine(x1, y1, x1 + 30, y1, 1, "black", []);
+                            if (y1 > ctxH) {
+                                textExceedV = true; ucenecOutV = nrUcencev;
+                            };
+                        };
+                    };
+                };
+            }
+            ucencevOutV = nrUcencev - ucenecOutV;
+            for (i = 1; i <= nrUcencev; i++) {
+                // ---- mouse over tip
+                tmpText = arrTipText[i];
+                colorId = i - 10 * (Math.trunc((i - 1) / 10)) - 1;
+                ;[w, h] = gMeasureText(tmpText, tipFont);
+                x1 = lo_mouseMoveX + 24;
+                y1 = lo_mouseMoveY + 16 + i * 21;
+                if (textExceedH) { x1 = ctxW - w - 7; if (!textExceedV) { y1 += 18; } };
+                if (textExceedV) { y1 -= (ucencevOutV) * 21; };
+                //gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", gf_alphaColor(208, "lightGray"), 5, 5);
+                colorId = i - 10 * (Math.trunc((i - 1) / 10)) - 1;
+                gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", rsltColor[colorId], "", 0, 0); // prej so bili vsi izpisani v darkBlue barvi!
+            }            
         }
     }
 
@@ -5911,10 +6261,17 @@ function lf_changePredmet(vp_newValue, vp_paint) {
 
 function lf_changeRazred(vp_newValue, vp_paint) {
 
+    //---- 25.5.2025 Če sem v mode Test in sem bil na prikazu za vse razrede, grem samo ven iz vseh razredov, samega razreda pa ne spreminjam
+    if (lo_razredAll && gl_mode == cv_mode_test) {
+        lo_razredAll = false;
+        if (vp_paint) { paint() }
+        return;
+    }
+
     lo_razred = vp_newValue;
 
-    if (lo_razred > lo_nrRazredov) { lo_razred = 1 };
-    if (lo_razred < 1) { lo_razred = lo_nrRazredov };
+    if (lo_razred > lo_nrRazredov) { lo_razred = 1; lo_razredAll = true; };
+    if (lo_razred < 1) { lo_razred = lo_nrRazredov; lo_razredAll = true; };
 
     if (vp_paint) { paint() }
 
@@ -6413,13 +6770,29 @@ function intDataStructures() {
     ocenaTip.length = 0;         // "U" (ustna) ali "P1" (pisna prva/druga/tretja)
     ocenaTipTip.length = 0;      // "U" (ustna) ali "P" (pisna) 6.2.2025
     ocenaTipSerialNr.length = 0; // "P1" pomeni prvi pisni test
-    ocenaTock.length = 0; 
-    ocenaMaxTock.length = 0; 
+    ocenaTock.length = 0;
+    ocenaMaxTock.length = 0;
+    ocenaTockPoNalogahArr.length = 0; // 22.5.2025
     lo_nrOcen = 0;
     lo_ocena = 0;
     sortIndexOcenOcenaId.length = 0;        // 16.2.2025
     sortIndexOcenPredmetOcenaId.length = 0; // 16.2.2025
 
+    //---- 24.5.2025
+    pisniTestLetnik.length = 0;
+    pisniTestPredmet.length = 0;
+    pisniTestRazred.length = 0;
+    pisniTestNr.length = 0;
+    pisniTestMaxTock.length = 0;
+    pisniTestNalogeTock.length = 0;
+    lo_nrPisnihTestov = 0;       // 23.5.2025
+    pisniTestUcenciTockeNalogUcenec.length = 0;
+    pisniTestUcenciTockeNalogTocke.length = 0;
+    pisniTestUcencevPoTockahNalog1.length = 0;
+    pisniTestUcencevPoTockahNalog05.length = 0;
+    pisniTestMaxUcencevPoTockahNalog1.length = 0;
+    pisniTestMaxUcencevPoTockahNalog05.length = 0;
+    
     console.log("---- DATA INIIALIZED ----" + "letnikov: " + lo_nrLetnikov.toString() + ", predmetov: " + lo_nrPredmetov.toString() + ", razredov: " + lo_nrRazredov.toString() + ", u" + scTchLow + "encev: " + lo_nrUcencev.toString() + ", ocen: " + lo_nrOcen.toString());
 
 };
@@ -6467,6 +6840,12 @@ function data_parse(clipText) {
                 break; // konec branja vrstic zaradi napake v podatkih ali česa drugega
             }
         //} else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#P") > 0 && lineStr.indexOf("#R") >= 0) {
+        } else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#P") >= 0  && lineStr.indexOf("#R") >= 0 && lineStr.indexOf("#T") >= 0 ) {
+            // imamo podatke pisnega testa
+            rslt = data_parse_novPisniTest(lineStr);
+            if (!rslt) {
+                break; // konec branja vrstic zaradi napake v podatkih ali česa drugega
+            }
         } else if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#R") >= 0) {
             // imamo začetek novega razreda ...
             rslt = data_parse_novRazred(lineStr);
@@ -6504,6 +6883,10 @@ function data_parse_novRazred(lineStr) {
         lo_nrLetnikov += 1;
         lo_letnik = lo_nrLetnikov;
         letnikStr[lo_nrLetnikov] = tmpLetnikStr;
+        //----
+        //pisniTestMaxTock[lo_letnik] = [];       // 23.5.2025
+        //pisniTestNalogeTock[lo_letnik] = []; // 23.5.2025
+        //console.log("[" + lo_letnik.toString() + "]");
     } 
     nrParams += 1;
 
@@ -6532,7 +6915,11 @@ function data_parse_novRazred(lineStr) {
                     predmetKratica[lo_nrPredmetov] = "KEM";
                     break;
             }
-        } 
+        }
+        //----
+        //pisniTestMaxTock[lo_letnik][lo_predmet] = [];       // 23.5.2025
+        //pisniTestNalogeTock[lo_letnik][lo_predmet] = []; // 23.5.2025
+        //console.log("[" + lo_letnik.toString() + "]" + "[" + lo_predmet.toString() + "]");
         nrParams += 1; // 28.1.2025
     } else {
         // predmeti ni podan ... očitno bo kratica predmeta pri vsaki oceni spredaj
@@ -6559,9 +6946,108 @@ function data_parse_novRazred(lineStr) {
             lo_nrRazredGen += 1;
             lo_razredGen = lo_nrRazredGen;
             razredGen[lo_nrRazredGen] = Number(tmpRazredLetnikStr);
-        } 
+        }
+        //----
+        //pisniTestMaxTock[lo_letnik][lo_predmet][lo_razred] = [];       // 23.5.2025
+        //pisniTestNalogeTock[lo_letnik][lo_predmet][lo_razred] = []; // 23.5.2025
+        //console.log("[" + lo_letnik.toString() + "]" + "[" + lo_predmet.toString() + "]" + "[" + lo_razred.toString() + "]");
     }
     return true;
+}
+
+function data_parse_novPisniTest(lineStr) {
+    //console.log("---- " + lineStr);
+    let tmpStr;
+    const itemList = lineStr.split("#");
+    if (itemList.length < 3) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+
+    let nrParams = 0;
+
+    // ---- LETNIK
+    let tmpLetnikStr = itemList[1].trim().slice(1);
+    // pogledamo, če ta letnik že obstaja med letniki?
+    lo_letnik = getLetnikId(tmpLetnikStr);
+    if (lo_letnik <= 0) {
+        // nov doslej neznan letnik
+        return false;
+    } 
+    nrParams += 1;
+
+    // ---- PREDMET
+    let tmpPredmetStr = itemList[nrParams + 1].trim().toUpperCase();
+    if (tmpPredmetStr.length < 2) {
+        return false;
+    }
+    if (tmpPredmetStr.substr(0, 1) == "P") {
+        tmpPredmetStr = tmpPredmetStr.slice(1);
+        // pogledamo, če ta predmet že obstaja med predmeti?
+        lo_predmet = getPredmetId(tmpPredmetStr);
+        if (lo_predmet <= 0) {
+            // nov doslej neznan predmet
+            return false;
+        } 
+        nrParams += 1; // 28.1.2025
+    } else {
+        // predmeti ni podan ... očitno bo kratica predmeta pri vsaki oceni spredaj
+        nrParams += 0; // debug purpose
+        return false;
+    }
+
+    // ---- RAZRED
+    let tmpRazredStr = itemList[nrParams + 1].trim().slice(1);
+    let tmpRazredLetnikStr = tmpRazredStr.substr(0, 1);
+    let tmpRazredCrka = tmpRazredStr.substr(1, 1);
+    if (tmpRazredCrka == ".") { tmpRazredCrka = tmpRazredStr.substr(2, 1); };
+    // pogledamo, če ta razred že obstaja med razredi?
+    lo_razred = getRazredId(tmpRazredLetnikStr, tmpRazredCrka);
+    if (lo_razred <= 0) { return false; }; // nov doslej neznan razred
+    nrParams += 1;
+  
+    // ---- PODATKI PISNEGA TESTA  
+    // ---- zaporedna številka pisnega testa pri danem predmetu
+    let tmpPisniTestStr = itemList[nrParams + 1].trim().slice(1);
+    let pisniTestList = tmpPisniTestStr.split("|");
+    if (pisniTestList.length < 1) {return false; }; // Če ni podatkov o možnih točkah skupaj in po posameznih nalogah, potem tu nimam kaj delati
+    //let tmpPisniTestNr = Number(pisniTestList[0].trim().substr(0, 1));
+    let tmpPisniTestNr = Number(pisniTestList[0].trim());
+    if (tmpPisniTestNr > lo_nrPredmetPisnihTestov[lo_predmet]) { return false; }; // mora biti en od obstoječih pisnih testov, ki je bil že prej zaznan med ocenami učencev
+
+    // ---- ŠTEVILO MOŽNIH TOČK NA PISNEM TESTU
+    if (pisniTestList.length < 2) {return false; }; // Če ni podatkov o možnih točkah skupaj, potem tu nimam kaj delati
+    let tmpPisniTestMaxTock = Number(pisniTestList[1].trim());
+
+    // ---- ŠTEVILO DOSEŽENIH TOČK PO POSAMEZNIH NALOGAH (22.5.2025 ... to je pri pisni oceni lahko dodano zraven ali pa ne. Do sedaj ni bilo, zdaj pa bo.)
+    if (pisniTestList.length < 3) { return false; }; // Če ni podatkov o možnih točkah po posameznih nalogah, potem tu nimam kaj delati
+    let tmppisniTestNalogeTockStr = pisniTestList[2].trim(); // space sep. lista točk po nalogah
+    // ---- to pa je zdaj treba spraviti v polje cifer
+    //tmpOcenaTockPoNalogahList = tmpOcenaTockPoNalogahStr.split(" "); // dobiš polje stringov in ne cifer
+    let tmppisniTestNalogeTockArr = tmppisniTestNalogeTockStr.split(' ').map(Number); // naj bi dobil polje številk
+
+    //pisniTestMaxTock[lo_letnik][lo_predmet][lo_razred][tmpPisniTestNr] = tmpPisniTestMaxTock;
+    //pisniTestNalogeTock[lo_letnik][lo_predmet][lo_razred][tmpPisniTestNr] = tmppisniTestNalogeTockArr;
+
+    lo_nrPisnihTestov += 1;
+    pisniTestNr[lo_nrPisnihTestov] = tmpPisniTestNr;
+    pisniTestLetnik[lo_nrPisnihTestov] = lo_letnik;
+    pisniTestPredmet[lo_nrPisnihTestov] = lo_predmet;
+    pisniTestRazred[lo_nrPisnihTestov] = lo_razred;
+    pisniTestMaxTock[lo_nrPisnihTestov] = tmpPisniTestMaxTock;
+    pisniTestNalogeTock[lo_nrPisnihTestov] = tmppisniTestNalogeTockArr;
+
+    pisniTestUcenciTockeNalogUcenec[lo_nrPisnihTestov] = [];
+    pisniTestUcenciTockeNalogTocke[lo_nrPisnihTestov] = [];
+    pisniTestUcencevPoTockahNalog1[lo_nrPisnihTestov] = [];
+    pisniTestUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
+    pisniTestMaxUcencevPoTockahNalog1[lo_nrPisnihTestov] = [];
+    pisniTestMaxUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
+
+    return true;
+    
 }
 
 function data_parse_imenaKraticePredmetov(lineStr) {
@@ -6620,7 +7106,7 @@ function data_parse_novUcenecOcene(lineStr) {
     //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
     //console.log(tmpStr + "    U: " + lineStr);
 
-    let pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpZnak1, tmpPredmetKratica1, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock;
+    let pos, pos1, i, tmpOcenaStr, ocenaDataList, tmpZnak1, tmpPredmetKratica1, tmpOcenaCifra, tmpOcenaTip, tmpPisnaOcenaNr, tmpOcenaDatum, tmpPisnaOcena, tmpOcenaTock, tmpOcenaMaxTock, tmpOcenaTockPoNalogahStr, tmpOcenaTockPoNalogahArr;
     const itemList = lineStr.split(",");
     if (itemList.length < 1) {
         return false;
@@ -6732,7 +7218,7 @@ function data_parse_novUcenecOcene(lineStr) {
         datumOceneMs = Date.parse(datumOcene);        
         paramId += 1;
 
-        // VPIS novE OCENE
+        // VPIS nove OCENE
         lo_nrOcen += 1;
         lo_ocena = lo_nrOcen;
         
@@ -6751,10 +7237,12 @@ function data_parse_novUcenecOcene(lineStr) {
         ocenaTipSerialNr[lo_nrOcen] = 0;
         ocenaDatumStr[lo_nrOcen] = tmpOcenaDatum;
         ocenaDatumMs[lo_nrOcen] = datumOceneMs; // 1.2.2025
-        // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU    
+        
+        // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU
         // ---- default število točk
         ocenaTock[lo_nrOcen] = -1;
         ocenaMaxTock[lo_nrOcen] = -1;
+        ocenaTockPoNalogahArr[lo_nrOcen] = []; // 22.5.2025
         // ---- zdaj pa pogledamo konkretno ...
         if (tmpPisnaOcena) {
             // ---- ŠTEVILO DOSEŽENIH TOČK NA PISNEM TESTU
@@ -6762,9 +7250,22 @@ function data_parse_novUcenecOcene(lineStr) {
             paramId += 1;
             // ---- ŠTEVILO MOŽNIH TOČK NA PISNEM TESTU
             tmpOcenaMaxTock = Number(ocenaDataList[paramId].trim());
+            paramId += 1;
+            // ---- ŠTEVILO DOSEŽENIH TOČK PO POSAMEZNIH NALOGAH (22.5.2025 ... to je pri pisni oceni lahko dodano zraven ali pa ne. Do sedaj ni bilo, zdaj pa bo.)
+            if (ocenaDataList.length > paramId) {
+                tmpOcenaTockPoNalogahStr = ocenaDataList[paramId].trim(); // space sep. lista točk po nalogah
+                // ---- to pa je zdaj treba spraviti v polje cifer
+                //tmpOcenaTockPoNalogahList = tmpOcenaTockPoNalogahStr.split(" "); // dobiš polje stringov in ne cifer
+                tmpOcenaTockPoNalogahArr = tmpOcenaTockPoNalogahStr.split(' ').map(Number); // naj bi dobil polje številk
+            } else {
+                tmpOcenaTockPoNalogahStr = "";
+                tmpOcenaTockPoNalogahArr = [];
+            }
+            
             // ----
             ocenaTock[lo_nrOcen] = tmpOcenaTock;       // koliko točk je bilo doseženih pri tej oceni
-            ocenaMaxTock[lo_nrOcen] = tmpOcenaMaxTock; // koliko je lahko na tstu največ točk
+            ocenaMaxTock[lo_nrOcen] = tmpOcenaMaxTock; // koliko je lahko na testu največ točk
+            ocenaTockPoNalogahArr[lo_nrOcen] = tmpOcenaTockPoNalogahArr; // koliko je doseženih točk na testu po posamezni nalogi (22.5.2025)
         }
 
         // ---- INDEX OCEN PO DATUMU 16.2.2025
@@ -6873,6 +7374,16 @@ function getRazredId(vp_letnik, vp_crka) {
     return -1;
 }
 
+function getPisniTestId(vp_letnik, vp_predmet, vp_razred, vp_pisniTestNr) { // 24.5.2025
+    let i;
+    for (i = 1; i <= lo_nrPisnihTestov; i++) {
+        if (pisniTestLetnik[i] == vp_letnik && pisniTestPredmet[i] == vp_predmet && pisniTestRazred[i] == vp_razred && pisniTestNr[i] == vp_pisniTestNr) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 function getUcenecByRazredImePriimek(vp_razredId, vp_ime, vp_priimek) {
     let i;
     for (i = 1; i <= lo_nrUcencev; i++) {
@@ -6909,6 +7420,10 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         ocenaRezultatiImePriimek[ocenaId] = []; ocenaRezultatiRazred[ocenaId] = []; ocenaRezultatiTock[ocenaId] = []; ocenaRezultatiPercent[ocenaId] = []; ocenaRezultatiOcenaIdVRazredu[ocenaId] = [];
     }
 
+    //---- 24.5.2025 Analiza toÄk po nalogah znotraj testa
+    let arrPisniTestUcenciTockeNalogUcenec = [];
+    let arrPisniTestUcenciTockeNalogTocke = [];
+
     let ocenaId0, passed, found;
     let myLetnik = getLetnikId(vp_letnik);
     let myPredmet = getPredmetId(vp_predmet);
@@ -6939,8 +7454,25 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         return [0, 0, 0, 0, 0, 0, 0, ocenaRezultatiImePriimek, ocenaRezultatiRazred, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, 0, rezultatiImePriimek, rezultatiRazred, rezultatiTock, rezultatiPercent, rezultatiOcena]; // result not valid - not found!
     }
 
-    let ucenecId, ocena, nrOcen, sumOcen, tock, imePriimek, sumTock;
+    let ucenecId, ocena, nrOcen, sumOcen, tock, tockPoNalogahArr, imePriimek, sumTock;
     // ---- smo na prvi ustrezni oceni
+
+    // ---- 24.5.2025 analiza točk po nalogah
+    let tmpPisniTestId;
+    let tmpPisniTestItemsCount = 0;
+    let pisniTestAnalizaProcess = false;
+    if (!razredCrkaAll) {
+        tmpPisniTestId = getPisniTestId(myLetnik, myPredmet, myRazred, lo_pisniTestNr);
+        //if (tmpPisniTestId == 3) { // debug
+        //    tmpPisniTestId = tmpPisniTestId;
+        //}
+        if (tmpPisniTestId > 0) { // če smo našli podatke ustreznega pisnega testa
+            if (pisniTestUcenciTockeNalogTocke[tmpPisniTestId].length <= 0) { // če doslej podatki tega pisnega testa še niso bili procesirani
+                pisniTestAnalizaProcess = true; // potem jih zdaj prvič in zadnjič sprocesiraj
+            }
+        }
+    };
+
     passed = false;
     nrOcen = 0;
     sumOcen = 0; sumTock = 0;
@@ -6964,6 +7496,7 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         ocena = ocenaCifraNr[ocenaId];
         maxTock = ocenaMaxTock[ocenaId];
         tock = ocenaTock[ocenaId];
+        tockPoNalogahArr = ocenaTockPoNalogahArr[ocenaId]; // 24.5.2025
         imePriimek = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId]; // 24.1.2025
         //----
         if (tock < lowTock) { lowTock = tock };
@@ -6991,6 +7524,12 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
         rezultatiPercent[nrOcen] = tock / maxTock * 100; // 21.1.2025 ta je dosegel toliko točk
         rezultatiOcena[nrOcen] = ocena;                  // 22.1.2025 ta je dosegel toliko točk
         
+        // ---- 24.5.2025 Analiza točk po nalogah znotraj testa oziroma ocene pri testu
+        if (pisniTestAnalizaProcess && tockPoNalogahArr.length > 0) {
+            tmpPisniTestItemsCount += 1;
+            arrPisniTestUcenciTockeNalogUcenec[tmpPisniTestItemsCount] = ucenecId;
+            arrPisniTestUcenciTockeNalogTocke[tmpPisniTestItemsCount] = tockPoNalogahArr;
+        }
     };
     
     // ---- Smo nabrali kakšne ocene?
@@ -7008,6 +7547,43 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
     ocenaCountPercent[3] = ocenaCount[3] / nrOcen * 100;
     ocenaCountPercent[4] = ocenaCount[4] / nrOcen * 100;
     ocenaCountPercent[5] = ocenaCount[5] / nrOcen * 100;
+
+    // ---- 24.5.2025 Analiza točk po nalogah znotraj testa
+    if (pisniTestAnalizaProcess) {
+        pisniTestUcenciTockeNalogUcenec[tmpPisniTestId] = arrPisniTestUcenciTockeNalogUcenec;
+        pisniTestUcenciTockeNalogTocke[tmpPisniTestId] = arrPisniTestUcenciTockeNalogTocke;
+        //---- zdaj pa je treba čez shranjene podatke glede tega testa in po posameznih nalogah pripraviti statistiko, koliko učencev je doseglo določeno število točk
+        let nrNalog = pisniTestNalogeTock[tmpPisniTestId].length; // število nalog na tem pisnem testu
+        let moznihTockNaloge = 0;
+        let stevec1 = []; let stevec05 = [];
+        let tock, tockIndex1, tockIndex05, maxUcencev1, maxUcencev05;
+        let ucencevPoTockah1 = []; let ucencevPoTockah05 = [];
+        for (let naloga = 0; naloga < nrNalog; naloga++) {
+            //---- smo znotraj ene od nalog pisnega testa
+            moznihTockNaloge = pisniTestNalogeTock[tmpPisniTestId][naloga];
+            ucencevPoTockah1.length = 0; ucencevPoTockah05.length = 0;
+            for (let tmpIndex = 0; tmpIndex <= moznihTockNaloge; tmpIndex++) { ucencevPoTockah1[tmpIndex] = 0 };
+            for (let tmpIndex = 0; tmpIndex <= 2 * moznihTockNaloge; tmpIndex++) { ucencevPoTockah05[tmpIndex] = 0 };
+            //---- grem po vseh učencih, ki so pisali ta test v tem razredu pri tem predmetu in učenca prištejem k številu točk, ki jih je on dosegel
+            maxUcencev1 = 0; maxUcencev05 = 0;
+            for (let tmpUcenec = 1; tmpUcenec <= pisniTestUcenciTockeNalogUcenec[tmpPisniTestId].length - 1; tmpUcenec++) {
+                tock = pisniTestUcenciTockeNalogTocke[tmpPisniTestId][tmpUcenec][naloga];
+                //if (tock == 5.5) {
+                //    tock = tock;
+                //}
+                tockIndex1 = Math.round(tock); ucencevPoTockah1[tockIndex1] += 1;
+                if (ucencevPoTockah1[tockIndex1] > maxUcencev1) { maxUcencev1 = ucencevPoTockah1[tockIndex1] };
+                tockIndex05 = Math.round(tock * 2); ucencevPoTockah05[tockIndex05] += 1;
+                if (ucencevPoTockah05[tockIndex05] > maxUcencev05) { maxUcencev05 = ucencevPoTockah05[tockIndex05] };
+            }
+            //---- razporeditev učencev po posameznem številu točk znotraj te naloge je določena
+            pisniTestUcencevPoTockahNalog1[tmpPisniTestId][naloga + 1] = ucencevPoTockah1.slice();
+            pisniTestUcencevPoTockahNalog05[tmpPisniTestId][naloga + 1] = ucencevPoTockah05.slice();
+            pisniTestMaxUcencevPoTockahNalog1[tmpPisniTestId][naloga + 1] = maxUcencev1;
+            pisniTestMaxUcencevPoTockahNalog05[tmpPisniTestId][naloga + 1] = maxUcencev05;
+            console.log("Opravljena analiza za pisni test #" + tmpPisniTestId.toString());
+        }
+    }
 
     return [true, nrOcen, avgOcena, avgTock, avgPercent, maxTock, lowTock, topTock, ocenaRezultatiImePriimek, ocenaRezultatiRazred, ocenaRezultatiTock, ocenaRezultatiPercent, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, maxOcenaCount, rezultatiImePriimek, rezultatiRazred, rezultatiTock, rezultatiPercent, rezultatiOcena]; // valid result
 
@@ -7653,12 +8229,15 @@ function test_avg_all() {
 
 function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, maxOcenaCount, vp_title) {
     
+    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false); // okvir okoli področja za ta graf
+
     const marginChart = 10;
     const gapChart = 5;
     const gapBar = 4;
     const wBar = (vp_w - 2 * marginChart - 2 * gapChart) / 5;
-    let y0 = vp_y + vp_h - marginChart;
-    let ky = (vp_h - 65) / maxOcenaCount; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
+    let y0 = vp_y + vp_h - marginChart - 8;
+    let titleHeight = 65; if (vp_title == "") { titleHeight = 30 }; // če ni naslova, potem se lahko barsi rišejo do vrha prostora za graf
+    let ky = (vp_h - titleHeight - marginChart - 8) / maxOcenaCount; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
     let xm1 = vp_x + marginChart + gapChart + wBar / 2; // sredina prvega bara
     let wBarFinal = wBar - 2 * gapBar;
 
@@ -7744,19 +8323,23 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     gText(avgOcena[vp_itemId].toFixed(2), "9pt verdana", "darkSlateGray", x + 7, y0 + 14);
 
     // ---- NASLOV GRAFA
-    tmpText = vp_title;
-    ;[w, h] = gMeasureText(tmpText, fontTitle);
-    x = vp_x + vp_w / 2 - w / 2;
-    y = vp_y + h + 4;
-    if (lo_showGUI && y < 60 && x > (ctxW - 245)) {
-        y = 60;
-        if (x > (ctxW - 160)) { x = ctxW - 160; }
-    };
-    gTextSO(tmpText, fontTitle, "darkSlateGray", "powderBlue", "darkGray", 2, 3, x, y);
+    if (vp_title != "") {
+        tmpText = vp_title;
+        ;[w, h] = gMeasureText(tmpText, fontTitle);
+        x = vp_x + vp_w / 2 - w / 2;
+        y = vp_y + h + 4;
+        if (lo_showGUI && y < 60 && x > (ctxW - 245)) {
+            y = 60;
+            if (x > (ctxW - 160)) { x = ctxW - 160; }
+        };
+        gTextSO(tmpText, fontTitle, "darkSlateGray", "powderBlue", "darkGray", 2, 3, x, y);        
+    }
 
 };
 
 function paint_pieChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, vp_razredId, arrOcene, vp_nrOcen) {
+    
+    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
     
     const marginChart = 10;
     let maxDim = Math.min(vp_w, vp_h);
@@ -7823,16 +8406,18 @@ function paint_scatterPlotChart_byRazprsenost(
     arrImePriimek, arrTock, arrPercent, arrOcena, arrKriteriji,
     Q1, Q2, Q3) {
     
+    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
+
     let marginChartH = 10;
     if (vp_w > 100) {
         marginChartH = 0.3 * vp_w
     };
-    const marginChartV = 10;
+    const marginChartTop = 20; const marginChartBottom = 14;
     const wTextArea = 20;
     const gapChart = 5;
     const gapChartR = 2;
-    let yXos = vp_y + vp_h - marginChartV - 10;
-    let yTop = vp_y + marginChartV;
+    let yXos = vp_y + vp_h - marginChartBottom;
+    let yTop = vp_y + marginChartTop;
     let yRange = yXos - yTop;
     let ky = (yRange) / vp_maxTock; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
     let kyp = ky * vp_maxTock / 100; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
@@ -8017,6 +8602,148 @@ function paint_scatterPlotChart_byRazprsenost(
         tmpText = "low: " + vp_lowTock.toString() + "/" + (vp_lowTock / vp_maxTock * 100).toFixed(1) + "%";
         gText(tmpText, fontAxisText, "darkSlateGray", x, yQlow + h / 2 - 1);
     }
+
+};
+
+function paint_barChart_analizaNalog(vp_x, vp_y, vp_w, vp_h, vp_itemId) {
+    
+    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
+
+    if (lo_byRazredGen) { return };
+    let myRazred = vp_itemId;
+    let myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
+    if (myPisniTestId <= 0) { return };
+    let nrNalog = pisniTestNalogeTock[myPisniTestId].length; // število nalog na tem pisnem testu
+    
+    const marginLeft = 8; let marginMiddleH = vp_w * 0.05; const marginRight = 8;
+    const marginTop = 8; const marginMiddleV = 8; const marginBottom = 8;
+
+    //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
+    anChartX[vp_itemId] = vp_x;
+    anChartY[vp_itemId] = vp_y;
+    anChartX1[vp_itemId] = vp_x + vp_w;
+    anChartY1[vp_itemId] = vp_y + vp_h;
+    //----
+    anChartXnaloga[vp_itemId] = [];
+    anChartYnaloga[vp_itemId] = [];
+    anChartX1naloga[vp_itemId] = [];
+    anChartY1naloga[vp_itemId] = [];
+    //----
+    anChartXtock[vp_itemId] = [];
+    anChartYtock[vp_itemId] = [];
+    anChartX1tock[vp_itemId] = [];
+    anChartY1tock[vp_itemId] = [];
+
+
+    let singleChartWidth = (vp_w - marginLeft - marginMiddleH - marginRight) / 2;
+    let itemsColumn1 = Math.trunc((nrNalog + 1) / 2);
+    let singleChartHeight = (vp_h - marginTop - marginBottom - (itemsColumn1 - 1) * marginMiddleV) / itemsColumn1;
+    let naloga, x, y;
+
+    //---- koordinate za bar chart prve naloge
+    x = vp_x + marginLeft; y = vp_y + marginTop;
+
+    //---- zanka po vseh nalogah
+    let column2 = false;
+    for (naloga = 0; naloga < nrNalog; naloga++) {    
+        //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
+        anChartXnaloga[vp_itemId][naloga + 1] = x;
+        anChartYnaloga[vp_itemId][naloga + 1] = y;
+        anChartX1naloga[vp_itemId][naloga + 1] = x + singleChartWidth;
+        anChartY1naloga[vp_itemId][naloga + 1] = y + singleChartHeight;        
+        //---- smo znotraj ene od nalog pisnega testa ... nariši bar chart zanjo
+        paint_barChart_analizaNalog_singleNaloga(x, y, singleChartWidth, singleChartHeight, vp_itemId, myPisniTestId, naloga + 1);
+        //---- priprava koordinat za bar chart naslednje naloge
+        if (!column2 && naloga + 1 >= nrNalog / 2) {
+            x += (singleChartWidth + marginMiddleH);
+            y = vp_y + marginTop;
+            column2 = true;
+        } else {
+            y += (singleChartHeight + marginMiddleV);
+        }
+    }
+}
+
+function paint_barChart_analizaNalog_singleNaloga(vp_x, vp_y, vp_w, vp_h, vp_itemId, vp_pisniTestId, vp_naloga) {
+    
+    //gBannerRect(vp_x, vp_y, vp_w, vp_h, 0, 0, "azure", 2, "gray", "black", 2, 2, false);
+
+    let maxTock = pisniTestNalogeTock[vp_pisniTestId][vp_naloga - 1];
+    let nrBars = maxTock + 1; // ker je poleg 1-max možno tudi 0 točk!
+    let gapBar = 2; // reža med stolpci
+    const maxUcencev = Math.max(pisniTestMaxUcencevPoTockahNalog1[vp_pisniTestId][vp_naloga]);
+
+    //---- Y ----
+    const marginChartV = 5;
+    const gapChartTop = 3;
+    let yXos = vp_y + vp_h - marginChartV - 10;
+    let yTop = vp_y + marginChartV;
+    let yTopData = yTop + gapChartTop;
+    let yRange = yXos - yTopData;
+    let ky = (yRange) / maxUcencev; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
+    let kyp = ky * maxUcencev / 100; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
+    //---- X ----
+    let marginChartH = 4; // rob na levi in na desni od celotnega grafa
+    const wTextArea = 2; // dodaten rob na levi zaradi označevanja števila učencev (v bistvu sploh ne bo teksta, ker so oznake že na vrhu stolpcev)
+    const gapChartL = 4;  // malo luknje med X osjo in začetkom podatkov
+    const gapChartR = 2;  // malo luknje med koncem podatkov in koncem X osi
+    let xYos = vp_x + marginChartH + wTextArea; // X koordinata Y osi
+    let x0 = xYos + gapChartL; // začetek risanja markerjev rezultatov, od tu so podatki
+    let x1 = vp_x + vp_w - marginChartH - gapChartR; // do tu je prostor za podatke
+    let xRight = x1 + gapChartR; // do tu bo narisana X os
+    const xRange = x1 - x0;
+    let wBar = (xRange - (nrBars - 1) * gapBar) / nrBars;
+    if (wBar > 15) { gapBar = 4; }; if (wBar > 25) { gapBar = wBar / 5; };
+    if (gapBar > 2) { wBar = (xRange - (nrBars - 1) * gapBar) / nrBars };
+
+    let fontAxisText = "9pt verdana";
+    let fontAxisTextBold = "bold 10pt verdana";
+    let fontNaloga = "bold 11pt verdana";
+
+    //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
+    anChartXtock[vp_itemId][vp_naloga] = [];
+    anChartYtock[vp_itemId][vp_naloga] = [];
+    anChartX1tock[vp_itemId][vp_naloga] = [];
+    anChartY1tock[vp_itemId][vp_naloga] = [];
+    
+    let tock, nrUcencev, tmpText, w, h, x, y, hBar, barColor;
+    for (tock = 0; tock <= maxTock; tock++) {
+        x = x0 + tock * (wBar + gapBar);
+        nrUcencev = pisniTestUcencevPoTockahNalog1[vp_pisniTestId][vp_naloga][tock];
+        hBar = 0; y = yXos; // default
+        if (nrUcencev > 0) {
+            hBar = ky * nrUcencev;
+            y = yXos - hBar;
+            barColor = "tan";
+            if (lo_anChartSelectedId == vp_itemId && lo_anChartNalogaSelectedId == vp_naloga && lo_anChartTockSelectedId >= 0) {
+                barColor = (lo_anChartTockSelectedId == tock) ? "peru" : "#ECECECFF";
+            }
+            gBannerRoundRect2(x, y, wBar, hBar, 3, barColor, 1, "silver", "#DCDCDCC0", 2, 2, false, true, true, false, false);
+            tmpText = nrUcencev.toString();
+            ;[w, h] = gMeasureText(tmpText, fontAxisText);
+            gText(tmpText, fontAxisText, "darkGray", x + wBar / 2 - w / 2, y - 2);
+        }
+        tmpText = tock.toString();
+        ;[w, h] = gMeasureText(tmpText, fontAxisText);
+        gText(tmpText, fontAxisText, "darkSlateGray", x + wBar / 2 - w / 2, yXos + 4 + h);
+        //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
+        anChartXtock[vp_itemId][vp_naloga][tock] = x;
+        anChartYtock[vp_itemId][vp_naloga][tock] = y;
+        anChartX1tock[vp_itemId][vp_naloga][tock] = x + wBar;
+        anChartY1tock[vp_itemId][vp_naloga][tock] = y + hBar;
+    }
+
+    gLine(xYos, yXos, xRight, yXos, 1, "darkSlateGray", []);
+    //gLine(xYos, yXos, xYos, yTop, 1, "darkSlateGray", []);
+
+    tmpText = vp_naloga.toString();
+    ;[w, h] = gMeasureText(tmpText, fontNaloga);
+    x = xYos - w / 2 - 2;
+    if (lo_anChartSelectedId == vp_pisniTestId && lo_anChartNalogaSelectedId == vp_naloga) { // 27.5.2025
+        tmpText += ". naloga";
+        ;[w, h] = gMeasureText(tmpText, fontNaloga);
+    }
+    gBannerRoundRectWithText(x, yTopData - 2, w, h, fontNaloga, "darkSlateGray", tmpText, 3, 3, 7, "azure", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
 
 };
 
