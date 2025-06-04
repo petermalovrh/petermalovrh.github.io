@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.2"
-const gl_versionDate = "1.6.2025"
+const gl_versionNr = "v2.3"
+const gl_versionDate = "3.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -32,6 +32,9 @@ const scSch = String.fromCharCode(0x160)
 const scSchLow = String.fromCharCode(0x161)
 const scZh = String.fromCharCode(0x17D)
 const scZhLow = String.fromCharCode(0x17E)
+//----
+const scTchSoft = String.fromCharCode(0x106)
+const scTchSoftLow = String.fromCharCode(0x107)
 //----
 const scCopyright = String.fromCharCode(0xA9)
 const scDoubleQuote = String.fromCharCode(0x22)
@@ -2436,6 +2439,7 @@ var drawBarChart = true;
 var drawPieChart = true;
 var drawSpChart = true;
 var drawAnChart = true; // 25.5.2025
+var drawSuChart = true; // 25.5.2025
 
 //---- 22.1.2025
 var spChartX = [];
@@ -3720,7 +3724,11 @@ window.addEventListener("keydown", (event) => {
             paint();
             break;        
         case 'KeyE':
-            lo_keyDownE = true; break;
+            if (event.shiftKey) {
+                encryptUcenciRazredi();
+                paint();
+            };
+            break;
         case 'ArrowRight':
         //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
         //break;
@@ -4273,7 +4281,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
     if (lo_byRazredGen) { nrItems = lo_nrRazredGen }; // 25.1.2025
     let chartWidth = (ctxW - 2 * chartMargin - (nrItems - 1) * chartGapX) / nrItems;
     let x0 = 20;
-    let tmpText, w, h, colorId, x, y, y0;
+    let tmpText, w, h, colorId, x, y, y0, y1, y2, chartBottom;
     let titleFont = "bold 18pt verdana";
 
     // ---- Common title panel
@@ -4329,7 +4337,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
             if (nrOcen[tmpItemId] > 0) {
                 let vl_chartTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
                 //if (lo_grafZakljucneOcene) {
-                    paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], maxZakljucnaOcenaCount, avgZakljucnaOcena, vl_chartTitle);
+                paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], maxZakljucnaOcenaCount, avgZakljucnaOcena, vl_chartTitle);
                 //} else {
                 //    paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], maxOcenaCount, vl_chartTitle);
                 //}
@@ -4360,11 +4368,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
         for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
             if (nrOcen[tmpItemId] > 0) {
                 // za tekoči razred narišem pie chart
-                //if (lo_grafZakljucneOcene) {
-                    paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], nrZakljucnihOcen[tmpItemId]);
-                //} else {
-                //    paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], nrOcen[tmpItemId]);
-                //}             
+                paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], nrZakljucnihOcen[tmpItemId]);
             }
         }
     }
@@ -4374,45 +4378,18 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
     
     // ============ (3) SEZNAM UČENCEV PO ZAKLJUČNIH OCENAH  ============
 
-    return;
-
     chartGapY = 30;
-    // .... Kje bo vrh scatter plot chartov (y2)
-    let y2 = y1; // vrh področja za ta graf
-    if (drawPieChart) {
-        y2 += chartHeight + chartGapY; // vrh področja za scatter plot chart graph
-    }
-    drawSpChart = true;
-    switch (lo_schrink) {
-        case 0: case 1: case 2: case 3:
-            chartHeight = ctxH - y2 - chartGapY / 2 - chartMargin;
-            break;
-        case 4: chartHeight = ctxH - 2 * chartMargin - titlePanelHeight; break;
-        case 5: chartHeight = ctxH - 2 * chartMargin; break;
-    }
+    // .... Kje bo vrh seznama učencev (y1)
+    y2 = y1 + chartHeight + chartGapY;
+    drawSuChart = true; // 3.6.2025
+    chartBottom = ctxH - marginBannerV - gapBannerV;
+    chartHeight = chartBottom - y2;
     x1 = 20;
-    // Za vse razrede nariši scatterplot-chart-e
+    // Za vse razrede nariši pie-chart-e
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-        // za tekoči razred narišem scatter plot chart
         if (nrOcen[tmpItemId] > 0) {
-            switch (lo_drawAnalizaNalog) {
-                case false:
-                    drawSpChart = true;
-                    drawAnChart = false;
-                    paint_scatterPlotChart_byRazprsenost(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight,
-                        tmpItemId,
-                        arrArrOceneCount[tmpItemId], nrOcen[tmpItemId],
-                        maxTock[tmpItemId], lowTock[tmpItemId], topTock[tmpItemId],
-                        avgTock[tmpItemId], avgPercent[tmpItemId],
-                        arrArrRezultatiUcenecId[tmpItemId], arrArrRezultatiImePriimek[tmpItemId], arrArrRezultatiTock[tmpItemId], arrArrRezultatiPercent[tmpItemId], arrArrRezultatiOcena[tmpItemId], arrKriteriji,
-                        arrQ1[tmpItemId], arrQ2[tmpItemId], arrQ3[tmpItemId]);
-                    break;
-                case true:
-                    drawSpChart = false;
-                    drawAnChart = true;
-                    paint_barChart_analizaNalog(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight, tmpItemId);
-                    break;
-            }
+            // za tekoči razred izpišem seznam učencev po zaključnih ocenah
+            paint_seznamUcencev_byZakljucnaOcena(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y2, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], nrZakljucnihOcen[tmpItemId]);
         }
     }
 
@@ -4524,6 +4501,7 @@ function paint_eRazred_grafTest_allRazred() {
         case 4: chartHeight = ctxH - 2 * chartMargin - titlePanelHeight; break;
         case 5: chartHeight = ctxH - 2 * chartMargin; break;
     }
+    drawSuChart = false; // 3.6.2025
     x1 = 20;
     // Za vse razrede nariši scatterplot-chart-e
     for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
@@ -4821,7 +4799,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips() {
 
     let tipFont = "bold italic 12pt verdana";
 
-        // ---- MOUSE OVER TIPS - BAR/PIE CHART 24.1.2025
+    // ---- MOUSE OVER TIPS - BAR/PIE CHART 24.1.2025
     let printList = false;
     let arrTipText = []; let arrTipColor = [];
     let textExceedH = false;
@@ -4853,7 +4831,6 @@ function paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips() {
             }
         }
         // ---- tekst za toolTip je nabran in tudi vemo, ali ga je treba prestaviti bolj levo, da ne bo gledal ven iz ekrana
-        //      zdaj bi bilo dobro presortirati nabrane učence glede na dosežene točke oziroma procente
         for (i = 0; i < arrArrZakljucneOceneCount[tmpItemId][lo_ocenaSelected]; i++) {
             // ---- mouse over tip
             tmpText = arrTipText[i];
@@ -4864,100 +4841,6 @@ function paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips() {
             //gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", gf_alphaColor(208, "lightGray"), 5, 5);
             colorId = arrTipColor[i];
             gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", rsltColor[colorId], "", 0, 0); // prej so bili vsi izpisani v darkBlue barvi!
-        }
-    }
-
-    return;
-
-    if (drawSpChart && lo_spChartSelectedId > 0) {
-        if (lo_testSelected > 0) {
-            // ---- odebeljen krogec okoli testa
-            x = spChartX[lo_spChartSelectedId] + lo_testSelected;
-            y = spChartY1[lo_spChartSelectedId] - spChartKy[lo_spChartSelectedId] * arrArrRezultatiTock[lo_spChartSelectedId][lo_testSelected];
-            colorId = lo_testSelected - 10 * (Math.trunc((lo_testSelected - 1) / 10)) - 1;
-            gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
-            // ---- mouse over tip
-            tmpText = "(" + arrArrRezultatiOcena[lo_spChartSelectedId][lo_testSelected] + ")";
-            tmpText += " " + arrArrRezultatiImePriimek[lo_spChartSelectedId][lo_testSelected];
-            if (lo_byRazredGen) { // če imam pregled za celo generacijo skupaj, k imenu in priimku dodam še razred
-                tmpText += ", " + arrArrRezultatiRazred[lo_spChartSelectedId][lo_testSelected];
-                //tmpText += ", " + arrRazredArrOceneArrRezultatiRazred[lo_testSelected];
-            }
-            tmpText += ", " + arrArrRezultatiTock[lo_spChartSelectedId][lo_testSelected].toString() + "t";
-            tmpText += ", " + arrArrRezultatiPercent[lo_spChartSelectedId][lo_testSelected].toFixed(1) + "%";
-            ;[w, h] = gMeasureText(tmpText, tipFont);
-            x1 = lo_mouseMoveX + 24; y1 = lo_mouseMoveY + 6;
-            if ((x1 + w + 15) > ctxW) {
-                x1 = ctxW - w - 7;
-                y1 = lo_mouseMoveY + 24;
-            }
-            gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, "papayaWhip", 1, "lightGray", "darkBlue", "", 0, 0);
-        }
-    }
-    
-    
-
-    // ---- MOUSE OVER TIPS - BAR CHART Z ANALIZAMI NALOG 24.1.2025
-    //---- najprej samo okvir okoli bar chart-a ene naloge
-    let myRazred, myPisniTestId, naloga, tock, tockReal, tmpTitle, tmpBody, ucenecId, nrUcencev;
-    let textExceedV = false;
-    let ucenecOutV = 0; // 27.5.2025 pri katerem učencu iz toolTip-a se je ta že hotel izpisati navpično ven iz ekrana
-    let ucencevOutV = 0; // ... koliko pa bi potem bilo vseh, ki bi se izpisali spodaj ven?
-    if (drawAnChart && lo_anChartSelectedId > 0 && lo_anChartNalogaSelectedId > 0) { 
-        if (lo_anChartTockSelectedId < 0) {
-            // ---- noben bar ni selektiran -> narišem samo črtkan okvir okoli bar chart grafa ene naloge
-            x = anChartXnaloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] - 5;
-            y = anChartYnaloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] - 5;
-            x1 = anChartX1naloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] + 1;
-            y1 = anChartY1naloga[lo_anChartSelectedId][lo_anChartNalogaSelectedId] + 1;
-            //gBannerRect2(x, y, x1 - x, y1 - y, 0, 0, "", 3, "crimson", [3, 3], "", 0, 0, false);
-        } else {
-            // ---- selektiran je en konkreten bar pri določenem številu točk ene konkretne naloge na enem konkretnem testu
-            tmpItemId = lo_anChartSelectedId;
-            myRazred = tmpItemId;
-            myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
-            naloga = lo_anChartNalogaSelectedId;
-            tock = lo_anChartTockSelectedId;
-            //---- 
-            tmpTitle = naloga.toString() + ". naloga, " + tock.toString() + " točk";
-            tmpBody = ""; nrUcencev = 0;
-            arrTipText.length = 0; textExceedH = false;
-            for (let tmpUcenec = 1; tmpUcenec <= pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1; tmpUcenec++) {
-                tockReal = pisniTestUcenciTockeNalogTocke[myPisniTestId][tmpUcenec][naloga - 1];
-                if (Math.round(tockReal) == tock) {
-                    //---- tale učenec je že tak, da je pisal točno toliko točk pri tej nalogi na tem testu
-                    nrUcencev += 1;
-                    ucenecId = pisniTestUcenciTockeNalogUcenec[myPisniTestId][tmpUcenec];
-                    //tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId]; // + ", " + razredIme[myRazred];
-                    tmpText = ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId] + ", " + tockReal.toString() + "t";
-                    arrTipText[nrUcencev] = tmpText;
-                    // ---- če še noben text ni pogledal ven iz ekrana, potem to preverim za tekoči tekst
-                    if (!textExceedH || !textExceedV) {
-                        ;[w, h] = gMeasureText(tmpText, tipFont);
-                        if (!textExceedH) { if ((lo_mouseMoveX + w + 30) > ctxW) { textExceedH = true; }; };
-                        if (!textExceedV) {
-                            y1 = lo_mouseMoveY + 16 + nrUcencev * 21 + 37; // x1 = lo_mouseMoveX - 150; gLine(x1, y1, x1 + 30, y1, 1, "black", []);
-                            if (y1 > ctxH) {
-                                textExceedV = true; ucenecOutV = nrUcencev;
-                            };
-                        };
-                    };
-                };
-            }
-            ucencevOutV = nrUcencev - ucenecOutV;
-            for (i = 1; i <= nrUcencev; i++) {
-                // ---- mouse over tip
-                tmpText = arrTipText[i];
-                colorId = i - 10 * (Math.trunc((i - 1) / 10)) - 1;
-                ;[w, h] = gMeasureText(tmpText, tipFont);
-                x1 = lo_mouseMoveX + 24;
-                y1 = lo_mouseMoveY + 16 + i * 21;
-                if (textExceedH) { x1 = ctxW - w - 7; if (!textExceedV) { y1 += 18; } };
-                if (textExceedV) { y1 -= (ucencevOutV) * 21; };
-                //gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", "darkBlue", gf_alphaColor(208, "lightGray"), 5, 5);
-                colorId = i - 10 * (Math.trunc((i - 1) / 10)) - 1;
-                gBannerRectWithText3(tmpText, x1, y1, tipFont, 5, 5, 5, 4, 4, gf_alphaColor(208, "papayaWhip"), 1, "lightGray", rsltColor[colorId], "", 0, 0); // prej so bili vsi izpisani v darkBlue barvi!
-            }            
         }
     }
 
@@ -8797,6 +8680,7 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     if (vp_w > 350 && vp_h > 350) { fontOcena = "bold 15pt verdana"; };
     let fontNr = "10pt verdana";
     let fontTitle = "bold 16pt verdana";
+    let vseh = 0; // koliko jih je vseh skupaj z znano oceno - iz tega ven se potem vidi, koliko jih ocene nima
     // ---- Grem po vrsti čez vse ocene od 1 do 5
     
     let xm = xm1;
@@ -8809,6 +8693,8 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
         bcChartY1[vp_itemId][i] = 0;
 
         if (arrOcene[i] > 0) {
+
+            vseh += arrOcene[i];
 
             // ---- BAR
             x = xm - wBar / 2 + gapBar;
@@ -8840,11 +8726,19 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
             if (yTextBase < (yTabletTop - 2)) {
                 gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1, yTextBase);
             } else {
-                gText(tmpText, fontNr, countOcenColor, xm - w / 2 - 1 + 13, yTextBase);
+                gText(tmpText, fontNr,"darkSlateGray", xm - w / 2 - 1 + 13, yTextBase);
             }
             
         }
         xm += wBar; // tale pomik mora biti v vsakem primeru, pa če bom risal bar ali ne (26.1.2025)
+    }
+
+    // ---- KOLIKO JIH JE BREZ OCENE?
+    if ((razredNrUcencev[vp_itemId] - vseh) > 0) {
+        tmpText = "brez: " + (razredNrUcencev[vp_itemId] - vseh).toString();
+        ;[w, h] = gMeasureText(tmpText, fontNr);
+        //gText(tmpText, fontNr, countOcenColor, vp_x + marginChart, vp_y + titleHeight + h + 4);
+        gBannerRoundRectWithText(vp_x + marginChart,vp_y + titleHeight + h + 4, w, h, fontNr, countOcenColor, tmpText, 2, 2, 2, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);        
     }
 
     // ---- VODORAVNA ČRTA KOT OSNOVA GRAFA
@@ -8938,6 +8832,109 @@ function paint_pieChart_byOcenaShare(vp_x, vp_y, vp_w, vp_h, vp_razredId, arrOce
         
         pcChartFi[vp_razredId][i] = fi; // 23.1.2025
 
+    }
+
+};
+
+function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredId, arrOcene, vp_nrOcen) {
+    //----------------------
+    // 3.6.2025
+    //----------------------
+
+    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
+    
+    const marginChart = 10;
+    let maxDim = Math.min(vp_w, vp_h);
+    const radij = (maxDim - 2 * marginChart) / 2;
+    let cx = vp_x + vp_w / 2;
+    let cy = vp_y + vp_h / 2;
+
+    //---- shrani lastnosti digrama za mouseOver() event (23.1.2025)
+    //pcChartCx[vp_razredId] = cx;
+    //pcChartCy[vp_razredId] = cy;
+    //pcChartRadij[vp_razredId] = radij;
+    //pcChartFi[vp_razredId] = [];
+    
+    let i, tmpText, w, h, x, y, tmpColor;
+    let fontOcena = "bold 13pt verdana";
+    if (vp_w > 150 && vp_h > 150) { fontOcena = "bold 14pt verdana"; };
+    if (vp_w > 250 && vp_h > 250) { fontOcena = "bold 15pt verdana"; };
+    if (vp_w > 350 && vp_h > 350) { fontOcena = "bold 16pt verdana"; };
+    let fontNr = "10pt verdana";
+    let fontTitle = "bold 16pt verdana";
+    let fontUcenec = "11pt verdana";
+    
+    //---- LAYOUT
+    let fullName = true;
+    let ucencevNaVrstico = 1;
+    if (vp_h < 300) { 
+        ucencevNaVrstico = 2;
+        if (vp_w < 150) { fullName = false; };
+    }
+    
+    let tmpOcena, tmpItemId;
+    let xOcenaMarker = vp_x + 2; // + 7;
+    let xIme1 = xOcenaMarker + 25; let xIme2, namesPrinted;
+    const cv_gapIme = 9;
+    const gapChartTop = 10;
+    y = vp_y + gapChartTop;
+    
+    tmpItemId = 0;
+    if (lo_ocenaSelected > 0) {
+        if (drawPieChart && lo_pcChartSelectedId > 0) { tmpItemId = lo_pcChartSelectedId; }
+        else if (drawBarChart && lo_bcChartSelectedId > 0) { tmpItemId = lo_bcChartSelectedId; };
+    }
+    let tmpSelOcena = 0;
+    if (tmpItemId == vp_razredId) { tmpSelOcena = lo_ocenaSelected };
+    let ocenaIdVRazredu, colorId;
+    const gapOcenaY = 30;
+
+    //---- Zanka po vseh petih ocenah pri tem konkretnem razredu
+    yLastOcena = y - gapOcenaY;
+    for (tmpOcena = 5; tmpOcena > 0; tmpOcena--) {
+
+        if (arrOcene[tmpOcena] > 0) {
+            
+            y = yLastOcena + gapOcenaY;
+            
+            // ---- TABLETEK OCENE
+            tmpText = tmpOcena.toString();
+            ;[w, h] = gMeasureText(tmpText, fontOcena);
+            x = xOcenaMarker;
+            tmpColor = colorOcena[tmpOcena];
+            if (tmpSelOcena > 0 && tmpSelOcena != tmpOcena) { 
+                tmpColor = gf_alphaColor(255 - tmpOcena * 40, "lightGray");
+            }
+            gBannerRoundRectWithText(x, y, w, h, fontOcena, tmpColor, tmpText, 3, 3, 5, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
+
+            // ---- SEZNAM UČENCEV S TO OCENO
+            x = xIme1; namesPrinted = 0;
+            yLastOcena = y;
+            for (i = 1; i <= arrArrZakljucneOceneCount[vp_razredId][tmpOcena]; i++) {
+                ocenaIdVRazredu = arrRazredArrZakljucneOceneArrRezultatiOcenaIdVRazredu[vp_razredId][tmpOcena][i];
+                colorId = ocenaIdVRazredu - 10 * (Math.trunc((ocenaIdVRazredu - 1) / 10)) - 1;
+                tmpColor = rsltColor[colorId];
+                if (tmpSelOcena > 0 && tmpSelOcena != tmpOcena) {
+                    tmpColor = "lightGray";
+                }
+                tmpText = arrRazredArrZakljucneOceneArrRezultatiImePriimek[vp_razredId][tmpOcena][i];
+                //arrTipText[i - 1] = tmpText; // zaradi kasnejšega sortiranja si zapise zapisujem od indeksa 0 vključno naprej
+                //arrTipColor[i - 1] = colorId;
+                //---- IZPIS TEGA UČENCA
+                ;[w, h] = gMeasureText(tmpText, fontUcenec);
+                gText(tmpText, fontUcenec, tmpColor, x, y + 13);
+                namesPrinted += 1;
+                yLastOcena = y;
+                switch (namesPrinted) {
+                    case 1: // ta učenec je prvi izpisan v tej vrstici - nastavim X na drugi stolpec, Y pa pustim isti
+                        x += (w + cv_gapIme);
+                        break;
+                    case 2: // ta učenec je bil zdaj že drugi v tej vrstici - nastavim X nazaj na začetek vrstice in Y pomaknem za eno vrstico dol
+                        x = xIme1; y += 20; namesPrinted = 0;
+                        break;
+                }
+            }
+        }
     }
 
 };
@@ -9074,8 +9071,6 @@ function paint_scatterPlotChart_byRazprsenost(
             myRazred = vp_itemId;
             myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
             naloga = lo_anChartNalogaSelectedId;
-
-
             //----
             for (let tmpUcenec = 1; tmpUcenec <= pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1; tmpUcenec++) {
                 if (pisniTestUcenciTockeNalogUcenec[myPisniTestId][tmpUcenec] == arrUcenecId[i]) {
@@ -9086,25 +9081,6 @@ function paint_scatterPlotChart_byRazprsenost(
                     };
                 }
             }
-            
-
-            //tockReal = pisniTestUcenciTockeNalogTocke[myPisniTestId][arrUcenecId[i]][naloga - 1];
-            //---- ali je učenec arrUcenecId[i] pri tem testu slučajno pri nalogi "naloga" imel "tockReal" točk?
-            //if (Math.round(tockReal) == lo_anChartTockSelectedId) {
-            //    //---- tale učenec je že tak, da je pisal točno toliko točk pri tej nalogi na tem testu
-            //    gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
-            //};
-
-
-            //---- 
-            //for (let tmpUcenec = 1; tmpUcenec <= pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1; tmpUcenec++) {
-            //    tockReal = pisniTestUcenciTockeNalogTocke[myPisniTestId][tmpUcenec][naloga - 1];
-            //    //---- ali je učenec arrUcenecId[i] pri tem testu slučajno pri nalogi "naloga" imel "tockReal" točk?
-            //    if (Math.round(tockReal) == lo_anChartTockSelectedId) {
-            //        //---- tale učenec je že tak, da je pisal točno toliko točk pri tej nalogi na tem testu
-            //        gEllipse(x, y, 7, 7, 0, "", 4, rsltColor[colorId]);
-            //    };
-            //}
         }
         //----
         x += 1;
@@ -9157,7 +9133,11 @@ function paint_scatterPlotChart_byRazprsenost(
     y = yQ2 + h / 2 - 1;
     if (yQ2 <= yAvg && y > (yAvg - 1)) { y = yAvg - 2; }
     else if (yQ2 > yAvg && (y - h) < (yAvg + 1)) { y = yAvg + h + 3; };
-    gText("Me", fontAxisTextBold, "darkSlateGray", xRight + 32, y);
+    // če pa pride izpis "Me" previsoko že v območje izpisa Q1/Me/Q3, potem "Me" sploh ne izpišem, ker je tam mediana že izpisana
+    if (y > yQ3 + 7 * h / 2 + 6) {
+        gText("Me", fontAxisTextBold, "darkSlateGray", xRight + 32, y);
+    }
+    
 
     //---- Q3, MEDIANA, Q1
     x += wSkatla + 5;
@@ -9985,4 +9965,107 @@ function load_demoText6() {
     addDemoText("Mare Car,        F|4|U|17-10-24,  K|2|U|17-10-24,  M|5|U|17-10-24, F|3|U|18-10-24, K|4|U|18-10-24,");
     addDemoText("Janko Bergant,   F|2|U|17-10-24,  F|3|U|18-10-24, K|3|U|18-10-24, M|2|U|18-10-24, F|3|U|19-10-24,");
     
+}
+
+function encryptUcenciRazredi() {
+
+    let ucenec, razred;
+    let arrConvSrc = []; let arrConvDst = [];
+    let lo_nrEncryptItems;
+
+    lo_nrEncryptItems = 0;
+
+    lo_nrEncryptItems = lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kri" + scZhLow + "ani" + scTchLow, "Velkavrh");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sara", "Roman");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bani" + scTchLow, "Nosan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bergant", "Teti" + scTchLow + "kovi" + scTchSoftLow + "");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jan", scZh + "iga");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bukov" + scSchLow + "ak", "Kozmus");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Arian", "Janez");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Erik", "Kenan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fi" + scSchLow + "er", "Terpinc");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejka", "Andreja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar Torkar", "A" + scZhLow + "be");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Homec", "Medi" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Maja", "Fani");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejc", "Ervin");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bab" + scSchLow + "ek", "Benko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jelov" + scTchLow + "an", "Novak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mojca", "Tina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jene", "Jenko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jurij", "Jakob");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Mina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Osmanagi" + scTchSoftLow, "Ber" + scTchLow + "i" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Najc", "Tone");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar", "Petri" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Torkar", "Kregar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Ur" + scSchLow + "ka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Posavec", "Logar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Merima", "Ne" + scZhLow + "a");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Salki" + scTchSoftLow, "Mrak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mia", "Maks");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sketelj", "Fink");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jenko", "Jelovac");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lejla", "Maja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Karaosmanovi" + scTchSoftLow, "Berisha");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tia", "Zinka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Zoja", "Kaja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ku" + scSchLow + "ar", "Bernik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tina", "Mija");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lenar" + scTchLow + "i" + scTchLow, "Ple" + scSchLow + "ko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fatki" + scTchSoftLow, scSch + "krlec");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tiana", "Sabina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Luki" + scTchSoftLow, "Tanko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Manca", "Marjana");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Martin" + scTchLow + "i" + scTchLow, "Justin");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kristian", "Ale" + scSchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mihajloski", scTch + "inku");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Teodora", "Ivanka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Milivojevi" + scTchSoftLow, "Zalaznik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Armin", "Toma" + scZhLow);
+   
+    // menjava imen
+    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
+        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
+            if (ucenecIme[ucenec] == arrConvSrc[eItem]) {
+                ucenecIme[ucenec] = arrConvDst[eItem];
+                break; // temu učencu je bilo ime zamenjano in grem lahko na naslednjega učenca
+            };
+        }
+    }
+
+    // menjava priimkov
+    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
+        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
+            if (ucenecPriimek[ucenec] == arrConvSrc[eItem]) {
+                ucenecPriimek[ucenec] = arrConvDst[eItem];
+                break; // temu učencu je bil priimek zamenjan in grem lahko na naslednjega učenca
+            };
+        }
+    }
+
+    // menjava črk razredov
+    for (razred = 1; razred <= lo_nrRazredov; razred++) {
+
+        if (razredCrka[razred] == "A") { razredCrka[razred] = "D"; };
+        if (razredCrka[razred] == "B") { razredCrka[razred] = "E"; };
+        
+        if (razredIme[razred] == "8.A") { razredIme[razred] == "8.D"; };
+        if (razredIme[razred] == "8.B") { razredIme[razred] == "8.E"; };
+        if (razredIme[razred] == "9.A") { razredIme[razred] == "9.D"; };
+        if (razredIme[razred] == "9.B") { razredIme[razred] == "9.E"; };
+    
+    }
+
+}
+
+function addEncryptItem(items, arrSrc, arrDst, srcStr, dstStr) {
+
+    items += 1;
+
+    arrSrc[items] = srcStr;
+    arrDst[items] = dstStr;
+
+    return items;
+
 }
