@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.3"
-const gl_versionDate = "3.6.2025"
+const gl_versionNr = "v2.4"
+const gl_versionDate = "5.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -39,6 +39,8 @@ const scTchSoftLow = String.fromCharCode(0x107)
 const scCopyright = String.fromCharCode(0xA9)
 const scDoubleQuote = String.fromCharCode(0x22)
 const scSingleQuote = String.fromCharCode(0x27)
+//----
+const scAdotDot = String.fromCharCode(0x00E4)
 
 function mouseInsideCircle(vp_mouseX, vp_mouseY, vp_cx, vp_cy, vp_radij) {
     
@@ -3726,7 +3728,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyE':
             if (event.shiftKey) {
                 encryptUcenciRazredi();
-                paint();
+                lf_setMode(gl_mode, true);
             };
             break;
         case 'ArrowRight':
@@ -4278,7 +4280,9 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
     let chartMargin = 20;
     let chartGapX = 30; let chartGapY = 30;
     let nrItems = lo_nrRazredov;
-    if (lo_byRazredGen) { nrItems = lo_nrRazredGen }; // 25.1.2025
+    if (lo_byRazredGen) {
+        nrItems = lo_nrRazredGen;
+    }; // 25.1.2025
     let chartWidth = (ctxW - 2 * chartMargin - (nrItems - 1) * chartGapX) / nrItems;
     let x0 = 20;
     let tmpText, w, h, colorId, x, y, y0, y1, y2, chartBottom;
@@ -4334,7 +4338,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
     if (drawBarChart) {
         for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
             // za tekoči razred ali tekočo generacijo razredov narišem graf
-            if (nrOcen[tmpItemId] > 0) {
+            if (nrZakljucnihOcen[tmpItemId] > 0) {
                 let vl_chartTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
                 //if (lo_grafZakljucneOcene) {
                 paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], maxZakljucnaOcenaCount, avgZakljucnaOcena, vl_chartTitle);
@@ -4366,7 +4370,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
         x1 = 20;
         // Za vse razrede nariši pie-chart-e
         for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
-            if (nrOcen[tmpItemId] > 0) {
+            if (nrZakljucnihOcen[tmpItemId] > 0) {
                 // za tekoči razred narišem pie chart
                 paint_pieChart_byOcenaShare(x1 + (tmpItemId - 1) * (chartWidth + chartGapX), y1, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], nrZakljucnihOcen[tmpItemId]);
             }
@@ -4817,9 +4821,9 @@ function paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips() {
             // ---- mouse over tip
             //tmpText += colorId.toString() + "t#";
             tmpText = arrRazredArrZakljucneOceneArrRezultatiImePriimek[tmpItemId][lo_ocenaSelected][i];
-            //if (lo_byRazredGen) { // če imam pregled za celo generacijo skupaj, k imenu in priimku dodam še razred
-            //    tmpText += ", " + arrRazredArrZakljucneOceneArrRezultatiRazred[tmpItemId][lo_ocenaSelected][i];
-            //}
+            if (lo_byRazredGen) { // če imam pregled za celo generacijo skupaj, k imenu in priimku dodam še razred
+                tmpText += ", " + arrRazredArrZakljucneOceneArrRezultatiRazred[tmpItemId][lo_ocenaSelected][i];
+            }
             arrTipText[i - 1] = tmpText; // zaradi kasnejšega sortiranja si zapise zapisujem od indeksa 0 vključno naprej
             arrTipColor[i - 1] = colorId;
             // ---- če še noben text ni pogledal ven iz ekrana, potem to preverim za tekoči tekst
@@ -6908,6 +6912,12 @@ function setWebLink() {
 
 function clipboard_load() {
 
+    if (document.hasFocus) {
+        let aa = 1;
+    } else {
+        console.log("Document not focused!");
+    }
+        
     navigator.clipboard.readText()
         .then((clipText) => {
             
@@ -7950,8 +7960,6 @@ function calculate_avg_zakljucnaOcena(vp_letnik, vp_predmet, vp_razredNr, vp_raz
         return [false, 0, 0, ocenaRezultatiUcenecId, ocenaRezultatiImePriimek, ocenaRezultatiRazred, ocenaRezultatiOcenaIdVRazredu, ocenaCount, ocenaCountPercent, 0, rezultatiUcenecId, rezultatiImePriimek, rezultatiRazred, rezultatiOcena]; // result not valid
     }
 
-
-
     // ---- 30.5.2025 Grem po vseh zaključnih ocenah izbranega razreda
     let ucenecId, zOcenaId, ocena, nrOcen, sumOcen, imePriimek;
     nrOcen = 0;
@@ -7965,7 +7973,10 @@ function calculate_avg_zakljucnaOcena(vp_letnik, vp_predmet, vp_razredNr, vp_raz
         //    continue;
         //}
         //---- če ni pravi letnik, predmet in razred, potem to zaključno oceno preskočim
-        if (zOcenaLetnikId[zOcenaId] != myLetnik || zOcenaPredmetId[zOcenaId] != myPredmet || zOcenaRazredId[zOcenaId] != myRazred) {
+        if (zOcenaLetnikId[zOcenaId] != myLetnik ||
+            zOcenaPredmetId[zOcenaId] != myPredmet ||
+            (!razredCrkaAll && zOcenaRazredId[zOcenaId] != myRazred) ||                 // če gledamo za konkreten razred, se mora ujemati id razreda
+            (razredCrkaAll && razredLetnik[zOcenaRazredId[zOcenaId]] != vp_razredNr)) { // če gledamo za generacijo, se mora ujemati le letnik (primer: za 8. razrede je letnik='8')
             continue;
         }
         //---- tu je učenec, ki ima zaključno oceno v ustreznem letniku/premetu/razredu
@@ -7977,6 +7988,9 @@ function calculate_avg_zakljucnaOcena(vp_letnik, vp_predmet, vp_razredNr, vp_raz
         ocenaRezultatiImePriimek[ocena][ocenaCount[ocena]] = imePriimek;  // Isto le da se vpiše ime in priimek
         ocenaRezultatiRazred[ocena][ocenaCount[ocena]] = razredIme[ucenecRazredId[ucenecId]]; // Isto le da se vpiše ID razreda
         
+        if (razredCrkaAll) {
+            razredCrkaAll = razredCrkaAll;
+        }
         //----
         if (ocenaCount[ocena] > maxOcenaCount) {
             maxOcenaCount = ocenaCount[ocena]; // pri kateri oceni od 1 do 5 je največ učencev s to oceno
@@ -8734,11 +8748,14 @@ function paint_barChart_byOcena(vp_x, vp_y, vp_w, vp_h, vp_itemId, arrOcene, max
     }
 
     // ---- KOLIKO JIH JE BREZ OCENE?
-    if ((razredNrUcencev[vp_itemId] - vseh) > 0) {
-        tmpText = "brez: " + (razredNrUcencev[vp_itemId] - vseh).toString();
+    tmpText = "";
+    switch (lo_byRazredGen) {
+        case false: if ((razredNrUcencev[vp_itemId] - vseh) > 0) { tmpText = "brez: " + (razredNrUcencev[vp_itemId] - vseh).toString(); } break;
+        case true: if ((razredGenNrUcencev[vp_itemId] - vseh) > 0) { tmpText = "brez: " + (razredGenNrUcencev[vp_itemId] - vseh).toString(); } break;
+    }
+    if (tmpText != "") {
         ;[w, h] = gMeasureText(tmpText, fontNr);
-        //gText(tmpText, fontNr, countOcenColor, vp_x + marginChart, vp_y + titleHeight + h + 4);
-        gBannerRoundRectWithText(vp_x + marginChart,vp_y + titleHeight + h + 4, w, h, fontNr, countOcenColor, tmpText, 2, 2, 2, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);        
+        gBannerRoundRectWithText(vp_x + marginChart, vp_y + titleHeight + h + 4, w, h, fontNr, countOcenColor, tmpText, 2, 2, 2, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
     }
 
     // ---- VODORAVNA ČRTA KOT OSNOVA GRAFA
@@ -8918,6 +8935,9 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
                     tmpColor = "lightGray";
                 }
                 tmpText = arrRazredArrZakljucneOceneArrRezultatiImePriimek[vp_razredId][tmpOcena][i];
+                if (lo_byRazredGen) { // če imam pregled za celo generacijo skupaj, k imenu in priimku dodam še razred
+                    tmpText += " " + arrRazredArrZakljucneOceneArrRezultatiRazred[vp_razredId][tmpOcena][i];
+                }                
                 //arrTipText[i - 1] = tmpText; // zaradi kasnejšega sortiranja si zapise zapisujem od indeksa 0 vključno naprej
                 //arrTipColor[i - 1] = colorId;
                 //---- IZPIS TEGA UČENCA
@@ -9968,104 +9988,5 @@ function load_demoText6() {
 }
 
 function encryptUcenciRazredi() {
-
-    let ucenec, razred;
-    let arrConvSrc = []; let arrConvDst = [];
-    let lo_nrEncryptItems;
-
-    lo_nrEncryptItems = 0;
-
-    lo_nrEncryptItems = lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kri" + scZhLow + "ani" + scTchLow, "Velkavrh");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sara", "Roman");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bani" + scTchLow, "Nosan");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bergant", "Teti" + scTchLow + "kovi" + scTchSoftLow + "");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jan", scZh + "iga");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bukov" + scSchLow + "ak", "Kozmus");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Arian", "Janez");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Erik", "Kenan");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fi" + scSchLow + "er", "Terpinc");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejka", "Andreja");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar Torkar", "A" + scZhLow + "be");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Homec", "Medi" + scTchLow);
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Maja", "Fani");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejc", "Ervin");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bab" + scSchLow + "ek", "Benko");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jelov" + scTchLow + "an", "Novak");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mojca", "Tina");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jene", "Jenko");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jurij", "Jakob");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Mina");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Osmanagi" + scTchSoftLow, "Ber" + scTchLow + "i" + scTchLow);
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Najc", "Tone");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar", "Petri" + scTchLow);
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Torkar", "Kregar");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Ur" + scSchLow + "ka");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Posavec", "Logar");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Merima", "Ne" + scZhLow + "a");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Salki" + scTchSoftLow, "Mrak");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mia", "Maks");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sketelj", "Fink");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jenko", "Jelovac");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lejla", "Maja");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Karaosmanovi" + scTchSoftLow, "Berisha");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tia", "Zinka");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Zoja", "Kaja");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ku" + scSchLow + "ar", "Bernik");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tina", "Mija");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lenar" + scTchLow + "i" + scTchLow, "Ple" + scSchLow + "ko");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fatki" + scTchSoftLow, scSch + "krlec");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tiana", "Sabina");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Luki" + scTchSoftLow, "Tanko");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Manca", "Marjana");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Martin" + scTchLow + "i" + scTchLow, "Justin");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kristian", "Ale" + scSchLow);
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mihajloski", scTch + "inku");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Teodora", "Ivanka");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Milivojevi" + scTchSoftLow, "Zalaznik");
-    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Armin", "Toma" + scZhLow);
-   
-    // menjava imen
-    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
-        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
-            if (ucenecIme[ucenec] == arrConvSrc[eItem]) {
-                ucenecIme[ucenec] = arrConvDst[eItem];
-                break; // temu učencu je bilo ime zamenjano in grem lahko na naslednjega učenca
-            };
-        }
-    }
-
-    // menjava priimkov
-    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
-        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
-            if (ucenecPriimek[ucenec] == arrConvSrc[eItem]) {
-                ucenecPriimek[ucenec] = arrConvDst[eItem];
-                break; // temu učencu je bil priimek zamenjan in grem lahko na naslednjega učenca
-            };
-        }
-    }
-
-    // menjava črk razredov
-    for (razred = 1; razred <= lo_nrRazredov; razred++) {
-
-        if (razredCrka[razred] == "A") { razredCrka[razred] = "D"; };
-        if (razredCrka[razred] == "B") { razredCrka[razred] = "E"; };
-        
-        if (razredIme[razred] == "8.A") { razredIme[razred] == "8.D"; };
-        if (razredIme[razred] == "8.B") { razredIme[razred] == "8.E"; };
-        if (razredIme[razred] == "9.A") { razredIme[razred] == "9.D"; };
-        if (razredIme[razred] == "9.B") { razredIme[razred] == "9.E"; };
-    
-    }
-
-}
-
-function addEncryptItem(items, arrSrc, arrDst, srcStr, dstStr) {
-
-    items += 1;
-
-    arrSrc[items] = srcStr;
-    arrDst[items] = dstStr;
-
-    return items;
-
+    // po potrebi sem prekopiraj kodo iz encryptData.txt !!
 }
