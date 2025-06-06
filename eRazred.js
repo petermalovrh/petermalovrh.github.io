@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.4"
-const gl_versionDate = "5.6.2025"
+const gl_versionNr = "v2.5"
+const gl_versionDate = "6.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2293,6 +2293,7 @@ const zOcenaPredmetId = []; // 31.5.2025 zOcenaPredmetId[zOcenaId]=predmetId ...
 const zOcenaRazredId = [];  // 31.5.2025 zOcenaRazredId[zOcenaId]=razredId   ... primer: zOcenaRazredId[17]=7   ... 17-ta znana zaključna ocena je v razredu #7
 const zOcenaUcenecId = [];  // 31.5.2025 zOcenaUcenecId[zOcenaId]=ucenecId   ... primer: zOcenaUcenecId[17]=35  ... 17-ta znana zaključna ocena je od učenca #35
 const zOcenaOcenaNr = [];   // 31.5.2025 zOcenaOcenaNr[zOcenaId]=ocenaNr     ... primer: zOcenaOcenaNr[17]=4    ... 17-ta znana zaključna ocena je ocena 4
+const zOcenaDatumStr = [];  // 6.6.2025  zOcenaDatumStr[zOcenaId]=datum      ... primer: zOcenaDatumStr[17]="5-6-25" ... 17-ta znana zaključna ocena je je bila podeljena na datum 5. junija 2025
 var lo_nrZakljucnihOcen = 0;
 var lo_zakljucnaOcena;
 
@@ -7076,6 +7077,7 @@ function intDataStructures() {
     zOcenaRazredId.length = 0; 
     zOcenaUcenecId.length = 0;
     zOcenaOcenaNr.length = 0; 
+    zOcenaDatumStr.length = 0; // 6.6.2025
     //----
     lo_nrZakljucnihOcen = 0;
     lo_zakljucnaOcena = 0;
@@ -7543,6 +7545,7 @@ function data_parse_novUcenecOcene(lineStr) {
             zOcenaRazredId[lo_nrZakljucnihOcen] = lo_razred;
             zOcenaUcenecId[lo_nrZakljucnihOcen] = lo_ucenec;
             zOcenaOcenaNr[lo_nrZakljucnihOcen] = Number(tmpOcenaCifra);
+            zOcenaDatumStr[lo_nrZakljucnihOcen] = tmpOcenaDatum;            
 
         } else {
         
@@ -9987,6 +9990,19 @@ function load_demoText6() {
     
 }
 
+async function setClipboard(text) {
+  const type = "text/plain";
+  const clipboardItemData = {
+    [type]: text,
+  };
+  const clipboardItem = new ClipboardItem(clipboardItemData);
+  await navigator.clipboard.write([clipboardItem]);
+}
+
 function encryptUcenciRazredi() {
     // po potrebi sem prekopiraj kodo iz encryptData.txt !!
+    // naloadaš prave podatke
+    // stisneš Shift-E
+    // na clipboard-u imaš konvertirane podatke, ki jih nekam paste-aš in shraniš (dataXX.txt)
 }
+
