@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.5"
-const gl_versionDate = "6.6.2025"
+const gl_versionNr = "v2.6"
+const gl_versionDate = "7.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2040,6 +2040,79 @@ class button {
     }
 }
 
+class buttonOnOff {
+    constructor(left, top, width, height, valueOnOff, valueOnColor, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, fillColor, smoothPx, gapLeft, gapTop, gapRight, gapBottom, hAlign, vAlign, shaddowColor, xShaddow, yShaddow, shaddowAll, enabled, disabledFillColor, disabledTextColor, visible, toolTipText, keyStroke) {
+        this.left = left; this.top = top; this.width = width; this.height = height;
+        this.valueOnOff = valueOnOff; this.valueOnColor = valueOnColor; // dodal 6.6.2025
+        this.text = text; this.font = font; this.textColor = textColor; this.focusedTextColor = focusedTextColor;
+        this.lineWidth = lineWidth; this.lineColor = lineColor; this.focusedLineColor = focusedLineColor;
+        this.fillColor = fillColor;
+        this.smoothPx = smoothPx;
+        this.gapLeft = gapLeft; this.gapTop = gapTop; this.gapRight = gapRight; this.gapBottom = gapBottom;
+        this.hAlign = hAlign; this.vAlign = vAlign;
+        this.shaddowColor = shaddowColor; this.xShaddow = xShaddow; this.yShaddow = yShaddow; this.shaddowAll = shaddowAll;
+        this.enabled = enabled; this.disabledFillColor = disabledFillColor; this.disabledTextColor = disabledTextColor;
+        this.visible = visible;
+        this.toolTipText = toolTipText; // 10.1.2025
+        this.keyStroke = keyStroke;     // 10.1.2025
+    }
+    paint() {
+        if (!this.visible) { return };
+        //---- pravokotnik
+        let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
+        let lineColor = focused ? this.focusedLineColor : this.lineColor;
+        let fillColor = this.enabled ? this.fillColor : this.disabledFillColor;
+        gBannerRect(this.left, this.top, this.width, this.height, this.smoothPx, this.smoothPx, fillColor, this.lineWidth, lineColor, this.shaddowColor, this.xShaddow, this.yShaddow, this.shaddowAll);
+        //---- text
+        let tmpW, tmpH, x, y;
+        ;[tmpW, tmpH] = gMeasureText(this.text, this.font);
+        let x0 = this.left + this.gapLeft; let x1 = this.left + this.width - this.gapRight;
+        switch (this.hAlign) {
+            case "left": x = x0; break;
+            case "right": x = x1 - tmpW; break;
+            case "middle": x = x0 + (x1 - x0) / 2 - tmpW / 2; break;
+        }
+        let y0 = this.top + this.gapTop; let y1 = this.top + this.height - this.gapBottom;
+        switch (this.vAlign) {
+            case "top": y = y0 + tmpH; break;
+            case "bottom": y = y1; break;
+            case "middle": y = y1 - (y1 - y0) / 2 + tmpH / 2; break;
+        }
+        let textColor = this.disabledTextColor;
+        if (this.enabled) { textColor = focused ? this.focusedTextColor : this.textColor; }
+        gText(this.text, this.font, textColor, x, y);
+        //---- 6.6.2025 če je valueOnOff=true, potem pod tekstom gumba na sredini dam pravokoten marker, ki kaže stanje ON
+        if (this.valueOnOff) {
+            //gLine(x + tmpW / 2 - 5, y + 4, x + tmpW / 2 + 5, y + 4, 2, this.valueOnColor, []);
+            gLine(x0 + 3, y + 4, x1 - 3, y + 4, 2, this.valueOnColor, []);
+        }
+    }
+    showToolTip() { // 10.1.2025
+        //---- toolTip
+        if (!this.visible || !this.enabled) { return };
+        if (this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY) && this.toolTipText !== "") {
+            gBannerRectWithText3(this.toolTipText, lo_mouseMoveX + 20, lo_mouseMoveY + 22, "italic 11pt cambria", 4, 5, 5, 1, 1, "white", 1, "gray", "dimGray", "lightGray", 1, 1);
+            if (this.keyStroke != "") {
+                gBannerRectWithText3(this.keyStroke, lo_mouseMoveX + 23, lo_mouseMoveY + 40, "italic 11pt cambria", 4, 5, 4, 2, 2, "azure", 1, "gray", "dimGray", "lightGray", 2, 2);
+            }
+        }      
+    } 
+    eventClick(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        if (this.eventMouseWithin(mouseX, mouseY)) { return true; } else { return false; };
+    }
+    eventMouseWithin(mouseX, mouseY) {
+        if (!this.visible || !this.enabled) { return false; };
+        let x0 = this.left - this.lineWidth / 2;
+        let x1 = this.left + this.width + this.lineWidth / 2;
+        let y0 = this.top - this.lineWidth / 2;
+        let y1 = this.top + this.height + this.lineWidth / 2;
+        if (mouseX >= x0 && mouseX <= x1 && mouseY >= y0 && mouseY <= y1) 
+             { return true; }
+        else { return false; }
+    }
+}
+
 class httpLink { // 24.2.2025
     constructor(left, top, text, font, textColor, focusedTextColor, lineWidth, lineColor, focusedLineColor, hAlign, vAlign, enabled, disabledTextColor, visible, toolTipText, keyStroke) {
         this.left = left; this.top = top;
@@ -2679,9 +2752,11 @@ switch (lo_GUI_layout) {
         var buttonRazred = new button(gpLeft, gpTop + 10, wBtn, hBtn, "R", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji razred ...", "R");
         var buttonPredmet = new button(gpLeft, gpTop + 10, wBtn, hBtn, "P", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji predmet ...", "P");
         var buttonTest = new button(gpLeft, gpTop + 10, wBtn, hBtn, "T", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji test ...", "T");
+        var buttonAnalizaNalog = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "A", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Analiza po nalogah testa ...", "A");
+        var buttonZakljucneOcene = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "Z", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Zaklju" + scTchLow + "ne ocene ...", "Z");
         var buttonUcenec = new button(gpLeft, gpTop + 10, wBtn, hBtn, "U", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji u" + scTchLow + "enec ...", "U / kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke");
         var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S (+SHIFT)");
-        var buttonKritLuknje = new button(gpLeft, gpTop + 10, wBtn, hBtn, "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
+        var buttonKritLuknje = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
         var buttonLoad = new button(gpLeft, gpTop + 10, wBtn, hBtn, "D", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "powderBlue", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Nalo" + scZhLow + "i skopirane podatke razredov in ocen iz clipboard-a ...", "D");
         var buttonHelp = new button(gpLeft, gpTop + 10, wBtn, hBtn, "?", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "lightGoldenrodYellow", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i pomo" + scTchLow, "F2");
         var buttonPDF = new httpLink(gpLeft, gpTop + 10, "PDF navodila", "italic 10pt verdana", "darkSlateGray", "blue", 1, "gray", "blue", "middle", "middle", true, disabledControlTextColor, true, "Prika" + scZhLow + "i PDF uporabni" + scSchLow + "ka navodila", "");
@@ -3085,6 +3160,10 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_razred:
                     lf_changeFocusRazred(lf_changeValueFocusRazred(e.shiftKey ? -1 : 1), true);
                     break;
+                case cv_mode_test: // 6.6.2025
+                    let tmpChange = e.shiftKey ? -1 : 1;
+                    lf_changeRazred(lo_razred + tmpChange, true);
+                    break;
             };
             vl_end = true;
         }
@@ -3133,6 +3212,34 @@ elMyCanvas.addEventListener('click', (e) => {
             }
             paint();
             vl_end = true
+        }
+    }
+
+    //---- analiza po nalogah testa / scatter plot statistična analiza (mode_test - samo pri skupnem pogledu po vseh razredih) 6.6.2025
+    if (!vl_end && buttonAnalizaNalog.visible && buttonAnalizaNalog.enabled) {
+        if (buttonAnalizaNalog.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            switch (gl_mode) {
+                case cv_mode_test:
+                    lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
+                    buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
+                    paint();
+                    break;
+            };
+            vl_end = true;
+        }
+    }
+
+    //---- pregled zaključni ocen on/off (mode_test) 6.6.2025
+    if (!vl_end && buttonZakljucneOcene.visible && buttonZakljucneOcene.enabled) {
+        if (buttonZakljucneOcene.eventClick(e.offsetX, e.offsetY)) {
+            //console.log("click(): rslt=" + rslt.toString())
+            switch (gl_mode) {
+                case cv_mode_test:
+                    lf_changeGrafZakljucneOcene(!lo_grafZakljucneOcene, true);
+                    break;
+            };
+            vl_end = true;
         }
     }
 
@@ -3302,7 +3409,9 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         else if (buttonLetnik.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonRazred.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-        else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }            
+        else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonAnalizaNalog.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
+        else if (buttonZakljucneOcene.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonUcenec.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
@@ -3724,6 +3833,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyA':
             //lo_keyDownA = true; break;
             lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
+            buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
             paint();
             break;        
         case 'KeyE':
@@ -6099,15 +6209,19 @@ function paint_GUI() {
     //---- 2. toolBar
     //if (!lo_showGUI) { return };
 
-    if (lo_showDynamicToolbar) { 
+    if (lo_showDynamicToolbar) {
         //console.log("painting ...")
-        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonAnalizaNalog.paint(); buttonZakljucneOcene.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
         //console.log("    painted-buttons")
         y = buttonMode.top;
         switch (gl_mode) {
             case cv_mode_test:
                 //console.log("    painting-rt")
-                x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                if (lo_grafZakljucneOcene) { // 6.6.2025
+                    x = buttonSPData.left + buttonSPData.width + 4.5;
+                } else {
+                    x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                }
                 gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
                 break;
             case cv_mode_ucenec: case cv_mode_razred:
@@ -6123,7 +6237,7 @@ function paint_GUI() {
     if (lo_showToolTips) { //1.4.2024
         //if (lo_enabledHelp) { // 27.1.2025
         // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
-        buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+        buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonAnalizaNalog.showToolTip(); buttonZakljucneOcene.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
         //};
     };
 
@@ -6331,24 +6445,42 @@ function paint_GUI_layoutB_modeTest() {
     buttonMode.top = yTop;
     buttonLetnik.left = buttonMode.left + buttonMode.width + wSep;
     buttonLetnik.top = buttonMode.top;
-    buttonPredmet.left = buttonLetnik.left + buttonLetnik.width + wSep;
-    buttonPredmet.top = buttonMode.top;
-    buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
-    buttonTest.top = buttonMode.top;
-    // ----
-    buttonSPData.left = buttonTest.left + buttonTest.width + wSep;
-    buttonSPData.top = buttonMode.top;
-    buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
-    buttonKritLuknje.top = buttonMode.top;
-    //----
-    x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
+    if (lo_grafZakljucneOcene) {
+        buttonPredmet.left = buttonLetnik.left + buttonLetnik.width + wSep;
+        buttonPredmet.top = buttonMode.top;
+        buttonZakljucneOcene.left = buttonPredmet.left + buttonPredmet.width + wSep;
+        buttonZakljucneOcene.top = buttonMode.top;
+        // ----
+        buttonSPData.left = buttonZakljucneOcene.left + buttonZakljucneOcene.width + wSep;
+        buttonSPData.top = buttonMode.top;
+        //----
+        x = buttonSPData.left + buttonSPData.width + wSep;
+    } else {
+        buttonRazred.left = buttonLetnik.left + buttonLetnik.width + wSep;
+        buttonRazred.top = buttonMode.top;
+        buttonPredmet.left = buttonRazred.left + buttonRazred.width + wSep;
+        buttonPredmet.top = buttonMode.top;
+        buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
+        buttonTest.top = buttonMode.top;
+        buttonAnalizaNalog.left = buttonTest.left + buttonTest.width + wSep;
+        buttonAnalizaNalog.top = buttonMode.top;
+        buttonZakljucneOcene.left = buttonAnalizaNalog.left + buttonAnalizaNalog.width + wSep;
+        buttonZakljucneOcene.top = buttonMode.top;
+        // ----
+        buttonSPData.left = buttonZakljucneOcene.left + buttonZakljucneOcene.width + wSep;
+        buttonSPData.top = buttonMode.top;
+        buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
+        buttonKritLuknje.top = buttonMode.top;
+        //----
+        x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
+    }
     buttonLoad.left = x + wSep;
     buttonLoad.top = buttonMode.top;
     //----
     x = buttonLoad.left + buttonLoad.width + wSep;
     buttonHelp.left = x + wSep;
-    buttonHelp.top = buttonPredmet.top;
-
+    buttonHelp.top = buttonMode.top;
+    
 }
 
 function lf_changeValueFocusUcenec(vp_diff) {
@@ -6470,6 +6602,7 @@ function lf_changeSchrink(vp_newValue, vp_paint) {
 function lf_changeZaokrozujNaCeleProcente(vp_newValue, vp_paint) {
 
     lo_zaokrozujNaCeleProcente = vp_newValue;
+    buttonKritLuknje.valueOnOff = !lo_zaokrozujNaCeleProcente;
     if (vp_paint) { paint() }
 
 }
@@ -6477,6 +6610,10 @@ function lf_changeZaokrozujNaCeleProcente(vp_newValue, vp_paint) {
 function lf_changeGrafZakljucneOcene(vp_newValue, vp_paint) {
 
     lo_grafZakljucneOcene = vp_newValue;
+    buttonZakljucneOcene.valueOnOff = lo_grafZakljucneOcene;
+    hideAllControls();
+    showAndEnableControls_modeTest();
+    lo_GUIlayoutHasChanged = true;
     if (vp_paint) { paint() }
 
 }
@@ -6584,6 +6721,8 @@ function lf_changeShowGUI_old(vp_newValue, vp_paint) {
     buttonRazred.visible = lo_showGUI; buttonRazred.enabled = lo_showGUI;
     buttonPredmet.visible = lo_showGUI; buttonPredmet.enabled = lo_showGUI;
     buttonTest.visible = lo_showGUI; buttonTest.enabled = lo_showGUI;
+    buttonAnalizaNalog.visible = lo_showGUI; buttonAnalizaNalog.enabled = lo_showGUI;
+    buttonZakljucneOcene.visible = lo_showGUI; buttonZakljucneOcene.enabled = lo_showGUI;    
     buttonUcenec.visible = lo_showGUI; buttonUcenec.enabled = lo_showGUI;
     buttonSPData.visible = lo_showGUI; buttonSPData.enabled = lo_showGUI;
     buttonKritLuknje.visible = lo_showGUI; buttonKritLuknje.enabled = lo_showGUI;
@@ -6599,11 +6738,15 @@ function lf_changeShowGUI_old(vp_newValue, vp_paint) {
                 break;
             case cv_mode_ucenec:
                 buttonTest.visible = false; buttonTest.enabled = false;
+                buttonAnalizaNalog.visible = false; buttonAnalizaNalog.enabled = false;
+                buttonZakljucneOcene.visible = false; buttonZakljucneOcene.enabled = false;
                 buttonSPData.visible = false; buttonSPData.enabled = false;
                 buttonKritLuknje.visible = false; buttonKritLuknje.enabled = false;
                 break;
             case cv_mode_razred:
                 buttonTest.visible = false; buttonTest.enabled = false;
+                buttonAnalizaNalog.visible = false; buttonAnalizaNalog.enabled = false;
+                buttonZakljucneOcene.visible = false; buttonZakljucneOcene.enabled = false;
                 buttonUcenec.visible = false; buttonUcenec.enabled = false;
                 buttonSPData.visible = false; buttonSPData.enabled = false;
                 buttonKritLuknje.visible = false; buttonKritLuknje.enabled = false;
@@ -6707,13 +6850,17 @@ function lf_setMode(vp_mode, vp_paint) {
 
 function hideAllControls() {
 
-    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonUcenec, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
+    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonUcenec, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
 
 }
 
 function showAndEnableControls_modeTest() {
 
-    [buttonMode, buttonLetnik, buttonPredmet, buttonTest, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    if (lo_grafZakljucneOcene) {
+        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonZakljucneOcene, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    } else {
+        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    }
 
 }
 
