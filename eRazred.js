@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.6"
-const gl_versionDate = "7.6.2025"
+const gl_versionNr = "v2.7"
+const gl_versionDate = "10.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -3223,6 +3223,9 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_test:
                     lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
                     buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
+                    hideAllControls();
+                    showAndEnableControls_modeTest();
+                    lo_GUIlayoutHasChanged = true;
                     paint();
                     break;
             };
@@ -3714,7 +3717,14 @@ window.addEventListener("keydown", (event) => {
         case 'KeyC':
             //lo_keyDownC = true; break;
             //console.log("C pressed");
-            lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
+            switch (gl_mode) {
+                case cv_mode_test:
+                    //if (drawSpChart) {
+                    if (!lo_grafZakljucneOcene && (!lo_drawAnalizaNalog || (lo_drawAnalizaNalog && lo_razredAll))) {
+                        lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
+                    }
+                    break;
+            }            
             break;
         case 'ShiftLeft':
             lo_keyDownShiftLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;
@@ -3758,12 +3768,19 @@ window.addEventListener("keydown", (event) => {
                     break;
                 case cv_mode_test: // 25.5.2025
                     let tmpChange = event.shiftKey ? -1 : 1;
+                    //hideAllControls();
+                    //showAndEnableControls_modeTest();
+                    lo_GUIlayoutHasChanged = true;
                     lf_changeRazred(lo_razred + tmpChange, true);
-                    break;                
+                    break;
             };
             break;
         case 'KeyZ': case 'KeyY':
-            lf_changeGrafZakljucneOcene(!lo_grafZakljucneOcene, true);
+            switch (gl_mode) {
+                case cv_mode_test:
+                    lf_changeGrafZakljucneOcene(!lo_grafZakljucneOcene, true);
+                    break;
+            }
             break;        
         case 'KeyP': // sprememba predmeta 28.1.2025
             //console.log("T pressed");
@@ -3832,9 +3849,18 @@ window.addEventListener("keydown", (event) => {
             break;
         case 'KeyA':
             //lo_keyDownA = true; break;
-            lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
-            buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
-            paint();
+            switch (gl_mode) {
+                case cv_mode_test:
+                    if (!lo_grafZakljucneOcene) {
+                        lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
+                        buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
+                        hideAllControls();
+                        showAndEnableControls_modeTest();
+                        lo_GUIlayoutHasChanged = true;
+                        paint();
+                    }
+                    break;
+            }
             break;        
         case 'KeyE':
             if (event.shiftKey) {
@@ -6220,8 +6246,17 @@ function paint_GUI() {
                 if (lo_grafZakljucneOcene) { // 6.6.2025
                     x = buttonSPData.left + buttonSPData.width + 4.5;
                 } else {
-                    x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-                }
+                    if (lo_drawAnalizaNalog && lo_razredAll) {
+                        x = buttonSPData.left + buttonSPData.width + 4.5;
+                    } else {
+                        x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                    }
+                };
+                //if (drawSpChart) {
+                //    x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                //} else {
+                //    x = buttonSPData.left + buttonSPData.width + 4.5;
+                //}
                 gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
                 break;
             case cv_mode_ucenec: case cv_mode_razred:
@@ -6469,10 +6504,16 @@ function paint_GUI_layoutB_modeTest() {
         // ----
         buttonSPData.left = buttonZakljucneOcene.left + buttonZakljucneOcene.width + wSep;
         buttonSPData.top = buttonMode.top;
-        buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
-        buttonKritLuknje.top = buttonMode.top;
-        //----
-        x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
+        //if (!drawSpChart) {
+        if (lo_drawAnalizaNalog && lo_razredAll) {
+            //----
+            x = buttonSPData.left + buttonSPData.width + wSep;
+        } else {
+            buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
+            buttonKritLuknje.top = buttonMode.top;
+            //----
+            x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
+        }
     }
     buttonLoad.left = x + wSep;
     buttonLoad.top = buttonMode.top;
@@ -6859,7 +6900,11 @@ function showAndEnableControls_modeTest() {
     if (lo_grafZakljucneOcene) {
         [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonZakljucneOcene, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
     } else {
-        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+        if (lo_drawAnalizaNalog && lo_razredAll) {
+            [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+        } else {
+            [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+        }
     }
 
 }
