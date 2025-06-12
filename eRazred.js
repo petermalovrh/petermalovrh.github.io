@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.10"
+const gl_versionNr = "v2.11"
 const gl_versionDate = "12.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -3159,7 +3159,8 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_razred:
                     lf_changeFocusRazred(lf_changeValueFocusRazred(e.shiftKey ? -1 : 1), true);
                     break;
-                case cv_mode_test: case cv_mode_test: // 6.6.2025 //12.6.2025
+                case cv_mode_test: case cv_mode_zOcena: // 6.6.2025 //12.6.2025
+                    lo_GUIlayoutHasChanged = true; // 12.6.2025
                     let tmpChange = e.shiftKey ? -1 : 1;
                     lf_changeRazred(lo_razred + tmpChange, true);
                     break;
