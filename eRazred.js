@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.9"
+const gl_versionNr = "v2.10"
 const gl_versionDate = "12.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -2296,8 +2296,6 @@ var lo_nrRazredov = 0;
 var lo_razred;
 var lo_razredAll = true; // 25.5.2025
 
-var lo_grafZakljucneOcene = false; // 29.5.2025
-
 // 25.1.2025
 const razredGen = [];   // generacije (primer: [8r, 9r])
 var lo_nrRazredGen = 0; // število generacij (primer: 8r, 9r)
@@ -2643,8 +2641,9 @@ var dbg = false; //true;
 const cv_mode_test = 1;
 const cv_mode_ucenec = 2;
 const cv_mode_razred = 3;
+const cv_mode_zOcena = 4;
 const cv_minMode = 1;
-const cv_maxMode = 3;
+const cv_maxMode = 4;
 var gl_mode = cv_mode_test;
 var gl_modeLast = gl_mode; 
                    
@@ -2754,7 +2753,6 @@ switch (lo_GUI_layout) {
         var buttonPredmet = new button(gpLeft, gpTop + 10, wBtn, hBtn, "P", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji predmet ...", "P");
         var buttonTest = new button(gpLeft, gpTop + 10, wBtn, hBtn, "T", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji test ...", "T");
         var buttonAnalizaNalog = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "A", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Analiza po nalogah testa ...", "A");
-        var buttonZakljucneOcene = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "Z", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Zaklju" + scTchLow + "ne ocene ...", "Z");
         var buttonUcenec = new button(gpLeft, gpTop + 10, wBtn, hBtn, "U", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Naslednji u" + scTchLow + "enec ...", "U / kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke");
         var buttonSPData = new button(gpLeft, gpTop + 10, wBtn, hBtn, "S", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Pove" + scTchLow + "an/pomanj" + scSchLow + "an graf razpr" + scSchLow + "enosti podatkov", "S (+SHIFT)");
         var buttonKritLuknje = new buttonOnOff(gpLeft, gpTop + 10, wBtn, hBtn, false, "rosyBrown", "C", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "white", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Prika" + scZhLow + "i luknje v kriterijih ocen", "C");
@@ -3134,7 +3132,7 @@ elMyCanvas.addEventListener('click', (e) => {
         if (buttonLetnik.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
-                case cv_mode_test:
+                case cv_mode_test: case cv_mode_zOcena:
                     lf_changeByRazredGen(!lo_byRazredGen, false);
                     data_prepareStructures_byTest();
                     paint();
@@ -3161,7 +3159,7 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_razred:
                     lf_changeFocusRazred(lf_changeValueFocusRazred(e.shiftKey ? -1 : 1), true);
                     break;
-                case cv_mode_test: // 6.6.2025
+                case cv_mode_test: case cv_mode_test: // 6.6.2025 //12.6.2025
                     let tmpChange = e.shiftKey ? -1 : 1;
                     lf_changeRazred(lo_razred + tmpChange, true);
                     break;
@@ -3181,7 +3179,7 @@ elMyCanvas.addEventListener('click', (e) => {
                 lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
             }
             switch (gl_mode) {
-                case cv_mode_test:
+                case cv_mode_test: case cv_mode_zOcena:
                     data_prepareStructures_byTest();
                     break;
                 case cv_mode_ucenec: case cv_mode_razred:
@@ -3228,19 +3226,6 @@ elMyCanvas.addEventListener('click', (e) => {
                     showAndEnableControls_modeTest();
                     lo_GUIlayoutHasChanged = true;
                     paint();
-                    break;
-            };
-            vl_end = true;
-        }
-    }
-
-    //---- pregled zaključni ocen on/off (mode_test) 6.6.2025
-    if (!vl_end && buttonZakljucneOcene.visible && buttonZakljucneOcene.enabled) {
-        if (buttonZakljucneOcene.eventClick(e.offsetX, e.offsetY)) {
-            //console.log("click(): rslt=" + rslt.toString())
-            switch (gl_mode) {
-                case cv_mode_test:
-                    lf_changeGrafZakljucneOcene(!lo_grafZakljucneOcene, true);
                     break;
             };
             vl_end = true;
@@ -3415,7 +3400,6 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         else if (buttonPredmet.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonTest.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonAnalizaNalog.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
-        else if (buttonZakljucneOcene.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonUcenec.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonSPData.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
         else if (buttonKritLuknje.eventMouseWithin(e.offsetX, e.offsetY)) { document.body.style.cursor = "pointer" }
@@ -3448,7 +3432,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
     //console.log("lo_showDynamicToolbar=" + lo_showDynamicToolbar.toString());
 
     // ---- ALI JE V MODE_RAZREDTEST NAD KAKŠNIM GRAFOM?
-    if (gl_mode == cv_mode_test) {
+    if (gl_mode == cv_mode_test || gl_mode == cv_mode_zOcena) {
         //---- Preverjanje, ali je z miško nad določenim elementom
         //let oldSpChartSelected = spChartSelected.slice(0);
         let oldSpChartSelectedId = lo_spChartSelectedId;
@@ -3466,12 +3450,12 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         //---- Smo z miško nad katerim od chartov za podatkovno analizo?
         let nrItems = lo_nrRazredov; if (lo_byRazredGen) { nrItems = lo_nrRazredGen };
         let tmpItemIdMin = 1; let tmpItemIdMax = nrItems; 
-        if (!lo_razredAll && !lo_grafZakljucneOcene) { tmpItemIdMin = lo_razred; tmpItemIdMax = lo_razred; }; // 26.5.2025
+        if (!lo_razredAll && gl_mode != cv_mode_zOcena) { tmpItemIdMin = lo_razred; tmpItemIdMax = lo_razred; }; // 26.5.2025
         //for (tmpItemId = 1; tmpItemId <= nrItems; tmpItemId++) {
         for (tmpItemId = tmpItemIdMin; tmpItemId <= tmpItemIdMax; tmpItemId++) {
             // ---- Smo z miško nad katerim od raztresenih chartov za podatkovno analizo ocen?
             if (drawSpChart) {
-                tmpNrOcen = nrOcen[tmpItemId]; if (lo_grafZakljucneOcene) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
+                tmpNrOcen = nrOcen[tmpItemId]; if (gl_mode == cv_mode_zOcena) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
                 if (tmpNrOcen > 0 && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, spChartX[tmpItemId], spChartY[tmpItemId], spChartX1[tmpItemId], spChartY1[tmpItemId])) {
                     chartSelected = true;
                     lo_spChartSelectedId = tmpItemId;
@@ -3511,7 +3495,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             // ---- Je pod miško katera od ocen v bar chartih? 24.1.2025
             if (drawBarChart) {
                 for (tmpOcena = 1; tmpOcena <= 5; tmpOcena++) {
-                    tmpNrOcen = nrOcen[tmpItemId]; if (lo_grafZakljucneOcene) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
+                    tmpNrOcen = nrOcen[tmpItemId]; if (gl_mode == cv_mode_zOcena) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
                     if (tmpNrOcen > 0 && mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, bcChartX[tmpItemId][tmpOcena], bcChartY[tmpItemId][tmpOcena], bcChartX1[tmpItemId][tmpOcena], bcChartY1[tmpItemId][tmpOcena])) {
                         chartSelected = true;
                         lo_bcChartSelectedId = tmpItemId; // miška je nad tem razredom
@@ -3522,7 +3506,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             }
             // ---- Je pod miško katera od ocen v pie chartu? 23.1.2025
             if (drawPieChart) {
-                tmpNrOcen = nrOcen[tmpItemId]; if (lo_grafZakljucneOcene) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
+                tmpNrOcen = nrOcen[tmpItemId]; if (gl_mode == cv_mode_zOcena) { tmpNrOcen = nrZakljucnihOcen[tmpItemId]; };
                 if (tmpNrOcen > 0 && mouseInsideCircle(lo_mouseMoveX, lo_mouseMoveY, pcChartCx[tmpItemId], pcChartCy[tmpItemId], pcChartRadij[tmpItemId])) {
                     chartSelected = true;
                     //pcChartSelected[tmpItemId] = true;
@@ -3716,16 +3700,14 @@ window.addEventListener("keydown", (event) => {
             }
             break;
         case 'KeyC':
-            //lo_keyDownC = true; break;
             //console.log("C pressed");
             switch (gl_mode) {
                 case cv_mode_test:
-                    //if (drawSpChart) {
-                    if (!lo_grafZakljucneOcene && (!lo_drawAnalizaNalog || (lo_drawAnalizaNalog && lo_razredAll))) {
+                    if (!lo_drawAnalizaNalog || (lo_drawAnalizaNalog && !lo_razredAll)) {
                         lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
                     }
                     break;
-            }            
+            }
             break;
         case 'ShiftLeft':
             lo_keyDownShiftLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;
@@ -3757,6 +3739,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyR':
             //lo_keyDownR = true; break;
             //console.log("R pressed");
+            let tmpChange;
             switch (gl_mode) {
                 case cv_mode_ucenec:
                     lo_focusUcenec = 0; // 4.2.2025
@@ -3767,22 +3750,15 @@ window.addEventListener("keydown", (event) => {
                     //lf_changeFocusRazred(!lo_byRazredGen, true);
                     lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -1 : 1), true);
                     break;
-                case cv_mode_test: // 25.5.2025
-                    let tmpChange = event.shiftKey ? -1 : 1;
-                    //hideAllControls();
-                    //showAndEnableControls_modeTest();
+                case cv_mode_test: case cv_mode_zOcena: // 25.5.2025 // 12.6.2025
+                    tmpChange = event.shiftKey ? -1 : 1;
                     lo_GUIlayoutHasChanged = true;
                     lf_changeRazred(lo_razred + tmpChange, true);
                     break;
             };
             break;
-        case 'KeyZ': case 'KeyY':
-            switch (gl_mode) {
-                case cv_mode_test:
-                    lf_changeGrafZakljucneOcene(!lo_grafZakljucneOcene, true);
-                    break;
-            }
-            break;        
+        // case 'KeyZ': case 'KeyY':
+       
         case 'KeyP': // sprememba predmeta 28.1.2025
             //console.log("T pressed");
             if (event.shiftKey) { // 26.1.2025
@@ -3852,14 +3828,12 @@ window.addEventListener("keydown", (event) => {
             //lo_keyDownA = true; break;
             switch (gl_mode) {
                 case cv_mode_test:
-                    if (!lo_grafZakljucneOcene) {
-                        lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
-                        buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
-                        hideAllControls();
-                        showAndEnableControls_modeTest();
-                        lo_GUIlayoutHasChanged = true;
-                        paint();
-                    }
+                    lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
+                    buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
+                    hideAllControls();
+                    showAndEnableControls_modeTest();
+                    lo_GUIlayoutHasChanged = true;
+                    paint();
                     break;
             }
             break;        
@@ -4080,7 +4054,8 @@ function paint() {
     if (lo_GUIlayoutHasChanged) {
         //initGraphicalEnvironment();
         switch (lo_GUI_layout) {
-            case cv_guiLayoutA: break;
+            case cv_guiLayoutA:
+                break;
             case cv_guiLayoutB:
                 paint_GUI_layoutB(); break;
         }
@@ -4385,6 +4360,9 @@ function paint_eRazred() {
         case cv_mode_razred: // 15.2.2025
             paint_eRazred_grafRazred();
             break;
+        case cv_mode_zOcena:
+            paint_eRazred_grafZOcene();
+            break;
     }
 
 }
@@ -4393,23 +4371,22 @@ function paint_eRazred_grafTest() {
      
     if (!lo_dataPrepared) { return; };
 
-    //---- 29.5.2025 Dodana opcija za prikaz zaključenih ocen po vseh razredih
-    if (lo_grafZakljucneOcene) {
-
-        paint_eRazred_grafZakljucneOcene_allRazred();
-        paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips(); // 26.5.2025 uporaba skupne funkcije za mouse over tipse
-        
+    //---- 25.5.2025 Dodana opcija, da se riše samo za posamezen razred in ne vedno za vse razrede en za drugim
+    if (!lo_razredAll) {
+        paint_eRazred_grafTest_singleRazred();
     } else {
-
-        //---- 25.5.2025 Dodana opcija, da se riše samo za posamezen razred in ne vedno za vse razrede en za drugim
-        if (!lo_razredAll) {
-            paint_eRazred_grafTest_singleRazred();
-        } else {
-            paint_eRazred_grafTest_allRazred();
-        }
-        paint_eRazred_grafTest_mouseOverTips(); // 26.5.2025 uporaba skupne funkcije za mouse over tipse
-
+        paint_eRazred_grafTest_allRazred();
     }
+    paint_eRazred_grafTest_mouseOverTips(); // 26.5.2025 uporaba skupne funkcije za mouse over tipse
+
+}
+
+function paint_eRazred_grafZOcene() {
+
+    if (!lo_dataPrepared) { return; };
+
+    paint_eRazred_grafZakljucneOcene_allRazred();
+    paint_eRazred_grafZakljucneOcene_allRazred_mouseOverTips(); // 26.5.2025 uporaba skupne funkcije za mouse over tipse
 
 }
 
@@ -4478,11 +4455,7 @@ function paint_eRazred_grafZakljucneOcene_allRazred() {
             // za tekoči razred ali tekočo generacijo razredov narišem graf
             if (nrZakljucnihOcen[tmpItemId] > 0) {
                 let vl_chartTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
-                //if (lo_grafZakljucneOcene) {
                 paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrZakljucneOceneCount[tmpItemId], maxZakljucnaOcenaCount, avgZakljucnaOcena, vl_chartTitle);
-                //} else {
-                //    paint_barChart_byOcena(x0 + (tmpItemId - 1) * (chartWidth + chartGapX), y0, chartWidth, chartHeight, tmpItemId, arrArrOceneCount[tmpItemId], maxOcenaCount, vl_chartTitle);
-                //}
             }
         }
     }
@@ -6268,32 +6241,28 @@ function paint_GUI() {
 
     if (lo_showDynamicToolbar) {
         //console.log("painting ...")
-        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonAnalizaNalog.paint(); buttonZakljucneOcene.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
+        buttonMode.paint(); buttonLetnik.paint(); buttonRazred.paint(); buttonPredmet.paint(); buttonTest.paint(); buttonAnalizaNalog.paint(); buttonUcenec.paint(); buttonSPData.paint(); buttonKritLuknje.paint(); buttonLoad.paint(); buttonHelp.paint();
         //console.log("    painted-buttons")
         y = buttonMode.top;
         switch (gl_mode) {
             case cv_mode_test:
                 //console.log("    painting-rt")
-                if (lo_grafZakljucneOcene) { // 6.6.2025
+                if (lo_drawAnalizaNalog && lo_razredAll) {
                     x = buttonSPData.left + buttonSPData.width + 4.5;
                 } else {
-                    if (lo_drawAnalizaNalog && lo_razredAll) {
-                        x = buttonSPData.left + buttonSPData.width + 4.5;
-                    } else {
-                        x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-                    }
-                };
-                //if (drawSpChart) {
-                //    x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
-                //} else {
-                //    x = buttonSPData.left + buttonSPData.width + 4.5;
-                //}
+                    x = buttonKritLuknje.left + buttonKritLuknje.width + 4.5;
+                }
                 gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
                 break;
             case cv_mode_ucenec: case cv_mode_razred:
                 //console.log("    painting-u")
                 x = buttonUcenec.left + buttonUcenec.width + 4.5;
                 gLine(x, y, x, y + buttonRazred.height + 1, 3, "darkGray", []);
+                break;
+            case cv_mode_zOcena:
+                //console.log("    painting-rt")
+                x = buttonSPData.left + buttonSPData.width + 4.5;
+                gLine(x, y, x, y + buttonLetnik.height + 1, 3, "darkGray", []);
                 break;
         }
         x = buttonLoad.left + buttonLoad.width + 4.5;
@@ -6303,7 +6272,7 @@ function paint_GUI() {
     if (lo_showToolTips) { //1.4.2024
         //if (lo_enabledHelp) { // 27.1.2025
         // pogoj VISIBLE IN ENABLED se testirata že v samem objektu!
-        buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonAnalizaNalog.showToolTip(); buttonZakljucneOcene.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
+        buttonMode.showToolTip(); buttonLetnik.showToolTip(); buttonRazred.showToolTip(); buttonPredmet.showToolTip(); buttonTest.showToolTip(); buttonAnalizaNalog.showToolTip(); buttonUcenec.showToolTip(); buttonSPData.showToolTip(); buttonKritLuknje.showToolTip(); buttonLoad.showToolTip(); buttonHelp.showToolTip();
         //};
     };
 
@@ -6445,6 +6414,9 @@ function paint_GUI_layoutB() {
         case cv_mode_razred:
             paint_GUI_layoutB_modeRazred()
             break;
+        case cv_mode_zOcena:
+            paint_GUI_layoutB_modeZOcene()
+            break;
     }
 }
 
@@ -6511,41 +6483,60 @@ function paint_GUI_layoutB_modeTest() {
     buttonMode.top = yTop;
     buttonLetnik.left = buttonMode.left + buttonMode.width + wSep;
     buttonLetnik.top = buttonMode.top;
-    if (lo_grafZakljucneOcene) {
-        buttonPredmet.left = buttonLetnik.left + buttonLetnik.width + wSep;
-        buttonPredmet.top = buttonMode.top;
-        buttonZakljucneOcene.left = buttonPredmet.left + buttonPredmet.width + wSep;
-        buttonZakljucneOcene.top = buttonMode.top;
-        // ----
-        buttonSPData.left = buttonZakljucneOcene.left + buttonZakljucneOcene.width + wSep;
-        buttonSPData.top = buttonMode.top;
+
+    buttonRazred.left = buttonLetnik.left + buttonLetnik.width + wSep;
+    buttonRazred.top = buttonMode.top;
+    buttonPredmet.left = buttonRazred.left + buttonRazred.width + wSep;
+    buttonPredmet.top = buttonMode.top;
+    buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonTest.top = buttonMode.top;
+    buttonAnalizaNalog.left = buttonTest.left + buttonTest.width + wSep;
+    buttonAnalizaNalog.top = buttonMode.top;
+    // ----
+    buttonSPData.left = buttonAnalizaNalog.left + buttonAnalizaNalog.width + wSep;
+    buttonSPData.top = buttonMode.top;
+    //if (!drawSpChart) {
+    if (lo_drawAnalizaNalog && lo_razredAll) {
         //----
+        buttonKritLuknje.enabled = false; buttonKritLuknje.visible = false; // 12.6.2025
         x = buttonSPData.left + buttonSPData.width + wSep;
     } else {
-        buttonRazred.left = buttonLetnik.left + buttonLetnik.width + wSep;
-        buttonRazred.top = buttonMode.top;
-        buttonPredmet.left = buttonRazred.left + buttonRazred.width + wSep;
-        buttonPredmet.top = buttonMode.top;
-        buttonTest.left = buttonPredmet.left + buttonPredmet.width + wSep;
-        buttonTest.top = buttonMode.top;
-        buttonAnalizaNalog.left = buttonTest.left + buttonTest.width + wSep;
-        buttonAnalizaNalog.top = buttonMode.top;
-        buttonZakljucneOcene.left = buttonAnalizaNalog.left + buttonAnalizaNalog.width + wSep;
-        buttonZakljucneOcene.top = buttonMode.top;
-        // ----
-        buttonSPData.left = buttonZakljucneOcene.left + buttonZakljucneOcene.width + wSep;
-        buttonSPData.top = buttonMode.top;
-        //if (!drawSpChart) {
-        if (lo_drawAnalizaNalog && lo_razredAll) {
-            //----
-            x = buttonSPData.left + buttonSPData.width + wSep;
-        } else {
-            buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
-            buttonKritLuknje.top = buttonMode.top;
-            //----
-            x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
-        }
+        buttonKritLuknje.enabled = true; buttonKritLuknje.visible = true; // 12.6.2025
+        buttonKritLuknje.left = buttonSPData.left + buttonSPData.width + wSep;
+        buttonKritLuknje.top = buttonMode.top;
+        //----
+        x = buttonKritLuknje.left + buttonKritLuknje.width + wSep;
     }
+    
+    buttonLoad.left = x + wSep;
+    buttonLoad.top = buttonMode.top;
+    //----
+    x = buttonLoad.left + buttonLoad.width + wSep;
+    buttonHelp.left = x + wSep;
+    buttonHelp.top = buttonMode.top;
+    
+}
+
+function paint_GUI_layoutB_modeZOcene() {
+
+    const wSep = 4;
+    let x;
+    let yTop = 2;
+
+    //---- 27.1.2025
+    buttonMode.left = 2;
+    buttonMode.top = yTop;
+    buttonLetnik.left = buttonMode.left + buttonMode.width + wSep;
+    buttonLetnik.top = buttonMode.top;
+
+    buttonPredmet.left = buttonLetnik.left + buttonLetnik.width + wSep;
+    buttonPredmet.top = buttonMode.top;
+    // ----
+    buttonSPData.left = buttonPredmet.left + buttonPredmet.width + wSep;
+    buttonSPData.top = buttonMode.top;
+    //----
+    x = buttonSPData.left + buttonSPData.width + wSep;
+
     buttonLoad.left = x + wSep;
     buttonLoad.top = buttonMode.top;
     //----
@@ -6675,17 +6666,6 @@ function lf_changeZaokrozujNaCeleProcente(vp_newValue, vp_paint) {
 
     lo_zaokrozujNaCeleProcente = vp_newValue;
     buttonKritLuknje.valueOnOff = !lo_zaokrozujNaCeleProcente;
-    if (vp_paint) { paint() }
-
-}
-
-function lf_changeGrafZakljucneOcene(vp_newValue, vp_paint) {
-
-    lo_grafZakljucneOcene = vp_newValue;
-    buttonZakljucneOcene.valueOnOff = lo_grafZakljucneOcene;
-    hideAllControls();
-    showAndEnableControls_modeTest();
-    lo_GUIlayoutHasChanged = true;
     if (vp_paint) { paint() }
 
 }
@@ -6913,6 +6893,10 @@ function lf_setMode(vp_mode, vp_paint) {
             if (lo_byRazredGen) { buttonRazred.toolTipText = "Naslednji letnik ..."; } else { buttonRazred.toolTipText = "Naslednji razred ..."; };
             buttonRazred.keyStroke = "R / kole" + scSchLow + scTchLow + "ekMi" + scSchLow + "ke";
             break;
+        case cv_mode_zOcena:
+            data_prepareStructures_byTest();
+            showAndEnableControls_modeZOcena();
+            break;
     };
 
     lo_GUIlayoutHasChanged = true;
@@ -6922,21 +6906,23 @@ function lf_setMode(vp_mode, vp_paint) {
 
 function hideAllControls() {
 
-    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonUcenec, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
+    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonUcenec, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(hideAndDisableControl);
 
 }
 
 function showAndEnableControls_modeTest() {
 
-    if (lo_grafZakljucneOcene) {
-        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonZakljucneOcene, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
+    if (lo_drawAnalizaNalog && lo_razredAll) {
+        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
     } else {
-        if (lo_drawAnalizaNalog && lo_razredAll) {
-            [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
-        } else {
-            [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonZakljucneOcene, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
-        }
+        [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonTest, buttonAnalizaNalog, buttonSPData, buttonKritLuknje, buttonLoad, buttonHelp].forEach(showAndEnableControl);
     }
+
+}
+
+function showAndEnableControls_modeZOcena() { // 12.6.2025
+
+    [buttonMode, buttonLetnik, buttonRazred, buttonPredmet, buttonSPData, buttonLoad, buttonHelp].forEach(showAndEnableControl);
 
 }
 
