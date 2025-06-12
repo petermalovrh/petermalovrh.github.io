@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.8"
-const gl_versionDate = "11.6.2025"
+const gl_versionNr = "v2.9"
+const gl_versionDate = "12.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -5806,6 +5806,13 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
                 tmpDatumMs00prev = tmpDatumMs00; x0 = x1; mesec += 1; continue;
             }
         };
+        // --- zapis zadnjega prvega dneva v mesecu lahko ne naredim, če je preblizu zadnjega dneva vseh ocen (ta je sigurno označen) 12.6.2025
+        if ((ucenciZadnjaOcenaDatum - tmpDatumMs) < 28 * cv_danMs) {
+            diffPix = kx * (ucenciZadnjaOcenaDatum - tmpDatumMs);
+            if (diffPix < w) {
+                break;
+            }
+        };        
         // ---- označitev naslednjega prvega v mesecu
         gLine(x, yXos - 2, x, yXos + 2, 1, "darkSlateGray", []);
         tmpText = "1." + (mesec + 1).toString() + ".";
