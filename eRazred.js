@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.13"
+const gl_versionNr = "v2.14"
 const gl_versionDate = "15.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -9089,21 +9089,10 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
     // 3.6.2025
     //----------------------
 
-    //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
+    // gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
     
     const marginChart = 10;
-    let maxDim = Math.min(vp_w, vp_h);
-    const radij = (maxDim - 2 * marginChart) / 2;
-    let cx = vp_x + vp_w / 2;
-    let cy = vp_y + vp_h / 2;
-
-    //---- shrani lastnosti digrama za mouseOver() event (23.1.2025)
-    //pcChartCx[vp_razredId] = cx;
-    //pcChartCy[vp_razredId] = cy;
-    //pcChartRadij[vp_razredId] = radij;
-    //pcChartFi[vp_razredId] = [];
-    
-    let i, tmpText, w, h, x, y, tmpColor;
+    let i, tmpText, w, h, w2, x, y, tmpColor;
     let fontOcena = "bold 13pt verdana";
     if (vp_w > 150 && vp_h > 150) { fontOcena = "bold 14pt verdana"; };
     if (vp_w > 250 && vp_h > 250) { fontOcena = "bold 15pt verdana"; };
@@ -9122,7 +9111,7 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
     
     let tmpOcena, tmpItemId;
     let xOcenaMarker = vp_x + 2; // + 7;
-    let xIme1 = xOcenaMarker + 25; let xIme2, namesPrinted;
+    let xIme1 = xOcenaMarker + 25; let xIme2, namesPrintedCurrentLine;
     const cv_gapIme = 9;
     const gapChartTop = 10;
     y = vp_y + gapChartTop;
@@ -9139,6 +9128,7 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
 
     //---- Zanka po vseh petih ocenah pri tem konkretnem razredu
     yLastOcena = y - gapOcenaY;
+    const cv_adaptive = true; // 15.6.2025
     for (tmpOcena = 5; tmpOcena > 0; tmpOcena--) {
 
         if (arrOcene[tmpOcena] > 0) {
@@ -9156,7 +9146,7 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
             gBannerRoundRectWithText(x, y, w, h, fontOcena, tmpColor, tmpText, 3, 3, 5, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
 
             // ---- SEZNAM UČENCEV S TO OCENO
-            x = xIme1; namesPrinted = 0;
+            x = xIme1; namesPrintedCurrentLine = 0;
             yLastOcena = y;
             for (i = 1; i <= arrArrZakljucneOceneCount[vp_razredId][tmpOcena]; i++) {
                 ocenaIdVRazredu = arrRazredArrZakljucneOceneArrRezultatiOcenaIdVRazredu[vp_razredId][tmpOcena][i];
@@ -9174,16 +9164,40 @@ function paint_seznamUcencev_byZakljucnaOcena(vp_x, vp_y, vp_w, vp_h, vp_razredI
                 //---- IZPIS TEGA UČENCA
                 ;[w, h] = gMeasureText(tmpText, fontUcenec);
                 gText(tmpText, fontUcenec, tmpColor, x, y + 13);
-                namesPrinted += 1;
+                namesPrintedCurrentLine += 1;
                 yLastOcena = y;
-                switch (namesPrinted) {
-                    case 1: // ta učenec je prvi izpisan v tej vrstici - nastavim X na drugi stolpec, Y pa pustim isti
-                        x += (w + cv_gapIme);
-                        break;
-                    case 2: // ta učenec je bil zdaj že drugi v tej vrstici - nastavim X nazaj na začetek vrstice in Y pomaknem za eno vrstico dol
-                        x = xIme1; y += 20; namesPrinted = 0;
-                        break;
+                //---- 15.6.2025 ali naj se jih v eno vrstico izpiše toliko, kot jih gre, ali največ 2
+                if (cv_adaptive) {
+                    // toliko, kot jih gre
+                    // je še kakšen za izpis?
+                    if (i < arrArrZakljucneOceneCount[vp_razredId][tmpOcena]) {
+                        // še jih je nekaj potrebno izpisati
+                        // je za naslednjega v trenutni vrsti še dovolj prostora za izpis?
+                        x += (w + cv_gapIme); // pomik na mesto, kjer bi se pričel izpis naslednjega v tej vrstici
+                        tmpText = arrRazredArrZakljucneOceneArrRezultatiImePriimek[vp_razredId][tmpOcena][i + 1]; //
+                        if (lo_byRazredGen) { // če imam pregled za celo generacijo skupaj, k imenu in priimku dodam še razred
+                            tmpText += " " + arrRazredArrZakljucneOceneArrRezultatiRazred[vp_razredId][tmpOcena][i + 1];
+                        }
+                        ;[w2, h] = gMeasureText(tmpText, fontUcenec);
+                        if (x - vp_x + w2 <= vp_w) {
+                            // dovolje je prostora v tej vrsti za izpis še enega
+                        } else {
+                            // ni več dovolj prostora za naslednjega, treba je iti v naslednjo vrstico
+                            x = xIme1; y += 20; namesPrintedCurrentLine = 0;
+                        }
+                    }
+                } else {
+                    // največ 2, tako je bilo do 15.6.2025
+                    switch (namesPrintedCurrentLine) {
+                        case 1: // ta učenec je prvi izpisan v tej vrstici - nastavim X na drugi stolpec, Y pa pustim isti
+                            x += (w + cv_gapIme);
+                            break;
+                        case 2: // ta učenec je bil zdaj že drugi v tej vrstici - nastavim X nazaj na začetek vrstice in Y pomaknem za eno vrstico dol
+                            x = xIme1; y += 20; namesPrintedCurrentLine = 0;
+                            break;
+                    }
                 }
+
             }
         }
     }
