@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.11"
-const gl_versionDate = "12.6.2025"
+const gl_versionNr = "v2.12"
+const gl_versionDate = "15.6.2025"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -3726,7 +3726,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyL':
             //console.log("L pressed");
             switch (gl_mode) {
-                case cv_mode_test:
+                case cv_mode_test: case cv_mode_zOcena:
                     lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
                     data_prepareStructures_byTest();
                     paint();
@@ -5834,8 +5834,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
 
     // ---- TABLETEK ZAKLJUČNE OCENE
     let tmpOcena;
-    let fontOcena = "bold 11pt verdana";
-    if (vp_focus) { fontOcena = "bold 15pt verdana"; };
+    let fontOcena = "bold 11pt verdana"; if (vp_focus) { fontOcena = "bold 24pt verdana"; };
     if (zOcenaId > 0) {
         tmpOcena = zOcenaOcenaNr[zOcenaId];
         tmpText = tmpOcena.toString();
@@ -5845,6 +5844,7 @@ function paint_eRazred_grafUcenec_drawSingleUcenec(vp_razredUcenecId, vp_focus, 
         //if (tmpSelOcena > 0 && tmpSelOcena != tmpOcena) {
         //    tmpColor = gf_alphaColor(255 - tmpOcena * 40, "lightGray");
         //}
+        if (vp_focus) { x += 10; y -= 7; };
         gBannerRoundRectWithText(x, y, w, h, fontOcena, tmpColor, tmpText, 3, 3, 5, "white", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
     }
     
@@ -10227,10 +10227,321 @@ async function setClipboard(text) {
   await navigator.clipboard.write([clipboardItem]);
 }
 
-function encryptUcenciRazredi() {
+function xencryptUcenciRazredi() {
     // po potrebi sem prekopiraj kodo iz encryptData.txt !!
     // naloadaš prave podatke
     // stisneš Shift-E
     // na clipboard-u imaš konvertirane podatke, ki jih nekam paste-aš in shraniš (dataXX.txt)
 }
+function encryptUcenciRazredi() {
 
+    let ucenec, razred;
+    let arrConvSrc = []; let arrConvDst = [];
+    let lo_nrEncryptItems;
+
+    lo_nrEncryptItems = 0;
+
+    lo_nrEncryptItems = lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kri" + scZhLow + "ani" + scTchLow, "Velkavrh");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejc", "Ervin");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bab" + scSchLow + "ek", "Benko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jelov" + scTchLow + "an", "Novak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mojca", "Tina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jene", "Jenko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jurij", "Jakob");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Mina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Karaosmanovi" + scTchSoftLow, "Berisha");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tia", "Zinka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Zoja", "Kaja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ku" + scSchLow + "ar", "Bernik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tina", "Mija");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lenar" + scTchLow + "i" + scTchLow, "Ple" + scSchLow + "ko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fatki" + scTchSoftLow, scSch + "krlec");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tiana", "Sabina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Luki" + scTchSoftLow, "Tanko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Manca", "Marjana");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Martin" + scTchLow + "i" + scTchLow, "Justin");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kristian", "Ale" + scSchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mihajloski", scTch + "inku");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Teodora", "Ivanka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Milivojevi" + scTchSoftLow, "Zalaznik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Armin", "Toma" + scZhLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Aleksandar", "Nikita");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Are" + scZhLow + "ina", "Bezjak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Brina", "Tamara");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bekavac", "An" + scZhLow + "lovar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ma" + scSchLow + "a", "Tja" + scSchLow + "a");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Belec", "Zorjan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bogataj", scSch + "kof");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Arne", "Val");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Brunec", "Polanc");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scTchSoft + "ati" + scTchSoftLow, "Duhovnik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ora" + scSchLow + scTchLow + "anin", "Govekar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Pavlovi" + scTchSoftLow + " Bartol", "Poglajen");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ana", "Beti");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Pikelj", scZh + "akelj");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bianka", scZh + "ana");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Plaznik Bili" + scTchSoftLow, "Kregar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lili", "Helena");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Razor" + scSchLow + "ek", "Kra" + scTchLow + "un");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Dia", "Majda");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Repnik", "Zorko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sara", "Roman");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bani" + scTchLow, "Nosan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bergant", "Teti" + scTchLow + "kovi" + scTchSoftLow + "");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jan", scZh + "iga");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bukov" + scSchLow + "ak", "Kozmus");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Arian", "Janez");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Erik", "Kenan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fi" + scSchLow + "er", "Terpinc");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nejka", "Andreja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar Torkar", "A" + scZhLow + "be");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Homec", "Medi" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Maja", "Fani");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Diana", "Sanja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scSch + "penko Ko" + scSchLow + "enina", "Perme");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "an", "Zvone");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "ban Matja" + scZhLow, "Kristan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bajcer", "Glas");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ema", "Marija");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bon" + scTchLow + "a", "Fistravec");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scTch + "epon", "Erzeti" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Teja", "Mirjana");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Erzin", "Kopa" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mark", "Vlado");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Golob", "Bogataj");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Viktor", "Du" + scSchLow + "an");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Orel", "Petek");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tin", "Gregor");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Seka" + scTchLow, "Kolar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Faruk", "Borut");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Turni" + scTchSoftLow, "Ko" + scSchLow + "ir");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Trina", "Jure");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Varl", "Koren");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Skale Dem" + scSchLow + "ar", "Zore");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lana", "Elena");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Skok", "Lipi" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Osmanagi" + scTchSoftLow, "Ber" + scTchLow + "i" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Najc", "Tone");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petelinkar", "Petri" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Torkar", "Kregar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Nika", "Ur" + scSchLow + "ka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Posavec", "Logar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Merima", "Ne" + scZhLow + "a");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Salki" + scTchSoftLow, "Mrak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mia", "Maks");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Sketelj", "Fink");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jenko", "Jelovac");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lejla", "Maja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "iva", "Lucija");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scSch + "u" + scSchLow + "ter" + scSchLow + "i" + scTchLow, "Kova" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Livia", "Smiljana");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Zabukovec", "Derganc");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Benjamin", "Janko");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "ebovec", "Plestenjak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Eva", "Mateja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bevk " + scSch + "ali", "Horvat");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Matic", "Ivan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Bikar Kern", "Mlakar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Matev" + scZhLow, "Matej");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Brade" + scSchLow + "ko", "Vidmar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Turni" + scTchSoftLow, "Ko" + scSchLow + "ir");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Trina", "Jure");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Varl", "Koren");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Skale Dem" + scSchLow + "ar", "Zore");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lana", "Elena");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Skok", "Lipi" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Julija", "Nata" + scSchLow + "a");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jam" + scSchLow + "ek Koli" + scTchLow, "");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Zarja", "Anita");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Klavora", scTch + "ade" + scZhLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Gal", "Nik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ko" + scSchLow + "ir", "Ko" + scZhLow + "elj");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Antonia", "Irena");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Krstev", "Petrovi" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Adem", "Klemen");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Ljubijanki" + scTchSoftLow, "Kranj" + scTchLow + "an");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Til", "Bojan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lojak", "Smrtnik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Luka", "Nace");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lu" + scSchLow + "trek", "Zelinka");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Darija", "Lovro");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Odoba" + scSchLow + "i" + scTchSoftLow, "Dem" + scSchLow + "ar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lenart", "Bine");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Omejec " + scZh + "idan", "Oman");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tarik", "Cene");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "iva", "Lucija");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scSch + "u" + scSchLow + "ter" + scSchLow + "i" + scTchLow, "Kri" + scZhLow + "man");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lea", "Barbara");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Burgar", "Kos");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Maksimiljan", "Robert");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Erjavec", "Kralj");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Peter", "David");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Fijav" + scZhLow, "Turk");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jamnik", "Bizjak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lara", "Katja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Izak", "Robi");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Marquis", "Tanja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kozamernik", "Zupan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kri" + scZhLow + "aj", "Kotnik");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Vid", "Miha");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "M" + scAdotDot + "chtig Ko" + scZhLow + "lin", "Hribar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Martin" + scTchLow + "i" + scTchLow, "Rozman");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Meden", "Kastelic");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Mija", "Monika");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Miheli" + scTchLow + " Ti" + scSchLow + "i" + scTchLow, "Oblak");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jagodi" + scTchLow, "Hru" + scSchLow + "ovar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Lotti", "Ermina");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Kova" + scTchLow + "i" + scTchLow, "Gros");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Hanan", "Kemal");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Novak", "Cotar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Pehli" + scTchSoftLow, "Frantar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Pernek", scZh + "vegli" + scTchLow);
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, scZh + "iga", "Lan");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Polj" + scSchLow + "ak", "Berce");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Petra", "Darja");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Jaka", "Rok");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Orel", "Petek");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Tin", "Gregor");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Seka" + scTchLow, "Kolar");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Faruk", "Borut");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Turni" + scTchSoftLow, "Ko" + scSchLow + "ir");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Trina", "Jure");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Varl", "Koren");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Dora", "Martin");
+    lo_nrEncryptItems = addEncryptItem(lo_nrEncryptItems, arrConvSrc, arrConvDst, "Vodopi" + scTchSoftLow, "Zajc");
+
+    // menjava imen
+    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
+        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
+            if (ucenecIme[ucenec] == arrConvSrc[eItem]) {
+                ucenecIme[ucenec] = arrConvDst[eItem];
+                break; // temu učencu je bilo ime zamenjano in grem lahko na naslednjega učenca
+            };
+        }
+    }
+
+    // menjava priimkov
+    for (ucenec = 1; ucenec <= lo_nrUcencev; ucenec++) {
+        for (eItem = 1; eItem <= lo_nrEncryptItems; eItem++) {
+            if (ucenecPriimek[ucenec] == arrConvSrc[eItem]) {
+                ucenecPriimek[ucenec] = arrConvDst[eItem];
+                break; // temu učencu je bil priimek zamenjan in grem lahko na naslednjega učenca
+            };
+        }
+    }
+
+    // menjava črk razredov
+    for (razred = 1; razred <= lo_nrRazredov; razred++) {
+
+        if (razredCrka[razred] == "A") { razredCrka[razred] = "E"; };
+        if (razredCrka[razred] == "B") { razredCrka[razred] = "D"; };
+        
+        if (razredIme[razred] == "8.A") { razredIme[razred] = "8.E"; };
+        if (razredIme[razred] == "8.B") { razredIme[razred] = "8.D"; };
+        if (razredIme[razred] == "9.A") { razredIme[razred] = "9.E"; };
+        if (razredIme[razred] == "9.B") { razredIme[razred] = "9.D"; };
+    
+    }
+
+    // menjava predmeta FIZIKA -> KEMIJA
+    predmetIme[1] = "KEMIJA";
+    predmetKratica[1] = "KEM";
+
+    saveEncryptedDataToClipboard();
+
+}
+
+function addEncryptItem(items, arrSrc, arrDst, srcStr, dstStr) {
+
+    items += 1;
+
+    arrSrc[items] = srcStr;
+    arrDst[items] = dstStr;
+
+    return items;
+
+}
+
+function saveEncryptedDataToClipboard() {
+
+    let data = "";
+    data = storeDataRazred(2, "", data);
+    data = storeDataRazred(1, "\n\n", data);
+    data = storeDataRazred(4, "\n\n", data);
+    data = storeDataRazred(3, "\n\n", data);
+    //data = storePisniTesti();
+    data += "\n\n#L2425 #PKEMIJA #R8.D #T2|65|12 7 5 3 4 6 10 2 4 4 3 5"
+    data += "\n#L2425 #PKEMIJA #R8.E #T2|65|12 7 5 3 4 6 10 2 4 4 3 5"
+    data += "\n#L2425 #PKEMIJA #R9.D #T2|62|13 6 6 4 6 4 5 2 3 4 4 5"
+    data += "\n#L2425 #PKEMIJA #R9.E #T2|62|13 6 6 4 6 4 5 2 3 4 4 5"
+    data += "\n";
+    
+    //setClipboard(data);
+    navigator.clipboard.writeText(data);
+    
+}
+
+function storeDataRazred(vp_razredId, addStr, dataStr) {
+
+    let ucenecId, ocenaId, naloga;
+
+    //---- tule se tipično spredaj doda prehod v novo vrstico, razen v primeru prvega razreda
+    dataStr += addStr;
+    
+    //---- nalimam header razreda
+    dataStr += "#L2425 #PKEMIJA #R" + razredIme[vp_razredId];
+    
+    // nalimam vse ocene učencev zahtevanega razreda
+    for (ucenecId = 1; ucenecId <= lo_nrUcencev; ucenecId++) {
+        if (ucenecRazredId[ucenecId] == vp_razredId) {
+        
+            //---- nalimam ime in priimek učenca
+            dataStr += "\n" + ucenecIme[ucenecId] + " " + ucenecPriimek[ucenecId];
+            
+            //---- nalimam še vse ocene tega učenca
+            for (ocenaId = 1; ocenaId <= lo_nrOcen; ocenaId++) {
+                if (ocenaRazredId[ocenaId] == vp_razredId && ocenaUcenecId[ocenaId] == ucenecId) {
+                    dataStr += (",  " + ocenaCifra[ocenaId]);
+                    dataStr += ("|" + ocenaTip[ocenaId]);
+                    dataStr += ("|" + ocenaDatumStr[ocenaId]);
+                    if (ocenaTock[ocenaId] >= 0) {
+                        dataStr += ("|" + ocenaTock[ocenaId].toString());
+                    }
+                    if (ocenaMaxTock[ocenaId] >= 0) {
+                        dataStr += ("|" + ocenaMaxTock[ocenaId].toString());
+                    }
+                    if (ocenaTockPoNalogahArr[ocenaId].length > 0) {
+                        dataStr += "|";
+                        for (naloga = 0; naloga <= ocenaTockPoNalogahArr[ocenaId].length - 1; naloga++) {
+                            if (naloga > 0) {
+                                dataStr += " ";
+                            }
+                            dataStr += (ocenaTockPoNalogahArr[ocenaId][naloga].toString());
+                        }
+                        dataStr += "|";
+                    }
+                }
+            }
+            
+            //---- nalimam še zaključno oceno tega učenca (če obstaja)
+            for (ocenaId = 1; ocenaId <= lo_nrZakljucnihOcen; ocenaId++) {
+                if (zOcenaRazredId[ocenaId] == vp_razredId && zOcenaUcenecId[ocenaId] == ucenecId) {
+                    dataStr += (",  " + zOcenaOcenaNr[ocenaId].toString());
+                    dataStr += "|Z";
+                    dataStr += ("|" + zOcenaDatumStr[ocenaId]);
+                    dataStr += ",";
+                    break;
+                }
+            }
+        }
+    }
+
+    return dataStr;
+
+}
+
+function storePisniTesti(dataStr) {
+
+    return dataStr;
+    
+}
