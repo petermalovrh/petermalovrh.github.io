@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 28.3.2026
-const gl_versionNr = "v1.1"
-const gl_versionDate = "30.3.2026"
+const gl_versionNr = "v1.2"
+const gl_versionDate = "31.3.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -1904,7 +1904,9 @@ class checkBox {
         let y1 = this.top; let y2 = y1 + this.smoothPx; let y3 = this.top + this.width - this.smoothPx; let y4 = this.top + this.width;
         //---- če je miška nad njim, je treba to v GUI označiti
         let focused = (this.enabled && this.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) ? true : false;
-        if (focused) { let addM = 5; gBannerRect(x1 - addM, y1 - addM, this.width + 2 * addM, this.width + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false); }
+        if (focused) {
+            let addM = 5; gBannerRect(x1 - addM, y1 - addM, this.width + 2 * addM, this.width + 2 * addM, 3, 3, focusedColor, 0, "", "", 0, 0, false);
+        }
         //---- risanje okvirčka
         ctx.beginPath()
         ctx.moveTo(x2, y1)
@@ -2333,8 +2335,8 @@ var lo_tipDatumMs = 0; // 9.2.2025
 var gl_usePohvala;
 var gl_usePotrebnaIzboljsava;
 var gl_useKomentar;
-var gl_useUcitelj; var gl_useUciteljStr = "Malovrh Peter" ;
-var gl_usePredmet; var gl_usePredmetStr = "MAT";
+var gl_useUcitelj; var gl_useUciteljStr = "" ;
+var gl_usePredmet; var gl_usePredmetStr = "";
 
 //---- kaj vključim v izhodni izpis
 var gl_includeTip;
@@ -2354,13 +2356,17 @@ var arrUra = [];
 var arrTermin = [];
 var arrVsebina = [];
 var nrDataLines = 0;
+var nrPohvala = 0;
+var nrPotrebnaIzboljsava = 0;
+var nrKomentar = 0;
+var nrOdsotnost = 0; 
+var nrOdsotnostDogodek = 0;
 var loadStatus = ""; 
 var copyStatus = "";
 
-
 const cv_separator_min = 1;
 const cv_separator_max = 5;
-const cv_separator_1 = "\t"; const cv_separatorDesc_1 = "TAB"; 
+const cv_separator_1 = "\t"; const cv_separatorDesc_1 = "TAB (za Excel)"; 
 const cv_separator_2 = " "; const cv_separatorDesc_2 = "\u0022" + " " + "\u0022";
 const cv_separator_3 = "  "; const cv_separatorDesc_3 = "\u0022" + "  " + "\u0022";
 const cv_separator_4 = " : ";  const cv_separatorDesc_4 = "\u0022" + " : " + "\u0022";
@@ -2456,7 +2462,7 @@ const lo_backgroundColor = "white";  //"whiteSmoke"
 const disabledControlLineColor = "silver";
 const disabledControlBackColor = "#F0F0F0FF";
 const disabledControlTextColor = "silver";
-const focusedColor = "lightYellow";
+const focusedColor = "khaki";  "lightYellow";
 
 var lo_linearGradientFill = false
 var lgfc1x, lgfc1y, lgfc2x, lgfc2y, lgfc1, lgfc2, lgfc3, lgfcs1, lgfcs2, lgfcs3;
@@ -2487,7 +2493,7 @@ switch (lo_GUI_layout) {
         //var checkBoxLegend = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Legenda", "gray", "normal 10pt verdana", 4, "right-middle", lo_showLegend, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Prikaz legende", "L");  //String.fromCharCode(0x0110));
         //----
         var checkFilterPohvala = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Pohvala", "gray", "normal 10pt verdana", 4, "right-middle", gl_usePohvala, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi pohvale", "");  //String.fromCharCode(0x0110));
-        var checkFilterPotrebnaIzboljsava = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Potrebna izbolj" + scSchLow + "ava", "gray", "normal 10pt verdana", 4, "right-middle", gl_usePotrebnaIzboljsava, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi potrebne izbolj"+scSchLow+"ave", "");  //String.fromCharCode(0x0110));
+        var checkFilterPotrebnaIzboljsava = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Potrebna izbolj" + scSchLow + "ava", "gray", "normal 10pt verdana", 4, "right-middle", gl_usePotrebnaIzboljsava, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi potrebne izbolj" + scSchLow + "ave", "");  //String.fromCharCode(0x0110));
         var checkFilterKomentar = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Komentar", "gray", "normal 10pt verdana", 4, "right-middle", gl_useKomentar, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi komentarje", "");  //String.fromCharCode(0x0110));
         var checkFilterUcitelj = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Samo u" + scTchLow + "itelj:", "gray", "normal 10pt verdana", 4, "right-middle", gl_useUcitelj, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi samo zapise tega u" + scTchLow + "itelja", "");  //String.fromCharCode(0x0110));
         var checkFilterPredmet = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Samo predmet:", "gray", "normal 10pt verdana", 4, "right-middle", gl_usePredmet, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "Preberi samo zapise tega predmeta", "");  //String.fromCharCode(0x0110));
@@ -2496,13 +2502,41 @@ switch (lo_GUI_layout) {
         var checkIncludeUcitelj = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "U" + scTchLow + "itelj", "gray", "normal 10pt verdana", 4, "right-middle", gl_includeUcitelj, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i u" + scTchLow + "itelja", "");  //String.fromCharCode(0x0110));
         var checkIncludePredmet = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Predmet", "gray", "normal 10pt verdana", 4, "right-middle", gl_includePredmet, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i predmet", "");  //String.fromCharCode(0x0110));
         var checkIncludeDatum = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Datum", "gray", "normal 10pt verdana", 4, "right-middle", gl_includeDatum, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i datum", "");  //String.fromCharCode(0x0110));
-        var checkIncludeUra = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, scSch + "olska ura", "gray", "normal 10pt verdana", 4, "right-middle", gl_includeUra, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i "+ scSchLow +"olsko uro", "");
+        var checkIncludeUra = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, scSch + "olska ura", "gray", "normal 10pt verdana", 4, "right-middle", gl_includeUra, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i " + scSchLow + "olsko uro", "");
         var checkIncludeTermin = new checkBox(gpLeft + 194, gpTop - 8, 18, 2, 2, "Od-do", "gray", "normal 10pt verdana", 4, "right-middle", gl_includeTermin, "gray", "white", "peru", true, disabledControlLineColor, disabledControlBackColor, disabledControlTextColor, true, "V izpis vklju" + scTchLow + "i termin", "");  //String.fromCharCode(0x0110));
         //----
         var buttonLoad = new button(gpLeft, gpTop + 10, 245, 26, "Beri eAsistent zapise iz clipboard-a", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "azure", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiraj zapise v clipboard ...", "C");
         var buttonCopy = new button(gpLeft, gpTop + 10, 186, 26, "Zapi" + scSchLow + "i/kopiraj na clipboard", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "azure", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Kopiraj zapise v clipboard ...", "C");
-        var buttonSeparator = new button(gpLeft, gpTop + 10, 20, 23, ">", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "ivory", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Izberi naslednji separator ...", "S");
-    }
+        var buttonSeparator = new button(gpLeft, gpTop + 10, 20, 23, ">", "10pt verdana", "darkSlateGray", "black", 1, "gray", "darkSlateGray", "whiteSmoke", 2, 0, 0, 0, 0, "middle", "middle", "lightGray", 2, 2, false, true, disabledControlBackColor, disabledControlTextColor, true, "Izberi naslednji separator ...", "S");
+        //----
+        var textBoxUcitelj = document.createElement('input');
+        textBoxUcitelj.type = 'text';
+        textBoxUcitelj.id = 'textBoxUcitelj';
+        textBoxUcitelj.value = '';
+        textBoxUcitelj.maxLength = 50
+        textBoxUcitelj.style.position = "absolute";
+        textBoxUcitelj.style.left = "140px"
+        textBoxUcitelj.style.top = "162px"
+        textBoxUcitelj.style.width = "180px"
+        textBoxUcitelj.style.zIndex = "2";
+        textBoxUcitelj.style.visibility = "hidden"
+        //textBoxUcitelj.style.visibility = "visible"
+        document.body.appendChild(textBoxUcitelj);
+        //----
+        var textBoxPredmet = document.createElement('input');
+        textBoxPredmet.type = 'text';
+        textBoxPredmet.id = 'textBoxPredmet';
+        textBoxPredmet.value = '';
+        textBoxPredmet.maxLength = 50
+        textBoxPredmet.style.position = "absolute";
+        textBoxPredmet.style.left = "158px"
+        textBoxPredmet.style.top = "187px"
+        textBoxPredmet.style.width = "100px"
+        textBoxPredmet.style.zIndex = "2";
+        textBoxPredmet.style.visibility = "hidden"
+        //textBoxPredmet.style.visibility = "visible"
+        document.body.appendChild(textBoxPredmet);
+}
 var lo_GUIlayoutHasChanged = true;
 var lo_repaintTimerActive  = false
 var lo_hasRepaintRequest  = false
@@ -2939,6 +2973,7 @@ elMyCanvas.addEventListener('click', (e) => {
         if (buttonLoad.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             eA_clipboard_load();
+            paint();
             vl_end = true;
         }
     }
@@ -2947,7 +2982,10 @@ elMyCanvas.addEventListener('click', (e) => {
     if (!vl_end && buttonCopy.visible && buttonCopy.enabled) {
         if (buttonCopy.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
+            if (gl_useUcitelj) { gl_useUciteljStr = textBoxUcitelj.value.trim() };
+            if (gl_usePredmet) { gl_usePredmetStr =  textBoxPredmet.value.trim() };
             eA_data_output();
+            paint();
             vl_end = true;
         }
     }
@@ -3178,163 +3216,33 @@ window.addEventListener("wheel", event => {
 window.addEventListener("keydown", (event) => {
 
     switch (event.code) {
-        case 'KeyS':
-            //lo_keyDownS = true; break;
-            //console.log("S pressed");
-            if (event.shiftKey) {
-                lf_changeSchrink(lo_schrink - 1, true);
-            } else {
-                lf_changeSchrink(lo_schrink + 1, true);
-            }
-            break;
-        case 'KeyC':
-            //console.log("C pressed");
-            switch (gl_mode) {
-                case cv_mode_test:
-                    if (!lo_drawAnalizaNalog || (lo_drawAnalizaNalog && !lo_razredAll)) {
-                        lf_changeZaokrozujNaCeleProcente(!lo_zaokrozujNaCeleProcente, true);
-                    }
-                    break;
-            }
-            break;
         case 'ShiftLeft':
             lo_keyDownShiftLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;
         case 'ControlLeft':
             // CTRL+mouseWheel = ZOOM v browserju !!!
-            lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); break;        
-        case 'KeyX':
-            lo_keyDownX = true; break;
-        case 'KeyM':
-            //lo_keyDownM = true; break;
-            //console.log("M pressed");
-            if (event.shiftKey) { lf_changeMode(gl_mode - 1, true); }
-            else { lf_changeMode(gl_mode + 1, true); }
-            break;
-        case 'KeyL':
-            //console.log("L pressed");
-            switch (gl_mode) {
-                case cv_mode_test: case cv_mode_zOcena:
-                    lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
-                    data_prepareStructures_byTest();
-                    paint();
-                    break;
-                case cv_mode_razred: // spremeni razred <-> razredGen 16.2.2025
-                    lo_focusRazred = 0;
-                    lf_changeByRazredGen(!lo_byRazredGen, true);
-                    break;
-            };
-            break;
+            //lo_keyDownControlLeft = true; break;  //console.log(lo_keyDownShiftLeft); 
+            break;        
         case 'KeyR':
             //lo_keyDownR = true; break;
             //console.log("R pressed");
-            let tmpChange;
-            switch (gl_mode) {
-                case cv_mode_ucenec:
-                    lo_focusUcenec = 0; // 4.2.2025
-                    if (event.shiftKey) { lf_changeRazred(lo_razred - 1, true); }
-                    else { lf_changeRazred(lo_razred + 1, true); };
-                    break;
-                case cv_mode_razred: // spremeni razred <-> razredGen 16.2.2025
-                    //lf_changeFocusRazred(!lo_byRazredGen, true);
-                    lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -1 : 1), true);
-                    break;
-                case cv_mode_test: case cv_mode_zOcena: // 25.5.2025 // 12.6.2025
-                    tmpChange = event.shiftKey ? -1 : 1;
-                    lo_GUIlayoutHasChanged = true;
-                    lf_changeRazred(lo_razred + tmpChange, true);
-                    break;
-            };
             break;
         // case 'KeyZ': case 'KeyY':
        
         case 'KeyP': // sprememba predmeta 28.1.2025
             //console.log("T pressed");
-            if (event.shiftKey) { // 26.1.2025
-                lf_changePredmet(lo_predmet - 1, false); // 26.1.2025
-            } else {
-                lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
-            }
-            switch (gl_mode) {
-                case cv_mode_test: case cv_mode_zOcena:
-                    data_prepareStructures_byTest();
-                    break;
-                default:
-                    break;
-            }
-            paint();
+            //if (event.shiftKey) { // 26.1.2025
+            //    lf_changePredmet(lo_predmet - 1, false); // 26.1.2025
+            //} else {
+            //    lf_changePredmet(lo_predmet + 1, false); // 26.1.2025
+            //}
             break;
         case 'KeyT': // sprememba zaporedne številke testa pri istem predmetu
             //console.log("T pressed");
-            if (event.shiftKey) { // 26.1.2025
-                lf_changePisniTestNr(lo_pisniTestNr - 1, false); // 26.1.2025
-            } else {
-                lf_changePisniTestNr(lo_pisniTestNr + 1, false); // 26.1.2025
-            }
-            switch (gl_mode) {
-                case cv_mode_test:
-                    data_prepareStructures_byTest();
-                    break;
-                default:
-                    break;
-            }
-            paint();
             break;
         case 'KeyU':
             //console.log("U pressed");
-            switch (gl_mode) {
-                case cv_mode_ucenec: // premakni se s fokusom na naslednjega/ prejšnjega učenca 20.2.2025
-                    lf_changeFocusUcenec(lf_changeValueFocusUcenec(event.shiftKey ? 1 : -1), true);
-                    break;
-            };
             break;
         case 'Escape':
-            if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
-                lf_changeFocusUcenec(0, true);
-            }
-            break;
-        case 'KeyB':
-            //console.log("F7 pressed");
-            if (lo_focusRazred == 2) {
-                lf_changeDebug(!dbg, true);
-            }
-            break;
-        case 'KeyF':
-            lf_changeFocusUcenecOnOff(true);
-            break;
-        case 'KeyD':
-            // Read text from the clipboard, or "paste"
-            lo_focusUcenec = 0; // 4.2.2025
-            clipboard_load();
-            break;
-        case 'KeyJ':
-            // Read text from the clipboard, or "paste"
-            lo_focusUcenec = 0; // 4.2.2025
-            eA_clipboard_load();
-            break;
-        case 'KeyW':
-            //lo_keyDownW = true; break;
-            //paint_realenLom();
-            lo_realniLom = !lo_realniLom;
-            paint();
-            break;
-        case 'KeyA':
-            //lo_keyDownA = true; break;
-            switch (gl_mode) {
-                case cv_mode_test:
-                    lo_drawAnalizaNalog = !lo_drawAnalizaNalog;
-                    buttonAnalizaNalog.valueOnOff = lo_drawAnalizaNalog;
-                    hideAllControls();
-                    showAndEnableControls_modeTest();
-                    lo_GUIlayoutHasChanged = true;
-                    paint();
-                    break;
-            }
-            break;
-        case 'KeyE':
-            if (event.shiftKey) {
-                encryptUcenciRazredi();
-                lf_setMode(gl_mode, true);
-            };
             break;
         case 'ArrowRight':
         //lf_changeMonthEnd(lf_changeVar(gl_monthEnd, 1, 1, nrMonthsAll), true)
@@ -3363,97 +3271,6 @@ window.addEventListener("keydown", (event) => {
             break;
     }
 });
-
-window.addEventListener("keyup", (event) => {
-    
-    let change, newValue;
-
-    switch (event.code) {
-        case 'Digit0':
-            lo_keyDownDigit0 = false;
-            // 1.4.2024 Ali spreminja vrednost lo_n samo s pomočjo tipke 0 brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_N) {
-                // 21.12.2023 tole je primer spreminjanja lo_printLevel samo s pomočjo tipke T  // obratno: Če med vrtenjem koleščka smo spreminjali vrednost lo_printLevel
-                //console.log("UP: process keyPress(T)");
-                change = lo_nStep;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueN(-change);
-                lf_changeN(newValue, false);
-            }
-            lo_selectedLeca = false;
-            paint();
-            gl_changeByMouseWheel_N = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        //case 'KeyX':
-        //    lo_keyDownX = false;
-        //    // 1.4.2024 Ali spreminja vrednost lo_xNrF samo s pomočjo tipke X brez vrtenja koleščka miške?
-        //    if (!gl_changeByMouseWheel_ucenecChart) {
-        //        // 21.12.2023 tole je primer spreminjanja lo_xNrF samo s pomočjo tipke X  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_xNrF
-        //        //console.log("UP: process keyPress(X)");
-        //        change = lo_stepXnrF;
-        //        if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-        //        if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-        //        newValue = lf_changeValueXnrF(-change);
-        //        lf_changeXnrF(newValue, true);
-        //    }
-        //    gl_changeByMouseWheel_ucenecChart = false;
-        //    //console.log("UP: false"); console.log("----");
-        //    break;
-        case 'KeyX':
-            lo_keyDownX = false;
-            // 1.4.2024 Ali spreminja vrednost lo_pixPerUnit samo s pomočjo tipke X brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_pixPerUnit) {
-                // 21.12.2023 tole je primer spreminjanja lo_pixPerUnit samo s pomočjo tipke X  // obratno: že med vrtenjem koleščka smo spreminjali vrednost lo_pixPerUnit
-                //console.log("UP: process keyPress(X)");
-                change = lo_stepPixPerUnit;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValuePixPerUnit(-change);
-                lf_changePixPerUnit(newValue, true);
-            }
-            gl_changeByMouseWheel_pixPerUnit = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'Digit2':
-            lo_keyDown2 = false;
-            // 1.4.2024 Ali spreminja vrednost lo_kriterij12 samo s pomočjo tipke 2 brez vrtenja koleščka miške?
-            if (!gl_changeByMouseWheel_kriterij12) {
-                // 21.12.2023 tole je primer spreminjanja lo_kriterij12 samo s pomočjo tipke 2  // obratno: že med vrtenjem koleščka miške smo spreminjali vrednost lo_kriterij12
-                //console.log("UP: process keyPress(T)");
-                change = 1;
-                if (lo_keyDownControlLeft) { change = 5 };  // CTRL poveča korak na 5 ... CTRL+T je v browserju odpiranje novega zavihka!!! Tako da povečanje koraka mi s CTRL ne dela
-                if (lo_keyDownShiftLeft) { change *= -1 };  // SHIFT obrne smer
-                newValue = lf_changeValueKriterij("12", -change);
-                lf_changeKriterij("12", newValue, true);
-            }
-            gl_changeByMouseWheel_kriterij12 = false;
-            //console.log("UP: false"); console.log("----");
-            break;
-        case 'KeyD':
-            lo_keyDownD = false; break;
-        case 'KeyW':
-            lo_keyDownW = false; break;
-        case 'KeyE':
-            lo_keyDownE = false; break;
-        case 'ShiftLeft':
-            lo_keyDownShiftLeft = false; break;  //console.log(lo_keyDownShiftLeft); break;
-        case 'ControlLeft':
-            // PAZI !! če daš CTRL-F, se odpre okenček za iskanje. Ko spustiš CTRL in F, dogodka letita v tisti okenček in moja aplikacija ne zazna spuščenega CTRL !!! Change tako ostane na 5 !!!
-            lo_keyDownControlLeft = false; break; // console.log(lo_keyDownControlLeft); 
-        //case 'KeyP':
-        //console.log("P pressed"); lf_changeAutoPlay(!lo_autoPlay); break;
-    }
-
-});
-
-//window.addEventListener('mouseup', (e) => {
-    //drawLine(context, x, y, e.offsetX, e.offsetY);
-    //x = 0;
-    //y = 0;
-    //isDrawing = false;
-//});
 
 //let zzzg = colorToHexRGB("plum")
 //zzzg = colorToHexRGBA("plum")
@@ -3687,11 +3504,27 @@ function lf_mouseOverScatterPlotDataPoint(mouseX, mouseY) {
 
 function paint_GUI() {
 
-    let y;
+    let y, w, h, tmpText;
 
     checkFilterPohvala.paint();
+    //if (nrPohvala > 0) { gText(nrPohvala.toString(), "normal 8pt verdana", "darkSlateGray", 102, checkFilterPohvala.top + 17); }
+    if (nrPohvala > 0) {
+        tmpText = nrPohvala.toString();
+        [w, h] = gMeasureText(tmpText, "normal 8pt verdana");
+        gBannerRoundRectWithText3(106, checkFilterPohvala.top + 5, w, h, "normal 9pt verdana", "darkSlateGray", tmpText, 4, 4, 3, 5, "lightYellow", 1, "gray", "darkGray", 2, 2, false);
+    };
     checkFilterPotrebnaIzboljsava.paint();
+    if (nrPotrebnaIzboljsava > 0) {
+        tmpText = nrPotrebnaIzboljsava.toString();
+        [w, h] = gMeasureText(tmpText, "normal 8pt verdana");
+        gBannerRoundRectWithText3(185, checkFilterPotrebnaIzboljsava.top + 5, w, h, "normal 9pt verdana", "darkSlateGray", tmpText, 4, 4, 3, 5, "lightYellow", 1, "gray", "darkGray", 2, 2, false);
+    };
     checkFilterKomentar.paint();
+    if (nrKomentar > 0) {
+        tmpText = nrKomentar.toString();
+        [w, h] = gMeasureText(tmpText, "normal 8pt verdana");
+        gBannerRoundRectWithText3(120, checkFilterKomentar.top + 5, w, h, "normal 9pt verdana", "darkSlateGray", tmpText, 4, 4, 3, 5, "lightYellow", 1, "gray", "darkGray", 2, 2, false);
+    };    
     checkFilterUcitelj.paint();
     checkFilterPredmet.paint();
     //----
@@ -4009,6 +3842,16 @@ function lf_changeUseUcitelj(vp_newValue, vp_paint) {
 
     gl_useUcitelj = vp_newValue;
     checkFilterUcitelj.value = gl_useUcitelj;
+    
+    switch (gl_useUcitelj) {
+        case true:
+            textBoxUcitelj.style.visibility = "visible";
+            break;
+        case false:
+            textBoxUcitelj.style.visibility = "hidden";
+            break;
+    }
+
     if (vp_paint) { paint() }
 
 }
@@ -4017,6 +3860,16 @@ function lf_changeUsePredmet(vp_newValue, vp_paint) {
 
     gl_usePredmet = vp_newValue;
     checkFilterPredmet.value = gl_usePredmet;
+
+    switch (gl_usePredmet) {
+        case true:
+            textBoxPredmet.style.visibility = "visible";
+            break;
+        case false:
+            textBoxPredmet.style.visibility = "hidden";
+            break;
+    }
+
     if (vp_paint) { paint() }
 
 }
@@ -4371,6 +4224,7 @@ function eA_data_parse(clipText) {
     //---- spraznimo podatkovne strukture
     arrTip.length = 0; arrDatum.length = 0; arrPredmet.length = 0; arrUra.length = 0; arrTermin.length = 0; arrVsebina.length = 0; arrUcitelj.length = 0;
     nrDataLines = 0;
+    nrPohvala = 0; nrPotrebnaIzboljsava = 0; nrKomentar = 0; nrOdsotnost = 0; nrOdsotnostDogodek = 0;
 
     for (pos = 0; haveLines; nrLines++) {
         // poiščem konec naslednje vrstice
@@ -4520,7 +4374,22 @@ function eA_data_newLineData(tip, ucitelj, predmet, datum, ura, termin, vsebina)
     arrUra[nrDataLines] = ura;
     arrTermin[nrDataLines] = termin;
     arrVsebina[nrDataLines] = vsebina;
-            
+
+    //---- 31.3.2026 štejem posamezne tipe zapisov
+    switch (tip) {
+        case "pohvala":
+            nrPohvala += 1;
+            break;
+        case "potrebna izbolj" + scSchLow + "ava":
+            nrPotrebnaIzboljsava += 1;
+            break;
+        case "komentar":
+            nrKomentar += 1;
+            break;
+        default:
+            break;
+    }
+    
     //---- izpis novega zapisa v konzolo
     textOut = ucitelj + " : " + tip + " : " + datum + " : " + predmet;
     if (ura != "") { textOut += " " + ura + " " + termin };
