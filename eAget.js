@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 28.3.2026
-const gl_versionNr = "v1.2"
-const gl_versionDate = "31.3.2026"
+const gl_versionNr = "v1.3"
+const gl_versionDate = "1.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2352,6 +2352,7 @@ var arrTip = [];
 var arrUcitelj = [];
 var arrPredmet = [];
 var arrDatum = [];
+var arrDan = [];
 var arrUra = [];
 var arrTermin = [];
 var arrVsebina = [];
@@ -4217,7 +4218,7 @@ function eA_data_parse(clipText) {
     let nrLines = 0;
     let rslt;
     let currentCol = 1; let currentLine = 1;
-    let tip = ""; let datum = ""; let predmet = ""; let ura = ""; let termin = ""; let vsebina = ""; let ucitelj = "";
+    let tip = ""; let ucitelj = ""; let predmet = ""; let danDatum = ""; let datum = ""; let ura = ""; let termin = ""; let vsebina = "";
     let haveDataLine = false; 
     let textOut = ""; let textOutClipboard = ""
     
@@ -4258,7 +4259,7 @@ function eA_data_parse(clipText) {
                         //---- vpis novega zapisa
                         eA_data_newLineData(tip, ucitelj, predmet, datum, ura, termin, vsebina);
                         //----- priprava struktur na naslednji zapis
-                        tip = ""; datum = ""; predmet = ""; ura = ""; termin = ""; vsebina = ""; ucitelj = "";
+                        tip = ""; ucitelj = ""; predmet = ""; danDatum = ""; datum = ""; ura = ""; termin = ""; vsebina = "";
                         haveDataLine = false;
                         currentCol = 1; currentLine = 1;
                         break;
@@ -4283,7 +4284,8 @@ function eA_data_parse(clipText) {
                         }
                         break;
                     case 2:
-                        datum = lineStr;
+                        danDatum = lineStr;
+                        datum = lf_getDatumFromDanDatum(danDatum);
                         currentCol = 2; currentLine = 1;
                         break;
                 }
@@ -4350,7 +4352,7 @@ function eA_data_parse(clipText) {
             //--- imamo vse podatke zapisa - shrani jih v strukture
             eA_data_newLineData(tip, ucitelj, predmet, datum, ura, termin, vsebina)
             //----- priprava struktur na naslednji zapis
-            tip = ""; datum = ""; predmet = ""; ura = ""; termin = ""; vsebina = ""; ucitelj = "";
+            tip = ""; ucitelj = ""; predmet = ""; danDatum = ""; datum = ""; ura = ""; termin = ""; vsebina = "";
             haveDataLine = false;
         }
 
@@ -4361,6 +4363,19 @@ function eA_data_parse(clipText) {
     console.log("     parsed ... " + "zapisov: " + nrDataLines.toString());
 
 }
+
+function cutToFirst(str, char) {
+    const i = str.indexOf(char);
+    return i === -1 ? str : str.slice(i + 1);
+}
+
+function lf_getDatumFromDanDatum(danDatum) {
+    //---- iz stringa "Sreda, 11. 3." dobimo "11.3."
+    let datum = cutToFirst(danDatum, " ");
+    datum = datum.replace(/ /g, ""); // to je samo za presledke, če hočeš za vse specialne znake potem str.replace(/\s+/g, "")
+    return datum;
+
+};
 
 function eA_data_newLineData(tip, ucitelj, predmet, datum, ura, termin, vsebina) {
 
