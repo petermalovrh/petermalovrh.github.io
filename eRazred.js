@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.20"
-const gl_versionDate = "24.4.2026"
+const gl_versionNr = "v2.21"
+const gl_versionDate = "25.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -8823,9 +8823,9 @@ function calculate_avg_test(vp_letnik, vp_predmet, vp_razredNr, vp_razredCrka, v
                 //if (tock == 5.5) {
                 //    tock = tock;
                 //}
-                if ((tmpPisniTestId==3) && (naloga==11) && ((tock==1.5)||(tock==2.5))) {
-                    tock = tock;
-                }
+                //if ((tmpPisniTestId==3) && (naloga==11) && ((tock==1.5)||(tock==2.5))) {
+                //    tock = tock;
+                //}
                 tockIndex1 = Math.round(tock); ucencevPoTockah1[tockIndex1] += 1;
                 if (ucencevPoTockah1[tockIndex1] > maxUcencev1) { maxUcencev1 = ucencevPoTockah1[tockIndex1] };
                 tockIndex05 = Math.round(tock * 2); ucencevPoTockah05[tockIndex05] += 1;
@@ -10156,7 +10156,7 @@ function paint_barChart_analizaNalog(vp_x, vp_y, vp_w, vp_h, vp_itemId) {
     let nrNalog = pisniTestNalogeTock[myPisniTestId].length; // število nalog na tem pisnem testu
     
     const marginLeft = 8; let marginMiddleH = vp_w * 0.05; const marginRight = 8;
-    const marginTop = 8; const marginMiddleV = 8; const marginBottom = 8;
+    const marginTop = 8; const marginMiddleV = 15; const marginBottom = 8;
 
     //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
     anChartX[vp_itemId] = vp_x;
@@ -10313,6 +10313,7 @@ function paint_barChart_analizaNalog_singleNaloga(vp_x, vp_y, vp_w, vp_h, vp_ite
         if (tock == (maxTock + 0.5)) { tmpText = maxTock.toString(); } // 22.2.2026 Če je max točk na pol točke, potem pri zadnjem stolpcu izpišem natančno število max točk
         ;[w, h] = gMeasureText(tmpText, fontAxisText);
         gText(tmpText, fontAxisText, "darkSlateGray", x + wBar / 2 - w / 2, yXos + 4 + h);
+        
         //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
         anChartXtock[vp_itemId][vp_naloga][tock] = x;
         anChartYtock[vp_itemId][vp_naloga][tock] = y;
@@ -10336,6 +10337,33 @@ function paint_barChart_analizaNalog_singleNaloga(vp_x, vp_y, vp_w, vp_h, vp_ite
         ;[w, h] = gMeasureText(tmpText, fontNaloga);
     }
     gBannerRoundRectWithText(x, yTopData - 2, w, h, fontNaloga, "darkSlateGray", tmpText, 3, 3, 7, "azure", 1, "lightGray", "#DCDCDCC0", 2, 2, false);
+
+    //---- 25.4.2026
+    let sumUcencev = pisniTestUcenciTockeNalogUcenec[vp_pisniTestId].length - 1;
+    let sumTock = 0;
+    if (sumUcencev > 0) {
+        // ---- SEŠTEVANJE TOČK PO UČENCIH ZA TO KONKRETNO NALOGO        
+        for (let tmpUcenec = 1; tmpUcenec <= sumUcencev; tmpUcenec++) {
+            sumTock += pisniTestUcenciTockeNalogTocke[vp_pisniTestId][tmpUcenec][vp_naloga - 1];
+        }
+        // ---- IZRAČUN POVPREČNE OCENE
+        let avgTock = sumTock / sumUcencev;
+        let avgPercent= avgTock / maxTock * 100;
+        // ---- OZNAČEVANJE POVPREČNE OCENE
+        kx = xRange / maxTock;
+        x = x0 + kx * avgTock;
+        y = yXos + 10;
+        let w = 4; let h = 9;
+        gLik(x, y - 3, [w, w, -w, -w], [h, 2 * h - 2, 2 * h - 2, h], "darkTurquoise", 1, "darkSlateGray", []); // vPointer
+        tmpText = avgTock.toFixed(2).replace(".", ","); if (tmpText == "0,00") { tmpText = "0" };
+        [w, h] = gMeasureText(tmpText, "9pt verdana");
+        gText(tmpText, "9pt verdana", "darkGray", x - w - 8, y + 14);
+        tmpText = avgPercent.toFixed(1).replace(".", ",") + "%"; if (tmpText == "0,0%") { tmpText = "0%" }; if (tmpText == "100,0%") { tmpText = "100%" };
+        gText(tmpText, "9pt verdana", "darkGray", x + 7, y + 14);
+
+        //tmpText = "avg: " + avgTock.toFixed(2);
+    }
+
 
 };
 
