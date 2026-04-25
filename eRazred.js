@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.19"
-const gl_versionDate = "25.3.2026"
+const gl_versionNr = "v2.20"
+const gl_versionDate = "24.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2454,6 +2454,7 @@ var arrArrZakljucneOceneRezultatiOcena = [];      // 22.1.2025
 //----
 //var arrKriteriji = [50, 63, 76, 90]; // 25.3.2026 OŠ Medvode
 var arrKriteriji = [50, 65, 80, 90];   // 25.3.2026 OŠIT
+const arrKriterijiStandard = [50, 65, 80, 90];   // 24.4.2026 OŠIT
 var arrQ1 = []; // 21.1.2025
 var arrQ2 = []; // 21.1.2025
 var arrQ3 = []; // 21.1.2025
@@ -2613,6 +2614,22 @@ var lo_showDynamicToolbar = true;
 var tmToolbarStartPeriod;
 
 var lo_tipDatumMs = 0; // 9.2.2025
+
+// ---- 21.4.2026
+var gl_dataExcelPoljane = false;
+var tipPreizkusaStrExcelPoljane = "";
+var datumPreizkusaStrExcelPoljane = "";
+var predmetRazredSkupinaStrExcelPoljane = "";
+var datumExcelPoljaneStr = ""
+var kriterij2ExcelPoljaneStr = 50;
+var kriterij3ExcelPoljaneStr = 64;
+var kriterij4ExcelPoljaneStr = 78;
+var kriterij5ExcelPoljaneStr = 91;
+var arrKriterijiExcelPoljane = [];
+var imePreizkusaExcelPoljaneStr = "";
+var tockPoNalogahArrExcelPoljane = [];
+var nalogeTockSkupajExcelPoljane;
+var nrNalogExcelPoljane;
 
 console.clear;
 
@@ -3119,7 +3136,8 @@ elMyCanvas.addEventListener('click', (e) => {
 
     //---- preklop mode 2.2.2025
     //if (!vl_end && lo_showGUI && lo_enabledMode) {
-    if (!vl_end && buttonMode.visible && buttonMode.enabled) {
+    //if (!vl_end && buttonMode.visible && buttonMode.enabled) {
+    if (!vl_end && buttonMode.visible && buttonMode.enabled && !gl_dataExcelPoljane) { // 24.4.2026
         if (buttonMode.eventClick(e.offsetX, e.offsetY)) {
             //console.log("click(): rslt=" + rslt.toString())
             lo_focusUcenec = 0; // 4.2.2025
@@ -3139,6 +3157,7 @@ elMyCanvas.addEventListener('click', (e) => {
             //console.log("click(): rslt=" + rslt.toString())
             switch (gl_mode) {
                 case cv_mode_test: case cv_mode_zOcena:
+                    if (gl_dataExcelPoljane) { break; }; // 24.4.2026
                     lf_changeByRazredGen(!lo_byRazredGen, false);
                     data_prepareStructures_byTest();
                     paint();
@@ -3166,6 +3185,7 @@ elMyCanvas.addEventListener('click', (e) => {
                     lf_changeFocusRazred(lf_changeValueFocusRazred(e.shiftKey ? -1 : 1), true);
                     break;
                 case cv_mode_test: case cv_mode_zOcena: // 6.6.2025 //12.6.2025
+                    if (gl_dataExcelPoljane) { break; } // 24.4.2026 
                     lo_GUIlayoutHasChanged = true; // 12.6.2025
                     let tmpChange = e.shiftKey ? -1 : 1;
                     lf_changeRazred(lo_razred + tmpChange, true);
@@ -3731,6 +3751,7 @@ window.addEventListener("keydown", (event) => {
         case 'KeyM':
             //lo_keyDownM = true; break;
             //console.log("M pressed");
+            if (gl_dataExcelPoljane) { break; } // 24.4.2026
             if (event.shiftKey) { lf_changeMode(gl_mode - 1, true); }
             else { lf_changeMode(gl_mode + 1, true); }
             break;
@@ -3738,6 +3759,7 @@ window.addEventListener("keydown", (event) => {
             //console.log("L pressed");
             switch (gl_mode) {
                 case cv_mode_test: case cv_mode_zOcena:
+                    if (gl_dataExcelPoljane) { break; }; // 24.4.2026
                     lf_changeByRazredGen(!lo_byRazredGen, false); // 25.1.2025
                     data_prepareStructures_byTest();
                     paint();
@@ -3763,6 +3785,7 @@ window.addEventListener("keydown", (event) => {
                     lf_changeFocusRazred(lf_changeValueFocusRazred(event.shiftKey ? -1 : 1), true);
                     break;
                 case cv_mode_test: case cv_mode_zOcena: // 25.5.2025 // 12.6.2025
+                    if (gl_dataExcelPoljane) { break; } // 24.4.2026
                     tmpChange = event.shiftKey ? -1 : 1;
                     lo_GUIlayoutHasChanged = true;
                     lf_changeRazred(lo_razred + tmpChange, true);
@@ -3810,7 +3833,7 @@ window.addEventListener("keydown", (event) => {
                     lf_changeFocusUcenec(lf_changeValueFocusUcenec(event.shiftKey ? 1 : -1), true);
                     break;
             };
-            break;        
+            break;
         case 'Escape':
             if (gl_mode == cv_mode_ucenec && lo_focusUcenec > 0) {
                 lf_changeFocusUcenec(0, true);
@@ -3830,6 +3853,11 @@ window.addEventListener("keydown", (event) => {
             lo_focusUcenec = 0; // 4.2.2025
             clipboard_load();
             break;
+        case 'KeyJ':
+            // Read text from the clipboard, or "paste"
+            lo_focusUcenec = 0; // 4.2.2025
+            eA_clipboard_load();
+            break;
         case 'KeyW':
             //lo_keyDownW = true; break;
             //paint_realenLom();
@@ -3848,7 +3876,7 @@ window.addEventListener("keydown", (event) => {
                     paint();
                     break;
             }
-            break;        
+            break;
         case 'KeyE':
             if (event.shiftKey) {
                 encryptUcenciRazredi();
@@ -4144,7 +4172,11 @@ function data_prepareStructures_byTest() {
     arrArrZakljucneOceneRezultatiOcena.length = 0;      // 21.1.2025
     // ----
     //arrKriteriji = [50, 63, 76, 90]; // 25.3.2026 OŠ Medvode
-    arrKriteriji = [50, 65, 80, 90];   // 25.3.2026 OŠIT 
+    //arrKriteriji = [50, 65, 80, 90];   // 25.3.2026 OŠIT 
+    arrKriteriji = arrKriterijiStandard; // 24.4.2026
+    if (gl_dataExcelPoljane) { // 24.4.2026
+        arrKriteriji = arrKriterijiExcelPoljane
+    }; 
     arrQ1.length = 0; // 21.1.2025
     arrQ2.length = 0; // 21.1.2025
     arrQ3.length = 0; // 21.1.2025
@@ -4708,6 +4740,9 @@ function paint_eRazred_grafTest_singleRazred() {
         if (lo_showGUI) { titlePanelWidth -= 198 };
         //tmpText = "FIZIKA - 1. pisni test";
         tmpText = vl_razredTitle + " - " + predmetIme[lo_predmet] + " - " + lo_pisniTestNr.toString() + ". pisni test";
+        if (gl_dataExcelPoljane) { // 24.4.2026
+            tmpText = tipPreizkusaStrExcelPoljane + " - " + predmetRazredSkupinaStrExcelPoljane + " (" + datumPreizkusaStrExcelPoljane + ")";
+        }
         ;[w, h] = gMeasureText(tmpText, titleFont);
         gBannerRect(titlePanelLeft, yTitleTop, titlePanelLeft + titlePanelWidth, 34, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
         x = titlePanelLeft + titlePanelWidth / 2 - w / 2;
@@ -7208,13 +7243,28 @@ function clipboard_load() {
     navigator.clipboard.readText()
         .then((clipText) => {
             
+            arrKriteriji = arrKriterijiStandard; // 24.4.2026
+            gl_dataExcelPoljane = false; // 24.4.2026
+            
+            // 21.4.2026 - če je clipboard vseboval data v formatu excel poljane, potem ga parsam s posebno funkcijo, ki je prilagojena temu formatu, sicer pa ga parsam s standardno funkcijo, ki je prilagojena za format, ki ga generira moj data export
+            if (clipboard_check_excelPoljane(clipText)) {
+                gl_dataExcelPoljane = true; // 24.4.2026
+                data_initParseAndPrepare_excelPoljane(clipText); // 21.4.2026
+                //----
+                gl_mode = cv_mode_test; // 24.4.2026
+                lo_razredAll = false; // 24.4.2026
+                lo_byRazredGen = false; // 24.4.2026
+                lo_drawAnalizaNalog = true;
+                paint();
+                return;
+            };
+            
             //console.log('clipboard contents', clipText);
-            if (!clipboard_check(clipText)) {
+            if (clipboard_check(clipText)) {
+                data_initParseAndPrepare(clipText); // 2.2.2025
                 return
             };
         
-            data_initParseAndPrepare(clipText); // 2.2.2025
-
             return;
             
             // Inicializacija podatkovnih struktur
@@ -7283,6 +7333,31 @@ function data_initParseAndPrepare(textData) {
 
 }
 
+function data_initParseAndPrepare_excelPoljane(textData) {
+
+    // Inicializacija podatkovnih struktur
+    intDataStructures();
+
+    // Očitno to so podatki o analizi preverjanja ali ocenjevanja, treba je sparsati
+    console.log("PARSE EXCEL DATA -->");
+    data_parse_excelPoljane(textData);
+
+    //return;
+    
+    // Inicializacija potrebnih struktur za risanje grafov
+    lo_predmet = 1; // FIZIKA
+    lo_pisniTestNr = 1; // P1
+    if (lo_razred > 1) { lo_razred = 1; };       // 18.2.2025
+    if (lo_razredGen > 1) { lo_razredGen = 1; }; // 18.2.2025
+    
+    data_prepareStructures_byUcenec();  //  2.2.2025 // 31.5.2025
+    
+    data_prepareStructures_byTest();    // 23.1.2025
+
+    data_prepareStructures_byRazred();  // 16.2.2025
+
+}
+
 function clipboard_check(clipText) {
 
     // Je kaj na clipboard-u?
@@ -7300,6 +7375,40 @@ function clipboard_check(clipText) {
     if (clipText.indexOf("#R") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
     if (clipText.indexOf(",") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
         
+    return (true);
+
+}
+
+function clipboard_check_excelPoljane(clipText) {
+    // 21.4.2026
+
+    // Je kaj na clipboard-u?
+    if (clipText.length < 200) {
+        //console.log("ERROR: No content on clipboard!");
+        return (false);
+    };
+
+    // Na clipboardu je kar nekaj vsebine
+    // A so notri potrebni markerji?
+    
+    // Preverim vsebovanje elementov, ki sigurno so v vsakem data fajlu
+    if (clipText.indexOf("Vseh") < 0) { return (false); };
+    if (clipText.indexOf("Kriterij") < 0) { return (false); };
+    if (clipText.indexOf("ocen") < 0) { return (false); };
+    if (clipText.indexOf("%") < 0) { return (false); };
+    if (clipText.indexOf("Ocena") < 0) { return (false); };
+    if (clipText.indexOf("Skupaj") < 0) { return (false); };
+    if (clipText.indexOf("Povpre" + scTchLow + "je to" + scTchLow + "k") < 0) { return (false); };
+    //---- header row
+    if (clipText.indexOf("Z" + scSch) < 0) { return (false); };
+    if ((clipText.indexOf("Priimek") < 0) && (clipText.indexOf("Primek") < 0)) { return (false); }; // osnovna verzija ima napako "Primek" :)
+    if (clipText.indexOf("Ime") < 0) { return (false); };
+    if (clipText.indexOf("1.n") < 0) { return (false); };
+    if (clipText.indexOf("5.n") < 0) { return (false); };
+    //---- data
+    if (clipText.indexOf("\t") < 0) { return (false); };
+    if (clipText.indexOf("\t\t") < 0) { return (false); };
+
     return (true);
 
 }
@@ -7413,7 +7522,7 @@ function data_parse(clipText) {
             break; // ven iz FOR zanke
         }
 
-        // ---- Našli smo nov prelom v naslednjo vrstico - treba je obdelati tekočo vrstivo
+        // ---- Našli smo nov prelom v naslednjo vrstico - treba je obdelati tekočo vrstico
         lineStr = clipText.slice(pos, pos1).trim();
         if (lineStr.length <= 4) {
             // brezvezna neuporabna vrstica - ignoriraj in beri dalje
@@ -7442,6 +7551,126 @@ function data_parse(clipText) {
             if (!rslt) {
                 break; // konec branja vrstic zaradi napake v podatkih ali česa drugega
             }
+        } else {
+            // nič uporabnega - ignoriraj in beri dalje
+        }
+        pos = pos1 + 1;
+
+    }
+    console.log("     parsed ... " + "letnikov: " + lo_nrLetnikov.toString() + ", predmetov: " + lo_nrPredmetov.toString() + ", razredov: " + lo_nrRazredov.toString() + ", u" + scTchLow + "encev: " + lo_nrUcencev.toString() + ", ocen: " + lo_nrOcen.toString());
+}
+
+function data_parse_excelPoljane(clipText) {
+    // 21.4.2026
+
+    let pos, pos1, lineStr, searchStr;
+    let haveLines = true;
+    let nrLines = 0;
+    let rslt;
+
+    //---- LETNIK
+    let tmpLetnikStr ="2526";
+    lo_nrLetnikov += 1;
+    lo_letnik = lo_nrLetnikov;
+    letnikStr[lo_nrLetnikov] = tmpLetnikStr;
+    //----
+    //pisniTestMaxTock[lo_letnik] = [];       // 23.5.2025
+    //pisniTestNalogeTock[lo_letnik] = []; // 23.5.2025
+    //console.log("[" + lo_letnik.toString() + "]");
+    //zOcena[lo_letnik] = [];
+    //----
+    gl_letnikStr = tmpLetnikStr; // 21.11.2025 s tem letnikom se bodo kasneje delali razni pregledi - SW bo delal tako za datoteke iz 2425, 2526, ... Mora pa biti samo en letnik znotraj datoteke!!
+
+    //---- PREDMET
+    let tmpPredmetStr = "MATEMATIKA";
+    lo_nrPredmetov += 1;
+    lo_predmet = lo_nrPredmetov;
+    lo_nrPredmetPisnihTestov[lo_predmet] = 1; // 22.4.2026
+    predmetIme[lo_nrPredmetov] = tmpPredmetStr;
+    switch (tmpPredmetStr) {
+        case "FIZIKA":
+            predmetKratica[lo_nrPredmetov] = "FIZ";
+            break;
+        case "MATEMATIKA": // 21.11.2025
+            predmetKratica[lo_nrPredmetov] = "MAT";
+            break;                
+        case "KEMIJA":
+            predmetKratica[lo_nrPredmetov] = "KEM";
+            break;
+    }
+
+    //---- RAZRED
+    let tmpRazredLetnikStr = "9";
+    let tmpRazredCrka = "A";
+    lo_nrRazredov += 1;
+    lo_razred = lo_nrRazredov;
+    razredIme[lo_nrRazredov] = tmpRazredLetnikStr + "." + tmpRazredCrka;
+    razredLetnik[lo_nrRazredov] = tmpRazredLetnikStr;
+    razredCrka[lo_nrRazredov] = tmpRazredCrka;
+
+    //---- RAZRED-GEN
+    lo_nrRazredGen = 1;
+    lo_razredGen = lo_nrRazredGen;
+    razredGen[lo_nrRazredGen] = Number(tmpRazredLetnikStr);
+    
+    //---- Branje podatkov vrstico po vrstico
+    for (pos = 0; haveLines; nrLines++) {
+        // poiščem konec naslednje vrstice
+        pos1 = clipText.indexOf("\n", pos);
+        
+        // ---- Ali morda ni več prehodov v nove vrstice?
+        if (pos1 <= pos) {
+            // ni več prelomov v novo vrstico - vzamem vse do konca teksta kot zadnjo vrstico
+            haveLines = false;
+            lineStr = clipText.slice(pos).trim();
+            if (lineStr.length <= 4) {
+                break; // ven iz FOR zanke
+            };
+            if (lineStr.length > 20 && lineStr.indexOf("%") > 0 && lineStr.indexOf("\t") > 0) {
+                // imamo še rezultate zadnjega učenca - obdelaj ga
+                data_parse_excelPoljane_novUcenecRslt(lineStr);
+            }
+            break; // ven iz FOR zanke
+        }
+
+        // ---- Našli smo nov prelom v naslednjo vrstico - treba je obdelati tekočo vrstico
+        lineStr = clipText.slice(pos, pos1).trim();
+        if (lineStr.length <= 4) {
+            // brezvezna neuporabna vrstica - ignoriraj in beri dalje
+            pos = pos1 + 1;
+            continue; // NEXT v FOR zanki (naslednja iteracija v zanki)
+        };
+        
+        if (lineStr.length > 15 && lineStr.indexOf("Vseh to" + scTchLow + "k") > 0 && lineStr.indexOf("Kriterij") > 0) {
+            // imamo tip preizkusa - preberi ga
+            data_parse_excelPoljane_tipPreizkusa(lineStr);
+        } else if (lineStr.length > 15 && (lineStr.indexOf("201") > 0 || lineStr.indexOf("202") > 0 || lineStr.indexOf("203") > 0) && lineStr.indexOf(".") > 0 && lineStr.indexOf("%") > 0) {
+            // imamo datum in kriterije preizkusa - preberi jih
+            data_parse_excelPoljane_datumKriteriji(lineStr);
+        } else if (lineStr.length > 15 && lineStr.indexOf("1") > 0 && lineStr.indexOf("2") > 0 && lineStr.indexOf("3") > 0 && lineStr.indexOf("4") > 0 && lineStr.indexOf("5") > 0 && lineStr.indexOf("Sk.") > 0) {
+            // imamo ime preizkusa - preberi ga in skušaj ugotoviti predmet
+            data_parse_excelPoljane_predmetRazredSkupina(lineStr);
+        } else if (lineStr.length > 15 && lineStr.indexOf(scSch + "t. ocen") >= 0) {
+            // imamo možne točke po nalogah - preberi jih
+            //## data_parse_excelPoljane_tockPoNalogah(lineStr);
+        } else if (lineStr.length > 15 && lineStr.indexOf("Mo" + scZhLow + "ne to" + scTchLow + "ke") >= 0) {
+            // imamo možne točke po nalogah - preberi jih
+            data_parse_excelPoljane_tockPoNalogah(lineStr);
+        } else if (lineStr.length > 25 && lineStr.indexOf("Povpre" + scTchLow + "je to" + scTchLow + "k v %") >= 0 ) {
+            // imamo naslovno vrstico za rezultate - preskoči
+            pos = pos1 + 1;
+            continue; // NEXT v FOR zanki (naslednja iteracija v zanki)
+        } else if (lineStr.length > 25 && lineStr.indexOf("Povpre" + scTchLow + "je to" + scTchLow + "k") >= 0 ) {
+            // imamo naslovno vrstico za rezultate - preskoči
+            pos = pos1 + 1;
+            continue; // NEXT v FOR zanki (naslednja iteracija v zanki)
+        } else if (lineStr.length > 25 && lineStr.indexOf("Z" + scSch) >= 0 && lineStr.indexOf("Ime") > 0 && lineStr.indexOf("Skupaj") > 0 && lineStr.indexOf("%") > 0 && lineStr.indexOf("Ocena") > 0) {
+            // imamo naslovno vrstico za rezultate - preskoči
+            pos = pos1 + 1;
+            continue; // NEXT v FOR zanki (naslednja iteracija v zanki)
+        } else if (lineStr.length > 20 && lineStr.indexOf("%") > 0 && lineStr.indexOf("\t") > 0) {
+            // imamo še rezultate zadnjega učenca - obdelaj ga
+            data_parse_excelPoljane_novUcenecRslt(lineStr);
         } else {
             // nič uporabnega - ignoriraj in beri dalje
         }
@@ -7928,6 +8157,275 @@ function data_parse_novUcenecOcene(lineStr) {
             }
         }
     }
+}
+
+function data_parse_excelPoljane_tipPreizkusa(lineStr) {
+    //--------------------------------------------------------------
+    // Primer:
+    // Pisno ocenjevanje znanja		Vseh točk				Kriterij
+    //--------------------------------------------------------------
+
+    //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
+    //console.log(tmpStr + "    U: " + lineStr);
+
+    const itemList = lineStr.split("\t");
+    if (itemList.length < 7) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+    
+    tipPreizkusaStrExcelPoljane = itemList[0].trim();
+    
+}
+
+function data_parse_excelPoljane_datumKriteriji(lineStr) {
+    //--------------------------------------------------------------
+    // Primer:
+    // 26.03.2026		46,00				50%	64%	78%	91%
+    //--------------------------------------------------------------
+
+    //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
+    //console.log(tmpStr + "    U: " + lineStr);
+
+    const itemList = lineStr.split("\t");
+    if (itemList.length < 10) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+    
+    datumPreizkusaStrExcelPoljane = itemList[0].trim();
+    
+    kriterij2ExcelPoljaneStr = itemList[6].trim().replace("%", "").replace(",", "."); // 50% -> 50
+    kriterij3ExcelPoljaneStr = itemList[7].trim().replace("%", "").replace(",", ".");
+    kriterij4ExcelPoljaneStr = itemList[8].trim().replace("%", "").replace(",", ".");
+    kriterij5ExcelPoljaneStr = itemList[9].trim().replace("%", "").replace(",", ".");
+    //----
+    arrKriterijiExcelPoljane[0] = Number(kriterij2ExcelPoljaneStr);
+    arrKriterijiExcelPoljane[1] = Number(kriterij3ExcelPoljaneStr);
+    arrKriterijiExcelPoljane[2] = Number(kriterij4ExcelPoljaneStr);
+    arrKriterijiExcelPoljane[3] = Number(kriterij5ExcelPoljaneStr);
+    
+}
+
+function data_parse_excelPoljane_predmetRazredSkupina(lineStr) {
+    //--------------------------------------------------------------
+    // Primer:
+    // 26.03.2026		46,00				50%	64%	78%	91%
+    //--------------------------------------------------------------
+
+    //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
+    //console.log(tmpStr + "    U: " + lineStr);
+
+    const itemList = lineStr.split("\t");
+    if (itemList.length < 11) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+    
+    predmetRazredSkupinaStrExcelPoljane = itemList[0].trim();
+    
+}
+
+function data_parse_excelPoljane_tockPoNalogah(lineStr) {
+    //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
+    //console.log(tmpStr + "    U: " + lineStr);
+
+    const itemList = lineStr.split("\t");
+    if (itemList.length < 24) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+    let nrNalog = 0;
+    let naloga = 0;
+    let nalogaIndex = 0;
+    let konecNalog = false;
+    let i; // index prve naloge
+    let nalogaTockStr, nalogaTock;
+    //----
+    tockPoNalogahArrExcelPoljane.length = 0;
+    nalogeTockSkupajExcelPoljane = 0;
+    nrNalogExcelPoljane = 0;
+    //----
+    for (i = 2; !konecNalog; i++) {
+        if (i >= itemList.length) {
+            konecNalog = true;
+        } else {
+            nalogaTockStr = itemList[i].trim();
+            if (nalogaTockStr == "" || nalogaTockStr == "0") {
+                konecNalog = true;
+                break;
+            } else {
+                nrNalog += 1;
+                nalogaTock = Number(nalogaTockStr);
+                tockPoNalogahArrExcelPoljane[nrNalog - 1] = nalogaTock;
+            }
+        }
+    }
+
+    //---- Število nalog in Vseh možnih točk
+    nrNalogExcelPoljane = nrNalog;
+    nalogeTockSkupajExcelPoljane = Number(itemList[23].trim().replace(",", "."));
+
+    //---- VPIŠEM PODATKE O PISNEM TESTU 24.4.2026
+    lo_nrPisnihTestov = 1;
+    pisniTestNr[lo_nrPisnihTestov] = 1;
+    pisniTestLetnik[lo_nrPisnihTestov] = lo_letnik;
+    pisniTestPredmet[lo_nrPisnihTestov] = lo_predmet;
+    pisniTestRazred[lo_nrPisnihTestov] = lo_razred;
+    pisniTestMaxTock[lo_nrPisnihTestov] = nalogeTockSkupajExcelPoljane;
+    pisniTestNalogeTock[lo_nrPisnihTestov] = tockPoNalogahArrExcelPoljane;
+
+    pisniTestUcenciTockeNalogUcenec[lo_nrPisnihTestov] = [];
+    pisniTestUcenciTockeNalogTocke[lo_nrPisnihTestov] = [];
+    pisniTestUcencevPoTockahNalog1[lo_nrPisnihTestov] = [];
+    pisniTestUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
+    pisniTestMaxUcencevPoTockahNalog1[lo_nrPisnihTestov] = [];
+    pisniTestMaxUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
+    
+}
+
+function data_parse_excelPoljane_novUcenecRslt(lineStr) {
+    // Primer vrstice:
+    // 4	Justin 	Nika		4	1	1	3	3	6	2	0	0	2	3	5										30	65%	3
+    
+    //let tmpStr = "L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString();
+    //console.log(tmpStr + "    U: " + lineStr);
+
+    let tmpOcenaDatum, tmpOcenaTock;
+    let tmpOcenaTockPoNalogahArr = [];
+    
+    const itemList = lineStr.split("\t");
+    if (itemList.length < 28) {
+        return false;
+    }
+    //console.log(itemList[1] + " - " + itemList[2] + " - " + itemList[3] + " - ");
+    //tmpStr = itemList[1].trim() + " - " + itemList[2].trim() + " - " + itemList[3].trim();
+    //console.log(tmpStr);
+
+    // ---- IME IN PRIIMEK
+    let ime = itemList[2].trim();
+    let priimek = itemList[1].trim();
+    let tmpImePriimek = ime + " " + priimek;
+    if (tmpImePriimek == " ") {
+        return false;        
+    }
+    //if (tmpImePriimek == "Neja Franko") { // debug purposes
+    //    tmpImePriimek = tmpImePriimek;
+    //}
+
+    // nov doslej neznan učenec - v vsakem primeru učenca dodam, tudi če ni pisal testa/preverjanja
+    lo_nrUcencev += 1;
+    lo_ucenec = lo_nrUcencev;
+    ucenecIme[lo_nrUcencev] = ime;
+    //if (ime == "Brina") {
+    //    ime = "Brina"
+    //};
+    ucenecPriimek[lo_nrUcencev] = priimek;
+    ucenecSpol[lo_nrUcencev] = "";
+    ucenecRazredId[lo_nrUcencev] = lo_razred;
+    ucenecRazredGenId[lo_nrUcencev] = lo_razredGen;
+    ucenecOceneId[lo_nrUcencev] = []; // tu bo polje Id-jev na ocene tega učenca 17.6.2025
+    ucenecZOceneId[lo_nrUcencev] = []; // tu bo polje Id-jev na zaključne ocene tega učenca
+    
+    //---- Točke po nalogah
+    let i;
+    for (i = 4; i <= 4 + nrNalogExcelPoljane - 1; i++) {
+        tmpOcenaTockPoNalogahArr[i - 4] = Number(itemList[i].trim().replace(",", "."));
+    }
+
+    //---- DATUM OCENJEVANJA
+    let datumOcene = new Date();
+    let arrDatumOcene = [];
+    let datumOceneMs;
+    //----
+    tmpOcenaDatum = "24-4-26";
+    arrDatumOcene = tmpOcenaDatum.split("-");
+    datumOcene.setFullYear(Number("20" + arrDatumOcene[2]), Number(arrDatumOcene[1]) - 1, Number(arrDatumOcene[0]));
+    datumOcene.setHours(12, 0, 0, 0);
+    datumOceneMs = Date.parse(datumOcene);
+
+    let tmpOcenaCifra = itemList[27].trim();
+    switch (tmpOcenaCifra) {
+        case "1": case "2": case "3": case "4": case "5":
+            // ne naredim nič tule. Treba je prebrati oceno, kratice predmeta spredaj ni bilo.
+            break;
+        case "np":
+            // ni pisal testa/preizkusa ... učenca sem vpisal, ne bom pa vpisal ocene
+            return false;
+            break;
+        default:
+            // neregularna ocena ... učenca sem vpisal, ne bom pa vpisal ocene
+            //console.log("ERROR: Neznana ocena ... " + tmpImePriimek + " " + tmpOcenaCifra);
+            return false;            
+            break;
+    }
+    let tmpOcenaTip = "P1";
+    let tmpPisnaOcena = true;
+    let tmpZakljucnaOcena = false;
+    let tmpPisnaOcenaNr = 1;
+    lo_nrPredmetPisnihTestov[lo_predmet] = 1;
+    
+    // VPIS nove OCENE
+    lo_nrOcen += 1;
+    lo_ocena = lo_nrOcen;
+
+    // ---- LINKI OCENE NA LETNIK, RAZRED, PREDMET IN NA UČENCA
+    ocenaLetnikId[lo_nrOcen] = lo_letnik;
+    ocenaPredmetId[lo_nrOcen] = lo_predmet;
+    ocenaRazredId[lo_nrOcen] = lo_razred;
+    ocenaRazredGenId[lo_nrOcen] = lo_razredGen; // 16.2.2025
+    ocenaUcenecId[lo_nrOcen] = lo_ucenec;
+
+    // ---- PODATKI SAME OCENE
+    ocenaCifra[lo_nrOcen] = tmpOcenaCifra;
+    ocenaCifraNr[lo_nrOcen] = Number(tmpOcenaCifra);
+    ocenaTip[lo_nrOcen] = tmpOcenaTip;
+    ocenaTipTip[lo_nrOcen] = tmpOcenaTip.substr(0, 1);
+    ocenaTipSerialNr[lo_nrOcen] = 0;
+    ocenaDatumStr[lo_nrOcen] = tmpOcenaDatum;
+    ocenaDatumMs[lo_nrOcen] = datumOceneMs; // 1.2.2025
+
+    //---- 17.6.2025
+    nrOcenUcenca = ucenecOceneId[lo_ucenec].length;     // toliko ima ta učenec do tu že nabranih ocen
+    ucenecOceneId[lo_ucenec][nrOcenUcenca] = lo_nrOcen; // Id ocene vpišemo k učencu     
+
+    // ŠTEVILO DOSEŽENIH IN VSEH MOŽNIH TOČK NA PISNEM TESTU
+    // ---- default število točk
+    tmpOcenaTock = Number(itemList[25].trim().replace(",", "."));
+    ocenaTock[lo_nrOcen] = tmpOcenaTock;
+    ocenaMaxTock[lo_nrOcen] = nalogeTockSkupajExcelPoljane;
+    ocenaTockPoNalogahArr[lo_nrOcen] = tmpOcenaTockPoNalogahArr;
+    
+    // ---- INDEX OCEN PO DATUMU 16.2.2025
+    //      grem po sortirani listi ocen in najdem prvo ceno, ki je po datumu novejša. Pred njo v sortirano listo vrinem trenutno oceno. Če pa nobena ni bila novejša, potem trenutno oceno dodam na koncu sortirane liste.
+    placed = false;
+    for (j = 1; j <= (lo_nrOcen - 1); j++) {
+        jOcenaId = sortIndexOcenOcenaId[j];
+        jDatumOceneMs = ocenaDatumMs[jOcenaId];
+        if (jDatumOceneMs > datumOceneMs) {
+            // pred to oceno moram vriniti trenutno (novo) oceno
+            for (k = (lo_nrOcen - 1); k >= j; k--) {
+                sortIndexOcenOcenaId[k + 1] = sortIndexOcenOcenaId[k]; // vse od tu dalje prestavim za 1 naprej
+            }
+            sortIndexOcenOcenaId[j] = lo_nrOcen; // vrinem novo oceno
+            placed = true;
+            break;
+        }
+    }
+    if (!placed) {
+        // nova ocena je časovno gledana zadnja, zato jo dam na konec sortirane liste
+        sortIndexOcenOcenaId[lo_nrOcen] = lo_nrOcen; // vrinem novo oceno
+        placed = true;
+    }
+        
 }
 
 function getLetnikId(vp_letnikStr) {
@@ -10493,4 +10991,183 @@ function encryptUcenciRazredi() {
     // naloadaš prave podatke
     // stisneš Shift-E
     // na clipboard-u imaš konvertirane podatke, ki jih nekam paste-aš in shraniš (dataXX.txt)
+}
+
+function eA_clipboard_load() {
+
+    if (document.hasFocus) {
+        let aa = 1;
+    } else {
+        console.log("Document not focused!");
+    }
+        
+    navigator.clipboard.readText()
+        .then((clipText) => {
+            
+            //console.log('clipboard contents', clipText);
+            if (!eA_clipboard_check(clipText)) {
+                return
+            };
+        
+            eA_data_initParseAndPrepare(clipText); // 28.3.2026
+
+        })
+}
+function eA_clipboard_check(clipText) {
+
+    // Je kaj na clipboard-u?
+    if (clipText.length < 50) {
+        console.log("ERROR: No content on clipboard!");
+        return (false);
+    };
+
+    // Na clipboardu je kar nekaj vsebine
+    // A so notri potrebni markerji?
+    
+    // Preverim vsebovanje elementov, ki sigurno so v vsakem data fajlu
+    if (clipText.indexOf("Datum") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
+    if (clipText.indexOf("Ura") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
+    if (clipText.indexOf("Vsebina") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
+    if (clipText.indexOf(".") < 0) { console.log("ERROR: Wrong data format!"); return (false); };
+        
+    return (true);
+
+}
+
+function eA_data_initParseAndPrepare(textData) {
+
+    // Inicializacija podatkovnih struktur
+    //intDataStructures();
+
+    // Očitno to so podatki o razredih in ocenah, treba je sparsati
+    console.log("PARSE -->");
+    eA_data_parse(textData);
+
+
+}
+
+function eA_data_parse(clipText) {
+
+    let pos, pos1, lineStr, searchStr;
+    let haveLines = true;
+    let nrLines = 0;
+    let rslt;
+    let currentCol = 1; let currentLine = 1;
+    let tip = ""; let datum = ""; let predmet = ""; let ura = ""; let termin = ""; let vsebina = ""; let ucitelj = "";
+    let haveDataLine = false; let nrDataLines = 0;
+    let textOut = ""; let textOutClipboard = ""
+    
+    for (pos = 0; haveLines; nrLines++) {
+        // poiščem konec naslednje vrstice
+        pos1 = clipText.indexOf("\n", pos);
+        
+        // ---- Ali morda ni več prehodov v nove vrstice?
+        if (pos1 <= pos) {
+            // ni več prelomov v novo vrstico - vzamem vse do konca teksta kot zadnjo vrstico
+            haveLines = false;
+            lineStr = clipText.slice(pos).trim();
+        } else {
+            // ---- Našli smo nov prelom v naslednjo vrstico - treba je obdelati tekočo vrstivo
+            lineStr = clipText.slice(pos, pos1).trim();
+        }
+
+        switch (currentCol) {
+            case 1: //---- TIP / DATUM
+                switch (currentLine) {
+                    case 1:
+                        switch (lineStr) {
+                            case "pohvala": case "potrebna izboljšava": case "komentar":
+                                tip = lineStr;
+                                currentLine = 2;
+                                break;
+                            default:
+                                // nič od tega, kar pričakujem - verjetno napačen format podatkov - nasleddnja vrstica ...
+                                break;
+                        }
+                        break;
+                    case 2:
+                        datum = lineStr;
+                        currentCol = 2; currentLine = 1;
+                        break;
+                }
+                break;
+            case 2: //---- URA / PREDMET / TERMIN
+                switch (currentLine) {
+                    case 1:
+                        predmet = lineStr;
+                        if (predmet.length > 2) {
+                            if (predmet.substring(1, 3) == ". ") {
+                                ura = predmet.substring(0, 2);
+                                predmet = predmet.substring(3, predmet.length);
+                            }
+                            if (predmet.substring(predmet.length - 2, predmet.length) == " D") {
+                                predmet = predmet.substring(0, predmet.length - 2);
+                                ura = ""; termin = "";
+                                currentCol += 1; currentLine = 1;
+                            } else {
+                                currentLine += 1;
+                            }
+                        } else {
+                            currentLine += 1;
+                        }
+                        break;
+                    case 2:
+                        termin = lineStr;
+                        currentCol += 1; currentLine = 1;
+                        break;
+                }
+                break;
+            case 3: //---- VSEBINA / UČITELJ
+                switch (currentLine) {
+                    case 1:
+                        vsebina = lineStr;
+                        currentLine += 1;
+                        break;
+                    case 2:
+                        ucitelj = lineStr;
+                        if (ucitelj.substring(0, 2) == "- ") {
+                            ucitelj = ucitelj.substring(2, ucitelj.length);
+                        }
+                        currentCol += 1; currentLine = 1;
+                        break;
+                }
+                break;
+            case 4: //---- STATUS
+                currentCol += 1; currentLine = 1;
+                break;
+            case 5: //---- OBVESTILO
+                currentCol += 1; currentLine = 1;
+                break;
+            case 6: //---- MOŽNOSTI
+                currentLine += 1;
+                if (currentLine > 2) {
+                    haveDataLine = true; nrDataLines += 1;
+                    currentCol = 1; currentLine = 1;
+                }
+                break;
+        }
+        
+        pos = pos1 + 1;
+        
+        if (haveDataLine) {
+            // imamo vse podatke o vrstici - lahko jih obdelamo
+            //console.log("UČITELJ: " + ucitelj + ", TIP: " + tip + ", DATUM: " + datum + ", PREDMET: " + predmet + ", URA: " + ura + ", VSEBINA: " + vsebina);
+            textOut = ucitelj + " : " + tip + " : " + datum + " : " + predmet;
+            if (ura != "") { textOut += " " + ura + " " + termin };
+            textOut += " : " + vsebina;
+            console.log(textOut);
+            //----
+            if (nrDataLines > 1) { textOutClipboard += "\n" };
+            textOutClipboard += (tip + "\t" + ucitelj + "\t" + predmet + "\t" + datum + "\t" + ura + "\t" + termin + "\t" + vsebina);
+            //-----
+            tip = ""; datum = ""; predmet = ""; ura = ""; termin = ""; vsebina = ""; ucitelj = "";
+            haveDataLine = false;
+            
+        }
+
+    }
+    console.log("     parsed ... " + "zapisov: " + nrDataLines.toString());
+    if (textOutClipboard != "") {
+        navigator.clipboard.writeText(textOutClipboard);
+    }
 }
