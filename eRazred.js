@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.21"
-const gl_versionDate = "25.4.2026"
+const gl_versionNr = "v2.23"
+const gl_versionDate = "27.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2718,6 +2718,7 @@ var lo_showHelpTips = true;
 //var lo_showStations = false
 
 var lo_showToolTips = true
+var lo_detailedView = true; // 26.4.2026
 
 // 29.7.2023 1.29
 var tmMouseOutOfWindowId 
@@ -3859,9 +3860,7 @@ window.addEventListener("keydown", (event) => {
             eA_clipboard_load();
             break;
         case 'KeyW':
-            //lo_keyDownW = true; break;
-            //paint_realenLom();
-            lo_realniLom = !lo_realniLom;
+            lo_detailedView = !lo_detailedView;
             paint();
             break;
         case 'KeyA':
@@ -7222,7 +7221,7 @@ function setWebLink() {
     webLink += "&ruler=" + (lo_showRuler ? "1" : "0");
     webLink += "&realLens=" + (lo_showRealLens ? "1" : "0");
     webLink += "&n=" + Number(intChooserN.value);
-    webLink += "&realRefl=" + (lo_realniLom ? "1" : "0"); // 12.1.2025
+    webLink += "&realRefl=" + (lo_detailedView ? "1" : "0"); // 12.1.2025
     webLink += "&legend=" + (lo_showLegend ? "1" : "0");
     webLink += "&initHelp=1";
     console.log("webLink=" + webLink);
@@ -9937,11 +9936,13 @@ function paint_scatterPlotChart_byRazprsenost(
     const wTextArea = 20;
     const gapChart = 5;
     const gapChartR = 2;
+    //---- Y
     let yXos = vp_y + vp_h - marginChartBottom;
     let yTop = vp_y + marginChartTop;
     let yRange = yXos - yTop;
     let ky = (yRange) / vp_maxTock; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
     let kyp = ky * vp_maxTock / 100; // na vrhu je še naslov, ki ga stolpci ne bi smeli prekriti
+    //---- X
     let xYos = vp_x + marginChartH + wTextArea;
     let x0 = xYos + gapChart; // začetek risanja markerjev rezultatov
     let wChart = 30; if (lo_byRazredGen) { wChart = 50 };
@@ -9968,31 +9969,38 @@ function paint_scatterPlotChart_byRazprsenost(
     if (vp_w > 350 && vp_h > 350) { fontOcena = "bold 15pt verdana"; };
     let fontAxisText = "10pt verdana";
     let fontAxisTextBold = "bold 10pt verdana";
-    
+    let fontKritPercent = "bold 9pt verdana";
+
     let y0, y1, y4;
+    let yKrit = []; // 27.4.2026
     addKritPercent = 0;  // da je meja med kriteriji obarvana v barvi višje ocene od teh dveh, ne nižje od teh dveh
     if (lo_zaokrozujNaCeleProcente) { addKritPercent = 0.5 };
     //---- OBMOČJE OCENE 5
     tmpH = kyp * (100 - arrKriteriji[3] + addKritPercent); // (100-90)+addKP
     y0 = yTop;
     y1 = yTop + tmpH;
+    yKrit[3] = y1; // 27.4.2026
     gBannerRect(xYos + 6, yTop, xRight - xYos, tmpH + 10, 3, 3, colorOcena[5], 1, "lightGray", "", 0, 0, false);
     gBannerRect(xYos + 6, y1, xRight - xYos, 10, 0, 0, bckgColor, 0, "", "", 0, 0, false); // brisanje zaobljenosti
+    
     //---- OBMOČJE OCENE 1
     tmpH = kyp * (arrKriteriji[0] - 1 + addKritPercent); // (50-1)+addKP
     y0 = yXos - tmpH;
     y1 = yXos;
+    yKrit[0] = y0; // 27.4.2026
     gBannerRect(xYos + 6, y0 - 10, xRight - xYos, tmpH + 10, 3, 3, colorOcena[1], 1, "lightGray", "", 0, 0, false);
     gBannerRect(xYos + 6, y0 - 10, xRight - xYos, 10, 0, 0, bckgColor, 0, "", "", 0, 0, false); // brisanje zaobljenosti
     //---- ---- OBMOČJE OCENE 4
     tmpH = kyp * (arrKriteriji[3] - 1 - arrKriteriji[2] + 2 * addKritPercent); // (90-1+addKP)-(76-addKP)=90-1-76-2*addKP
     y0 = yXos - kyp * (arrKriteriji[3] - 1 + addKritPercent);
     y1 = y0 + tmpH;
+    yKrit[2] = y1; // 27.4.2026
     gBannerRect(xYos + 6, y0, xRight - xYos, tmpH, 0, 0, colorOcena[4], 1, "lightGray", "", 0, 0, false);
     //---- OBMOČJE OCENE 3
     tmpH = kyp * (arrKriteriji[2] - 1 - arrKriteriji[1] + 2 * addKritPercent); // (76-1+addKP)-(63-addKP)=76-1-63-2*addKP
     y0 = yXos - kyp * (arrKriteriji[2] - 1 + addKritPercent);
     y1 = y0 + tmpH;
+    yKrit[1] = y1; // 27.4.2026
     gBannerRect(xYos + 6, y0, xRight - xYos, tmpH, 0, 0, colorOcena[3], 1, "lightGray", "", 0, 0, false);
     //---- OBMOČJE OCENE 2
     tmpH = kyp * (arrKriteriji[1] - 1 - arrKriteriji[0] + 2 * addKritPercent); // (63-1+addKP)-(50-addKP)=63-1-50-2*addKP
@@ -10003,9 +10011,25 @@ function paint_scatterPlotChart_byRazprsenost(
     //---- pravokotnik, v katerega se riše markerje rezultatov
     gBannerRect(xYos, yTop, xRight - xYos, yXos - yTop, 3, 3, "azure", 1, "lightGray", "", 0, 0, false);
 
-    
+    //---- kriteriji ocen
+    if (lo_detailedView) {
+        tmpH = kyp * (100 - arrKriteriji[3] + addKritPercent); // (100-90)+addKP
+        y0 = yTop;
+        y1 = yTop + tmpH;
+        const dW = 0; const dH = 4;
+        [w, h] = gMeasureText(arrKriteriji[3].toString() + "%", fontKritPercent);
+        gBannerRectWithText3(arrKriteriji[3].toString() + "%", xYos - w - dW, yKrit[3] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        [w, h] = gMeasureText(arrKriteriji[2].toString() + "%", fontKritPercent);
+        gBannerRectWithText3(arrKriteriji[2].toString() + "%", xYos - w - dW, yKrit[2] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        [w, h] = gMeasureText(arrKriteriji[1].toString() + "%", fontKritPercent);
+        gBannerRectWithText3(arrKriteriji[1].toString() + "%", xYos - w - dW, yKrit[1] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        [w, h] = gMeasureText(arrKriteriji[0].toString() + "%", fontKritPercent);
+        gBannerRectWithText3(arrKriteriji[0].toString() + "%", xYos - w - dW, yKrit[0] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+    }
+
     // ---- OZNAKE MAX IN MIN TOČK/%
     tmpText = vp_maxTock.toString();
+    if (lo_detailedView) { tmpText += "t" }; // 27.4.2026
     ;[w, h] = gMeasureText(tmpText, fontAxisText);
     x = xYos - w - 3;
     y = yTop + h;
@@ -10354,16 +10378,17 @@ function paint_barChart_analizaNalog_singleNaloga(vp_x, vp_y, vp_w, vp_h, vp_ite
         x = x0 + kx * avgTock;
         y = yXos + 10;
         let w = 4; let h = 9;
-        gLik(x, y - 3, [w, w, -w, -w], [h, 2 * h - 2, 2 * h - 2, h], "darkTurquoise", 1, "darkSlateGray", []); // vPointer
-        tmpText = avgTock.toFixed(2).replace(".", ","); if (tmpText == "0,00") { tmpText = "0" };
-        [w, h] = gMeasureText(tmpText, "9pt verdana");
-        gText(tmpText, "9pt verdana", "darkGray", x - w - 8, y + 14);
-        tmpText = avgPercent.toFixed(1).replace(".", ",") + "%"; if (tmpText == "0,0%") { tmpText = "0%" }; if (tmpText == "100,0%") { tmpText = "100%" };
-        gText(tmpText, "9pt verdana", "darkGray", x + 7, y + 14);
-
-        //tmpText = "avg: " + avgTock.toFixed(2);
+        if (lo_detailedView) {
+            gLik(x, y - 8, [w, w, -w, -w], [h, 2 * h - 2, 2 * h - 2, h], "darkTurquoise", 1, "darkSlateGray", []); // vPointer
+            tmpText = avgTock.toFixed(2).replace(".", ","); if (tmpText == "0,00") { tmpText = "0" };
+            [w, h] = gMeasureText(tmpText, "9pt verdana");
+            gText(tmpText, "9pt verdana", "darkGray", x - w - 8, y + 14);
+            tmpText = avgPercent.toFixed(1).replace(".", ",") + "%"; if (tmpText == "0,0%") { tmpText = "0%" }; if (tmpText == "100,0%") { tmpText = "100%" };
+            gText(tmpText, "9pt verdana", "darkGray", x + 7, y + 14);
+        } else {
+            gLik(x, y - 8, [w, w, -w, -w], [h, 2 * h - 2, 2 * h - 2, h], "darkTurquoise", 1, "darkSlateGray", []); // vPointer
+        }
     }
-
 
 };
 
