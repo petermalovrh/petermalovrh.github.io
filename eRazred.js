@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.23"
-const gl_versionDate = "27.4.2026"
+const gl_versionNr = "v2.24"
+const gl_versionDate = "28.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -10180,7 +10180,7 @@ function paint_barChart_analizaNalog(vp_x, vp_y, vp_w, vp_h, vp_itemId) {
     let nrNalog = pisniTestNalogeTock[myPisniTestId].length; // število nalog na tem pisnem testu
     
     const marginLeft = 8; let marginMiddleH = vp_w * 0.05; const marginRight = 8;
-    const marginTop = 8; const marginMiddleV = 15; const marginBottom = 8;
+    const marginTop = 8; const marginMiddleV = 20; const marginBottom = 8;
 
     //---- shrani lastnosti digrama za mouseOver() event (26.5.2025)
     anChartX[vp_itemId] = vp_x;
@@ -10292,6 +10292,14 @@ function paint_barChart_analizaNalog_singleNaloga(vp_x, vp_y, vp_w, vp_h, vp_ite
             spSelUcenecTock = Math.round(pisniTestUcenciTockeNalogTocke[vp_pisniTestId][ucenecIndex][vp_naloga - 1]);
             spSelUcenecTockExact = pisniTestUcenciTockeNalogTocke[vp_pisniTestId][ucenecIndex][vp_naloga - 1];
         }
+    }
+
+    //---- če je uporabnik z miško nad to nalogo, potem jo označi, da je selektirana
+    if (lo_anChartSelectedId == vp_itemId && lo_anChartNalogaSelectedId == vp_naloga) { // 22.2.2026
+        x = xYos - 16; y = vp_y;
+        const cv_selColor = "steelBlue";  // "royalBlue" "teal";
+        gLine(x, y - 6, x, y + vp_h + 13, 12, cv_selColor, []);
+        gBannerRect(x-5, y - 6, vp_w + 17, vp_h + 18, 0, 0, "", 1, cv_selColor, "", 0, 0, false);
     }
 
     for (tock = 0; tock <= (maxTock + 0.5); tock++) {
