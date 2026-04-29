@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.25"
+const gl_versionNr = "v2.26"
 const gl_versionDate = "29.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -3598,10 +3598,10 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             }     
         };
 
-        //---- 28.4.2026
+        //---- 28.4.2026 Je pod miško vrtljiv seznam učencev?
         lo_spChartInsideListUcenec = false;
         if (gl_mode == cv_mode_test && lo_razredAll == false) {
-            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 150, 400)) {
+            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 145, 55 + (arrArrRezultatiUcenecId[lo_razred].length - 1) * 16 + 5)) {
                 lo_spChartInsideListUcenec = true;
             }
         }
@@ -6690,10 +6690,13 @@ function lf_changeValueSelectedListUcenec(vp_diff) {
 
     newValue = lo_selectedListUcenec + vp_diff;
 
-    let myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, lo_razred, lo_pisniTestNr);
-    let nrItems = pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1;
-    if (newValue < 1) { newValue = 1 };
+    //let myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, lo_razred, lo_pisniTestNr);
+    //let nrItems = pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1;
+    //let nrItems = arrArrRezultatiUcenecId[myPisniTestId].length - 1; // 29.4.2026
+    let nrItems = arrArrRezultatiUcenecId[lo_razred].length - 1; // 29.4.2026
+
     if (newValue > nrItems) { newValue = nrItems };
+    if (newValue < 1) { newValue = 1 };
     
     return newValue;
 
@@ -7536,6 +7539,13 @@ function data_parse(clipText) {
                 // imamo še zadnjega učenca z ocenami - obdelaj ga
                 data_parse_novUcenecOcene(lineStr);
             }
+            if (lineStr.indexOf("#L") >= 0 && lineStr.indexOf("#P") >= 0 && lineStr.indexOf("#R") >= 0 && lineStr.indexOf("#T") >= 0) {
+                // imamo podatke še zadnjega pisnega testa
+                rslt = data_parse_novPisniTest(lineStr);
+                if (!rslt) {
+                    break; // konec branja vrstic zaradi napake v podatkih ali Äesa drugega
+                }
+            }
             break; // ven iz FOR zanke
         }
 
@@ -7574,7 +7584,7 @@ function data_parse(clipText) {
         pos = pos1 + 1;
 
     }
-    console.log("     parsed ... " + "letnikov: " + lo_nrLetnikov.toString() + ", predmetov: " + lo_nrPredmetov.toString() + ", razredov: " + lo_nrRazredov.toString() + ", u" + scTchLow + "encev: " + lo_nrUcencev.toString() + ", ocen: " + lo_nrOcen.toString());
+    console.log("     parsed ... " + "letnikov: " + lo_nrLetnikov.toString() + ", predmetov: " + lo_nrPredmetov.toString() + ", razredov: " + lo_nrRazredov.toString() + ", u" + scTchLow + "encev: " + lo_nrUcencev.toString() + ", pisnih-testov: " + lo_nrPisnihTestov.toString() + ", ocen: " + lo_nrOcen.toString());
 }
 
 function data_parse_excelPoljane(clipText) {
@@ -7859,7 +7869,9 @@ function data_parse_novPisniTest(lineStr) {
     if (pisniTestList.length < 1) {return false; }; // Če ni podatkov o možnih točkah skupaj in po posameznih nalogah, potem tu nimam kaj delati
     //let tmpPisniTestNr = Number(pisniTestList[0].trim().substr(0, 1));
     let tmpPisniTestNr = Number(pisniTestList[0].trim());
-    if (tmpPisniTestNr > lo_nrPredmetPisnihTestov[lo_predmet]) { return false; }; // mora biti en od obstoječih pisnih testov, ki je bil že prej zaznan med ocenami učencev
+    if (tmpPisniTestNr > lo_nrPredmetPisnihTestov[lo_predmet]) {
+        //return false;
+    }; // mora biti en od obstoječih pisnih testov, ki je bil že prej zaznan med ocenami učencev
 
     // ---- ŠTEVILO MOŽNIH TOČK NA PISNEM TESTU
     if (pisniTestList.length < 2) {return false; }; // Če ni podatkov o možnih točkah skupaj, potem tu nimam kaj delati
@@ -7889,6 +7901,9 @@ function data_parse_novPisniTest(lineStr) {
     pisniTestUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
     pisniTestMaxUcencevPoTockahNalog1[lo_nrPisnihTestov] = [];
     pisniTestMaxUcencevPoTockahNalog05[lo_nrPisnihTestov] = [];
+
+    console.log("pisni-test(" + lo_nrPisnihTestov.toString() + "):" + " #" + tmpPisniTestNr.toString() + " L" + lo_letnik.toString() + " P" + lo_predmet.toString() + " R" + lo_razred.toString() + " max" + tmpPisniTestMaxTock.toString());
+
 
     return true;
     
@@ -10078,9 +10093,10 @@ function paint_scatterPlotChart_byRazprsenost(
         gBannerRoundRect2(xYos, y, xRight - xYos, tmpH, 6, gf_alphaColor(48, colorOcena[lo_ocenaSelected]), 0, "", "", 0, 0, false, r1, r2, r3, r4);
     }
     
-    //---- 28.4.2026
+    //---- 28.4.2026 VRTLJIV SEZNAM UČENCEV
     const drawListUcenec = true;
     if (lo_razredAll == false && (arrUcenecId.length - 1 > 0) && lo_spChartInsideListUcenec && drawListUcenec) {
+        if (lo_selectedListUcenec > arrUcenecId.length - 1) { lo_selectedListUcenec = arrUcenecId.length - 1 }; // 29.4.2026
         lo_testSelected = lo_selectedListUcenec;
         lo_spChartSelectedId = vp_itemId;
         let listLength = 29; // koliko učencev naj bo v seznamu, ki se izpiše ob selektiranju nekega učenca v scatter plot chartu (dela samo za liha števila !!!)
@@ -10113,22 +10129,23 @@ function paint_scatterPlotChart_byRazprsenost(
             y = yTop - 10; const dy = 16;
             if (doBefore) {
                 for (let i = beforeOd; i <= beforeDo; i++) {
-                    //y = yTop + (i - beforeOd) * 20;
-                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
+                    ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                    if (w > xYos - vp_x) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
                     gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
                     y += dy;
                 }
             }
             //---- izpis imena in priimka selektiranega učenca
-            //y = yTop + (lo_selectedListUcenec - beforeOd) * dy;
-            tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+            tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // tu vedno izpišem poudarjen priimek in celotno ime
             gText(tmpText, fontListUcenciBold, "darkSlateBlue", vp_x, y);
             y += dy;
             //---- izpis imena in priimka učencev po selektiranem, če je treba
             if (doAfter) {
                 for (let i = afterOd; i <= afterDo; i++) {
-                    //y = yTop + (i - afterOd) * 20;
-                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
+                    ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                    if (w > xYos - vp_x) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
                     gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
                     y += dy;
                 }
@@ -11095,6 +11112,55 @@ function load_demoText5() {
     addDemoText("Mladen Starina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 4));
     addDemoText("Bindo Farina, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 4, 5));
     addDemoText("Pikica Slon, " + generateDemoUcenecOceneVsiPredmeti(mesec, leto, mesecev, 3, 5));
+
+    addDemoText("#L2425 #PFIZIKA #R8.D #T1|69|")
+    addDemoText("#L2425 #PFIZIKA #R8.E #T1|69|")
+    addDemoText("#L2425 #PFIZIKA #R9.D #T1|69|")
+    addDemoText("#L2425 #PFIZIKA #R9.E #T1|69|")
+    //----
+    addDemoText("#L2425 #PFIZIKA #R8.D #T2|77|")
+    addDemoText("#L2425 #PFIZIKA #R8.E #T2|77|")
+    addDemoText("#L2425 #PFIZIKA #R9.D #T2|77|")
+    addDemoText("#L2425 #PFIZIKA #R9.E #T2|77|")
+    //----
+    addDemoText("#L2425 #PFIZIKA #R8.D #T3|72|")
+    addDemoText("#L2425 #PFIZIKA #R8.E #T3|72|")
+    addDemoText("#L2425 #PFIZIKA #R9.D #T3|72|")
+    addDemoText("#L2425 #PFIZIKA #R9.E #T3|72|");
+
+    addDemoText("#L2425 #PKEMIJA #R8.D #T1|69|")
+    addDemoText("#L2425 #PKEMIJA #R8.E #T1|69|")
+    addDemoText("#L2425 #PKEMIJA #R9.D #T1|69|")
+    addDemoText("#L2425 #PKEMIJA #R9.E #T1|69|")
+    //----
+    addDemoText("#L2425 #PKEMIJA #R8.D #T2|77|")
+    addDemoText("#L2425 #PKEMIJA #R8.E #T2|77|")
+    addDemoText("#L2425 #PKEMIJA #R9.D #T2|77|")
+    addDemoText("#L2425 #PKEMIJA #R9.E #T2|77|")
+    //----
+    addDemoText("#L2425 #PKEMIJA #R8.D #T3|72|")
+    addDemoText("#L2425 #PKEMIJA #R8.E #T3|72|")
+    addDemoText("#L2425 #PKEMIJA #R9.D #T3|72|")
+    addDemoText("#L2425 #PKEMIJA #R9.E #T3|72|");
+
+    addDemoText("#L2425 #PMATEMATIKA #R8.D #T1|69|")
+    addDemoText("#L2425 #PMATEMATIKA #R8.E #T1|69|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.D #T1|69|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.E #T1|69|")
+    //----
+    addDemoText("#L2425 #PMATEMATIKA #R8.D #T2|77|")
+    addDemoText("#L2425 #PMATEMATIKA #R8.E #T2|77|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.D #T2|77|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.E #T2|77|")
+    //----
+    addDemoText("#L2425 #PMATEMATIKA #R8.D #T3|72|")
+    addDemoText("#L2425 #PMATEMATIKA #R8.E #T3|72|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.D #T3|72|")
+    addDemoText("#L2425 #PMATEMATIKA #R9.E #T3|72|");
+
+    //let tmpText = demoText.join("\r\n");
+    //navigator.clipboard.writeText(tmpText);
+    
 }
 
 function load_demoText6() {
