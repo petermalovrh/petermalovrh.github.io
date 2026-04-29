@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.24"
-const gl_versionDate = "28.4.2026"
+const gl_versionNr = "v2.25"
+const gl_versionDate = "29.4.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2631,6 +2631,9 @@ var tockPoNalogahArrExcelPoljane = [];
 var nalogeTockSkupajExcelPoljane;
 var nrNalogExcelPoljane;
 
+var lo_selectedListUcenec = 1; // 28.4.2026 učenec, ki je izbran v seznamu učencev
+var lo_spChartInsideListUcenec = false; // 28.4.2026 ali je miška nad seznamom učencev
+
 console.clear;
 
 //===========================================
@@ -2694,6 +2697,7 @@ var lo_addTempMarginDown = 0; //6.12.2023
 var gl_changeByMouseWheel_printLevel = false;   //4.1.2024
 var gl_changeByMouseWheel_ucenecChart = false;   //15.2.2025
 var gl_changeByMouseWheel_razredChart = false;   //15.2.2025
+var gl_changeByMouseWheel_scatterPlotChart = false;   //28.4.2026
 
 //---- grafične meje med razredi
 var gpMarginTop, gpMarginBottom, gpMarginLeft, gpMarginRight
@@ -3594,6 +3598,14 @@ elMyCanvas.addEventListener('mousemove', (e) => {
             }     
         };
 
+        //---- 28.4.2026
+        lo_spChartInsideListUcenec = false;
+        if (gl_mode == cv_mode_test && lo_razredAll == false) {
+            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 150, 400)) {
+                lo_spChartInsideListUcenec = true;
+            }
+        }
+        
         // če se je karkoli v zvezi s selektiranostjo chartov in učencev spremenilo, potem sledi repaint
         if (!(lo_spChartSelectedId == oldSpChartSelectedId && lo_testSelected == oldTestSelected)) { paint_delay(); return; }   // 22.1.2025
         if (!(lo_pcChartSelectedId == oldPcChartSelectedId && lo_ocenaSelected == oldOcenaSelected)) { paint_delay(); return; } // 23.1.2025
@@ -3681,33 +3693,8 @@ window.addEventListener("wheel", event => {
         return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
     };
 
-    ////---- če vrti kolešček miške ob pritisnjeni tipki X, s tem spreminja skupno število goriščnih razdalj na X osi
-    //if (lo_keyDownX) {
-    //    //if (lo_enabledintChooserF) {
-    //    change = delta * lo_stepXnrF;
-    //    if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-    //    newValue = lf_changeValueXnrF(change);
-    //    gl_changeByMouseWheel_ucenecChart = true; // 4.1.2024
-    //    lf_changeXnrF(newValue, true);
-    //    //}
-    //    return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
-    //}
 
-  
-    ////---- ... sicer spreminja ...?        
-    ////---- če si nad intChooserjem za goriščno razdaljo f lahko z vrtenjem koleščka miške spreminjaš f
-    //else if (lo_enabledintChooserF && intChooserF.eventMouseWithin(lo_mouseMoveX, lo_mouseMoveY)) {
-    //    change = delta * lo_fStep;
-    //    if (lo_keyDownShiftLeft) { change = 5 * delta / Math.abs(delta) };
-    //    //newValue = lf_changeValueF(change);
-    //    //if (change > 0 && (Math.trunc(10 * lo_f) / 10 !== lo_f)) { change -= 1 }; // ker bom delal trunc!(primer: 44.3 na dol bo tako 44, na gor bo 45)
-    //    //newValue = Math.trunc(lf_changeValueF(change)); // ker imam step=1 in lahko grem nazaj na cele vrednosti! 4.1.2025
-    //    newValue = lf_changeValueF(change, true);
-    //    gl_changeByMouseWheel_F = true; // 4.1.2024
-    //    lf_changeF(newValue, true);
-    //}
-
-    //---- ... sicer (2) spreminja ...?  
+    //---- ... sicer (2) spreminja ...?
     ////---- če je v bližini optične osi lahko z vrtenjem koleščka miške premikaš predmet levo-desno (spreminjaš a)
     //else if ((Math.abs(lo_mouseMoveY - lo_gyO) < 40) && (lo_mouseMoveX < lo_gxO)) {
     //    change = delta * lo_aStep;
@@ -3717,6 +3704,14 @@ window.addEventListener("wheel", event => {
     //    lf_changeA(newValue, true);
     //}
 
+    //---- 28.4.2026 če v mode_test nad seznamom učencev vrti kolešček in izbira učemca ...
+    if (gl_mode == cv_mode_test && lo_razredAll == false) {
+        if (lo_spChartInsideListUcenec) {
+            gl_changeByMouseWheel_scatterPlotChart = true; // 4.2.2024
+            lf_changeSelectedListUcenec(lf_changeValueSelectedListUcenec(event.shiftKey ? -delta : delta), true);
+            return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
+        }
+    }
 
 });
 
@@ -6689,6 +6684,21 @@ function lf_changeValueFocusRazred(vp_diff) {
 
 }
 
+function lf_changeValueSelectedListUcenec(vp_diff) {
+
+    let newValue;
+
+    newValue = lo_selectedListUcenec + vp_diff;
+
+    let myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, lo_razred, lo_pisniTestNr);
+    let nrItems = pisniTestUcenciTockeNalogUcenec[myPisniTestId].length - 1;
+    if (newValue < 1) { newValue = 1 };
+    if (newValue > nrItems) { newValue = nrItems };
+    
+    return newValue;
+
+}
+
 function lf_changeValuePrintLevel(vp_change) {
 
     lo_printLevel += vp_change
@@ -6958,6 +6968,14 @@ function lf_changeFocusRazred(vp_newValue, vp_paint) {
 
     lo_focusRazred = vp_newValue;
     //console.log("lo_focusRazred=" + lo_focusRazred.toString());
+    if (vp_paint) { paint() }
+
+}
+
+function lf_changeSelectedListUcenec(vp_newValue, vp_paint) {
+
+    lo_selectedListUcenec = vp_newValue;
+    //console.log("lo_selectedListUcenec=" + lo_selectedListUcenec.toString());
     if (vp_paint) { paint() }
 
 }
@@ -10017,14 +10035,18 @@ function paint_scatterPlotChart_byRazprsenost(
         y0 = yTop;
         y1 = yTop + tmpH;
         const dW = 0; const dH = 4;
-        [w, h] = gMeasureText(arrKriteriji[3].toString() + "%", fontKritPercent);
-        gBannerRectWithText3(arrKriteriji[3].toString() + "%", xYos - w - dW, yKrit[3] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
-        [w, h] = gMeasureText(arrKriteriji[2].toString() + "%", fontKritPercent);
-        gBannerRectWithText3(arrKriteriji[2].toString() + "%", xYos - w - dW, yKrit[2] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
-        [w, h] = gMeasureText(arrKriteriji[1].toString() + "%", fontKritPercent);
-        gBannerRectWithText3(arrKriteriji[1].toString() + "%", xYos - w - dW, yKrit[1] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
-        [w, h] = gMeasureText(arrKriteriji[0].toString() + "%", fontKritPercent);
-        gBannerRectWithText3(arrKriteriji[0].toString() + "%", xYos - w - dW, yKrit[0] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        tmpText = arrKriteriji[3].toString() + "%";
+        [w, h] = gMeasureText(tmpText, fontKritPercent);
+        gBannerRectWithText3(tmpText, xYos - w - dW, yKrit[3] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        tmpText = arrKriteriji[2].toString() + "%";
+        [w, h] = gMeasureText(tmpText, fontKritPercent);
+        gBannerRectWithText3(tmpText, xYos - w - dW, yKrit[2] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        tmpText = arrKriteriji[1].toString() + "%";
+        [w, h] = gMeasureText(tmpText, fontKritPercent);
+        gBannerRectWithText3(tmpText, xYos - w - dW, yKrit[1] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
+        tmpText = arrKriteriji[0].toString() + "%";
+        [w, h] = gMeasureText(tmpText, fontKritPercent);
+        gBannerRectWithText3(tmpText, xYos - w - dW, yKrit[0] - dH, fontKritPercent, 2, 3, 2, 2, 2, "azure", 1, "darkGray", "darkGray", "", 0, 0);
     }
 
     // ---- OZNAKE MAX IN MIN TOČK/%
@@ -10044,7 +10066,6 @@ function paint_scatterPlotChart_byRazprsenost(
     gText("100%", fontAxisText, "darkSlateGray", xRight + 6, yTop - addY);
     gText("0%", fontAxisText, "darkSlateGray", xRight + 7, yXos + h / 2);
 
-
     //---- Označiti je treba področje chartu izbrane ocene v scatter plot chartu, če je ta ocena selektirana v bar/pie chartu
     let krit0, krit1;
     if (lo_ocenaSelected > 0 && ((drawBarChart && lo_bcChartSelectedId == vp_itemId) || (drawPieChart && lo_pcChartSelectedId == vp_itemId))) {
@@ -10057,6 +10078,63 @@ function paint_scatterPlotChart_byRazprsenost(
         gBannerRoundRect2(xYos, y, xRight - xYos, tmpH, 6, gf_alphaColor(48, colorOcena[lo_ocenaSelected]), 0, "", "", 0, 0, false, r1, r2, r3, r4);
     }
     
+    //---- 28.4.2026
+    const drawListUcenec = true;
+    if (lo_razredAll == false && (arrUcenecId.length - 1 > 0) && lo_spChartInsideListUcenec && drawListUcenec) {
+        lo_testSelected = lo_selectedListUcenec;
+        lo_spChartSelectedId = vp_itemId;
+        let listLength = 29; // koliko učencev naj bo v seznamu, ki se izpiše ob selektiranju nekega učenca v scatter plot chartu (dela samo za liha števila !!!)
+        if (listLength >= arrUcenecId.length) { listLength = arrUcenecId.length - 1; };
+        let fontListUcenci = "9pt verdana";
+        let fontListUcenciBold = "bold 11pt verdana";
+        //---- kateri je selektiran?
+        let doBefore, beforeOd, beforeDo;
+        let doAfter, afterOd, afterDo;
+        let regularSel = true; if (lo_selectedListUcenec <= 1 || lo_selectedListUcenec >= arrUcenecId.length) { regularSelection = false };
+        if (regularSel) {
+            switch (lo_selectedListUcenec) {
+                case 1: // izbran je prvi učenec
+                    doBefore = false; beforeOd = lo_selectedListUcenec; beforeDo = lo_selectedListUcenec;
+                    doAfter = true; afterOd = 2; afterDo = listLength;
+                    break;
+                case arrUcenecId.length - 1: // izbran je zadnji učenec
+                    doBefore = true; beforeOd = arrUcenecId.length - listLength; beforeDo = lo_selectedListUcenec - 1;
+                    doAfter = false;
+                    break;
+                default: // izbran je en vmes
+                    doBefore = true; beforeOd = lo_selectedListUcenec - Math.trunc(listLength / 2);
+                    if (beforeOd < 1) { beforeOd = 1; };
+                    if (beforeOd > arrUcenecId.length - listLength) { beforeOd = arrUcenecId.length - listLength; };
+                    beforeDo = lo_selectedListUcenec - 1;
+                    doAfter = true; afterOd = lo_selectedListUcenec + 1; afterDo = beforeOd + listLength - 1;
+                    break;
+            }
+            //---- najprej izpišem tiste po vrsti, ki so za izbranim učencem
+            y = yTop - 10; const dy = 16;
+            if (doBefore) {
+                for (let i = beforeOd; i <= beforeDo; i++) {
+                    //y = yTop + (i - beforeOd) * 20;
+                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+                    gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                    y += dy;
+                }
+            }
+            //---- izpis imena in priimka selektiranega učenca
+            //y = yTop + (lo_selectedListUcenec - beforeOd) * dy;
+            tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+            gText(tmpText, fontListUcenciBold, "darkSlateBlue", vp_x, y);
+            y += dy;
+            //---- izpis imena in priimka učencev po selektiranem, če je treba
+            if (doAfter) {
+                for (let i = afterOd; i <= afterDo; i++) {
+                    //y = yTop + (i - afterOd) * 20;
+                    tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; // zaradi varovanja zasebnosti izpišem samo začetnico imena
+                    gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                    y += dy;
+                }
+            }
+        }
+    }
 
     //---- Zanka po vseh ocenjenih preverjanjih pri tem konkretnem razredu
     x = x0 + 1;
