@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.26"
-const gl_versionDate = "29.4.2026"
+const gl_versionNr = "v2.27"
+const gl_versionDate = "1.5.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2522,6 +2522,7 @@ var drawPieChart = true;
 var drawSpChart = true;
 var drawAnChart = true; // 25.5.2025
 var drawSuChart = true; // 25.5.2025
+var drawLuChart = true; // 1.5.2026
 
 //---- 22.1.2025
 var spChartX = [];
@@ -2631,8 +2632,14 @@ var tockPoNalogahArrExcelPoljane = [];
 var nalogeTockSkupajExcelPoljane;
 var nrNalogExcelPoljane;
 
+var lo_showListUcenci = true; // 1.5.2026 ali se prikazuje vrtljiv seznam učencev na analizi testa enega razreda
 var lo_selectedListUcenec = 1; // 28.4.2026 učenec, ki je izbran v seznamu učencev
 var lo_spChartInsideListUcenec = false; // 28.4.2026 ali je miška nad seznamom učencev
+var lo_luChartInsideListUcenec = false; // 1.5.2026 ali je miška nad seznamom učencev
+var luChartX = [];
+var luChartY = [];
+var luChartX1 = [];
+var luChartY1 = [];
 
 console.clear;
 
@@ -3192,8 +3199,10 @@ elMyCanvas.addEventListener('click', (e) => {
                 case cv_mode_test: case cv_mode_zOcena: // 6.6.2025 //12.6.2025
                     if (gl_dataExcelPoljane) { break; } // 24.4.2026 
                     lo_GUIlayoutHasChanged = true; // 12.6.2025
-                    let tmpChange = e.shiftKey ? -1 : 1;
-                    lf_changeRazred(lo_razred + tmpChange, true);
+                    switch (lo_byRazredGen) {
+                        case false: lf_changeRazred(lo_razred + (e.shiftKey ? -1 : 1), true); break;
+                        case true: lf_changeRazredGen(lo_razredGen + (e.shiftKey ? -1 : 1), true); break;
+                    }
                     break;
             };
             vl_end = true;
@@ -3599,10 +3608,20 @@ elMyCanvas.addEventListener('mousemove', (e) => {
         };
 
         //---- 28.4.2026 Je pod miško vrtljiv seznam učencev?
-        lo_spChartInsideListUcenec = false;
+        lo_spChartInsideListUcenec = false; lo_luChartInsideListUcenec = false;
         if (gl_mode == cv_mode_test && lo_razredAll == false) {
-            if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 145, 55 + (arrArrRezultatiUcenecId[lo_razred].length - 1) * 16 + 5)) {
-                lo_spChartInsideListUcenec = true;
+            tmpItemId = lo_razred; if (lo_byRazredGen) { tmpItemId = lo_razredGen };
+            switch (lo_showListUcenci) {
+                case true:
+                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, luChartX[tmpItemId], luChartY[tmpItemId], luChartX1[tmpItemId], luChartY1[tmpItemId])) {
+                        lo_luChartInsideListUcenec = true;
+                    }
+                    break;
+                case false:
+                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 145, 55 + (arrArrRezultatiUcenecId[lo_razred].length - 1) * 16 + 5)) {
+                        lo_spChartInsideListUcenec = true;
+                    }
+                    break;
             }
         }
         
@@ -3706,7 +3725,7 @@ window.addEventListener("wheel", event => {
 
     //---- 28.4.2026 če v mode_test nad seznamom učencev vrti kolešček in izbira učemca ...
     if (gl_mode == cv_mode_test && lo_razredAll == false) {
-        if (lo_spChartInsideListUcenec) {
+        if (lo_spChartInsideListUcenec || lo_luChartInsideListUcenec) {
             gl_changeByMouseWheel_scatterPlotChart = true; // 4.2.2024
             lf_changeSelectedListUcenec(lf_changeValueSelectedListUcenec(event.shiftKey ? -delta : delta), true);
             return; //konec prverjanja, ker je s pritisnjeno tipko X povedal, da hoče točno to in nič drugega
@@ -3782,9 +3801,11 @@ window.addEventListener("keydown", (event) => {
                     break;
                 case cv_mode_test: case cv_mode_zOcena: // 25.5.2025 // 12.6.2025
                     if (gl_dataExcelPoljane) { break; } // 24.4.2026
-                    tmpChange = event.shiftKey ? -1 : 1;
                     lo_GUIlayoutHasChanged = true;
-                    lf_changeRazred(lo_razred + tmpChange, true);
+                    switch (lo_byRazredGen) {
+                        case false: lf_changeRazred(lo_razred + (event.shiftKey ? -1 : 1), true); break;
+                        case true: lf_changeRazredGen(lo_razredGen + (event.shiftKey ? -1 : 1), true); break;
+                    }
                     break;
             };
             break;
@@ -3827,6 +3848,12 @@ window.addEventListener("keydown", (event) => {
             switch (gl_mode) {
                 case cv_mode_ucenec: // premakni se s fokusom na naslednjega/ prejšnjega učenca 20.2.2025
                     lf_changeFocusUcenec(lf_changeValueFocusUcenec(event.shiftKey ? 1 : -1), true);
+                    break;
+                case cv_mode_test: // premakni se s fokusom na naslednjega/ prejšnjega učenca 20.2.2025
+                    if (!lo_razredAll) { 
+                        lo_showListUcenci = !lo_showListUcenci;
+                        paint();
+                    }
                     break;
             };
             break;
@@ -4713,13 +4740,13 @@ function paint_eRazred_grafTest_singleRazred() {
     let chartMargin = 20;
     let chartGapX = 20; let chartGapY = 20;
     let vl_item = lo_razred;
-    if (lo_byRazredGen) { vl_item = lo_razredGen }; 
+    if (lo_byRazredGen) { vl_item = lo_razredGen };
     let tmpItemId = vl_item;
     let chartWidth = (ctxW - 2 * chartMargin);
     let x0 = 20;
     let tmpText, w, h, colorId, x, y, y0;
     let titleFont = "bold 18pt verdana";
-    let vl_razredTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_chartTitle = razredGen[tmpItemId].toString() + ". razred" };
+    let vl_razredTitle = razredIme[tmpItemId]; if (lo_byRazredGen) { vl_razredTitle = razredGen[tmpItemId].toString() + ". razred" };
 
     // ---- Common title panel
     drawCommonChartTitle = true;
@@ -4747,6 +4774,7 @@ function paint_eRazred_grafTest_singleRazred() {
     
     y0 = yTitleTop + titlePanelHeight + 18;
 
+    //---- X ----
     let marginBannerH = 12;
     let bannerWidth = ctxW - 2 * marginBannerH;
     let chartGapBannerH = 8;
@@ -4754,6 +4782,7 @@ function paint_eRazred_grafTest_singleRazred() {
     let chartAreaWidth = bannerWidth - 2 * chartGapBannerH;
     let chartAreaWidthJustCharts = chartAreaWidth - 2 * chartGapX;
 
+    //---- Y ----
     let bannerHeight = ctxH - 2 * chartMargin + 15 - titlePanelHeight;
     let chartGapBannerV = 8; // spodaj od dna bannerja navzgor do dna najnižjega charta
     const marginBannerV = 12;
@@ -4763,6 +4792,24 @@ function paint_eRazred_grafTest_singleRazred() {
     // ---- Za konkreten razred narišem panel čez celo višino ekrana
     gBannerRect(x0 - 8, y0 - 10, chartWidth + 16, bannerHeight, 7, 7, "#F7F7F7FF", 1, "lightGray", "", 0, 0, false);
     
+    // ============ (0) VRTLJIV SEZNAM UČENCEV  ============ 1.5.2026
+
+    let luChartTop = y0;
+    let luChartWidth = 0;
+    let chartGapXListUcenci = 0;
+    drawLuChart = lo_showListUcenci && !lo_razredAll;
+    if (drawLuChart) {
+        chartGapXListUcenci = chartGapX;
+        luChartWidth = 0.05 * chartAreaWidthJustCharts;
+        if (luChartWidth < 100) { luChartWidth = 100 };
+        let luChartHeight = chartAreaHeight; // ctxH - luChartTop - chartMargin;
+        // za tekoči razred izpišem vrtljiv seznam učencev
+        paint_scatterPlotChart_byListUcenci(x0, luChartTop, luChartWidth, luChartHeight, tmpItemId, arrArrRezultatiUcenecId[tmpItemId]);
+        //----
+        chartAreaWidthJustCharts -= (luChartWidth + chartGapXListUcenci);        
+        x0 += (luChartWidth + chartGapXListUcenci);
+    }
+
     // ============ (1) RAZPRŠENOST REZULTATOV IN POVPREČJA  ============
     
     let spChartTop = y0;
@@ -4797,7 +4844,8 @@ function paint_eRazred_grafTest_singleRazred() {
     
     // ============ (3) ŠTEVILO TESTOV PO OCENAH - BAR CHART  ============
 
-    let barChartWidth = chartAreaWidth - spChartWidth - chartGapX - pieChartWidth - chartGapX;
+    //let barChartWidth = chartAreaWidth - spChartWidth - chartGapX - pieChartWidth - chartGapX;
+    let barChartWidth = chartAreaWidthJustCharts - spChartWidth - pieChartWidth;
     drawBarChart = true;
     let barChartHeight = pieChartHeight;
     // za tekoči razred ali tekočo generacijo razredov narišem graf
@@ -6873,6 +6921,24 @@ function lf_changeRazred(vp_newValue, vp_paint) {
 
 }
 
+function lf_changeRazredGen(vp_newValue, vp_paint) {
+
+    //---- 25.5.2025 Če sem v mode Test in sem bil na prikazu za vse razrede, grem samo ven iz vseh razredov, samega razreda pa ne spreminjam
+    if (lo_razredAll && gl_mode == cv_mode_test) {
+        lo_razredAll = false;
+        if (vp_paint) { paint() }
+        return;
+    }
+
+    lo_razredGen = vp_newValue;
+
+    if (lo_razredGen > lo_nrRazredGen) { lo_razredGen = 1; lo_razredAll = true; };
+    if (lo_razredGen < 1) { lo_razredGen = lo_nrRazredGen; lo_razredAll = true; };
+
+    if (vp_paint) { paint() }
+
+}
+
 function lf_changeShowHelpTips(vp_newValue, vp_paint) {
 
     lo_showHelpTips = vp_newValue;
@@ -7883,7 +7949,9 @@ function data_parse_novPisniTest(lineStr) {
     // ---- to pa je zdaj treba spraviti v polje cifer
     //tmpOcenaTockPoNalogahList = tmpOcenaTockPoNalogahStr.split(" "); // dobiš polje stringov in ne cifer
     let tmppisniTestNalogeTockArr = tmppisniTestNalogeTockStr.split(' ').map(Number); // naj bi dobil polje številk
-
+    if (tmppisniTestNalogeTockStr == "") {
+        tmppisniTestNalogeTockArr.length = 0; // 1.5.2026 če ni podatkov o točkah po nalogah, ne naredi polja z dolžino 1 in z elementom 0 !!!
+    }
     //pisniTestMaxTock[lo_letnik][lo_predmet][lo_razred][tmpPisniTestNr] = tmpPisniTestMaxTock;
     //pisniTestNalogeTock[lo_letnik][lo_predmet][lo_razred][tmpPisniTestNr] = tmppisniTestNalogeTockArr;
 
@@ -10094,8 +10162,7 @@ function paint_scatterPlotChart_byRazprsenost(
     }
     
     //---- 28.4.2026 VRTLJIV SEZNAM UČENCEV
-    const drawListUcenec = true;
-    if (lo_razredAll == false && (arrUcenecId.length - 1 > 0) && lo_spChartInsideListUcenec && drawListUcenec) {
+    if (lo_razredAll == false && (arrUcenecId.length - 1 > 0) && lo_spChartInsideListUcenec && !lo_showListUcenci) {
         if (lo_selectedListUcenec > arrUcenecId.length - 1) { lo_selectedListUcenec = arrUcenecId.length - 1 }; // 29.4.2026
         lo_testSelected = lo_selectedListUcenec;
         lo_spChartSelectedId = vp_itemId;
@@ -10264,6 +10331,99 @@ function paint_scatterPlotChart_byRazprsenost(
 
 };
 
+function paint_scatterPlotChart_byListUcenci(
+    vp_x, vp_y, vp_w, vp_h,
+    vp_itemId, arrUcenecId) {
+
+    //---- Y
+    const marginTop = 10; const marginBottom = 5;
+    let yTop = vp_y;    
+    let yTopText = vp_y + marginTop;
+    let yBottomText = vp_y + vp_h - marginBottom;
+    let yBottom = vp_y + vp_h;
+
+    //---- X
+    const marginH = 6;
+    let xLeft = vp_x;
+    let xLeftText = vp_x + marginH;
+    let xRightText = vp_x + vp_w - marginH;
+    let xRight = vp_x + vp_w;
+    let wAvailableText = vp_w - 2 * marginH;
+
+    //---- shrani lastnosti digrama za mouseOver() event (22.1.2025)
+    luChartX[vp_itemId] = xLeft;
+    luChartY[vp_itemId] = yTop;
+    luChartX1[vp_itemId] = xRight;
+    luChartY1[vp_itemId] = yBottom;
+
+    //----
+    let tmpText, w, h, y;
+    
+    //---- 28.4.2026 VRTLJIV SEZNAM UČENCEV
+    if (lo_razredAll) { return; };
+    if (arrUcenecId.length - 1 <= 0) { return; };
+
+    if (lo_selectedListUcenec > arrUcenecId.length - 1) { lo_selectedListUcenec = arrUcenecId.length - 1 }; // 29.4.2026
+    //---- če je z miško nad tem seznamom učencev, potem forsiram selektiranega učenca iz seznama, sicer pa tega ne forsiram in pustim, da svoje opravi _mouseOverTips funkcija
+    if (lo_luChartInsideListUcenec) {
+        lo_testSelected = lo_selectedListUcenec;
+        lo_spChartSelectedId = vp_itemId;
+    }
+    let listLength = 29; // koliko učencev naj bo v seznamu, ki se izpiše ob selektiranju nekega učenca v scatter plot chartu (dela samo za liha števila !!!)
+    if (listLength >= arrUcenecId.length) { listLength = arrUcenecId.length - 1; };
+    let fontListUcenci = "9pt verdana";
+    let fontListUcenciBold = "bold 11pt verdana";
+    //---- kateri je selektiran?
+    let doBefore, beforeOd, beforeDo;
+    let doAfter, afterOd, afterDo;
+    let regularSel = true; if (lo_selectedListUcenec <= 1 || lo_selectedListUcenec >= arrUcenecId.length) { regularSelection = false };
+    if (regularSel) {
+        switch (lo_selectedListUcenec) {
+            case 1: // izbran je prvi učenec
+                doBefore = false; beforeOd = lo_selectedListUcenec; beforeDo = lo_selectedListUcenec;
+                doAfter = true; afterOd = 2; afterDo = listLength;
+                break;
+            case arrUcenecId.length - 1: // izbran je zadnji učenec
+                doBefore = true; beforeOd = arrUcenecId.length - listLength; beforeDo = lo_selectedListUcenec - 1;
+                doAfter = false;
+                break;
+            default: // izbran je en vmes
+                doBefore = true; beforeOd = lo_selectedListUcenec - Math.trunc(listLength / 2);
+                if (beforeOd < 1) { beforeOd = 1; };
+                if (beforeOd > arrUcenecId.length - listLength) { beforeOd = arrUcenecId.length - listLength; };
+                beforeDo = lo_selectedListUcenec - 1;
+                doAfter = true; afterOd = lo_selectedListUcenec + 1; afterDo = beforeOd + listLength - 1;
+                break;
+        }
+        //---- najprej izpišem tiste po vrsti, ki so za izbranim učencem
+        y = yTopText; const dy = 16;
+        if (doBefore) {
+            for (let i = beforeOd; i <= beforeDo; i++) {
+                tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
+                ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                if (w > wAvailableText) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
+                gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                y += dy;
+            }
+        }
+        //---- izpis imena in priimka selektiranega učenca
+        tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // tu vedno izpišem poudarjen priimek in celotno ime
+        gText(tmpText, fontListUcenciBold, "darkSlateBlue", vp_x, y);
+        y += dy;
+        //---- izpis imena in priimka učencev po selektiranem, če je treba
+        if (doAfter) {
+            for (let i = afterOd; i <= afterDo; i++) {
+                tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
+                ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                if (w > wAvailableText) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
+                gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                y += dy;
+            }
+        }
+    }
+    
+};
+
 function paint_barChart_analizaNalog(vp_x, vp_y, vp_w, vp_h, vp_itemId) {
     
     //gBannerRect2(vp_x, vp_y, vp_w, vp_h, 0, 0, "", 1, "gray", [3, 3], "", 0, 0, false);  // okvir okoli področja za ta graf
@@ -10273,7 +10433,12 @@ function paint_barChart_analizaNalog(vp_x, vp_y, vp_w, vp_h, vp_itemId) {
     let myPisniTestId = getPisniTestId(lo_letnik, lo_predmet, myRazred, lo_pisniTestNr);
     if (myPisniTestId <= 0) { return };
     let nrNalog = pisniTestNalogeTock[myPisniTestId].length; // število nalog na tem pisnem testu
-    
+    if (nrNalog == 1) {
+        if (pisniTestNalogeTock[myPisniTestId][0] == 0) {
+            nrNalog = 0;
+        } // 1.5.2026
+    };
+
     const marginLeft = 8; let marginMiddleH = vp_w * 0.05; const marginRight = 8;
     const marginTop = 8; const marginMiddleV = 20; const marginBottom = 8;
 
