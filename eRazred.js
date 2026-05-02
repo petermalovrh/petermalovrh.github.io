@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.27"
-const gl_versionDate = "1.5.2026"
+const gl_versionNr = "v2.28"
+const gl_versionDate = "2.5.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -2636,10 +2636,12 @@ var lo_showListUcenci = true; // 1.5.2026 ali se prikazuje vrtljiv seznam učenc
 var lo_selectedListUcenec = 1; // 28.4.2026 učenec, ki je izbran v seznamu učencev
 var lo_spChartInsideListUcenec = false; // 28.4.2026 ali je miška nad seznamom učencev
 var lo_luChartInsideListUcenec = false; // 1.5.2026 ali je miška nad seznamom učencev
+var lo_lu_clickedListY = 0; // 2.5.2026 Y koordinata klika miške nad vrtljivim seznamom učencev
 var luChartX = [];
 var luChartY = [];
 var luChartX1 = [];
 var luChartY1 = [];
+const cv_lu_itemHeight = 16; // 2.5.2026
 
 console.clear;
 
@@ -3353,6 +3355,14 @@ elMyCanvas.addEventListener('click', (e) => {
         }
     }
     
+    //---- 2.5.2026 je v mode_test (single-razred) kliknil na enega od učencev v vrtljivem seznamu učencev? 2.5.2026 (že v mouse_move se je nastavila lo_luChartInsideListUcenec !!)
+    lo_lu_clickedListY = 0;
+    if (!vl_end && gl_mode == cv_mode_test && !lo_razredAll && lo_luChartInsideListUcenec) {
+        lo_lu_clickedListY = lo_mouseMoveY; // to je Y koordinata klika miške nad vrtljivim seznamom učencev
+        vl_end = true;
+        paint(); paint();
+    }
+    
     //if (lo_dragIntervalIgnoreFirstClick) { lo_dragIntervalIgnoreFirstClick = false; } //4.2.2023 v1.12
 
 });
@@ -3618,7 +3628,7 @@ elMyCanvas.addEventListener('mousemove', (e) => {
                     }
                     break;
                 case false:
-                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 145, 55 + (arrArrRezultatiUcenecId[lo_razred].length - 1) * 16 + 5)) {
+                    if (mouseInsideRect(lo_mouseMoveX, lo_mouseMoveY, 12, 55, 145, 55 + (arrArrRezultatiUcenecId[lo_razred].length - 1) * cv_lu_itemHeight + 5)) {
                         lo_spChartInsideListUcenec = true;
                     }
                     break;
@@ -4804,7 +4814,7 @@ function paint_eRazred_grafTest_singleRazred() {
         if (luChartWidth < 100) { luChartWidth = 100 };
         let luChartHeight = chartAreaHeight; // ctxH - luChartTop - chartMargin;
         // za tekoči razred izpišem vrtljiv seznam učencev
-        paint_scatterPlotChart_byListUcenci(x0, luChartTop, luChartWidth, luChartHeight, tmpItemId, arrArrRezultatiUcenecId[tmpItemId]);
+        paint_listChart_byUcenci(x0, luChartTop, luChartWidth, luChartHeight, tmpItemId, arrArrRezultatiUcenecId[tmpItemId]);
         //----
         chartAreaWidthJustCharts -= (luChartWidth + chartGapXListUcenci);        
         x0 += (luChartWidth + chartGapXListUcenci);
@@ -6552,7 +6562,10 @@ function paint_tips() {
             y += vStep;
             gBannerRectWithText2("desniKlikMi" + scSchLow + "ke", x0, y, font, 3, 3, 1, 1, "azure", 1, "darkSlateGray", "darkSlateGray", "lightGray", 2, 2);
             gBannerRectWithText2("... lahko shrani" + scSchLow + " sliko", x1, y, font2, 2, 2, 1, 1, "", 0, "", lo_tipsColor, "", 0, 0);
-                
+               
+            // + april 2026 ... na W prikažeš/skriješ detajle na testu (kriteriji za oceno, povprečja točk/procentov po nalogah
+            // + maj 20260  ... na U prikažeš/skriješ vrtljiv seznam učencev pri analizi testa
+        
     }
 }
 
@@ -10193,20 +10206,20 @@ function paint_scatterPlotChart_byRazprsenost(
                     break;
             }
             //---- najprej izpišem tiste po vrsti, ki so za izbranim učencem
-            y = yTop - 10; const dy = 16;
+            y = yTop - 10;
             if (doBefore) {
                 for (let i = beforeOd; i <= beforeDo; i++) {
                     tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
                     ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                     if (w > xYos - vp_x) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
                     gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
-                    y += dy;
+                    y += cv_lu_itemHeight;
                 }
             }
             //---- izpis imena in priimka selektiranega učenca
             tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // tu vedno izpišem poudarjen priimek in celotno ime
             gText(tmpText, fontListUcenciBold, "darkSlateBlue", vp_x, y);
-            y += dy;
+            y += cv_lu_itemHeight;
             //---- izpis imena in priimka učencev po selektiranem, če je treba
             if (doAfter) {
                 for (let i = afterOd; i <= afterDo; i++) {
@@ -10214,7 +10227,7 @@ function paint_scatterPlotChart_byRazprsenost(
                     ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                     if (w > xYos - vp_x) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
                     gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
-                    y += dy;
+                    y += cv_lu_itemHeight;
                 }
             }
         }
@@ -10331,7 +10344,7 @@ function paint_scatterPlotChart_byRazprsenost(
 
 };
 
-function paint_scatterPlotChart_byListUcenci(
+function paint_listChart_byUcenci(
     vp_x, vp_y, vp_w, vp_h,
     vp_itemId, arrUcenecId) {
 
@@ -10369,10 +10382,15 @@ function paint_scatterPlotChart_byListUcenci(
         lo_testSelected = lo_selectedListUcenec;
         lo_spChartSelectedId = vp_itemId;
     }
-    let listLength = 29; // koliko učencev naj bo v seznamu, ki se izpiše ob selektiranju nekega učenca v scatter plot chartu (dela samo za liha števila !!!)
+
+    //let listLength = 29; // koliko učencev naj bo v seznamu, ki se izpiše ob selektiranju nekega učenca v scatter plot chartu (dela samo za liha števila !!!)
+    //if (listLength >= arrUcenecId.length) { listLength = arrUcenecId.length - 1; };
+    let availableHeight = vp_h + 7; // - marginTop - marginBottom; // 2.5.2026
+    let possibleItemsForAvailableHeight = Math.trunc(availableHeight / cv_lu_itemHeight);
+    let listLength = possibleItemsForAvailableHeight;
     if (listLength >= arrUcenecId.length) { listLength = arrUcenecId.length - 1; };
     let fontListUcenci = "9pt verdana";
-    let fontListUcenciBold = "bold 11pt verdana";
+    let fontListUcenciBold = "bold 12pt verdana";
     //---- kateri je selektiran?
     let doBefore, beforeOd, beforeDo;
     let doAfter, afterOd, afterDo;
@@ -10395,31 +10413,58 @@ function paint_scatterPlotChart_byListUcenci(
                 doAfter = true; afterOd = lo_selectedListUcenec + 1; afterDo = beforeOd + listLength - 1;
                 break;
         }
-        //---- najprej izpišem tiste po vrsti, ki so za izbranim učencem
-        y = yTopText; const dy = 16;
+        //---- IZPIS SEZNAMA UČENCEV
+        y = yTopText;
+        //---- izpis imena in priimka učencev pred selektiranim, če je treba
+        let selUcenecChanged = false;
         if (doBefore) {
             for (let i = beforeOd; i <= beforeDo; i++) {
                 tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
                 ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                 if (w > wAvailableText) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
-                gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
-                y += dy;
+                //if (lo_lu_clickedListY > 0) {
+                //    lo_lu_clickedListY = lo_lu_clickedListY;
+                //    //gText("PPPPPPP", fontListUcenci, "darkSlateGray", vp_x, 5);
+                //}
+                if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight, y)) {
+                    lo_selectedListUcenec = i;
+                    selUcenecChanged = true;
+                    gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
+                } else {
+                    gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                };
+                y += cv_lu_itemHeight;
             }
         }
         //---- izpis imena in priimka selektiranega učenca
         tmpText = ucenecPriimek[arrUcenecId[lo_selectedListUcenec]] + " " + ucenecIme[arrUcenecId[lo_selectedListUcenec]]; // tu vedno izpišem poudarjen priimek in celotno ime
-        gText(tmpText, fontListUcenciBold, "darkSlateBlue", vp_x, y);
-        y += dy;
+        if (selUcenecChanged) {
+            gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+        } else {
+            gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
+        };
+        y += cv_lu_itemHeight;
         //---- izpis imena in priimka učencev po selektiranem, če je treba
         if (doAfter) {
             for (let i = afterOd; i <= afterDo; i++) {
                 tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]]; // najprej poskusim s celotnim priimkom in imenom
                 ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                 if (w > wAvailableText) { tmpText = ucenecPriimek[arrUcenecId[i]] + " " + ucenecIme[arrUcenecId[i]].substring(0, 1) + "."; }; // bilo je predolgo, zato ime skrajšam na inicialko
-                gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
-                y += dy;
+                if (selUcenecChanged) {
+                    gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                } else {
+                    if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight, y)) {
+                        lo_selectedListUcenec = i;
+                        selUcenecChanged = true;
+                        gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
+                    } else {
+                        gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                    };
+                }
+                y += cv_lu_itemHeight;
             }
         }
+        lo_lu_clickedListY = 0;
     }
     
 };
