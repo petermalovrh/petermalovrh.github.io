@@ -6,7 +6,7 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.29"
+const gl_versionNr = "v2.30"
 const gl_versionDate = "3.5.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
@@ -10361,7 +10361,8 @@ function paint_listChart_byUcenci(
     let xLeftText = vp_x + marginH;
     let xRightText = vp_x + vp_w - marginH;
     let xRight = vp_x + vp_w;
-    let wAvailableText = vp_w - 2 * marginH;
+    //let wAvailableText = vp_w - 2 * marginH;
+    let wAvailableText = vp_w - 2 * marginH + 100;
 
     //---- shrani lastnosti digrama za mouseOver() event (22.1.2025)
     luChartX[vp_itemId] = xLeft;
@@ -10433,7 +10434,7 @@ function paint_listChart_byUcenci(
                     gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
                 } else {
                     //---- Če je z miško ravno nad nim, potem mu spredaj narišem marker
-                    if (valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
+                    if (lo_luChartInsideListUcenec && valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
                         ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                         gBannerRect(vp_x - 1, y - 12, w + 3, h + 5, 0, 0, "white", 1, "darkGray", "", 0, 0, false);
                         gText(tmpText, fontListUcenci, "gray", vp_x, y);
@@ -10469,7 +10470,7 @@ function paint_listChart_byUcenci(
                         gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
                     } else {
                         //---- Če je z miško ravno nad nim, potem mu spredaj narišem marker
-                        if (valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
+                        if (lo_luChartInsideListUcenec && valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
                             ;[w, h] = gMeasureText(tmpText, fontListUcenci);
                             gBannerRect(vp_x - 1, y - 12, w + 3, h + 5, 0, 0, "white", 1, "darkGray", "", 0, 0, false);
                             gText(tmpText, fontListUcenci, "gray", vp_x, y);
