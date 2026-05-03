@@ -6,8 +6,8 @@
 
 //------------------------------------
 //---- pričetek razvoja 17.1.2025
-const gl_versionNr = "v2.28"
-const gl_versionDate = "2.5.2026"
+const gl_versionNr = "v2.29"
+const gl_versionDate = "3.5.2026"
 const gl_versionNrDate = gl_versionNr + " " + gl_versionDate
 //------------------------------------
 var gl_appStart = true;      // 19.12.2023
@@ -10426,12 +10426,21 @@ function paint_listChart_byUcenci(
                 //    lo_lu_clickedListY = lo_lu_clickedListY;
                 //    //gText("PPPPPPP", fontListUcenci, "darkSlateGray", vp_x, 5);
                 //}
-                if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight, y)) {
+                //---- Če je kliknil ravno na tega, potem tega selektiram
+                if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight + 1, y)) {
                     lo_selectedListUcenec = i;
                     selUcenecChanged = true;
                     gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
                 } else {
-                    gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                    //---- Če je z miško ravno nad nim, potem mu spredaj narišem marker
+                    if (valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
+                        ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                        gBannerRect(vp_x - 1, y - 12, w + 3, h + 5, 0, 0, "white", 1, "darkGray", "", 0, 0, false);
+                        gText(tmpText, fontListUcenci, "gray", vp_x, y);
+                        gLine(vp_x - 3, y - 10, vp_x - 3, y + 1, 2, "gray", []);
+                    } else {
+                        gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                    }
                 };
                 y += cv_lu_itemHeight;
             }
@@ -10453,12 +10462,21 @@ function paint_listChart_byUcenci(
                 if (selUcenecChanged) {
                     gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
                 } else {
-                    if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight, y)) {
+                    //---- Če je kliknil ravno na tega, potem tega selektiram                    
+                    if (valueBetween(lo_lu_clickedListY, y - cv_lu_itemHeight + 1, y)) {
                         lo_selectedListUcenec = i;
                         selUcenecChanged = true;
                         gText(tmpText, fontListUcenciBold, "purple", vp_x, y); // "navy" "purple" "maroon"
                     } else {
-                        gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                        //---- Če je z miško ravno nad nim, potem mu spredaj narišem marker
+                        if (valueBetween(lo_mouseMoveY, y - cv_lu_itemHeight + 1, y)) {
+                            ;[w, h] = gMeasureText(tmpText, fontListUcenci);
+                            gBannerRect(vp_x - 1, y - 12, w + 3, h + 5, 0, 0, "white", 1, "darkGray", "", 0, 0, false);
+                            gText(tmpText, fontListUcenci, "gray", vp_x, y);
+                            gLine(vp_x - 3, y - 10, vp_x - 3, y + 1, 2, "gray", []);
+                        } else {
+                            gText(tmpText, fontListUcenci, "darkSlateGray", vp_x, y);
+                        }
                     };
                 }
                 y += cv_lu_itemHeight;
